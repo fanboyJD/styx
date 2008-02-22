@@ -1,31 +1,48 @@
 <?php
 class Cache {
-	public static $_PREFIX = 'framework_', //only for eaccelerator to have two versions parallel (dev and online)
-		$eAccelerator = false;
-	private static $instance,
+	private $prefix = 'framework_',
+		$root = './Cache/',
 		$cache = array();
 	
-	private function __construct(){
-		if(function_exists('eaccelerator_get'))
-			self::$eAccelerator = true;
+	private static $instance,
+		$engine = false;
+	
+	private function __construct($options = array()){
+		if((!$options['engine'] || $options['engine']=='eaccelerator') && function_exists('eaccelerator_get'))
+			self::$engine = array(
+				'type' => 'eaccelerator',
+			);
+		
+		if($options['prefix'])
+			$this->prefix = $options['prefix'];
+		
+		if($options['root'])
+			$this->root = realpath($options['root']);
+		else
+			$this->root = Env::retrieve('basePath').$this->root;
 	}
+	
 	private function __clone(){}
 	
-	public static function getInstance(){
+	public static function getInstance($options = null){
 		if(!self::$instance)
-			self::$instance = new Cache();
+			self::$instance = new Cache($options);
 		
 		return self::$instance;
 	}
 	
+	public function matchEngine($match){
+		return self::$engine['type']==$match;
+	}
+	
 	public function retrieve($key, $id, $expire = null){
-		if(self::$cache[$key.'/'.$id])
-			return self::$cache[$key.'/'.$id];
+		if($this->cache[$key.'/'.$id])
+			return $this->cache[$key.'/'.$id];
 		
-		if(self::$eAccelerator && $expire!=-1){
-			$content = eaccelerator_get(self::$_PREFIX.$key.'/'.$id);
+		if(self::matchEngine('eaccelerator') && $expire!=-1){
+			$content = eaccelerator_get($this->prefix.$key.'/'.$id);
 		}else{
-			$file = config::$_CACHEDIR.$key.'/'.$id.'.txt';
+			$file = $this->root.$this->prefix.'/'.$key.'/'.$id.'.txt';
 			if(!file_exists($file)) return null;
 			
 			$content = explode('|', file_get_contents($file), 2);
@@ -33,40 +50,49 @@ class Cache {
 			if($content[0]<time() && $content[0]!=-1) return null;
 		}
 		
-		self::$cache[$key.'/'.$id] = json_decode($content, true);
-		return self::$cache[$key.'/'.$id];
+		$this->cache[$key.'/'.$id] = json_decode($content, true);
+		return $this->cache[$key.'/'.$id];
 	}
 	
 	public function store($key, $id, $content, $expire = 3600){
 		if(!$content) return;
-		self::$cache[$key.'/'.$id] = $content = Util::cleanWhitespaces($content);
+		$this->cache[$key.'/'.$id] = $content = Util::cleanWhitespaces($content);
 		$content = json_encode($content);
-		if(self::$eAccelerator && $expire!=-1){
-			eaccelerator_put(self::$_PREFIX.$key.'/'.$id, $content, $expire);
+		if(self::matchEngine('eaccelerator') && $expire!=-1){
+			eaccelerator_put($this->prefix.$key.'/'.$id, $content, $expire);
 		}else{
-			$file = config::$_CACHEDIR.$key.'/'.$id.'.txt';
+			$file = $this->root.$this->prefix.'/'.$key.'/'.$id.'.txt';
 			if(!file_exists($file)){
-				touch($file); 
-				chmod($file, 0777);
+				try{
+					$dir = dirname($file);
+					if(!is_dir($dir)){
+						if(!is_dir($this->root.$this->prefix))
+							mkdir($this->root.$this->prefix, 0777);
+						
+						mkdir(dirname($file), 0777);
+					}
+					touch($file); 
+					chmod($file, 0777);
+				}catch(Exception $e){}
 			}
 			file_put_contents($file, ($expire==-1 ? -1 : time()+$expire).'|'.$content);
 		}
 	}
 	
 	public function erase($key, $id, $expire = null){
-		if(self::$eAccelerator && !$expire){
+		if(self::matchEngine('eaccelerator') && !$expire){
 			$this->removeCache($key.'/'.$id);
 		}else{
-			unset(self::$cache[$key.'/'.$id]);
+			unset($this->cache[$key.'/'.$id]);
 			$this->removeFileCache($key.'/'.$id.'.txt', $expire);
 		}
 	}
 	
 	public function eraseByStart($key, $id){
-		if(self::$eAccelerator){
+		if(self::matchEngine('eaccelerator')){
 			$keys = eaccelerator_list_keys();
 			foreach($keys as $val)
-				if(Util::startsWith($val['name'], ':'.self::$_PREFIX.$key.'/'.$id))
+				if(Util::startsWith($val['name'], ':'.$this->prefix.$key.'/'.$id))
 					$this->removeCache($key.'/'.substr($val['name'], strrpos($val['name'], '/')+1));
 		}else{
 			$this->removeFileCache($key.'/'.$id.'*.txt');
@@ -74,37 +100,37 @@ class Cache {
 	}
 	
 	public function eraseAll(){
-		if(self::$eAccelerator){
+		if(self::matchEngine('eaccelerator')){
 			$keys = eaccelerator_list_keys();
 			foreach($keys as $val)
-				if(Util::startsWith($val['name'], ':'.self::$_PREFIX))
-					$this->removeCache(substr($val['name'], strrpos($val['name'], self::$_PREFIX)+strlen(self::$_PREFIX)));
+				if(Util::startsWith($val['name'], ':'.$this->prefix))
+					$this->removeCache(substr($val['name'], strrpos($val['name'], $this->prefix)+strlen($this->prefix)));
 		}else{
 			$this->removeFileCache('*/*.txt');
 		}
 	}
 	
 	private function removeCache($cache){
-		unset(self::$cache[$cache]);
-		$cache = self::$_PREFIX.$cache;
+		unset($this->cache[$cache]);
+		$cache = $this->prefix.$cache;
 		eaccelerator_lock($cache);
 		eaccelerator_rm($cache);
 		eaccelerator_unlock($cache);
 	}
 	
 	private function removeFileCache($key, $force = false){
-		$files = glob(config::$_CACHEDIR.$key);
+		$files = glob($this->root.$this->prefix.'/'.$key);
 		if(!is_array($files))
 			return;
 		
-		$error_reporting = ini_set('error_reporting', 0);
-		foreach($files as $file){
-			$content = explode('|', file_get_contents($file), 2);
-			if($content[0]==-1 && $force!='force')
-				continue;
-			unlink($file);
-		}
-		ini_set('error_reporting', $error_reporting);
+		try{
+			foreach($files as $file){
+				$content = explode('|', file_get_contents($file), 2);
+				if($content[0]==-1 && $force!='force')
+					continue;
+				unlink($file);
+			}
+		}catch(Exception $e){}
 	}
 }
 ?>

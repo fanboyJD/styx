@@ -1,8 +1,9 @@
 <?php
+define('ONE_DAY', 86400);
+define('ONE_WEEK', 604800);
+	
+//Here's the basic configuration
 Env::store(array(
-	'Connection' => array(
-		'host' => 'localhost',
-		
-	),
+	'debugMode' => true,
 ));
 ?>

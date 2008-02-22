@@ -1,0 +1,12 @@
+The following configuration keys exist:
+
+appPath - (string) The path of the application [user not allowed to set it]
+basePath - (string) The path of the framework [user not allowed to set it]
+
+debugMode - (boolean) Whether the debug mode should be activated or not
+appName - (string) The Name of the application
+
+cacheOptions - (array) The user is able to set custom options for the cache
+	engine - (string) The engine to be used (default: eaccelerator). Currently only eaccelerator is available
+	prefix - (string) The engine's prefix to be used (for running more than one application)
+	root - (string) Path to the cache directory for file-based cache

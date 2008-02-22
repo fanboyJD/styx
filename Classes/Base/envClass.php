@@ -3,10 +3,14 @@ class Env {
 	private static $Initialized = false,
 		$Configuration = array();
 	
-	public static function initialize(){
+	public static function initialize($basePath = null){
 		if(self::$Initialized) return;
+		
+		if($basePath) self::store('basePath', $basePath);
+		
 		/* @var $c Cache */
-		$c = Cache::getInstance();
+		$c = Cache::getInstance(self::retrieve('cacheOptions', array()));
+		
 		$Classes = $c->retrieve('Env', 'Classes');
 		if(!$Classes){
 			$files = glob('./Classes/*/*.php');
