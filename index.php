@@ -30,7 +30,4 @@
 		
 		return true;
 	}
-	
-	print_r(Env::retrieve('Classes'));
-	Cache::getInstance()->eraseAll();
 ?>

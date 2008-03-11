@@ -14,7 +14,7 @@ class Env {
 		
 		$Classes = $c->retrieve('Env', 'Classes');
 		if(!$Classes){
-			$files = glob('./Classes/*/*.php');
+			$files = glob($basePath.'/Classes/*/*.php');
 			if(is_array($files))
 				foreach($files as $file)
 					$Classes[basename($file, '.php')] = $file;

@@ -4,6 +4,6 @@
 	$_CONFIGURATION['appPath'] = realpath('./');
 	
 	chdir(realpath($_CONFIGURATION['path']));
-	
+
 	include('./index.php');
 ?>
