@@ -2,6 +2,6 @@
 	$_CONFIGURATION = array(
 		'appName' => 'My Sample Application',
 		
-		'path' => '../../',
+		'path' => '../../Source/',
 	);
 ?>
