@@ -2,15 +2,15 @@
 define('ONE_DAY', 86400);
 define('ONE_WEEK', 604800);
 
-Env::registerClasses('element', array(
+Core::registerClasses('element', array(
 	'elements', 'input', 'button', 'field', 'radio', 'textarea', 'checkbox', 'select'
 ));
-Env::registerClasses('validator', array(
+Core::registerClasses('validator', array(
 	'parser', 'formatter',
 ));
 
 //Here's the basic configuration
-Env::store(array(
+Core::store(array(
 	'debugMode' => true,
 ));
 ?>

@@ -1,33 +1,18 @@
 <?php
-	require_once('./Classes/Base/envClass.php');
-	require_once('./Classes/Base/cacheClass.php');
-	require_once('./Classes/Base/utilClass.php');
+	require_once('./Classes/Core/coreClass.php');
+	Core::loadClass('Base', 'Cache');
+	Core::loadClass('Base', 'Util');
 	
 	require_once('./Config/Configuration.php');
 	
 	if(is_array($_CONFIGURATION)){
-		Env::store($_CONFIGURATION);
+		Core::store($_CONFIGURATION);
 		unset($_CONFIGURATION);
 	}
 	
-	Env::initialize(realpath('./'));
-	
-	function class_file_exists($class){
-		$class = strtolower($class);
-		
-		$Classes = Env::retrieve('Classes');
-		if(class_exists($class) || $Classes[$class.'Class'])
-			return $Classes[$class.'Class'];
-		
-		return false;
-	}
+	Core::initialize(realpath('./'));
 	
 	function __autoload($class){
-		$file = class_file_exists($class);
-		
-		if($file && !class_exists($class))
-			require_once($file);
-		
-		return true;
+		Core::autoloadClass($class);
 	}
 ?>

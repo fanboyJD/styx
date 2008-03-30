@@ -1,8 +1,47 @@
 <?php
-class Env {
+class Core {
 	private static $Initialized = false,
 		$Configuration = array(),
 		$onInitialize = array();
+	
+	public static function classFileExists($class){
+		$class = strtolower($class);
+		
+		$Classes = self::retrieve('Classes');
+		if(class_exists($class) || $Classes[$class])
+			return $Classes[$class];
+		
+		return false;
+	}
+	
+	public static function autoloadClass($class){
+		$file = self::classFileExists($class);
+		
+		if($file && !class_exists($class))
+			require_once($file);
+		
+		return true;
+	}
+	
+	/**
+	 * This method loads the given class and only returns false, when the given
+	 * classfile does not exist.
+	 *
+	 * @param string $dir
+	 * @param string $class
+	 * @return bool
+	 */
+	public static function loadClass($dir, $class){
+		$file = self::retrieve('basePath').'Classes/'.$dir.'/'.strtolower($class).'Class.php';
+		
+		if(!file_exists($file))
+			return false;
+		
+		if(!class_exists($class))
+			require_once($file);
+		
+		return true;
+	}
 	
 	public static function initialize($basePath = null){
 		if(self::$Initialized) return;
@@ -12,20 +51,21 @@ class Env {
 		/* @var $c Cache */
 		$c = Cache::getInstance(self::retrieve('cacheOptions', array()));
 		
-		$Classes = $c->retrieve('Env', 'Classes');
+		$Classes = $c->retrieve('Core', 'Classes');
 		if(!$Classes){
 			$files = glob($basePath.'/Classes/*/*.php');
 			if(is_array($files))
 				foreach($files as $file)
-					$Classes[basename($file, '.php')] = $file;
+					$Classes[substr(basename($file, '.php'), 0, -5)] = $file;
 			
-			if($Classes) $c->store('Env', 'Classes', $Classes);
+			if($Classes) $c->store('Core', 'Classes', $Classes);
 		}
 		self::store('Classes', $Classes);
+		
 		self::$Initialized = true;
 		foreach(self::$onInitialize as $value)
 			foreach($value as $key =>$val)
-				call_user_func_array(array('Env', $key), $val);
+				call_user_func_array(array('Core', $key), $val);
 	}
 	
 	public static function store($key, $value = null){
@@ -60,11 +100,11 @@ class Env {
 			return;
 		}
 		
-		$Classes = Env::retrieve('Classes');
+		$Classes = self::retrieve('Classes');
 		foreach($classes as $val)
-			$Classes[$val.'Class'] = $Classes[$base.'Class'];
+			$Classes[$val] = $Classes[$base];
 		
-		Env::store('Classes', $Classes);
+		self::store('Classes', $Classes);
 	}
 }
 ?>

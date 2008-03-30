@@ -19,19 +19,15 @@ class Cache {
 		if($options['prefix'])
 			$this->prefix = $options['prefix'];
 		
-		$basePath = Env::retrieve('basePath');
 		if($options['root'])
 			$this->root = realpath($options['root']);
 		else
-			$this->root = $basePath.$this->root;
+			$this->root = Core::retrieve('basePath').$this->root;
 		
-		$engineClass = $basePath.'/Classes/Cache/'.$this->engine['type'].'Class.php';
-		if($this->engine['type'] && file_exists($engineClass)){
-			require_once($engineClass);
+		if($this->engine['type'] && Core::loadClass('Cache', $this->engine['type']))
 			$this->engineInstance = new $this->engine['type']($this->prefix, $this->root);
-		}
 		
-		require_once($basePath.'/Classes/Cache/filecacheClass.php');
+		Core::loadClass('Cache', 'filecache');
 		$this->filecacheInstance = new filecache($this->prefix, $this->root);
 	}
 	

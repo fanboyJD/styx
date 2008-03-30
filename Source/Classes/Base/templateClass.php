@@ -10,8 +10,8 @@ class Template {
 	private function __construct(){
 		$root = $this->root;
 		
-		$this->root = realpath(Env::retrieve('basePath').$root);
-		$this->appRoot = realpath(Env::retrieve('appPath').$root);
+		$this->root = realpath(Core::retrieve('basePath').$root);
+		$this->appRoot = realpath(Core::retrieve('appPath').$root);
 		
 		$this->tpl['global'] = array();
 	}
@@ -42,7 +42,7 @@ class Template {
 		/* @var $c cache */
 		$c = Cache::getInstance();
 		
-		if(!Env::retrieve('debugMode'))
+		if(!Core::retrieve('debugMode'))
 			$content = $c->retrieve('Templates', $file);
 		
 		if(!$content){
