@@ -76,7 +76,7 @@ class Cache {
 	public function erase($key, $id, $force = false){
 		unset($this->cache[$key.'/'.$id]);
 		
-		if($this->engineInstance && !$force)
+		if($this->engineInstance)
 			$this->engineInstance->erase($key.'/'.$id);
 		
 		if($force || !$this->engineInstance)
