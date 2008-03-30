@@ -22,7 +22,7 @@ class Cache {
 		if($options['root'])
 			$this->root = realpath($options['root']);
 		else
-			$this->root = Core::retrieve('basePath').$this->root;
+			$this->root = Core::retrieve('path').$this->root;
 		
 		if($this->engine['type'] && Core::loadClass('Cache', $this->engine['type']))
 			$this->engineInstance = new $this->engine['type']($this->prefix, $this->root);

@@ -1,54 +1,45 @@
 <?php
 class Template {
-	public $root = 'Templates/',
-		$appRoot = null,
-		$tpl = array(),
-		$tmp = null;
+	private $assigned = array(),
+		$dir = null,
+		$file = null;
 	
-	private static $instance;
+	private static $paths = null;
 	
-	private function __construct(){
-		$root = $this->root;
-		
-		$this->root = realpath(Core::retrieve('basePath').$root);
-		$this->appRoot = realpath(Core::retrieve('appPath').$root);
-		
-		$this->tpl['global'] = array();
-	}
-	
+	private function __construct(){}
 	private function __clone(){}
 	
-	public static function getInstance($file = null){
-		if(!self::$instance)
-			self::$instance = new template();
+	public static function map($dir, $file){
+		if(!self::$paths)
+			self::$paths = array(
+				'root' => realpath(Core::retrieve('path').'Templates/'),
+				'appRoot' => realpath(Core::retrieve('appPath').'Templates/'),
+			);
 		
-		if($file)
-			self::$instance->setFile($file);
+		$t = new Template();
 		
-		return self::$instance;
+		return $t->setFile($dir, $file);
 	}
 	
-	private function flush($file){
-		unset($this->tpl[$file]);
-		$this->tmp = null;
-	}
-	
-	public function setFile($file){
-		$this->tmp = $file;
+	public function setFile($dir, $file){
+		$this->dir = $dir;
+		$this->file = $file;
 		return $this;
 	}
 	
-	private function getFile($file){
+	private function getFile(){
 		/* @var $c cache */
 		$c = Cache::getInstance();
+		
+		$file = $this->dir.'/'.$this->file.'.tpl';
 		
 		if(!Core::retrieve('debugMode'))
 			$content = $c->retrieve('Templates', $file);
 		
 		if(!$content){
-			$loadFile = $this->appRoot.$file.'.tpl';
+			$loadFile = self::$paths['appRoot'].$file;
 			if(!file_exists($loadFile))
-				$loadFile = $this->root.$file.'.tpl';
+				$loadFile = self::$paths['root'].$file;
 			
 			$content = file_get_contents($loadFile);
 			$c->store('Templates', $file, $content, ONE_WEEK);
@@ -57,26 +48,22 @@ class Template {
 	}
 	
 	public function parse($return = false){
-		if(!$this->tmp)
-			return;
+		$out = $this->getFile();
 		
-		$assigned = $this->tpl[$this->tmp] ? array_merge($this->tpl[$this->tmp], $this->tpl['global']) : $this->tpl['global'];
+		$this->assigned = Util::multiImplode($this->assigned);
 		
-		$out = $this->getFile($this->tmp);
+		preg_match_all('/\\${([A-z0-9\-_\.]+?)\}/i', $out, $vars);
 		
-		preg_match_all('/\{([A-z0-9\-_]+?)\}/i', $out, $vars);
 		$rep = array(
 			array_values($vars[0]),
 		);
 		foreach($vars[1] as $val)
-			$rep[1][] = $this->tpl[$this->tmp][$val];
+			$rep[1][] = $this->assigned[$val];
 		
 		$rep[0][] = "\t";
 		$rep[1][] = "";
 		
 		$out = str_replace($rep[0], $rep[1], $out);
-		
-		$this->flush($this->tmp);
 		
 		if($return)
 			return $out;
@@ -85,15 +72,8 @@ class Template {
 		flush();
 	}
 	
-	public function assign($array, $file = null){
-		if(!is_array($array))
-			return $this;
-		
-		if($this->tmp && $file!='global')
-			$file = $this->tmp;
-		
-		$this->tpl[$file] = $this->tpl[$file] ? array_merge($this->tpl[$file], $array) : $array;
-		
+	public function assign($array){
+		$this->assigned = is_array($array) ? array_merge($this->assigned, $array) : $this->assigned;
 		return $this;
 	}
 }

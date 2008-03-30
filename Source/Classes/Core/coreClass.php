@@ -32,8 +32,7 @@ class Core {
 	 * @return bool
 	 */
 	public static function loadClass($dir, $class){
-		$file = self::retrieve('basePath').'Classes/'.$dir.'/'.strtolower($class).'Class.php';
-		
+		$file = self::retrieve('path').'Classes/'.$dir.'/'.strtolower($class).'Class.php';
 		if(!file_exists($file))
 			return false;
 		
@@ -43,17 +42,15 @@ class Core {
 		return true;
 	}
 	
-	public static function initialize($basePath = null){
+	public static function initialize(){
 		if(self::$Initialized) return;
-		
-		if($basePath) self::store('basePath', $basePath);
 		
 		/* @var $c Cache */
 		$c = Cache::getInstance(self::retrieve('cacheOptions', array()));
 		
 		$Classes = $c->retrieve('Core', 'Classes');
 		if(!$Classes){
-			$files = glob($basePath.'/Classes/*/*.php');
+			$files = glob(self::retrieve('path').'/Classes/*/*.php');
 			if(is_array($files))
 				foreach($files as $file)
 					$Classes[substr(basename($file, '.php'), 0, -5)] = $file;

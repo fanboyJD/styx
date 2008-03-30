@@ -6,9 +6,11 @@ class Util {
 	public static function endsWith($string, $look){
 		return strrpos($string, $look)===strlen($string)-strlen($look);
 	}
+	
 	public static function startsWith($string, $look){
 		return strpos($string, $look)===0;
 	}
+	
 	public static function cleanWhitespaces($array, $whitespaces = false){
 		if(is_array($array)){
 			foreach($array as $key => $val){
@@ -25,6 +27,19 @@ class Util {
 		
 		return $array;
 	}
+	
+	public static function multiImplode($array, $k = null){
+		$imploded = array();
+		foreach($array as $key => $val){
+			if(is_array($val)){
+				$val = self::multiImplode($val, ($k ? $k.'.' : '').$key);
+				$imploded = array_merge($imploded, $val[0]);
+			}else
+				$imploded[($k ? $k.'.' : '').$key] = $val;
+		}
+		return $k===null ? $imploded : array($imploded, $key);
+	}
+	
 	/*public static function sendMail($options = array(
 		'title' => '',
 		'tpl' => '',
@@ -56,6 +71,7 @@ class Util {
 		ini_set('error_reporting', $error_reporting);
 		return $return;
 	}
+	
 	public static function pagination($start, $count, $per, $link, $options = array(
 		'limit' => false,
 	)){
@@ -86,13 +102,14 @@ class Util {
 				'.lang::$global['page'].' <span class="slide b">'.(floor($start/$per)+1).'</span> '.lang::$global['of'].' '.ceil($count/$per).'
 			</div>';
 	}*/
+	
 	public static function getTitle($title, $options = array(
 		'editId' => null,
 		'contents' => null,
 	)){
 		if(!self::$regex)
 			self::$regex = array(
-				explode(' ', 'Æ æ Œ œ ß Ü ü Ö ö Ä ä À Á Â Ã Ä Å &#260; &#258; Ç &#262; &#268; &#270; &#272; Ð È É Ê Ë &#280; &#282; &#286; Ì Í Î Ï &#304; &#321; &#317; &#313; Ñ &#323; &#327; Ò Ó Ô Õ Ö Ø &#336; &#340; &#344; Š &#346; &#350; &#356; &#354; Ù Ú Û Ü &#366; &#368; Ý Ž &#377; &#379; à á â ã ä å &#261; &#259; ç &#263; &#269; &#271; &#273; è é ê ë &#281; &#283; &#287; ì í î ï &#305; &#322; &#318; &#314; ñ &#324; &#328; ð ò ó ô õ ö ø &#337; &#341; &#345; &#347; š &#351; &#357; &#355; ù ú û ü &#367; &#369; ý ÿ ž &#378; &#380;'),
+				explode(' ', 'ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ &#260; &#258; ï¿½ &#262; &#268; &#270; &#272; ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ &#280; &#282; &#286; ï¿½ ï¿½ ï¿½ ï¿½ &#304; &#321; &#317; &#313; ï¿½ &#323; &#327; ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ &#336; &#340; &#344; ï¿½ &#346; &#350; &#356; &#354; ï¿½ ï¿½ ï¿½ ï¿½ &#366; &#368; ï¿½ ï¿½ &#377; &#379; ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ &#261; &#259; ï¿½ &#263; &#269; &#271; &#273; ï¿½ ï¿½ ï¿½ ï¿½ &#281; &#283; &#287; ï¿½ ï¿½ ï¿½ ï¿½ &#305; &#322; &#318; &#314; ï¿½ &#324; &#328; ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ ï¿½ &#337; &#341; &#345; &#347; ï¿½ &#351; &#357; &#355; ï¿½ ï¿½ ï¿½ ï¿½ &#367; &#369; ï¿½ ï¿½ ï¿½ &#378; &#380;'),
 				explode(' ', 'Ae ae Oe oe ss Ue ue Oe oe Ae ae A A A A A A A A C C C D D D E E E E E E G I I I I I L L L N N N O O O O O O O R R S S S T T U U U U U U Y Z Z Z a a a a a a a a c c c d d e e e e e e g i i i i i l l l n n n o o o o o o o o r r s s s t t u u u u u u y y z z z'),
 			);
 		
@@ -105,6 +122,7 @@ class Util {
 		
 		return $title;
 	}
+	
 	public static function checkTitle($title, $i, $options = array(
 		'contents' => null,
 		'editId' => null,
