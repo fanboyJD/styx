@@ -63,6 +63,8 @@ class Core {
 		foreach(self::$onInitialize as $value)
 			foreach($value as $key =>$val)
 				call_user_func_array(array('Core', $key), $val);
+		
+		self::pollute();
 	}
 	
 	public static function store($key, $value = null){
@@ -102,6 +104,24 @@ class Core {
 			$Classes[$val] = $Classes[$base];
 		
 		self::store('Classes', $Classes);
+	}
+	
+	public static function pollute(){
+		$polluted = array();
+		$vars = explode('/', $_SERVER['PATH_INFO']);
+		
+		foreach($vars as $v){
+			$v = Util::cleanWhitespaces($v);
+			if(!$v) continue;
+			
+			$v = explode(':', $v, 2);
+			if($polluted['p'][$v[0]]) continue;
+			
+			$polluted['p'][$v[0]] = $v[1] ? $v[1] : $v[0];
+			$polluted['n'][] = $v[0];
+		}
+		
+		$_GET = array_merge($_GET, $polluted);
 	}
 }
 ?>

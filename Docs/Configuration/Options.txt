@@ -1,7 +1,7 @@
 The following configuration keys exist:
 
 appPath - (string) The path of the application [user not allowed to set it]
-basePath - (string) The path of the framework [user not allowed to set it]
+path - (string) The path of the framework [user not allowed to set it]
 
 debugMode - (boolean) Whether the debug mode should be activated or not
 appName - (string) The Name of the application
