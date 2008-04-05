@@ -1,19 +1,17 @@
 <?php
-class form extends element {
-	private $elements = array();
-	public function __construct(){
-		$this->elements = func_get_args();
-		if(is_array($this->elements[0]))
-			$options = array_shift($this->elements);
-		$this->collector = new elements($this->elements);
-		parent::__construct($options, 'form');
+class Form extends Elements {
+	
+	/*public function __construct(){
+		parent::__construct(func_get_args());
+	}*/
+	
+	public function format($tpl = null, $vars = array()){
+		$this->html = parent::format($tpl, $vars);
+		
+		return '<div '.self::implode($this->options, 'skipName').'>'.$this->html.'</div>';
 	}
-	public function get($tpl = null, $vars = array()){
-		$this->html = $this->collector->get($tpl, $vars);
-		$options = $this->options;
-		unset($options['name']);
-		return '<div '.self::implode($options).'>'.$this->html.'</div>';
-	}
+	
+	//this method needs to be redone!
 	public function getFields($options = array(
 		'all' => false,
 		'detail' => true,
@@ -22,7 +20,7 @@ class form extends element {
 	)){
 		$els = array();
 		foreach($this->elements as $el){
-			if(in_array($el->type, array('button', 'string')) || (!$options['all'] && !in_array($el->type, array('input', 'checkbox', 'radio', 'select', 'textarea'))))
+			if(in_array($el->type, array('button', 'string')) || (!$options['all'] && !in_array($el->type, self::$formElements)))
 				continue;
 			if(!$options['detail'] && !$options['js'] && $el->options['detail'])
 				continue;
@@ -50,6 +48,7 @@ class form extends element {
 		}
 		return $els;
 	}
+	
 	public function getEvents($helper){
 		$els = array();
 		foreach($this->elements as $el)
@@ -57,75 +56,69 @@ class form extends element {
 		
 		return implode($els);
 	}
+	
 	public function setValue($data){
 		foreach($this->elements as $el)
 			if($data[$el->options['name']])
 				$el->setValue($data[$el->options['name']]);
 	}
+	
 	public function prepareElementData($val, $el){
 		if($el->type=='field')
 			$val = $el->options['value'];
-		if($el->options['length'][1])
-			$val = substr($val, 0, $el->options['length'][1]);
-		if($el->options['validate'])
-			$val = parser::call($el->options['validate'], $val);
-		return db::add(util::cleanWhitespaces($val));
+		
+		if($el->options[':length'][1])
+			$val = substr($val, 0, $el->options[':length'][1]);
+		
+		if($el->options[':validate'])
+			$val = parser::call($el->options[':validate'], $val);
+		
+		return db::add(Util::cleanWhitespaces($val));
 	}
-	public function prepareDatabaseData($data){
+	
+	public function prepareData($data, $alias = false){
 		$els = array();
+		
 		foreach($this->elements as $el){
-			if(in_array($el->type, array('button', 'string')) || !$el->options['name'] || $el->options['alias'] || $el->options['readOnly'])
-				continue;
-			$val = $this->prepareElementData($data[$el->options['name']], $el);
-			if($val!==false)
-				$els[$el->options['name']] = $val;
-		}
-		return $els;
-	}
-	public function prepareAliasData($data){
-		$els = array();
-		foreach($this->elements as $el){
-			if(!$el->options['alias'] || in_array($el->type, array('button', 'string')))
+			if(in_array($el->type, array('button', 'string')) || (!$alias && ($el->options[':alias'] || $el->options[':readOnly'])) || ($alias && !$this->options[':alias']))
 				continue;
 			
 			$val = $this->prepareElementData($data[$el->options['name']], $el);
+			
 			if($val!==false)
 				$els[$el->options['name']] = $val;
 		}
+		
 		return $els;
 	}
+	
 	public function validate($data){
 		$return = true;
+		
 		foreach($this->elements as $el){
-			if(!in_array($el->type, array('input', 'checkbox', 'radio', 'select', 'textarea')) || !$el->options['validate'])
+			if(!in_array($el->type, self::$formElements) || !$el->options[':validate'])
 				continue;
 			
-			$data[$el->options['name']] = util::cleanWhitespaces($data[$el->options['name']]);
-			if(!$el->options['empty'] && !$data[$el->options['name']] && $el->options['validate'][0]!='bool'){
+			$data = Util::cleanWhitespaces($data[$el->options['name']]);
+			if(!$el->options[':empty'] && $el->options[':validate'][0]!='bool' && !$data){
 				$return = 'notempty';
 				break;
 			}
-			if(($el->options['validate'][0]=='bool' || $el->options['empty']) && !$data[$el->options['name']])
+			
+			if(($el->options[':empty'] || $el->options[':validate'][0]=='bool') && !$data){
 				$v = true;
-			else
-				$v = validator::call($el->options['validate'], $data[$el->options['name']]);
+			}else{
+				$v = Validator::call($el->options[':validate'], $data);
+				if($this->options[':length'] && $v===true && (strlen($data)<$this->options[':length'][0] || strlen($data)>$this->options[':length'][1]))
+					$v = false;
+			}
 			if($v!==true){
 				$return = $v;
 				break;
 			}
 		}
+		
 		return $return;
-	}
-	public function addElement($el){
-		$this->collector->addElement($el);
-		array_push($this->elements, $el);
-		return $el;
-	}
-	public function allowHTML(){
-		foreach($this->elements as $key => $el){
-			if(is_array($el->options['validate']) && $el->options['validate'][0]=='specialchars')
-				$this->elements[$key]->options['validate'] = null;
-		}
 	}
 }
 ?>

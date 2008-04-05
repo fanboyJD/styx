@@ -9,19 +9,7 @@ class Template {
 	private function __construct(){}
 	private function __clone(){}
 	
-	public static function map($dir, $file){
-		if(!self::$paths)
-			self::$paths = array(
-				'root' => realpath(Core::retrieve('path').'Templates/'),
-				'appRoot' => realpath(Core::retrieve('appPath').'Templates/'),
-			);
-		
-		$t = new Template();
-		
-		return $t->setFile($dir, $file);
-	}
-	
-	public function setFile($dir, $file){
+	private function setFile($dir, $file){
 		$this->dir = $dir;
 		$this->file = $file;
 		return $this;
@@ -47,6 +35,23 @@ class Template {
 		return $content;
 	}
 	
+	public static function map($dir, $file){
+		if(!self::$paths)
+			self::$paths = array(
+				'root' => realpath(Core::retrieve('path').'Templates/'),
+				'appRoot' => realpath(Core::retrieve('appPath').'Templates/'),
+			);
+		
+		$t = new Template();
+		
+		return $t->setFile($dir, $file);
+	}
+	
+	public function assign($array){
+		$this->assigned = is_array($array) ? array_merge($this->assigned, $array) : $this->assigned;
+		return $this;
+	}
+	
 	public function parse($return = false){
 		$out = $this->getFile();
 		
@@ -70,11 +75,6 @@ class Template {
 		
 		echo $out;
 		flush();
-	}
-	
-	public function assign($array){
-		$this->assigned = is_array($array) ? array_merge($this->assigned, $array) : $this->assigned;
-		return $this;
 	}
 }
 ?>

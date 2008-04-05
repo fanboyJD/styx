@@ -1,5 +1,5 @@
 <?php
-	chdir('..');
+	chdir('../Public');
 	include('index.php');
 	
 	function is($a, $b = null){
