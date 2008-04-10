@@ -40,6 +40,16 @@ class Util {
 		return $k===null ? $imploded : array($imploded, $key);
 	}
 	
+	public static function extend($src, $extended){
+		if(!is_array($extended))
+			return $src;
+		
+		foreach($extended as $key => $val)
+			$src[$key] = is_array($val) ? self::extend($src[$key], $val) : $val;
+		
+		return $src;
+	}
+	
 	/*public static function sendMail($options = array(
 		'title' => '',
 		'tpl' => '',

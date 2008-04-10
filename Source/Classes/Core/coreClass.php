@@ -8,10 +8,8 @@ class Core {
 		$class = strtolower($class);
 		
 		$Classes = self::retrieve('Classes');
-		if(class_exists($class) || $Classes[$class])
-			return $Classes[$class];
-		
-		return false;
+
+		return class_exists($class) || $Classes[$class] ? $Classes[$class] : false;
 	}
 	
 	public static function autoloadClass($class){
@@ -32,7 +30,7 @@ class Core {
 	 * @return bool
 	 */
 	public static function loadClass($dir, $class){
-		$file = self::retrieve('path').'Classes/'.$dir.'/'.strtolower($class).'Class.php';
+		$file = self::retrieve('path').'Classes/'.$dir.'/'.strtolower($class).'.php';
 		if(!file_exists($file))
 			return false;
 		
@@ -48,16 +46,20 @@ class Core {
 		/* @var $c Cache */
 		$c = Cache::getInstance(self::retrieve('cacheOptions', array()));
 		
-		$Classes = $c->retrieve('Core', 'Classes');
-		if(!$Classes){
-			$files = glob(self::retrieve('path').'/Classes/*/*.php');
-			if(is_array($files))
-				foreach($files as $file)
-					$Classes[substr(basename($file, '.php'), 0, -5)] = $file;
-			
-			if($Classes) $c->store('Core', 'Classes', $Classes);
+		foreach(array(
+			'Classes' => glob(self::retrieve('path').'/Classes/*/*.php'),
+			'Layers' => glob(self::retrieve('appPath').'/Layers/*.php'),
+		) as $key => $files){
+			$List = $c->retrieve('Core', $key);
+			if(!$List){
+				if(is_array($files))
+					foreach($files as $file)
+						$List[basename($file, '.php')] = $file;
+				
+				if($List) $c->store('Core', $key, $List);
+			}
+			self::store($key, $List);
 		}
-		self::store('Classes', $Classes);
 		
 		self::$Initialized = true;
 		foreach(self::$onInitialize as $value)
@@ -120,6 +122,10 @@ class Core {
 			$polluted['p'][$v[0]] = $v[1] ? $v[1] : $v[0];
 			$polluted['n'][] = $v[0];
 		}
+		
+		foreach(array('index', 'default') as $k => $v)
+			if(!$polluted['n'][$k])
+				$polluted['p'][$v] = $polluted['n'][$k] = $v;
 		
 		$_GET = array_merge($_GET, $polluted);
 	}
