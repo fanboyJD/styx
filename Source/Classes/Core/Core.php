@@ -4,21 +4,25 @@ class Core {
 		$Configuration = array(),
 		$onInitialize = array();
 	
-	public static function classFileExists($class){
-		$class = strtolower($class);
+	public static function classFileExists($class, $toLoad = null){
+		$toLoad = in_array($toLoad, array('Classes', 'Layers')) ? $toLoad : 'Classes';
 		
-		$Classes = self::retrieve('Classes');
-
-		return class_exists($class) || $Classes[$class] ? $Classes[$class] : false;
+		$class = ucfirst(strtolower($class));
+		if($toLoad=='Layers')
+			$class .= 'Layer';
+		
+		$List = self::retrieve($toLoad);
+		
+		return class_exists($class) || $List[$class] ? $List[$class] : false;	
 	}
 	
-	public static function autoloadClass($class){
-		$file = self::classFileExists($class);
+	public static function autoload($class, $toLoad = null){
+		$file = self::classFileExists($class, $toLoad);
 		
 		if($file && !class_exists($class))
 			require_once($file);
 		
-		return true;
+		return $file;
 	}
 	
 	/**
@@ -46,12 +50,14 @@ class Core {
 		/* @var $c Cache */
 		$c = Cache::getInstance(self::retrieve('cacheOptions', array()));
 		
+		$isDebug = self::retrieve('debugMode');
+		
 		foreach(array(
 			'Classes' => glob(self::retrieve('path').'/Classes/*/*.php'),
 			'Layers' => glob(self::retrieve('appPath').'/Layers/*.php'),
 		) as $key => $files){
 			$List = $c->retrieve('Core', $key);
-			if(!$List){
+			if(!$List || $isDebug){
 				if(is_array($files))
 					foreach($files as $file)
 						$List[basename($file, '.php')] = $file;
