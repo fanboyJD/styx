@@ -16,6 +16,8 @@ class Route {
 		if(!call_user_func($class.'::isLayer'))
 			return false;
 		
+		$layer = new $class();
+		echo $layer->{$event}();
 		echo $class.'->'.$event;
 	}
 }

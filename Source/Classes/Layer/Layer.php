@@ -1,5 +1,5 @@
 <?php
-class Layer {
+abstract class Layer {
 	/**
 	 * A Form-Element instance
 	 *
@@ -43,7 +43,7 @@ class Layer {
 			'viewer' => array()								//Options for the viewer
 		);
 	
-	public function __construct($options){
+	public function __construct(){
 		$initialize = $this->initialize();
 		
 		$this->options = Util::extend($this->options, $initialize['options']);

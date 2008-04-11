@@ -1,13 +1,12 @@
 <?php
-class Cache {
+class Cache extends DynamicStorage {
 	private $prefix = 'framework_',
 		$root = './Cache/',
 		$engine = false,
 		$engineInstance = null,
-		$filecacheInstance = null,
-		$cache = array();
+		$filecacheInstance = null;
 	
-	private static $instance;
+	private static $Instance;
 	
 	private function __construct($options = array()){
 		if((!$options['engine'] || $options['engine']=='eaccelerator') && function_exists('eaccelerator_get'))
@@ -34,10 +33,10 @@ class Cache {
 	private function __clone(){}
 	
 	public static function getInstance($options = null){
-		if(!self::$instance)
-			self::$instance = new Cache($options);
+		if(!self::$Instance)
+			self::$Instance = new Cache($options);
 		
-		return self::$instance;
+		return self::$Instance;
 	}
 	
 	public function getEngine(){
@@ -45,7 +44,8 @@ class Cache {
 	}
 	
 	public function retrieve($key, $id, $ttl = null){
-		if(!$this->cache[$key.'/'.$id]){
+		$content = parent::retrieve($key.'/'.$id);
+		if(!$content){
 			if($this->engineInstance && $ttl!='file')
 				$content = $this->engineInstance->retrieve($key.'/'.$id);
 			else
@@ -53,15 +53,18 @@ class Cache {
 			
 			if(!$content) return null;
 			
-			$this->cache[$key.'/'.$id] = json_decode($content, true);
+			$content = json_decode($content, true);
+			parent::store($key.'/'.$id, $content);
 		}
 		
-		return $this->cache[$key.'/'.$id];
+		return $content;
 	}
 	
 	public function store($key, $id, $content, $ttl = 3600){
 		if(!$content) return;
-		$this->cache[$key.'/'.$id] = $content = Util::cleanWhitespaces($content);
+		
+		$content = Util::cleanWhitespaces($content);
+		parent::store($key.'/'.$id, $content);
 		$content = json_encode($content);
 		if($this->engineInstance && $ttl!='file')
 			$this->engineInstance->store($key.'/'.$id, $content, $ttl);
@@ -70,7 +73,7 @@ class Cache {
 	}
 	
 	public function erase($key, $id, $force = false){
-		unset($this->cache[$key.'/'.$id]);
+		parent::erase($key.'/'.$id);
 		
 		if($this->engineInstance)
 			$this->engineInstance->erase($key.'/'.$id);
@@ -80,9 +83,7 @@ class Cache {
 	}
 	
 	public function eraseBy($key, $id, $force = false){
-		foreach($this->cache as $k => $v)
-			if(Util::startsWith($k, $key.'/'.$id))
-				unset($this->cache[$k]);
+		parent::eraseBy($key.'/'.$id);
 		
 		if($this->engineInstance)
 			$this->engineInstance->eraseBy($key.'/'.$id);
@@ -92,7 +93,7 @@ class Cache {
 	}
 	
 	public function eraseAll($force = false){
-		$this->cache = array();
+		parent::eraseAll();
 		
 		if($this->engineInstance)
 			$this->engineInstance->eraseAll();

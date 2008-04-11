@@ -2,11 +2,11 @@
 define('ONE_DAY', 86400);
 define('ONE_WEEK', 604800);
 
-Core::registerClasses('element', array(
-	'elements', 'input', 'button', 'field', 'radio', 'textarea', 'checkbox', 'select'
+Core::registerClasses('Element', array(
+	'Elements', 'Input', 'Button', 'Field', 'Radio', 'Textarea', 'Checkbox', 'Select'
 ));
-Core::registerClasses('validator', array(
-	'parser', 'formatter',
+Core::registerClasses('Validator', array(
+	'Parser', 'Formatter',
 ));
 
 // Here's the basic configuration

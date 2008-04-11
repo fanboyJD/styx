@@ -8,6 +8,7 @@
 	$path = dirname(__FILE__).'/';
 	set_include_path(get_include_path().PATH_SEPARATOR.$path);
 	
+	require_once('Classes/Core/Storage.php');
 	require_once('Classes/Core/Core.php');
 	
 	Core::store('path', $path);

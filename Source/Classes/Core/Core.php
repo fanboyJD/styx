@@ -1,7 +1,6 @@
 <?php
-class Core {
+class Core extends Storage {
 	private static $Initialized = false,
-		$Configuration = array(),
 		$onInitialize = array();
 	
 	public static function classFileExists($class, $toLoad = null){
@@ -73,30 +72,6 @@ class Core {
 				call_user_func_array(array('Core', $key), $val);
 		
 		self::pollute();
-	}
-	
-	public static function store($key, $value = null){
-		if(is_array($key)){
-			foreach($key as $k => $val)
-				self::store($k, $val);
-			
-			return;
-		}
-		if(!self::$Configuration[$key] || self::$Configuration[$key]!=$value){
-			self::$Configuration[$key] = $value;
-			if(!$value) unset(self::$Configuration[$key]);
-		}
-	}
-	
-	public static function retrieve($key, $value = null){
-		if(!self::$Configuration[$key])
-			self::store($key, $value);
-		
-		return self::$Configuration[$key];
-	}
-	
-	public static function erase($key){
-		unset(self::$Configuration[$key]);
 	}
 	
 	public static function registerClasses($base, $classes){
