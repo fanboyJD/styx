@@ -1,7 +1,10 @@
 <?php
-class Core extends Storage {
+class Core extends StaticStorage {
 	private static $Initialized = false,
 		$onInitialize = array();
+	
+	private function __construct(){}
+	private function __clone(){}
 	
 	public static function classFileExists($class, $toLoad = null){
 		$toLoad = in_array($toLoad, array('Classes', 'Layers')) ? $toLoad : 'Classes';

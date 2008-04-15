@@ -2,25 +2,26 @@
 /* ELEMENT CLASS */
 abstract class Element {
 	
-	public $html = '',
-		$type = null,
+	public $type = null,
 		$options = array(
 			/*Keys:
 				:caption
-				:validate
 				:alias (no db field (for username etc.))
+				:nobreak
 				:readOnly (only read from db)
+				:events
+				:default (for checkbox, defaultvalue)
+				:validate
+				:jsvalidate
+				:length
 				:empty (input value could be empty too?)
 				:detail (dont show in view->all if detail is true)
-				:default (for checkbox, defaultvalue)
-				-> htmlAttributes
-					name, value, type, id etc.
+				:elements
 			*/
 		);
 	
 	private static $uid = 0;
-	protected static $formElements = array('input', 'checkbox', 'radio', 'select', 'textarea');
-	//protected static $skipAttributes = array('caption', 'alias', 'nobreak', 'readOnly', 'events', 'default', 'validate', 'jsvalidate', 'length', 'empty', 'detail', 'elements');
+	protected static $formElements = array('input', 'checkbox', 'radio', 'select', 'textarea', 'richtext');
 	
 	public function __construct($options, $type = 'element'){
 		$this->options = $options;
@@ -35,36 +36,23 @@ abstract class Element {
 			$this->options['name'] = $this->options['id'];
 		else
 			$this->options['name'] = $this->options['id'] = $this->type.'_'.(self::$uid++);
+		
+		if($this->options['class']){
+			if(!is_array($this->options['class']))
+				$this->options['class'] = explode(' ', $this->options['class']);
+		}else{
+			$this->options['class'] = array();
+		}
 	}
 	
 	public function format(){
-		return $this->html;
+		return '';
 	}
 	
 	public static function skipable($key){
 		return Util::startsWith($key, ':');
 	}
-	
-	public static function implode($a, $options = array(
-		/*'skip*' => false,*/
-	)){
-		if($options && !is_array($options))
-			$options = array($options);
 		
-		if(!is_array($a))
-			return '';
-		
-		foreach($a as $key => $val)
-			if(!in_array('skip'.ucfirst($key), $options) && !self::skipable($key))
-				$s[] = $key.'="'.$val.'"';
-		
-		return is_array($s) ? implode(' ', $s) : '';
-	}
-	
-	public function setValue($v){
-		$this->options['value'] = $v;
-	}
-	
 	public function getEvents($helper){
 		if(!is_array($this->options[':events']))
 			return;
@@ -74,7 +62,47 @@ abstract class Element {
 			$event = !db::numeric($key) && $key!==0 ? $ev : 'start';
 			$events[] = "$('".$this->options['id']."').addEvent('".(!db::numeric($key) && $key!==0 ? $key : $ev)."', ".(strpos($event, '.') ? $event : $helper.".".$event).".bindWithEvent(".$helper.", $('".$this->options['id']."')));";
 		}
+		
 		return implode($events);
+	}
+	
+	public function setValue($v){
+		$this->options['value'] = $v;
+	}
+	
+	public function addClass($class){
+		if(!$this->hasClass($class)) array_push($this->options['class'], $class);
+	}
+	
+	public function removeClass($class){
+		array_remove($this->options['class'], $class);
+	}
+	
+	public function hasClass($class){
+		return in_array($class, $this->options['class']);
+	}
+	
+	public function implode($options = array(
+		/*'skip*' => false,*/
+	)){
+		$a = $this->options;
+		
+		if($options && !is_array($options))
+			$options = array($options);
+		
+		if(!is_array($a))
+			return '';
+		
+		if(is_array($a['class']) && sizeof($a['class']))
+			$a['class'] = implode(' ', $a['class']);
+		else
+			unset($a['class']);
+		
+		foreach($a as $key => $val)
+			if($val!==false && !in_array('skip'.ucfirst($key), $options) && !self::skipable($key))
+				$s[] = $key.'="'.$val.'"';
+		
+		return is_array($s) ? ' '.implode(' ', $s) : '';
 	}
 }
 /* ELEMENTS ClASS */
@@ -84,6 +112,9 @@ class Elements extends Element {
 	
 	public function __construct(){
 		$this->elements = func_get_args();
+		if(is_subclass_of($this, 'Elements'))
+			$this->elements = $this->elements[0];
+		
 		if(is_array($this->elements[0]))
 			$options = array_shift($this->elements);
 		
@@ -102,11 +133,11 @@ class Elements extends Element {
 				$els[$el->options['name']] = $el->format();
 		
 		if($tpl)
-			$this->html = Template::map('Element', $tpl)->assign($els)->assign($vars)->parse(true);
+			$out = Template::map('Element', $tpl)->assign($els)->assign($vars)->parse(true);
 		else
-			$this->html = implode($els);
+			$out = implode($els);
 		
-		return $this->html;
+		return $out;
 	}
 }
 
@@ -114,20 +145,30 @@ class Elements extends Element {
 class Input extends Element {
 	
 	public function __construct($options){
+		if(!$options['type'])
+			$options['type'] = 'text';
+		
 		parent::__construct($options, 'input');
 	}
 	
 	public function format(){
-		if(!$this->options['type'])
-			$this->options['type'] = 'text';
+		return ($this->options[':caption'] ? '<span class="b">'.$this->options[':caption'].'</span>'.(!$this->options[':nobreak'] ? '<br/>' : '') : '').'
+			<input'.$this->implode().'/>'.(!$this->options[':nobreak'] ? '<br/>' : '');
+	}
+}
+
+/* HIDDEN CLASS */
+
+class HiddenInput extends Input {
+	
+	public function __construct($options){
+		$options['type'] = 'hidden';
 		
-		if($this->options['type']=='hidden')
-			$this->options[':nobreak'] = true;
-		
-		$this->html = ($this->options['type']!='hidden' && $this->options[':caption'] ? '<span class="b">'.$this->options[':caption'].'</span>'.(!$this->options[':nobreak'] ? '<br/>' : '') : '').'
-				<input '.self::implode($this->options).'/>'.(!$this->options[':nobreak'] ? '<br/>' : '');
-		
-		return $this->html;
+		parent::__construct($options);
+	}
+	
+	public function format(){
+		return '<input'.$this->implode().'/>';
 	}
 }
 
@@ -139,8 +180,7 @@ class Button extends Element {
 	}
 	
 	public function format(){
-		$this->html = '<button '.self::implode($this->options).'>'.$this->options[':caption'].'</button>';
-		return $this->html;
+		return '<button'.$this->implode().'>'.$this->options[':caption'].'</button>';
 	}
 }
 
@@ -161,20 +201,16 @@ class Radio extends Element {
 	
 	public function __construct($options){
 		$options['type'] = 'radio';
+		
 		parent::__construct($options, 'radio');
 	}
 	
 	public function format(){
-		$els[] = array();
 		foreach($this->options[':elements'] as $val)
-			$els[] = '<label><input value="'.$val['value'].'" '.self::implode($this->options, array('skipValue', 'skipId')).' '.($val['value']==$this->options['value'] ? 'checked="checked" ' : '').'/> '.$val[':caption'].'</label>';
+			$els[] = '<label><input value="'.$val['value'].'"'.$this->implode(array('skipValue', 'skipId')).' '.($val['value']==$this->options['value'] ? 'checked="checked" ' : '').'/> '.$val[':caption'].'</label>';
 		
-		if($this->options[':caption'])
-			$this->html = '<span class="b">'.$this->options[':caption'].'</span><br/>';
-		
-		$this->html .= '<div id="'.$this->options['id'].'">'.implode($els).'</div>';
-		
-		return $this->html;
+		return ($this->options[':caption'] ? '<span class="b">'.$this->options[':caption'].'</span><br/>' : '').'
+			<div id="'.$this->options['id'].'">'.implode($els).'</div>';
 	}
 }
 
@@ -186,16 +222,11 @@ class Select extends Element {
 	}
 	
 	public function format(){
-		$els[] = array();
 		foreach($this->options[':elements'] as $val)
-			$els[] = '<option value="'.$val['value'].'" '.self::implode($this->options, array('skipValue', 'skipId', 'skipName')).($val['value']==$this->options['value'] ? ' selected="selected"' : '').'> '.$val[':caption'].'</option>';
+			$els[] = '<option value="'.$val['value'].'"'.$this->implode(array('skipValue', 'skipId', 'skipName')).($val['value']==$this->options['value'] ? ' selected="selected"' : '').'>'.$val[':caption'].'</option>';
 		
-		if($this->options[':caption'])
-			$this->html = '<span class="b">'.$this->options[':caption'].'</span><br/>';
-		
-		$this->html .= '<div><select '.self::implode($this->options, 'skipValue').'>'.implode($els).'</select></div>';
-		
-		return $this->html;
+		return ($this->options[':caption'] ? '<span class="b">'.$this->options[':caption'].'</span><br/>' : '').'
+			<div><select'.$this->implode('skipValue').'>'.implode($els).'</select></div>';
 	}
 }
 
@@ -204,26 +235,38 @@ class Checkbox extends Element {
 	
 	public function __construct($options){
 		$options['type'] = 'checkbox';
+		
 		parent::__construct($options, 'checkbox');
 	}
 	
 	public function format(){
-		$this->html = '<label><input value="'.$this->options[':default'].'" '.self::implode($this->options, 'skipValue').' '.($this->options[':default']==$this->options['value'] ? 'checked="checked" ' : '').'/> '.$this->options[':caption'].'</label>';
-		return $this->html;
+		return '<label><input value="'.$this->options[':default'].'"'.$this->implode('skipValue').' '.($this->options[':default']==$this->options['value'] ? 'checked="checked" ' : '').'/> '.$this->options[':caption'].'</label>';
 	}
 }
 
 /* TEXTAREA CLASS */
 class Textarea extends Element {
 	
-	public function __construct($options){
-		parent::__construct($options, 'textarea');
+	public function __construct($options, $type = null){
+		$options['cols'] = 0;
+		$options['rows'] = 0;
+		parent::__construct($options, $type ? $type : 'textarea');
 	}
 	
 	public function format(){
-		$this->html = ($this->options[':caption'] ? '<span class="b">'.$this->options[':caption'].'</span>'.(!$this->options[':nobreak'] ? '<br/>' : '') : '').'
-				<textarea '.self::implode($this->options, 'skipValue').' rows="0" cols="0">'.$this->options['value'].'</textarea><br/>';
-		return $this->html;
+		return ($this->options[':caption'] ? '<span class="b">'.$this->options[':caption'].'</span>'.(!$this->options[':nobreak'] ? '<br/>' : '') : '').'
+				<textarea'.$this->implode('skipValue').'>'.$this->options['value'].'</textarea><br/>';
 	}
+}
+
+/* RICHTEXT CLASS */
+class RichText extends Textarea {
+	
+	public function __construct($options){
+		parent::__construct($options, 'richtext');
+		
+		$this->addClass('richtext');
+	}
+	
 }
 ?>

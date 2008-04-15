@@ -62,6 +62,21 @@ abstract class Layer {
 		);*/
 	}
 	
+	public function handler($event, $get, $post){
+		$handler = strtolower($event);
+		$event = 'on'.ucfirst($handler);
+		
+		if($handler=='save' && is_array($post) && sizeof($post)){
+			
+		}else{
+			
+			//echo $this->{$event}();
+			
+		}
+		
+		
+	}
+	
 	public function edit($v = null, $vars = array()){
 		if(!$this->checkPermissions('edit'))
 			return;
@@ -201,10 +216,6 @@ abstract class Layer {
 			}
 		
 		return $data;
-	}
-	
-	public static function isLayer(){
-		return true;
 	}
 }
 ?>

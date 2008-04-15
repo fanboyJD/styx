@@ -3,6 +3,11 @@
 		Core::autoload($class);
 	}
 	
+	function array_remove(&$array, $value){
+		$i = array_search($value, $array);
+		if($i!==false) unset($array[$i]);
+	}
+	
 	require_once('../Config/Configuration.php');
 	
 	$path = dirname(__FILE__).'/';
@@ -26,5 +31,5 @@
 	
 	Core::initialize();
 	
-	Route::initialize($_GET['p'], $_GET['n']);
+	Route::initialize($_GET, $_POST);
 ?>

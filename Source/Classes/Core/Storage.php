@@ -1,43 +1,6 @@
 <?php
-class Storage {
-	private static $Storage = array();
-	
-	public static function store($key, $value = null){
-		if(is_array($key)){
-			foreach($key as $k => $val)
-				self::store($k, $val);
-			
-			return;
-		}
-		if(!self::$Storage[$key] || self::$Storage[$key]!=$value){
-			self::$Storage[$key] = $value;
-			if(!$value) unset(self::$Storage[$key]);
-		}
-	}
-	
-	public static function retrieve($key, $value = null){
-		if(!self::$Storage[$key])
-			self::store($key, $value);
-		
-		return self::$Storage[$key];
-	}
-	
-	public static function erase($key){
-		unset(self::$Storage[$key]);
-	}
-	
-	public static function eraseBy($key){
-		foreach(self::$Storage as $k => $v)
-			if(Util::startsWith($k, $key))
-				unset(self::$Storage[$k]);
-	}
-	
-	public static function eraseAll(){
-		self::$Storage = array();
-	}
-}
-
 class DynamicStorage {
+	
 	private $Storage = array();
 	
 	public function store($key, $value = null){
@@ -49,12 +12,12 @@ class DynamicStorage {
 		}
 		if(!$this->Storage[$key] || $this->Storage[$key]!=$value){
 			$this->Storage[$key] = $value;
-			if(!$value) unset($this->Storage[$key]);
+			if(!$value) $this->erase($key);
 		}
 	}
 	
 	public function retrieve($key, $value = null){
-		if(!$this->Storage[$key])
+		if($value && !$this->Storage[$key])
 			self::store($key, $value);
 		
 		return $this->Storage[$key];
@@ -73,5 +36,44 @@ class DynamicStorage {
 	public function eraseAll(){
 		$this->Storage = array();
 	}
+	
+}
+
+class StaticStorage {
+	
+	private static $Instance;
+	
+	private static function map($fn, $args){
+		if(!self::$Instance)
+			self::$Instance = new DynamicStorage();
+		
+		return call_user_func_array(array(self::$Instance, $fn), $args);
+	}
+	
+	public static function store(){
+		$args = func_get_args();
+		return self::map('store', $args);
+	}
+	
+	public static function retrieve(){
+		$args = func_get_args();
+		return self::map('retrieve', $args);
+	}
+	
+	public static function erase(){
+		$args = func_get_args();
+		return self::map('erase', $args);
+	}
+	
+	public static function eraseBy(){
+		$args = func_get_args();
+		return self::map('eraseBy', $args);
+	}
+	
+	public static function eraseAll(){
+		$args = func_get_args();
+		return self::map('eraseAll', $args);
+	}
+	
 }
 ?>

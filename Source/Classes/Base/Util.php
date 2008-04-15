@@ -3,6 +3,9 @@ class Util {
 	private static $regex = null,
 		$once = false;
 	
+	private function __construct(){}
+	private function __clone(){}
+	
 	public static function endsWith($string, $look){
 		return strrpos($string, $look)===strlen($string)-strlen($look);
 	}

@@ -1,24 +1,25 @@
 <?php
 class Route {
 	
-	public static function initialize($parts, $numbered){
+	private function __construct(){}
+	private function __clone(){}
+	
+	public static function initialize(&$get, &$post){
 		
-		self::initializeLayer($numbered[0], $numbered[1], $parts);
+		self::initializeLayer($get['n'][0], $get['n'][1], $get, $post);
 	}
 	
-	public static function initializeLayer($class, $event, $values){
+	public static function initializeLayer($class, $event, &$get, &$post){
 		if(!$class || !Core::autoload($class, 'Layers'))
 			return false;
 		
 		$class = ucfirst(strtolower($class)).'Layer';
-		$event = 'on'.ucfirst(strtolower($event));
 		
-		if(!call_user_func($class.'::isLayer'))
+		if(!is_subclass_of($class, 'Layer'))
 			return false;
 		
 		$layer = new $class();
-		echo $layer->{$event}();
-		echo $class.'->'.$event;
+		$layer->handler($event, $get, $post);
 	}
 }
 ?>

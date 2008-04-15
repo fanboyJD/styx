@@ -1,15 +1,25 @@
 <?php
-class validator {
+class Validator {
+	
+	private static $Instance;
+	
+	private function __construct(){}
+	private function __clone(){}
+	
 	public static function call($t, $data){
-		if(method_exists('validator', $t[0]))
-			$ret = call_user_func(array('validator', $t[0]), $data, $t[1]);
-		else
-			$ret = true;
-		return $ret;
+		if(!self::$Instance)
+			self::$Instance = new Validator();
+		
+		if(method_exists(self::$Instance, $t[0]))
+			return self::$Instance->{$t[0]}($data, $t[1]);
+		
+		return true;
 	}
+	
 	public static function pagetitle($data){
 		return util::getTitle($data)==$data;
 	}
+	
 	public static function mail($data){
 		if(!$data)
 			return false;
@@ -26,11 +36,13 @@ class validator {
 		
 		return true;
 	}
+	
 	public static function pwd($data){
 		if(settype($data, 'string') && strlen($data)>=4)
 			return true;
 		return 'pwdlength';
 	}
+	
 	public static function username($data, $options = array(
 		'login' => false
 	)){
@@ -48,24 +60,29 @@ class validator {
 		}
 		return ($options['login'] ? 'uname' : true);
 	}
+	
 	public static function numeric($data){
 		return db::numeric($data)>0;
 	}
+	
 	public static function numericrange($data, $options){
 		$data = db::numeric($data);
 		if(($data || ($data==0 && is_numeric($data))) && $data>=$options[0] && $data<=$options[1])
 			return true;
 		return false;
 	}
+	
 	public static function bool($data){
 		return self::numericrange($data, array(0, 1));
 	}
+	
 	public static function homepage($data){
 		if(!util::startsWith($data, 'http://') && !util::startsWith($data, 'https://'))
 			return false;
 		
 		return true;
 	}
+	
 	public static function date($data){
 		$data = db::numericArray(explode('.', $data));
 		if(!$data[0] || !$data[1] || !$data[2])
@@ -75,26 +92,39 @@ class validator {
 			return false;
 		return true;
 	}
+	
 }
 
 /* PARSER */
-class parser {
+class Parser {
+	
+	private static $Instance;
+	
+	private function __construct(){}
+	private function __clone(){}
+	
 	public static function call($t, $data){
-		if(method_exists('parser', $t[0]))
-			$ret = call_user_func(array('parser', $t[0]), $data, $t[1]);
-		else
-			$ret = $data;
-		return $ret;
+		if(!self::$Instance)
+			self::$Instance = new Parser();
+		
+		if(method_exists(self::$Instance, $t[0]))
+			return self::$Instance->{$t[0]}($data, $t[1]);
+		
+		return $data;
 	}
+	
 	public static function pagetitle($data){
 		return util::getTitle($data);
 	}
+	
 	public static function mail($data){
 		return db::add($data);
 	}
+	
 	public static function username($data){
 		return self::pagetitle($data);
 	}
+	
 	public static function bool($data){
 		$ret = false;
 		if($data=='true')
@@ -106,20 +136,25 @@ class parser {
 		
 		return $ret;
 	}
+	
 	public static function numeric($data){
 		return db::numeric($data);
 	}
+	
 	public static function numericrange($data, $options){
 		$data = db::numeric($data);
 		return ($data>=$options[0] && $data<=$options[1] ? $data : 0);
 	}
+	
 	public static function specialchars($data){
 		//db::strip because we do db::add it in the abstractionlayer again :D
 		return db::strip(db::addh($data));
 	}
+	
 	public static function homepage($data){
 		return self::specialchars($data);
 	}
+	
 	public static function date($data){
 		$data = db::numericArray(explode('.', $data));
         if(!$data[0] || !$data[1] || !$data[2])
@@ -132,21 +167,31 @@ class parser {
         
         return $time;
 	}
+	
 }
 
 /* FORMATTER */
-class formatter {
+class Formatter {
+	
 	public static
 		$days = array('Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'),
 		$months = array('', 'Jänner', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember');
 	
-	public static function call($t, $data, $options = null){
-		if(method_exists('formatter', $t))
-			$ret = call_user_func(array('formatter', $t), $data, $options);
-		else
-			$ret = $data;
-		return $ret;
+	private static $Instance;
+	
+	private function __construct(){}
+	private function __clone(){}
+	
+	public static function call($t, $data, $options){
+		if(!self::$Instance)
+			self::$Instance = new Formatter();
+		
+		if(method_exists(self::$Instance, $t[0]))
+			return self::$Instance->{$t[0]}($data, $options);
+		
+		return '';
 	}
+	
 	public static function time($data, $options = array(
 		'short' => false,
 		'hours' => true,
@@ -154,6 +199,7 @@ class formatter {
 	)){
 		return (!$options['nodays'] ? self::$days[date('w', $data)].', ' : '').date('d.', $data).($options['short'] ? date('m', $data) : ' '.self::$months[date('n', $data)].date(' Y', $data)).($options['hours'] ? date(' - H<\s\u\p>i</\s\u\p>', $data) : '');
 	}
+	
 	public static function user($data, $options = array(
 		'system' => false,
 	)){
@@ -162,9 +208,11 @@ class formatter {
 		else
 			return self::username(util::getUsr($data));
 	}
+	
 	public static function username($data){
 		return $data['name'] ? '<a class="u" href="user/'.$data['name'].'" style="background-image: url(\'uimg/'.($data['img'] ? 's/'.$data['img'] : 'no.png').'\');">'.$data['name'].'</a>' : '';
 	}
+	
 	public static function regex($data, $options = array(
 		'noUbb' => false,
 		'ubb' => null,
@@ -193,6 +241,7 @@ class formatter {
 		}
 		return db::strip($data);
 	}
+	
 	public static function seconds($data, $options = array()){
 		$names = array(
 			array('Sekunde', 'Sekunden'),
@@ -215,5 +264,6 @@ class formatter {
 		krsort($out);
 		return (is_array($out) ? implode(', ', $out) : null);
 	}
+	
 }
 ?>

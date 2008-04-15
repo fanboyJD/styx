@@ -1,14 +1,12 @@
 <?php
 class Form extends Elements {
 	
-	/*public function __construct(){
+	public function __construct(){
 		parent::__construct(func_get_args());
-	}*/
+	}
 	
 	public function format($tpl = null, $vars = array()){
-		$this->html = parent::format($tpl, $vars);
-		
-		return '<div '.self::implode($this->options, 'skipName').'>'.$this->html.'</div>';
+		return '<div'.$this->implode('skipName').'>'.parent::format($tpl, $vars).'</div>';
 	}
 	
 	//this method needs to be redone!
@@ -18,7 +16,6 @@ class Form extends Elements {
 		'db' => false,
 		'js' => false,
 	)){
-		$els = array();
 		foreach($this->elements as $el){
 			if(in_array($el->type, array('button', 'string')) || (!$options['all'] && !in_array($el->type, self::$formElements)))
 				continue;
