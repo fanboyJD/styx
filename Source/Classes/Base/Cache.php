@@ -14,7 +14,6 @@ class Cache extends DynamicStorage {
 				'type' => 'eaccelerator',
 			);
 		
-		
 		if($options['prefix'])
 			$this->prefix = $options['prefix'];
 		
@@ -23,8 +22,9 @@ class Cache extends DynamicStorage {
 		else
 			$this->root = Core::retrieve('path').$this->root;
 		
-		if($this->engine['type'] && Core::loadClass('Cache', $this->engine['type']))
-			$this->engineInstance = new $this->engine['type']($this->prefix, $this->root);
+		$class = $this->engine['type'].'cache';
+		if($this->engine['type'] && Core::loadClass('Cache', $class))
+			$this->engineInstance = new $class($this->prefix, $this->root);
 		
 		Core::loadClass('Cache', 'filecache');
 		$this->filecacheInstance = new filecache($this->prefix, $this->root);
@@ -63,7 +63,7 @@ class Cache extends DynamicStorage {
 	public function store($key, $id, $content, $ttl = 3600){
 		if(!$content) return;
 		
-		$content = Util::cleanWhitespaces($content);
+		$content = Data::clean($content);
 		parent::store($key.'/'.$id, $content);
 		$content = json_encode($content);
 		if($this->engineInstance && $ttl!='file')

@@ -6,12 +6,11 @@
 		'Elements', 'Input', 'HiddenInput', 'Button', 'Field', 'Radio',
 		'Textarea', 'Checkbox', 'Select', 'RichText',
 	));
-	Core::registerClasses('Validator', array(
-		'Parser', 'Formatter',
-	));
 	
 	// Here's the basic configuration
-	/*Core::store(array(
+	Core::store(array(
 		'debugMode' => false,
-	));*/
+		'identifier.id' => 'id',
+		'identifier.pagetitle' => 'pagetitle',
+	));
 ?>

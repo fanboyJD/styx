@@ -9,9 +9,9 @@ class Core extends StaticStorage {
 	public static function classFileExists($class, $toLoad = null){
 		$toLoad = in_array($toLoad, array('Classes', 'Layers')) ? $toLoad : 'Classes';
 		
-		$class = ucfirst(strtolower($class));
+		$class = strtolower($class);
 		if($toLoad=='Layers')
-			$class .= 'Layer';
+			$class .= 'layer';
 		
 		$List = self::retrieve($toLoad);
 		
@@ -55,14 +55,15 @@ class Core extends StaticStorage {
 		$isDebug = self::retrieve('debugMode');
 		
 		foreach(array(
-			'Classes' => glob(self::retrieve('path').'/Classes/*/*.php'),
-			'Layers' => glob(self::retrieve('appPath').'/Layers/*.php'),
-		) as $key => $files){
+			'Classes' => self::retrieve('path').'/Classes/*/*.php',
+			'Layers' => self::retrieve('appPath').'/Layers/*.php',
+		) as $key => $dir){
 			$List = $c->retrieve('Core', $key);
 			if(!$List || $isDebug){
+				$files = glob($dir);
 				if(is_array($files))
 					foreach($files as $file)
-						$List[basename($file, '.php')] = $file;
+						$List[strtolower(basename($file, '.php'))] = $file;
 				
 				if($List) $c->store('Core', $key, $List);
 			}
@@ -71,10 +72,37 @@ class Core extends StaticStorage {
 		
 		self::$Initialized = true;
 		foreach(self::$onInitialize as $value)
-			foreach($value as $key =>$val)
-				call_user_func_array(array('Core', $key), $val);
+			foreach($value as $fn => $v)
+				call_user_func_array(array('Core', $fn), $v);
+	}
+	
+	public static function pollute(){
+		$polluted = array();
+		$vars = explode('/', $_SERVER['PATH_INFO']);
 		
-		self::pollute();
+		foreach($vars as $v){
+			$v = Data::clean($v);
+			if(!$v) continue;
+			
+			$v = explode(':', $v, 2);
+			if($polluted['p'][$v[0]]) continue;
+			
+			$polluted['p'][$v[0]] = $v[1] ? $v[1] : $v[0];
+			if($v[0]!='handler')
+				$polluted['n'][] = $v[0];
+		}
+		
+		foreach(array('index', 'view') as $k => $v)
+			if(!$polluted['n'][$k])
+				$polluted['p'][$v] = $polluted['n'][$k] = $v;
+		
+		if(!$polluted['p']['handler']) $polluted['p']['handler'] = 'html';
+		
+		$_GET = array_merge($_GET, $polluted);
+		
+		if(sizeof($_POST) && get_magic_quotes_gpc())
+			foreach($_POST as &$val)
+				$val = stripslashes($val);
 	}
 	
 	public static function registerClasses($base, $classes){
@@ -85,33 +113,12 @@ class Core extends StaticStorage {
 			return;
 		}
 		
+		$base = strtolower($base);
 		$Classes = self::retrieve('Classes');
 		foreach($classes as $val)
-			$Classes[$val] = $Classes[$base];
+			$Classes[strtolower($val)] = $Classes[$base];
 		
 		self::store('Classes', $Classes);
-	}
-	
-	public static function pollute(){
-		$polluted = array();
-		$vars = explode('/', $_SERVER['PATH_INFO']);
-		
-		foreach($vars as $v){
-			$v = Util::cleanWhitespaces($v);
-			if(!$v) continue;
-			
-			$v = explode(':', $v, 2);
-			if($polluted['p'][$v[0]]) continue;
-			
-			$polluted['p'][$v[0]] = $v[1] ? $v[1] : $v[0];
-			$polluted['n'][] = $v[0];
-		}
-		
-		foreach(array('index', 'default') as $k => $v)
-			if(!$polluted['n'][$k])
-				$polluted['p'][$v] = $polluted['n'][$k] = $v;
-		
-		$_GET = array_merge($_GET, $polluted);
 	}
 }
 ?>

@@ -9,16 +9,17 @@ class Route {
 		self::initializeLayer($get['n'][0], $get['n'][1], $get, $post);
 	}
 	
-	public static function initializeLayer($class, $event, &$get, &$post){
-		if(!$class || !Core::autoload($class, 'Layers'))
+	public static function initializeLayer($layerName, $event, &$get, &$post){
+		if(!$layerName || !Core::autoload($layerName, 'Layers'))
 			return false;
 		
-		$class = ucfirst(strtolower($class)).'Layer';
+		$layerName = strtolower($layerName);
+		$class = ucfirst($layerName).'Layer';
 		
 		if(!is_subclass_of($class, 'Layer'))
 			return false;
 		
-		$layer = new $class();
+		$layer = new $class($layerName);
 		$layer->handler($event, $get, $post);
 	}
 }

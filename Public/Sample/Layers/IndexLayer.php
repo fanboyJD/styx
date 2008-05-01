@@ -3,18 +3,19 @@ class IndexLayer extends Layer {
 	
 	public function initialize(){
 		return array(
+			'table' => 'news',
 			'options' => array(
-				
+				'identifier' => 'id',
 			),
 			'form' => new Form(array(
 					
 				),
 				new Input(array(
-					'name' => 'yea',
-					':caption' => 'Test',
+					'name' => 'title',
+					':caption' => 'Titel',
 				)),
 				new Button(array(
-					'name' => 'buttonia',
+					'name' => 'bsave',
 					':caption' => 'EinTest',
 				))
 			)
@@ -23,13 +24,13 @@ class IndexLayer extends Layer {
 	
 	public function onEdit(){
 		
-	}
-	
-	public function onView(){
+		/*return array(
+			'edit' => array('uid' => 1)
+		);*/
 		
 	}
 	
-	public function onDefault(){
+	public function onView(){
 		return 'This is Some Default Thing!';
 	}
 }

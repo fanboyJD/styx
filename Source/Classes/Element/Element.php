@@ -59,8 +59,8 @@ abstract class Element {
 		
 		$events = array();
 		foreach($this->options[':events'] as $key => $ev){
-			$event = !db::numeric($key) && $key!==0 ? $ev : 'start';
-			$events[] = "$('".$this->options['id']."').addEvent('".(!db::numeric($key) && $key!==0 ? $key : $ev)."', ".(strpos($event, '.') ? $event : $helper.".".$event).".bindWithEvent(".$helper.", $('".$this->options['id']."')));";
+			$event = !Data::id($key) && $key!==0 ? $ev : 'start';
+			$events[] = "$('".$this->options['id']."').addEvent('".(!Data::id($key) && $key!==0 ? $key : $ev)."', ".(strpos($event, '.') ? $event : $helper.".".$event).".bindWithEvent(".$helper.", $('".$this->options['id']."')));";
 		}
 		
 		return implode($events);
@@ -80,6 +80,26 @@ abstract class Element {
 	
 	public function hasClass($class){
 		return in_array($class, $this->options['class']);
+	}
+	
+	public function set($key, $value = null){
+		if(is_array($key)){
+			foreach($key as $k => $val)
+				$this->set($k, $val);
+			
+			return;
+		}
+		if(!$this->options[$key] || $this->options[$key]!=$value){
+			$this->options[$key] = $value;
+			if(!$value) unset($this->options[$key]);
+		}
+	}
+	
+	public function get($key, $value = null){
+		if($value && !$this->options[$key])
+			$this->set($key, $value);
+		
+		return $this->options[$key];
 	}
 	
 	public function implode($options = array(
@@ -108,7 +128,7 @@ abstract class Element {
 /* ELEMENTS ClASS */
 class Elements extends Element {
 	
-	private $elements = array();
+	protected $elements = array();
 	
 	public function __construct(){
 		$this->elements = func_get_args();
@@ -126,14 +146,14 @@ class Elements extends Element {
 		return $el;
 	}
 	
-	public function format($tpl = null, $vars = array()){
+	public function format($tpl = null){
 		$els = array();
 		foreach($this->elements as $el)
 			if(!in_array($el->options['type'], array('field')))
 				$els[$el->options['name']] = $el->format();
 		
 		if($tpl)
-			$out = Template::map('Element', $tpl)->assign($els)->assign($vars)->parse(true);
+			$out = Template::map('Element', $tpl)->assign($els)->parse(true);
 		else
 			$out = implode($els);
 		

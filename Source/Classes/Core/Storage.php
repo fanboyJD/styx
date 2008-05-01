@@ -1,7 +1,7 @@
 <?php
 class DynamicStorage {
 	
-	private $Storage = array();
+	protected $Storage = array();
 	
 	public function store($key, $value = null){
 		if(is_array($key)){
@@ -18,7 +18,7 @@ class DynamicStorage {
 	
 	public function retrieve($key, $value = null){
 		if($value && !$this->Storage[$key])
-			self::store($key, $value);
+			$this->store($key, $value);
 		
 		return $this->Storage[$key];
 	}
@@ -41,13 +41,13 @@ class DynamicStorage {
 
 class StaticStorage {
 	
-	private static $Instance;
+	private static $StorageInstance;
 	
 	private static function map($fn, $args){
-		if(!self::$Instance)
-			self::$Instance = new DynamicStorage();
+		if(!self::$StorageInstance)
+			self::$StorageInstance = new DynamicStorage();
 		
-		return call_user_func_array(array(self::$Instance, $fn), $args);
+		return call_user_func_array(array(self::$StorageInstance, $fn), $args);
 	}
 	
 	public static function store(){

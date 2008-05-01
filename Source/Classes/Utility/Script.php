@@ -15,7 +15,7 @@ class Script {
 	}
 	
 	public static function get(){
-		return Template::map('Core', 'script')->assign(Util::cleanWhitespaces(self::$script, true))->parse(true);
+		return Template::map('Core', 'script')->assign(Data::clean(self::$script, true))->parse(true);
 	}
 }
 ?>

@@ -6,55 +6,60 @@ abstract class Layer {
 	 * @var form
 	 */
 	public $form;
-	/**
-	 * A Viewer instance
-	 *
-	 * @var viewer
-	 */
-	protected $viewer;
 	
-	public $helper = '',
-		$user = null,
-		$sid = null,
-		$isPreview = null,									//just for preview bugfixes :)
-		$child = false,										//child or parent?
+	public $name,
+		$table,
+		$templates = array(
+			'save' => '',
+			'edit' => '',
+		),
+		$events = array(
+			'save' => array('save'),
+			'edit' => array('edit'),
+		),
+		$javascript = array(
+			'helper' => '',
+			'helpername' => '',
+		),
 		$options = array(
-			'permissions' => array(							//permissions
-				'general' => array(							//takes
-					'rights' => 1,							//general, view, save
-					'none' => false,
-				),
-				'save' => array(
-					'session' => true,						//Checks if the user passed a session (not for general, only helpful for save)
-				),
-				/*
-				'delete' => array(
-					
-				),
-				'view' => array(
-					
-				)*/
-			),
-			'editing' => false,								//Stuff for edition
-			'delete' => false,								//Add Delete buttons?
-			'preview' => false,
-			'table' => '',									//table to modify
-			'viewername' => 'viewer',						//Name of viewer class
-			'viewer' => array()								//Options for the viewer
+			'identifier' => null,
 		);
 	
-	public function __construct(){
+	public function __construct($name){
+		$this->name = $this->table = $name;
+		
 		$initialize = $this->initialize();
 		
+		if($initialize['table'])
+			$this->table = $initialize['table'];
+		
 		$this->options = Util::extend($this->options, $initialize['options']);
+		
+		if(!$this->options['identifier']){
+			$id = Core::retrieve('identifier.id');
+			$this->options['identifier'] = array(
+				'internal' => $id,
+				'external' => $id,
+			);
+		}elseif(!is_array($this->options['identifier'])){
+			$this->options['identifier'] = array(
+				'internal' => $this->options['identifier'],
+				'external' => $this->options['identifier'],
+			);
+		}
+		
 		$this->form = $initialize['form'];
 		
-		$this->helper = 'Helpers.'.$this->form->options['id'];
-		$this->helpername = 'Helper';
+		if(!$this->form->options['action'])
+			$this->form->options['action'] = $this->name.'/'.reset($this->events['save']);
+		
+		$this->javascript['helper'] = 'Helpers.'.$this->form->options['id'];
+		$this->javascript['helpername'] = 'Helper';
 	}
 	
 	public function initialize(){
 		/*return array(
+			'table' => '',
 			'options' => array(
 			
 			),
@@ -66,156 +71,86 @@ abstract class Layer {
 		$handler = strtolower($event);
 		$event = 'on'.ucfirst($handler);
 		
-		if($handler=='save' && is_array($post) && sizeof($post)){
+		if($this->hasEvent('save', $handler) && is_array($post) && sizeof($post)){
 			
+		}elseif($this->hasEvent('edit', $handler)){
+			$pass = true;
+			if(method_exists($this, $event))
+				$pass = $this->{$event}($get, $post);
+			
+			if(!$pass || ($pass && !$pass['error']))
+				echo $this->edit($pass['edit'], $handler, $get);
+			elseif($pass['error'])
+				echo $pass['error'];
 		}else{
 			
 			//echo $this->{$event}();
 			
 		}
 		
-		
 	}
 	
-	public function edit($v = null, $vars = array()){
-		if(!$this->checkPermissions('edit'))
-			return;
+	public function edit($v = null, $handler = null, $get = null){
+		if(!$v && $handler && $get['p'][$handler])
+			$v = array(
+				$this->options['identifier']['external'] => array($get['p'][$handler], $this->options['identifier']['external'])
+			);
 		
-		$data = abstractionlayer::prepareData($v);
-		if($data){
-			/* @var $db db */
-			$db = db::getInstance();
-			$view = $db->select($this->options['table'], $data);
-			$this->form->setValue($view);
-		}
+		if(Validator::check($v))
+			$this->form->setValue(db::getInstance()->select($this->table)->where($v)->fetch());
+		
 		$options = Util::extend(array(
 			'fields' => $this->form->getFields(array('js' => true)),
 		), $this->options['jsoptions']);
-		
-		if($this->options['permissions']['save']['session'])
-			$options['session'] = 1;
-		if($this->options['helperevents'])
-			$options['events'] = $this->options['helperevents'];
 			
-		script::set("
-			".$this->helper." = new ".$this->helpername."('".$this->form->options['id']."', ".json_encode($options).");
-			".$this->form->getEvents($this->helper)."
+		Script::set("
+			".$this->javascript['helper']." = new ".$this->javascript['helpername']."('".$this->form->options['id']."', ".json_encode($options).");
+			".$this->form->getEvents($this->javascript['helper'])."
 		");
 		
-		return $this->form->get($this->options['edit'], $vars);
+		return $this->form->format($this->getTemplate('edit'));
 	}
 	
 	public function save($data, $options = array(
 		'noDefault' => false,
 		'update' => null
 	)){
-		if(!$this->checkPermissions('save'))
-			return false;
-		
 		$validation = $this->form->validate($data);
 		$dbdata = $this->form->prepareDatabaseData($data);
 		
-		if($validation===true && $this->options['table'] && !$options['noDefault']){
+		if($validation===true && $this->table && !$options['noDefault']){
 			/* @var $db db */
 			$db = db::getInstance();
 			if($options['update'])
-				$db->update($this->options['table'], $options['update'], $dbdata);
+				$db->update($this->table, $options['update'], $dbdata);
 			else
-				$db->insert($this->options['table'], $dbdata);
+				$db->insert($this->table, $dbdata);
 		}
-		if($this->child)
-			return array(
-				'validation' => $validation,
-				'data' => $dbdata,
-			);
-	}
-	
-	//this methods are empty! They have to be defined separate in every child!
-	public function delete(){}
-	public function quote(){}
-	public function lock(){}
-	
-	public function view(){
-		if(!$this->checkPermissions('view'))
-			return;
-		
-		if(!$this->viewer){
-			if(!class_exists($this->options['viewername']) || !util::startsWith($this->options['viewername'], 'viewer'))
-				$this->options['viewername'] = 'viewer';
-			
-			$this->viewer = new $this->options['viewername']($this, $this->options['viewer']);
-		}
-		return $this->viewer;
-	}
-	
-	public function preview($data, $user){
-		if(!$this->options['preview'] || !$this->checkPermissions('save'))
-			return;
-		
-		$this->options['delete'] = false;
-		$p = $this->save($data, array(
-			'noDefault' => true,
-		));
-		$this->isPreview = true;
-		$view = $p['validation']!==true ? null : $this->view()->one(null, array(
-			'data' => $p['data'],
-		));
-		$this->isPreview = false;
 		
 		return array(
-			's' => $p['validation']!==true ? $p['s'] : $p['validation'],
-			'p' => $view,
+			'validation' => $validation,
+			'data' => $dbdata,
 		);
 	}
 	
-	public function checkPermissions($type, $ignoreSession = false){
-		if($type=='lock'){
-			$type = 'delete';
-			$ignoreSession = true;
-		}elseif(in_array($type, array('edit', 'editing', 'quote'))){
-			if(!$this->options['permissions'][$type])
-				$type = 'save';
-			$ignoreSession = true;
-		}elseif($type=='delete' && !$this->checkPermissions('save', $ignoreSession)){
-			return false;
-		}
-		if(is_array($this->options['permissions'][$type]) && !$this->options['permissions'][$type]['none']){
-			if($this->options['permissions'][$type]['rights']>0 && $this->user['rights']<$this->options['permissions'][$type]['rights'])
-				return false;
-			if(!$ignoreSession && $this->options['permissions'][$type]['session'] && !userutil::checkSession($this->sid))
-				return false;
-		}
-		if(!$this->options['permissions']['general']['none']){
-			if($this->options['permissions']['general']['rights']>0 && $this->user['rights']<$this->options['permissions']['general']['rights'])
-				return false;
-		}
-		return true;
+	public function addEvent($type, $ev){
+		if(!$this->hasEvent($type, $ev)) array_push($this->events[$type], $ev);
 	}
 	
-	public static function prepareData($v){
-		if(is_array($v))
-			foreach($v as $key => $val){
-				if(db::numeric($key) || $key===0){
-					$data[] = $val;
-				}elseif(is_array($val)){
-					if($val[1]){
-						if(!validator::call(array($val[1]), $val[0]))
-							return false;
-						$data[$key] = db::add(formatter::call($val[1], $val[0]));
-					}elseif($val[2]){
-						$data[$key] = array(
-							$val[0],
-							'operator' => $val[2]
-						);
-					}else{
-						$data[$key] = $val[0];
-					}
-				}else{
-					$data[$key] = $val;
-				}
-			}
-		
-		return $data;
+	public function removeEvent($type, $ev){
+		array_remove($this->events[$type], $ev);
+	}
+	
+	public function hasEvent($type, $ev){
+		return in_array($ev, $this->events[$type]);
+	}
+	
+	public function setTemplate($type, $tpl){
+		$this->templates[$type] = $tpl;
+	}
+	
+	public function getTemplate($type){
+		return $this->templates[$type];
 	}
 }
 ?>

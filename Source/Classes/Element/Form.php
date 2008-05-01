@@ -3,10 +3,13 @@ class Form extends Elements {
 	
 	public function __construct(){
 		parent::__construct(func_get_args());
+		
+		if(!$this->options['method'])
+			$this->options['method'] = 'post';
 	}
 	
-	public function format($tpl = null, $vars = array()){
-		return '<div'.$this->implode('skipName').'>'.parent::format($tpl, $vars).'</div>';
+	public function format($tpl = null){
+		return '<form'.$this->implode('skipName').'>'.parent::format($tpl).'</form>';
 	}
 	
 	//this method needs to be redone!
@@ -16,6 +19,7 @@ class Form extends Elements {
 		'db' => false,
 		'js' => false,
 	)){
+		$els = array();
 		foreach($this->elements as $el){
 			if(in_array($el->type, array('button', 'string')) || (!$options['all'] && !in_array($el->type, self::$formElements)))
 				continue;
@@ -68,9 +72,9 @@ class Form extends Elements {
 			$val = substr($val, 0, $el->options[':length'][1]);
 		
 		if($el->options[':validate'])
-			$val = parser::call($el->options[':validate'], $val);
+			$val = Data::call($val, $el->options[':validate']);
 		
-		return db::add(Util::cleanWhitespaces($val));
+		return Data::clean($val);
 	}
 	
 	public function prepareData($data, $alias = false){
@@ -96,7 +100,7 @@ class Form extends Elements {
 			if(!in_array($el->type, self::$formElements) || !$el->options[':validate'])
 				continue;
 			
-			$data = Util::cleanWhitespaces($data[$el->options['name']]);
+			$data = Data::clean($data[$el->options['name']]);
 			if(!$el->options[':empty'] && $el->options[':validate'][0]!='bool' && !$data){
 				$return = 'notempty';
 				break;
@@ -105,7 +109,7 @@ class Form extends Elements {
 			if(($el->options[':empty'] || $el->options[':validate'][0]=='bool') && !$data){
 				$v = true;
 			}else{
-				$v = Validator::call($el->options[':validate'], $data);
+				$v = Validator::call($data, $el->options[':validate']);
 				if($this->options[':length'] && $v===true && (strlen($data)<$this->options[':length'][0] || strlen($data)>$this->options[':length'][1]))
 					$v = false;
 			}
