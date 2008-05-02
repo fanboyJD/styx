@@ -3,7 +3,7 @@ abstract class Layer {
 	/**
 	 * A Form-Element instance
 	 *
-	 * @var form
+	 * @var Form
 	 */
 	public $form;
 	
@@ -12,10 +12,13 @@ abstract class Layer {
 		$templates = array(
 			'save' => '',
 			'edit' => '',
+			'new' => '',
+			'error' => '',
 		),
 		$events = array(
 			'save' => array('save'),
 			'edit' => array('edit'),
+			'new' => array('new'),
 		),
 		$javascript = array(
 			'helper' => '',
@@ -33,7 +36,7 @@ abstract class Layer {
 		if($initialize['table'])
 			$this->table = $initialize['table'];
 		
-		$this->options = Util::extend($this->options, $initialize['options']);
+		array_extend($this->options, $initialize['options']);
 		
 		if(!$this->options['identifier']){
 			$id = Core::retrieve('identifier.id');
@@ -67,6 +70,14 @@ abstract class Layer {
 		);*/
 	}
 	
+	public function __call($name, $args){
+		return preg_match('/^on[A-Z]/', $name) ? true : false;
+	}
+	
+	public function onError($get = null, $post = null, $handler = null, $pass = null){
+		
+	}
+	
 	public function handler($event, $get, $post){
 		$handler = strtolower($event);
 		$event = 'on'.ucfirst($handler);
@@ -74,14 +85,12 @@ abstract class Layer {
 		if($this->hasEvent('save', $handler) && is_array($post) && sizeof($post)){
 			
 		}elseif($this->hasEvent('edit', $handler)){
-			$pass = true;
-			if(method_exists($this, $event))
-				$pass = $this->{$event}($get, $post);
+			$pass = $this->{$event}($get, $post, $handler);
 			
 			if(!$pass || ($pass && !$pass['error']))
-				echo $this->edit($pass['edit'], $handler, $get);
+				$this->edit($get, $post, $handler, $pass);
 			elseif($pass['error'])
-				echo $pass['error'];
+				$this->onError($get, $post, $handler, $pass);
 		}else{
 			
 			//echo $this->{$event}();
@@ -90,19 +99,27 @@ abstract class Layer {
 		
 	}
 	
-	public function edit($v = null, $handler = null, $get = null){
-		if(!$v && $handler && $get['p'][$handler])
-			$v = array(
+	public function edit($get = null, $post = null, $handler = null, $pass = null){
+		if(!$pass['edit'] && !$pass['preventDefault'] && $handler && $get['p'][$handler])
+			$pass['edit'] = array(
 				$this->options['identifier']['external'] => array($get['p'][$handler], $this->options['identifier']['external'])
 			);
 		
-		if(Validator::check($v))
-			$this->form->setValue(db::getInstance()->select($this->table)->where($v)->fetch());
+		if(Validator::check($pass['edit'])){
+			$data = db::getInstance()->select($this->table)->where($v)->fetch();
+			if($data){
+				$this->form->addElement(new HiddenInput(array(
+					'name' => $this->options['identifier']['internal']
+				)));
+				
+				$this->form->setValue($data);
+			}
+		}
 		
-		$options = Util::extend(array(
+		$options = array_extend(array(
 			'fields' => $this->form->getFields(array('js' => true)),
 		), $this->options['jsoptions']);
-			
+		
 		Script::set("
 			".$this->javascript['helper']." = new ".$this->javascript['helpername']."('".$this->form->options['id']."', ".json_encode($options).");
 			".$this->form->getEvents($this->javascript['helper'])."
@@ -151,6 +168,10 @@ abstract class Layer {
 	
 	public function getTemplate($type){
 		return $this->templates[$type];
+	}
+	
+	public static function execute(){
+		include(func_get_arg(0));
 	}
 }
 ?>

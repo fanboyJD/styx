@@ -104,7 +104,10 @@ class db {
 	}
 	
 	public function fetch($query, $type = null){
-		return mysql_fetch_array($query, ($type ? $type : MYSQL_ASSOC));
+		if(!$query) return false;
+		
+		$row = mysql_fetch_array($query, ($type ? $type : MYSQL_ASSOC));
+		return $row ? $row : false;
 	}
 	
 	public function getId(){

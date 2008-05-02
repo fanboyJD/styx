@@ -60,16 +60,18 @@ class Cache extends DynamicStorage {
 		return $content;
 	}
 	
-	public function store($key, $id, $content, $ttl = 3600){
-		if(!$content) return;
+	public function store($key, $id, $input, $ttl = 3600){
+		if(!$input) return;
 		
-		$content = Data::clean($content);
+		$content = Data::clean($input);
 		parent::store($key.'/'.$id, $content);
-		$content = json_encode($content);
+		
 		if($this->engineInstance && $ttl!='file')
-			$this->engineInstance->store($key.'/'.$id, $content, $ttl);
+			$this->engineInstance->store($key.'/'.$id, json_encode($content), $ttl);
 		else
-			$this->filecacheInstance->store($key.'/'.$id, $content, $ttl);
+			$this->filecacheInstance->store($key.'/'.$id, json_encode($content), $ttl);
+		
+		return $input;
 	}
 	
 	public function erase($key, $id, $force = false){

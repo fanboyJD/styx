@@ -10,7 +10,5 @@
 	// Here's the basic configuration
 	Core::store(array(
 		'debugMode' => false,
-		'identifier.id' => 'id',
-		'identifier.pagetitle' => 'pagetitle',
 	));
 ?>

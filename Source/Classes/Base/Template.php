@@ -1,61 +1,93 @@
 <?php
 class Template {
 	private $assigned = array(),
-		$dir = null,
-		$file = null;
+		$file = array(),
+		$obj = null;
 	
 	private static $paths = null;
 	
-	private function __construct(){}
+	private function __construct($file){
+		$this->file = $file;
+	}
 	private function __clone(){}
 	
-	private function setFile($dir, $file){
-		$this->dir = $dir;
-		$this->file = $file;
-		return $this;
+	private static function getFileName($file){
+		$loadFile = self::$paths['appRoot'].$file;
+		if(!file_exists($loadFile)){
+			$loadFile = self::$paths['root'].$file;
+			if(!file_exists($loadFile))
+				return false;
+		}
+		
+		return $loadFile;
 	}
 	
 	private function getFile(){
 		/* @var $c cache */
 		$c = Cache::getInstance();
 		
-		$file = $this->dir.'/'.$this->file.'.tpl';
+		$ext = pathinfo(end($this->file), PATHINFO_EXTENSION);
+		$file = implode('/', $this->file).(!$ext ? $ext = '.tpl' : '');
+		
+		$allowExecution = in_array($ext, array('php', 'phtml'));
+		
+		if($allowExecution){
+			if($this->obj && method_exists($this->obj, 'execute')){
+				ob_start();
+				
+				$filename = self::getFileName($file);
+				if(!$filename) return;
+				
+				$this->obj->execute($filename);
+				return ob_get_clean();
+			}else{
+				// We stop here if the extension is not a template for 
+				// security reasons (code may gets exposed)
+				return;
+			}
+		}
 		
 		if(!Core::retrieve('debugMode'))
-			$content = $c->retrieve('Templates', $file);
+			return $c->retrieve('Templates', $file);
 		
-		if(!$content){
-			$loadFile = self::$paths['appRoot'].$file;
-			if(!file_exists($loadFile))
-				$loadFile = self::$paths['root'].$file;
-			
-			$content = file_get_contents($loadFile);
-			$c->store('Templates', $file, $content, ONE_WEEK);
-		}
-		return $content;
+		
+		$filename = self::getFileName($file);
+		if(!$filename) return;
+		
+		return $c->store('Templates', $file, file_get_contents($filename), ONE_WEEK);
 	}
 	
-	public static function map($dir, $file){
+	public static function map($file){
 		if(!self::$paths)
 			self::$paths = array(
 				'root' => realpath(Core::retrieve('path').'Templates/'),
 				'appRoot' => realpath(Core::retrieve('appPath').'Templates/'),
 			);
 		
-		$t = new Template();
+		$args = func_get_args();
+		if(sizeof($args)==1 && !is_array($file))
+			$args = splat($file);
 		
-		return $t->setFile($dir, $file);
+		return new Template($args);
+	}
+	
+	public function object($obj){
+		if(is_object($obj))
+			$this->obj = $obj;
+		
+		return $this;
 	}
 	
 	public function assign($array){
-		$this->assigned = is_array($array) ? array_merge($this->assigned, $array) : $this->assigned;
+		$this->assigned = array_extend($this->assigned, splat($array));
+		
 		return $this;
 	}
 	
 	public function parse($return = false){
 		$out = $this->getFile();
 		
-		$this->assigned = Util::multiImplode($this->assigned);
+		array_flatten($this->assigned);
 		
 		preg_match_all('/\\${([A-z0-9\-_\.]+?)\}/i', $out, $vars);
 		

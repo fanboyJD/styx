@@ -8,12 +8,15 @@ class DynamicStorage {
 			foreach($key as $k => $val)
 				$this->store($k, $val);
 			
-			return;
+			return $key;
 		}
+		
 		if(!$this->Storage[$key] || $this->Storage[$key]!=$value){
 			$this->Storage[$key] = $value;
 			if(!$value) $this->erase($key);
 		}
+		
+		return $value;
 	}
 	
 	public function retrieve($key, $value = null){
@@ -29,7 +32,7 @@ class DynamicStorage {
 	
 	public function eraseBy($key){
 		foreach($this->Storage as $k => $v)
-			if(Util::startsWith($k, $key))
+			if(startsWith($k, $key))
 				unset($this->Storage[$k]);
 	}
 	

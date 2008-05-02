@@ -14,6 +14,12 @@ class IndexLayer extends Layer {
 					'name' => 'title',
 					':caption' => 'Titel',
 				)),
+				new Textarea(array(
+					'name' => 'content',
+					':caption' => 'Text',
+					'cols' => 20,
+					'rows' => 5,
+				)),
 				new Button(array(
 					'name' => 'bsave',
 					':caption' => 'EinTest',
@@ -25,7 +31,8 @@ class IndexLayer extends Layer {
 	public function onEdit(){
 		
 		/*return array(
-			'edit' => array('uid' => 1)
+			'edit' => array('uid' => 1),
+			'preventDefault' => true,
 		);*/
 		
 	}

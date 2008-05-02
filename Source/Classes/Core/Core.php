@@ -6,7 +6,7 @@ class Core extends StaticStorage {
 	private function __construct(){}
 	private function __clone(){}
 	
-	public static function classFileExists($class, $toLoad = null){
+	public static function classExists($class, $toLoad = null){
 		$toLoad = in_array($toLoad, array('Classes', 'Layers')) ? $toLoad : 'Classes';
 		
 		$class = strtolower($class);
@@ -19,7 +19,7 @@ class Core extends StaticStorage {
 	}
 	
 	public static function autoload($class, $toLoad = null){
-		$file = self::classFileExists($class, $toLoad);
+		$file = self::classExists($class, $toLoad);
 		
 		if($file && !class_exists($class))
 			require_once($file);

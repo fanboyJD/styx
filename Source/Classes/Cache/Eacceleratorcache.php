@@ -26,14 +26,14 @@ class eacceleratorcache {
 		$prefix = explode('/', $key);
 		$keys = eaccelerator_list_keys();
 		foreach($keys as $val)
-			if(Util::startsWith($val['name'], ':'.$this->prefix.$key))
+			if(startsWith($val['name'], ':'.$this->prefix.$key))
 				$this->erase($prefix[0].'/'.substr($val['name'], strrpos($val['name'], '/')+1));
 	}
 	
 	public function eraseAll(){
 		$keys = eaccelerator_list_keys();
 		foreach($keys as $val)
-			if(Util::startsWith($val['name'], ':'.$this->prefix))
+			if(startsWith($val['name'], ':'.$this->prefix))
 				$this->erase(substr($val['name'], strrpos($val['name'], $this->prefix)+strlen($this->prefix)));
 	}
 }

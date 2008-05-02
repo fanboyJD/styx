@@ -149,10 +149,10 @@ class Data {
 			return $title;
 		
 		foreach($options['contents'] as $content)
-			if((!$options['editId'] || $options['editId']!=$content['id']) && strtolower($content['pagetitle'])==strtolower($title.(self::id($i) ? (!Util::endsWith($title, '_') ? '_' : '').$i : '')))
+			if((!$options['editId'] || $options['editId']!=$content['id']) && strtolower($content['pagetitle'])==strtolower($title.(self::id($i) ? (!endsWith($title, '_') ? '_' : '').$i : '')))
 				return self::checkTitle($title, ++$i, $options);
 		
-		return $title.(self::id($i) ? (!Util::endsWith($title, '_') ? '_' : '').$i : '');
+		return $title.(self::id($i) ? (!endsWith($title, '_') ? '_' : '').$i : '');
 	}
 	
 }

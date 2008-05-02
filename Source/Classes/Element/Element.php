@@ -50,7 +50,7 @@ abstract class Element {
 	}
 	
 	public static function skipable($key){
-		return Util::startsWith($key, ':');
+		return startsWith($key, ':');
 	}
 		
 	public function getEvents($helper){
@@ -141,11 +141,6 @@ class Elements extends Element {
 		parent::__construct($options);
 	}
 	
-	public function addElement($el){
-		array_push($this->elements, $el);
-		return $el;
-	}
-	
 	public function format($tpl = null){
 		$els = array();
 		foreach($this->elements as $el)
@@ -158,6 +153,25 @@ class Elements extends Element {
 			$out = implode($els);
 		
 		return $out;
+	}
+	
+	public function addElement($el){
+		if(!$this->hasElement($el))
+			array_push($this->elements, $el);
+		
+		return $el;
+	}
+	
+	public function removeElement($el){
+		array_remove($this->elements, $el);
+	}
+	
+	public function hasElement($el){
+		foreach($this->elements as $elem)
+			if($el->options['name']==$elem->options['name'])
+				return true;
+		
+		return false;
 	}
 }
 
@@ -268,8 +282,9 @@ class Checkbox extends Element {
 class Textarea extends Element {
 	
 	public function __construct($options, $type = null){
-		$options['cols'] = 0;
-		$options['rows'] = 0;
+		foreach(array('cols', 'rows') as $v)
+			if(!$options[$v]) $options[$v] = 0;
+		
 		parent::__construct($options, $type ? $type : 'textarea');
 	}
 	
