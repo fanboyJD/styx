@@ -1,12 +1,19 @@
 <?php
 class Route {
 	
+	private static $mainLayer = null;
+	
 	private function __construct(){}
 	private function __clone(){}
 	
 	public static function initialize(&$get, &$post){
+		self::$mainLayer = $get['n'][0];
 		
 		self::initializeLayer($get['n'][0], $get['n'][1], $get, $post);
+	}
+	
+	public static function getMainLayer(){
+		return self::$mainLayer;
 	}
 	
 	public static function initializeLayer($layerName, $event, &$get, &$post){
@@ -20,7 +27,7 @@ class Route {
 			return false;
 		
 		$layer = new $class($layerName);
-		$layer->handler($event, $get, $post);
+		$layer->handle($event, $get, $post);
 	}
 }
 ?>

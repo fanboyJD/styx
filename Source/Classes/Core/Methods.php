@@ -1,8 +1,18 @@
 <?php
 	class EmptyClass {
+		
 		public function __call($name, $args){
 			return $this;
 		}
+		
+	}
+	
+	abstract class Runner {
+		
+		public function execute(){
+			include(func_get_arg(0));
+		}
+		
 	}
 	
 	function array_remove(&$array, $value){

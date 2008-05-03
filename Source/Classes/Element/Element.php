@@ -1,13 +1,13 @@
 <?php
 /* ELEMENT CLASS */
-abstract class Element {
+abstract class Element extends Runner {
 	
-	public $type = null,
+	public $name = null,
+		$type = null,
 		$options = array(
 			/*Keys:
 				:caption
 				:alias (no db field (for username etc.))
-				:nobreak
 				:readOnly (only read from db)
 				:events
 				:default (for checkbox, defaultvalue)
@@ -23,8 +23,9 @@ abstract class Element {
 	private static $uid = 0;
 	protected static $formElements = array('input', 'checkbox', 'radio', 'select', 'textarea', 'richtext');
 	
-	public function __construct($options, $type = 'element'){
+	public function __construct($options, $name, $type = 'element'){
 		$this->options = $options;
+		$this->name = $name;
 		$this->type = $type ? $type : 'element';
 		
 		if($this->options[':validate'] && !is_array($this->options[':validate']))
@@ -45,14 +46,15 @@ abstract class Element {
 		}
 	}
 	
-	public function format(){
-		return '';
+	public function format($pass = null){
+		return Template::map('Element', $this->name)->object($this)->assign($this->options)->assign($pass ? $pass : array('attributes' => $this->implode()))->parse(true);
 	}
 	
 	public static function skipable($key){
 		return startsWith($key, ':');
 	}
-		
+	
+	//have a look at this one
 	public function getEvents($helper){
 		if(!is_array($this->options[':events']))
 			return;
@@ -132,13 +134,14 @@ class Elements extends Element {
 	
 	public function __construct(){
 		$this->elements = func_get_args();
-		if(is_subclass_of($this, 'Elements'))
+		if(is_subclass_of($this, 'Elements')){
+			$name = $this->elements[1];
 			$this->elements = $this->elements[0];
-		
+		}
 		if(is_array($this->elements[0]))
 			$options = array_shift($this->elements);
 		
-		parent::__construct($options);
+		parent::__construct($options, $name ? $name : get_class());
 	}
 	
 	public function format($tpl = null){
@@ -182,13 +185,9 @@ class Input extends Element {
 		if(!$options['type'])
 			$options['type'] = 'text';
 		
-		parent::__construct($options, 'input');
+		parent::__construct($options, get_class(), 'input');
 	}
 	
-	public function format(){
-		return ($this->options[':caption'] ? '<span class="b">'.$this->options[':caption'].'</span>'.(!$this->options[':nobreak'] ? '<br/>' : '') : '').'
-			<input'.$this->implode().'/>'.(!$this->options[':nobreak'] ? '<br/>' : '');
-	}
 }
 
 /* HIDDEN CLASS */
@@ -198,36 +197,31 @@ class HiddenInput extends Input {
 	public function __construct($options){
 		$options['type'] = 'hidden';
 		
-		parent::__construct($options);
+		parent::__construct($options, get_class());
 	}
 	
-	public function format(){
-		return '<input'.$this->implode().'/>';
-	}
 }
 
 /* BUTTON CLASS */
 class Button extends Element {
 	
 	public function __construct($options){
-		parent::__construct($options, 'button');
+		parent::__construct($options, get_class(), 'button');
 	}
 	
-	public function format(){
-		return '<button'.$this->implode().'>'.$this->options[':caption'].'</button>';
-	}
 }
 
 /* FIELD CLASS */
 class Field extends Element {
 	
 	public function __construct($options){
-		parent::__construct($options, 'field');
+		parent::__construct($options, get_class(), 'field');
 	}
 	
 	public function format(){
 		return '';
 	}
+	
 }
 
 /* RADIO CLASS */
@@ -236,32 +230,24 @@ class Radio extends Element {
 	public function __construct($options){
 		$options['type'] = 'radio';
 		
-		parent::__construct($options, 'radio');
+		parent::__construct($options, get_class().'.php', 'radio');
 	}
 	
-	public function format(){
-		foreach($this->options[':elements'] as $val)
-			$els[] = '<label><input value="'.$val['value'].'"'.$this->implode(array('skipValue', 'skipId')).' '.($val['value']==$this->options['value'] ? 'checked="checked" ' : '').'/> '.$val[':caption'].'</label>';
-		
-		return ($this->options[':caption'] ? '<span class="b">'.$this->options[':caption'].'</span><br/>' : '').'
-			<div id="'.$this->options['id'].'">'.implode($els).'</div>';
-	}
 }
 
 /* SELECT CLASS */
 class Select extends Element {
 	
 	public function __construct($options){
-		parent::__construct($options, 'select');
+		parent::__construct($options, get_class().'.php', 'select');
 	}
 	
 	public function format(){
-		foreach($this->options[':elements'] as $val)
-			$els[] = '<option value="'.$val['value'].'"'.$this->implode(array('skipValue', 'skipId', 'skipName')).($val['value']==$this->options['value'] ? ' selected="selected"' : '').'>'.$val[':caption'].'</option>';
-		
-		return ($this->options[':caption'] ? '<span class="b">'.$this->options[':caption'].'</span><br/>' : '').'
-			<div><select'.$this->implode('skipValue').'>'.implode($els).'</select></div>';
+		return parent::format(array(
+			'attributes' => $this->implode('skipValue'),
+		));
 	}
+	
 }
 
 /* CHECKBOX CLASS */
@@ -270,12 +256,16 @@ class Checkbox extends Element {
 	public function __construct($options){
 		$options['type'] = 'checkbox';
 		
-		parent::__construct($options, 'checkbox');
+		parent::__construct($options, get_class(), 'checkbox');
 	}
 	
 	public function format(){
-		return '<label><input value="'.$this->options[':default'].'"'.$this->implode('skipValue').' '.($this->options[':default']==$this->options['value'] ? 'checked="checked" ' : '').'/> '.$this->options[':caption'].'</label>';
+		return parent::format(array(
+			'attributes' => $this->implode('skipValue'),
+			'checked' => ($this->options[':default']==$this->options['value'] ? 'checked="checked" ' : ''),
+		));
 	}
+	
 }
 
 /* TEXTAREA CLASS */
@@ -285,20 +275,22 @@ class Textarea extends Element {
 		foreach(array('cols', 'rows') as $v)
 			if(!$options[$v]) $options[$v] = 0;
 		
-		parent::__construct($options, $type ? $type : 'textarea');
+		parent::__construct($options, get_class(), $type ? $type : 'textarea');
 	}
 	
 	public function format(){
-		return ($this->options[':caption'] ? '<span class="b">'.$this->options[':caption'].'</span>'.(!$this->options[':nobreak'] ? '<br/>' : '') : '').'
-				<textarea'.$this->implode('skipValue').'>'.$this->options['value'].'</textarea><br/>';
+		return parent::format(array(
+			'attributes' => $this->implode('skipValue'),
+		));
 	}
+	
 }
 
 /* RICHTEXT CLASS */
 class RichText extends Textarea {
 	
 	public function __construct($options){
-		parent::__construct($options, 'richtext');
+		parent::__construct($options, get_class(), 'richtext');
 		
 		$this->addClass('richtext');
 	}

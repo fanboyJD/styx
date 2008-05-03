@@ -3,10 +3,12 @@
 	
 	Handler::getInstance()->behaviour('html')->setTemplate('index')->assign(array(
 		'appName' => Core::retrieve('appName'),
-		'body' => 'yeah',
+		'body' => '',
 	))->parse();
 	
-	Handler::getInstance()->behaviour('json')->assign(array(
+	Handler::getInstance()->behaviour('xml', 'json')->disable();
+	
+	/*Handler::getInstance()->behaviour('json')->assign(array(
 		'test' => 'a',
 		'body' => array(
 			'here goes something that could be used for an API :)',
@@ -23,5 +25,5 @@
 				'descr' => 'yes',
 			),
 		),
-	))->setTemplate('rss.php')->parse();
+	))->setTemplate('rss.php')->parse();*/
 ?>

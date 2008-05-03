@@ -28,7 +28,8 @@
 	
 	db::getInstance(Core::retrieve('database'));
 	
-	Handler::getInstance()->setType($_GET['p']['handler']);
+	Handler::setHandlers(Core::retrieve('handler'));
+	Handler::setType($_GET['p']['handler']);
 	
 	Route::initialize($_GET, $_POST);
 ?>

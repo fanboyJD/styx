@@ -7,6 +7,6 @@
 	${scripts}
 </head>
 <body>
-${body}
+${layer}
 </body>
 </html>

@@ -49,7 +49,6 @@ class Core extends StaticStorage {
 	public static function initialize(){
 		if(self::$Initialized) return;
 		
-		/* @var $c Cache */
 		$c = Cache::getInstance(self::retrieve('cacheOptions', array()));
 		
 		$isDebug = self::retrieve('debugMode');

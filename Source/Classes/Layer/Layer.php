@@ -1,20 +1,17 @@
 <?php
-abstract class Layer {
+abstract class Layer extends Runner {
 	/**
-	 * A Form-Element instance
-	 *
 	 * @var Form
 	 */
-	public $form;
+	protected $form;
 	
-	public $name,
+	/**
+	 * @var Handler
+	 */
+	protected $Handler = null;
+	
+	protected $name,
 		$table,
-		$templates = array(
-			'save' => '',
-			'edit' => '',
-			'new' => '',
-			'error' => '',
-		),
 		$events = array(
 			'save' => array('save'),
 			'edit' => array('edit'),
@@ -26,6 +23,7 @@ abstract class Layer {
 		),
 		$options = array(
 			'identifier' => null,
+			'javascript' => array(),
 		);
 	
 	public function __construct($name){
@@ -78,19 +76,21 @@ abstract class Layer {
 		
 	}
 	
-	public function handler($event, $get, $post){
-		$handler = strtolower($event);
-		$event = 'on'.ucfirst($handler);
+	public function handle($event, $get, $post){
+		$event = array(strtolower($event));
+		$event[] = 'on'.ucfirst($event[0]);
 		
-		if($this->hasEvent('save', $handler) && is_array($post) && sizeof($post)){
+		$this->Handler = Handler::getInstance('layer.'.$this->name);
+		
+		if($this->hasEvent('save', $event[0]) && is_array($post) && sizeof($post)){
 			
-		}elseif($this->hasEvent('edit', $handler)){
-			$pass = $this->{$event}($get, $post, $handler);
+		}elseif($this->hasEvent('edit', $event[0])){
+			$pass = $this->{$event[1]}($get, $post, $event[0]);
 			
 			if(!$pass || ($pass && !$pass['error']))
-				$this->edit($get, $post, $handler, $pass);
+				$this->edit($get, $post, $event[0], $pass);
 			elseif($pass['error'])
-				$this->onError($get, $post, $handler, $pass);
+				$this->onError($get, $post, $event[0], $pass);
 		}else{
 			
 			//echo $this->{$event}();
@@ -106,7 +106,7 @@ abstract class Layer {
 			);
 		
 		if(Validator::check($pass['edit'])){
-			$data = db::getInstance()->select($this->table)->where($v)->fetch();
+			$data = db::getInstance()->select($this->table)->where($pass['edit'])->fetch();
 			if($data){
 				$this->form->addElement(new HiddenInput(array(
 					'name' => $this->options['identifier']['internal']
@@ -116,16 +116,16 @@ abstract class Layer {
 			}
 		}
 		
-		$options = array_extend(array(
+		array_extend($options = array(
 			'fields' => $this->form->getFields(array('js' => true)),
-		), $this->options['jsoptions']);
+		), $this->options['javascript']);
 		
 		Script::set("
 			".$this->javascript['helper']." = new ".$this->javascript['helpername']."('".$this->form->options['id']."', ".json_encode($options).");
 			".$this->form->getEvents($this->javascript['helper'])."
 		");
 		
-		return $this->form->format($this->getTemplate('edit'));
+		$this->Handler->assign($this->form->format($this->getTemplate('edit')));
 	}
 	
 	public function save($data, $options = array(
@@ -136,7 +136,6 @@ abstract class Layer {
 		$dbdata = $this->form->prepareDatabaseData($data);
 		
 		if($validation===true && $this->table && !$options['noDefault']){
-			/* @var $db db */
 			$db = db::getInstance();
 			if($options['update'])
 				$db->update($this->table, $options['update'], $dbdata);
@@ -162,16 +161,5 @@ abstract class Layer {
 		return in_array($ev, $this->events[$type]);
 	}
 	
-	public function setTemplate($type, $tpl){
-		$this->templates[$type] = $tpl;
-	}
-	
-	public function getTemplate($type){
-		return $this->templates[$type];
-	}
-	
-	public static function execute(){
-		include(func_get_arg(0));
-	}
 }
 ?>

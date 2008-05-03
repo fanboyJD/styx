@@ -30,6 +30,10 @@ class db {
 		$this->closeConnection();
 	}
 	
+	/**
+	 * @param array $options
+	 * @return Db
+	 */
 	public static function getInstance($options = null){
 		if(!self::$Instance)
 			self::$Instance = new db($options);
@@ -61,18 +65,34 @@ class db {
 		}
 	}
 	
+	/**
+	 * @param string $table
+	 * @return QuerySelect
+	 */
 	public function select($table){
 		return new QuerySelect($table);
 	}
 	
+	/**
+	 * @param string $table
+	 * @return QueryHandler
+	 */
 	public function update($table){
 		return new QueryHandler($table, 'update');
 	}
 	
+	/**
+	 * @param string $table
+	 * @return QueryHandler
+	 */
 	public function insert($table){
 		return new QueryHandler($table, 'insert');
 	}
 	
+	/**
+	 * @param string $table
+	 * @return QueryHandler
+	 */
 	public function delete($table){
 		return new QueryHandler($table, 'delete');
 	}

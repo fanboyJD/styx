@@ -9,6 +9,8 @@
 			'user' => 'root',
 			'password' => '',
 			'db' => 'framework'
-		)
+		),
+		
+		'handler' => array('html', 'json', 'xml'),
 	);
 ?>

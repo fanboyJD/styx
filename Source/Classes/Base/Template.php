@@ -23,7 +23,6 @@ class Template {
 	}
 	
 	private function getFile(){
-		/* @var $c cache */
 		$c = Cache::getInstance();
 		
 		$ext = pathinfo(end($this->file), PATHINFO_EXTENSION);
@@ -57,6 +56,10 @@ class Template {
 		return $c->store('Templates', $file, file_get_contents($filename), ONE_WEEK);
 	}
 	
+	/**
+	 * @param mixed $file
+	 * @return Template
+	 */
 	public static function map($file){
 		if(!self::$paths)
 			self::$paths = array(
@@ -71,6 +74,9 @@ class Template {
 		return new Template($args);
 	}
 	
+	/**
+	 * @return Template
+	 */
 	public function object($obj){
 		if(is_object($obj))
 			$this->obj = $obj;
@@ -78,6 +84,9 @@ class Template {
 		return $this;
 	}
 	
+	/**
+	 * @return Template
+	 */
 	public function assign($array){
 		$this->assigned = array_extend($this->assigned, splat($array));
 		
@@ -89,7 +98,7 @@ class Template {
 		
 		array_flatten($this->assigned);
 		
-		preg_match_all('/\\${([A-z0-9\-_\.]+?)\}/i', $out, $vars);
+		preg_match_all('/\\${([A-z0-9\-_\.\:]+?)\}/i', $out, $vars);
 		
 		$rep = array(
 			array_values($vars[0]),

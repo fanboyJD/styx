@@ -2,7 +2,7 @@
 class Form extends Elements {
 	
 	public function __construct(){
-		parent::__construct(func_get_args());
+		parent::__construct(func_get_args(), get_class());
 		
 		if(!$this->options['method'])
 			$this->options['method'] = 'post';

@@ -32,6 +32,10 @@ class Cache extends DynamicStorage {
 	
 	private function __clone(){}
 	
+	/**
+	 * @param array $options
+	 * @return Cache
+	 */
 	public static function getInstance($options = null){
 		if(!self::$Instance)
 			self::$Instance = new Cache($options);

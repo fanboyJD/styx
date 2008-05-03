@@ -1,0 +1,1 @@
+<button${attributes}>${:caption}</button>
