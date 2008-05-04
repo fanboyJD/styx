@@ -13,9 +13,8 @@ abstract class Layer extends Runner {
 	protected $name,
 		$table,
 		$events = array(
-			'save' => array('save'),
-			'edit' => array('edit'),
-			'new' => array('new'),
+			'save' => 'save',
+			'error' => 'error',
 		),
 		$javascript = array(
 			'helper' => '',
@@ -25,6 +24,11 @@ abstract class Layer extends Runner {
 			'identifier' => null,
 			'javascript' => array(),
 		);
+	
+	private $event = null,
+		$get = array(),
+		$post = array(),
+		$parsed = null;
 	
 	public function __construct($name){
 		$this->name = $this->table = $name;
@@ -51,9 +55,6 @@ abstract class Layer extends Runner {
 		
 		$this->form = $initialize['form'];
 		
-		if(!$this->form->options['action'])
-			$this->form->options['action'] = $this->name.'/'.reset($this->events['save']);
-		
 		$this->javascript['helper'] = 'Helpers.'.$this->form->options['id'];
 		$this->javascript['helpername'] = 'Helper';
 	}
@@ -68,44 +69,31 @@ abstract class Layer extends Runner {
 		);*/
 	}
 	
-	public function __call($name, $args){
-		return preg_match('/^on[A-Z]/', $name) ? true : false;
-	}
-	
-	public function onError($get = null, $post = null, $handler = null, $pass = null){
-		
-	}
-	
-	public function handle($event, $get, $post){
+	public function handle($event, &$get, &$post){
 		$event = array(strtolower($event));
 		$event[] = 'on'.ucfirst($event[0]);
 		
 		$this->Handler = Handler::getInstance('layer.'.$this->name);
 		
-		if($this->hasEvent('save', $event[0]) && is_array($post) && sizeof($post)){
-			
-		}elseif($this->hasEvent('edit', $event[0])){
-			$pass = $this->{$event[1]}($get, $post, $event[0]);
-			
-			if(!$pass || ($pass && !$pass['error']))
-				$this->edit($get, $post, $event[0], $pass);
-			elseif($pass['error'])
-				$this->onError($get, $post, $event[0], $pass);
-		}else{
-			
-			//echo $this->{$event}();
-			
-		}
+		$this->get = &$get;
+		$this->post = &$post;
+		$this->event = $event[0];
 		
+		if($this->getDefaultEvent('save')==$this->event && is_array($this->post) && sizeof($this->post)){
+			$parsed = $this->parseData($this->post);
+			$this->{$event[1]}($parsed[0], $parsed[1], $parsed[2]);
+		}else
+			$this->{$event[1]}();
 	}
 	
-	public function edit($get = null, $post = null, $handler = null, $pass = null){
-		if(!$pass['edit'] && !$pass['preventDefault'] && $handler && $get['p'][$handler])
+	/* EditHandler Begin */
+	public function edit($pass = null){
+		if(!$pass['edit'] && !$pass['preventDefault'] && $this->event && $this->get['p'][$this->event])
 			$pass['edit'] = array(
-				$this->options['identifier']['external'] => array($get['p'][$handler], $this->options['identifier']['external'])
+				$this->options['identifier']['external'] => array($this->get['p'][$this->event], $this->options['identifier']['external']),
 			);
 		
-		if(Validator::check($pass['edit'])){
+		if(Validator::check($pass['edit']) && $this->table){
 			$data = db::getInstance()->select($this->table)->where($pass['edit'])->fetch();
 			if($data){
 				$this->form->addElement(new HiddenInput(array(
@@ -116,50 +104,93 @@ abstract class Layer extends Runner {
 			}
 		}
 		
-		array_extend($options = array(
+		$this->form->get('action', $this->name.'/'.$this->getDefaultEvent('save').($data ? ':'.$data[$this->options['identifier']['internal']] : ''));
+		
+		/*array_extend($options = array(
 			'fields' => $this->form->getFields(array('js' => true)),
 		), $this->options['javascript']);
 		
 		Script::set("
 			".$this->javascript['helper']." = new ".$this->javascript['helpername']."('".$this->form->options['id']."', ".json_encode($options).");
 			".$this->form->getEvents($this->javascript['helper'])."
-		");
+		");*/
 		
-		$this->Handler->assign($this->form->format($this->getTemplate('edit')));
+		return $this->form->format();
 	}
 	
-	public function save($data, $options = array(
-		'noDefault' => false,
-		'update' => null
-	)){
-		$validation = $this->form->validate($data);
-		$dbdata = $this->form->prepareDatabaseData($data);
+	public function add($pass = null){
+		$array = array('preventDefault' => true);
+		return $this->edit($pass ? array_extend($pass, $array) : $array);
+	}
+	/* EditHandler End */
+	
+	/* SaveHandler Begin */
+	public function prepare($data, $alias = false){
+		return $this->form->prepare($data, $alias);
+	}
+	
+	public function validate($data){
+		return $this->form->validate($data);
+	}
+	
+	public function parseData($data){
+		if($this->parsed)
+			return $this->parsed;
 		
-		if($validation===true && $this->table && !$options['noDefault']){
-			$db = db::getInstance();
-			if($options['update'])
-				$db->update($this->table, $options['update'], $dbdata);
-			else
-				$db->insert($this->table, $dbdata);
+		$prepared = $this->prepare($data);
+		
+		if($data[$this->options['identifier']['internal']]){
+			$where = array(
+				$this->options['identifier']['internal'] => array($data[$this->options['identifier']['internal']], $this->options['identifier']['internal']),
+			);
+			
+			$this->form->setValue(array(
+				$this->options['identifier']['internal'] => '',
+			));
+			unset($prepared[$this->options['identifier']['internal']]);
 		}
 		
-		return array(
-			'validation' => $validation,
-			'data' => $dbdata,
+		return $this->parsed = array(
+			$prepared,
+			$this->form->validate($data),
+			$where,
 		);
 	}
 	
-	public function addEvent($type, $ev){
-		if(!$this->hasEvent($type, $ev)) array_push($this->events[$type], $ev);
+	public function save($where = null){
+		if(!$where)
+			$where = $this->parsed[2];
+		
+		$data = $this->form->getValue();
+		if(!$data)
+			return;
+		
+		if(!$this->table)
+			return;
+		
+		if($where)
+			db::getInstance()->update($this->table)->set($data)->where($where)->query();
+		else
+			db::getInstance()->insert($this->table)->set($data)->query();
+	}
+	/* SaveHandler End */
+	
+	public function getDefaultEvent($event){
+		return $this->events[$event];
 	}
 	
-	public function removeEvent($type, $ev){
-		array_remove($this->events[$type], $ev);
+	public function setDefaultEvent($event, $name){
+		return $this->events[$event] = $name;
 	}
 	
-	public function hasEvent($type, $ev){
-		return in_array($ev, $this->events[$type]);
+	public function getPagetitle($title, $where){
+		if($this->table)
+			$options['contents'] = db::getInstance()->select($this->table)->retrieve();
+		
+		if($where[$this->options['identifier']['internal']])
+			$options['id'] = Data::call($where[$this->options['identifier']['internal']][0], $where[$this->options['identifier']['internal']][1]);
+		
+		return Data::pagetitle($title, $options);
 	}
-	
 }
 ?>

@@ -1,2 +1,2 @@
 <label>${:caption}</label>
-<textarea${attributes}> ${value}</textarea>
+<textarea${attributes}>${value}</textarea>

@@ -1,6 +1,7 @@
 <?php
 	$_CONFIGURATION = array(
 		'appName' => 'My Sample Application',
+		'appLink' => 'http://svn/Framework/trunk/Public/Sample/Public/index.php/',
 		
 		'debugMode' => true,
 		

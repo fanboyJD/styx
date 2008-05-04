@@ -3,6 +3,7 @@
 	
 	Handler::getInstance()->behaviour('html')->setTemplate('index')->assign(array(
 		'appName' => Core::retrieve('appName'),
+		'appLink' => Core::retrieve('appLink'),
 		'body' => '',
 	))->parse();
 	

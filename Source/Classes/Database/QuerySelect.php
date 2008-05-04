@@ -22,12 +22,20 @@ class QuerySelect extends QueryHandler implements Iterator {
 		return $data ? ' ORDER BY '.implode(',', splat($data)) : '';
 	}
 	
+	/**
+	 * @param array $data
+	 * @return QuerySelect
+	 */
 	public function fields($data){
 		$this->Storage->store('fields', $data);
 		
 		return $this;
 	}
 	
+	/**
+	 * @param mixed $data
+	 * @return QuerySelect
+	 */
 	public function order($data){
 		$this->Storage->store('order', $data);
 		

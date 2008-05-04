@@ -21,7 +21,7 @@ class Form extends Elements {
 	)){
 		$els = array();
 		foreach($this->elements as $el){
-			if(in_array($el->type, array('button', 'string')) || (!$options['all'] && !in_array($el->type, self::$formElements)))
+			if($el->type=='button' || (!$options['all'] && !in_array($el->type, self::$formElements)))
 				continue;
 			if(!$options['detail'] && !$options['js'] && $el->options['detail'])
 				continue;
@@ -52,6 +52,7 @@ class Form extends Elements {
 	
 	public function getEvents($helper){
 		$els = array();
+		
 		foreach($this->elements as $el)
 			$els[] = $el->getEvents($helper);
 		
@@ -64,62 +65,54 @@ class Form extends Elements {
 				$el->setValue($data[$el->options['name']]);
 	}
 	
-	public function prepareElementData($val, $el){
-		if($el->type=='field')
-			$val = $el->options['value'];
+	public function getValue(){
+		$els = array();
 		
-		if($el->options[':length'][1])
-			$val = substr($val, 0, $el->options[':length'][1]);
+		foreach($this->elements as $el)
+			if($val = $el->getValue())
+				$els[$el->options['name']] = $val;
 		
-		if($el->options[':validate'])
-			$val = Data::call($val, $el->options[':validate']);
-		
-		return Data::clean($val);
+		return sizeof($els) ? $els : false;
 	}
 	
-	public function prepareData($data, $alias = false){
+	public function prepare($data, $alias = false){
 		$els = array();
 		
 		foreach($this->elements as $el){
-			if(in_array($el->type, array('button', 'string')) || (!$alias && ($el->options[':alias'] || $el->options[':readOnly'])) || ($alias && !$this->options[':alias']))
+			if($el->type=='button' || (!$alias && ($el->options[':alias'] || $el->options[':readOnly'])) || ($alias && !$this->options[':alias']))
 				continue;
 			
-			$val = $this->prepareElementData($data[$el->options['name']], $el);
+			$val = $el->formatData($data[$el->options['name']]);
 			
-			if($val!==false)
-				$els[$el->options['name']] = $val;
+			if($val!==false && !is_null($val))
+				$els[$el->options['name']] = $el->setValue($val);
 		}
 		
-		return $els;
+		return sizeof($els) ? $els : false;
 	}
 	
 	public function validate($data){
-		$return = true;
-		
 		foreach($this->elements as $el){
+			unset($v);
 			if(!in_array($el->type, self::$formElements) || !$el->options[':validate'])
 				continue;
 			
-			$data = Data::clean($data[$el->options['name']]);
-			if(!$el->options[':empty'] && $el->options[':validate'][0]!='bool' && !$data){
-				$return = 'notempty';
-				break;
-			}
+			$val = Data::clean($data[$el->options['name']]);
+			if(!$val){
+				if(!$el->options[':empty'] && $el->options[':validate'][0]!='bool')
+					return array($el->options['name'], 'notempty');
+				elseif($el->options[':empty'] || $el->options[':validate'][0]=='bool')
+					continue;
+			}elseif($this->options[':length'] && (strlen((string)$val)<$this->options[':length'][0] || strlen((string)$val)>$this->options[':length'][1]))
+				return array($el->options['name'], 'length');
 			
-			if(($el->options[':empty'] || $el->options[':validate'][0]=='bool') && !$data){
-				$v = true;
-			}else{
-				$v = Validator::call($data, $el->options[':validate']);
-				if($this->options[':length'] && $v===true && (strlen($data)<$this->options[':length'][0] || strlen($data)>$this->options[':length'][1]))
-					$v = false;
-			}
-			if($v!==true){
-				$return = $v;
-				break;
-			}
+			$v = Validator::call($val, $el->options[':validate']);
+			
+			if($v!==true)
+				return array($el->options['name'], $el->options[':validate'][0]);
 		}
 		
-		return $return;
+		return true;
 	}
 }
 ?>

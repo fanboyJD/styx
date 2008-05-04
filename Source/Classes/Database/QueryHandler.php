@@ -67,26 +67,41 @@ class QueryHandler {
 	}
 	
 	protected function formatLimit(){
+		$type = in_array($this->type, array('update', 'delete'));
+		
 		// This is awesome: through DynamicStorage it sets the limit value only if it has not been set yet
-		$limit = $this->Storage->retrieve('limit', in_array($this->type, array('update', 'delete')) ? array(0, 1) : null);
+		$limit = $this->Storage->retrieve('limit', $type ? array(0, 1) : null);
 		if(!$limit || (!$limit[0] && !$limit[1]))
 			return '';
 		
-		return 'LIMIT '.$limit[0].','.$limit[1];
+		return 'LIMIT '.(!$type ? $limit[0].',' : '').$limit[1];
 	}
 	
+	/**
+	 * @param array $data
+	 * @return QueryHandler
+	 */
 	public function set($data){
 		$this->Storage->store('set', $data);
 		
 		return $this;
 	}
 	
+	/**
+	 * @param array $data
+	 * @return QueryHandler
+	 */
 	public function where($data){
 		$this->Storage->store('where', $data);
 		
 		return $this;
 	}
 	
+	/**
+	 * @param mixed $limit
+	 * @param mixed $val
+	 * @return QueryHandler
+	 */
 	public function limit($limit, $val = null){
 		if($val)
 			$limit = array($limit, $val);

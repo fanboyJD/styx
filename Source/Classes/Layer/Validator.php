@@ -10,10 +10,9 @@ class Validator {
 		if(!$data || !is_array($data))
 			return false;
 		
-		foreach($data as $k => $v){
+		foreach($data as $k => $v)
 			if(!ctype_digit((string)$k) && is_array($v) && !self::call($v[0], $v[1]))
 				return false;
-		}
 		
 		return true;
 	}

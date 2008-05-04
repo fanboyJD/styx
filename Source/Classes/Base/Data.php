@@ -122,7 +122,7 @@ class Data {
 	}
 	
 	public static function pagetitle($title, $options = array(
-		'editId' => null,
+		'id' => null,
 		'contents' => null,
 	)){
 		if(!self::$titleRegex)
@@ -143,13 +143,13 @@ class Data {
 	
 	private static function checkTitle($title, $i, $options = array(
 		'contents' => null,
-		'editId' => null,
+		'id' => null,
 	)){
 		if(!is_array($options['contents']))
 			return $title;
 		
 		foreach($options['contents'] as $content)
-			if((!$options['editId'] || $options['editId']!=$content['id']) && strtolower($content['pagetitle'])==strtolower($title.(self::id($i) ? (!endsWith($title, '_') ? '_' : '').$i : '')))
+			if((!$options['id'] || $options['id']!=$content['id']) && strtolower($content['pagetitle'])==strtolower($title.(self::id($i) ? (!endsWith($title, '_') ? '_' : '').$i : '')))
 				return self::checkTitle($title, ++$i, $options);
 		
 		return $title.(self::id($i) ? (!endsWith($title, '_') ? '_' : '').$i : '');

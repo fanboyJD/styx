@@ -28,8 +28,8 @@ abstract class Element extends Runner {
 		$this->name = $name;
 		$this->type = $type ? $type : 'element';
 		
-		if($this->options[':validate'] && !is_array($this->options[':validate']))
-			$this->options['validate'] = array($this->options['validate']);
+		if($this->options[':validate'])
+			splat($this->options[':validate']);
 		
 		if(!$this->options['id'])
 			$this->options['id'] = $this->options['name'].'_'.(self::$uid++);
@@ -69,7 +69,11 @@ abstract class Element extends Runner {
 	}
 	
 	public function setValue($v){
-		$this->options['value'] = $v;
+		return $this->options['value'] = $v;
+	}
+	
+	public function getValue(){
+		return $this->options['value'];
 	}
 	
 	public function addClass($class){
@@ -126,6 +130,17 @@ abstract class Element extends Runner {
 		
 		return is_array($s) ? ' '.implode(' ', $s) : '';
 	}
+	
+	public function formatData($val){
+		if($this->options[':length'][1])
+			$val = substr($val, 0, $this->options[':length'][1]);
+		
+		if($this->options[':validate'])
+			$val = Data::call($val, $this->options[':validate']);
+		
+		return Data::clean($val);
+	}
+	
 }
 /* ELEMENTS ClASS */
 class Elements extends Element {
@@ -220,6 +235,10 @@ class Field extends Element {
 	
 	public function format(){
 		return '';
+	}
+	
+	public function formatData($val){
+		return parent::formatData($this->options['value']);
 	}
 	
 }

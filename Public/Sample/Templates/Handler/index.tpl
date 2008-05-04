@@ -3,6 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<title>${appName}</title>
+	<base href="${appLink}"></base>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	${scripts}
 </head>
