@@ -131,14 +131,11 @@ abstract class Element extends Runner {
 		return is_array($s) ? ' '.implode(' ', $s) : '';
 	}
 	
-	public function formatData($val){
+	public function prepareData(){
 		if($this->options[':length'][1])
-			$val = substr($val, 0, $this->options[':length'][1]);
+			$this->options['value'] = substr($this->options['value'], 0, $this->options[':length'][1]);
 		
-		if($this->options[':validate'])
-			$val = Data::call($val, $this->options[':validate']);
-		
-		return Data::clean($val);
+		return array($this->options['value'], $this->options[':validate']);
 	}
 	
 }
@@ -148,13 +145,16 @@ class Elements extends Element {
 	protected $elements = array();
 	
 	public function __construct(){
-		$this->elements = func_get_args();
+		$elements = func_get_args();
 		if(is_subclass_of($this, 'Elements')){
-			$name = $this->elements[1];
-			$this->elements = $this->elements[0];
+			$name = $elements[1];
+			$elements = $elements[0];
 		}
-		if(is_array($this->elements[0]))
-			$options = array_shift($this->elements);
+		if(is_array($elements[0]))
+			$options = array_shift($elements);
+		
+		foreach($elements as $el)
+			$this->elements[$el->options['name']] = $el;
 		
 		parent::__construct($options, $name ? $name : get_class());
 	}
@@ -175,7 +175,7 @@ class Elements extends Element {
 	
 	public function addElement($el){
 		if(!$this->hasElement($el))
-			array_push($this->elements, $el);
+			$this->elements[$el->options['name']] = $el;
 		
 		return $el;
 	}
@@ -185,11 +185,7 @@ class Elements extends Element {
 	}
 	
 	public function hasElement($el){
-		foreach($this->elements as $elem)
-			if($el->options['name']==$elem->options['name'])
-				return true;
-		
-		return false;
+		return !!$this->elements[$el->options['name']];
 	}
 }
 
@@ -235,10 +231,6 @@ class Field extends Element {
 	
 	public function format(){
 		return '';
-	}
-	
-	public function formatData($val){
-		return parent::formatData($this->options['value']);
 	}
 	
 }

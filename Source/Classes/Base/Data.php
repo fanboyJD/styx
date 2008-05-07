@@ -76,7 +76,6 @@ class Data {
 			
 			$input[$v] = $data[$k];
 		}
-		print_r($input);
 		
 		return mktime(0, 0, 0, $input['m'], $input['d'], $input['y']);
 	}

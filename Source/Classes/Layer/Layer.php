@@ -28,7 +28,23 @@ abstract class Layer extends Runner {
 	private $event = null,
 		$get = array(),
 		$post = array(),
-		$parsed = null;
+		$where = null;
+	
+	public static function run($layerName, $event, &$get = null, &$post = null){
+		if(!$layerName || !Core::autoload($layerName, 'Layers'))
+			return false;
+		
+		$layerName = strtolower($layerName);
+		$class = ucfirst($layerName).'Layer';
+		
+		if(!is_subclass_of($class, 'Layer'))
+			return false;
+		
+		$layer = new $class($layerName);
+		$layer->handle($event, $get, $post);
+		
+		return $layer;
+	}
 	
 	public function __construct($name){
 		$this->name = $this->table = $name;
@@ -69,21 +85,20 @@ abstract class Layer extends Runner {
 		);*/
 	}
 	
-	public function handle($event, &$get, &$post){
+	public function handle($event, &$get = null, &$post = null){
 		$event = array(strtolower($event));
 		$event[] = 'on'.ucfirst($event[0]);
 		
 		$this->Handler = Handler::getInstance('layer.'.$this->name);
 		
-		$this->get = &$get;
-		$this->post = &$post;
+		$this->get = $get ? $get : $_GET;
+		$this->post = $post ? $post : $_POST;
 		$this->event = $event[0];
 		
-		if($this->getDefaultEvent('save')==$this->event && is_array($this->post) && sizeof($this->post)){
-			$parsed = $this->parseData($this->post);
-			$this->{$event[1]}($parsed[0], $parsed[1], $parsed[2]);
-		}else
-			$this->{$event[1]}();
+		if($this->getDefaultEvent('save')==$this->event && is_array($this->post) && sizeof($this->post))
+			$this->prepareData($this->post);
+		
+		$this->{$event[1]}();
 	}
 	
 	/* EditHandler Begin */
@@ -125,47 +140,27 @@ abstract class Layer extends Runner {
 	/* EditHandler End */
 	
 	/* SaveHandler Begin */
-	public function prepare($data, $alias = false){
-		return $this->form->prepare($data, $alias);
-	}
-	
-	public function validate($data){
-		return $this->form->validate($data);
-	}
-	
-	public function parseData($data){
-		if($this->parsed)
-			return $this->parsed;
-		
-		$prepared = $this->prepare($data);
-		
+	public function prepareData($data){
 		if($data[$this->options['identifier']['internal']]){
-			$where = array(
+			$this->where = array(
 				$this->options['identifier']['internal'] => array($data[$this->options['identifier']['internal']], $this->options['identifier']['internal']),
 			);
 			
-			$this->form->setValue(array(
-				$this->options['identifier']['internal'] => '',
-			));
-			unset($prepared[$this->options['identifier']['internal']]);
+			unset($data[$this->options['identifier']['internal']]);
 		}
 		
-		return $this->parsed = array(
-			$prepared,
-			$this->form->validate($data),
-			$where,
-		);
+		$this->form->setValue($data, true);
 	}
 	
 	public function save($where = null){
-		if(!$where)
-			$where = $this->parsed[2];
+		if(!$where) $where = $this->where;
 		
-		$data = $this->form->getValue();
-		if(!$data)
-			return;
+		$validate = $this->form->validate();
+		if($validate!==true)
+			return $validate;
 		
-		if(!$this->table)
+		$data = $this->form->prepareData();
+		if(!$data || !$this->table)
 			return;
 		
 		if($where)
@@ -180,12 +175,12 @@ abstract class Layer extends Runner {
 	}
 	
 	public function setDefaultEvent($event, $name){
-		return $this->events[$event] = $name;
+		return $this->events[$event] = strtolower($name);
 	}
 	
 	public function getPagetitle($title, $where){
 		if($this->table)
-			$options['contents'] = db::getInstance()->select($this->table)->retrieve();
+			$options['contents'] = db::getInstance()->select($this->table)->fields('id, pagetitle')->retrieve();
 		
 		if($where[$this->options['identifier']['internal']])
 			$options['id'] = Data::call($where[$this->options['identifier']['internal']][0], $where[$this->options['identifier']['internal']][1]);

@@ -59,57 +59,53 @@ class Form extends Elements {
 		return implode($els);
 	}
 	
-	public function setValue($data){
-		foreach($this->elements as $el)
-			if($data[$el->options['name']])
-				$el->setValue($data[$el->options['name']]);
+	public function setValue($data, $raw = false){
+		foreach($data as $k => $v)
+			if($this->elements[$k]){
+				$el = $this->elements[$k];
+				if($raw && (!in_array($el->type, self::$formElements) || $el->options[':readOnly']))
+					continue;
+				
+				$el->setValue(Data::clean($v));
+			}
 	}
 	
-	public function getValue(){
-		$els = array();
-		
-		foreach($this->elements as $el)
-			if($val = $el->getValue())
-				$els[$el->options['name']] = $val;
-		
-		return sizeof($els) ? $els : false;
+	public function getValue($name){
+		return $this->elements[$name] ? $this->elements[$name]->getValue() : false;
 	}
 	
-	public function prepare($data, $alias = false){
+	public function prepareData($alias = false){
 		$els = array();
 		
-		foreach($this->elements as $el){
+		foreach($this->elements as $k => $el){
 			if($el->type=='button' || (!$alias && ($el->options[':alias'] || $el->options[':readOnly'])) || ($alias && !$this->options[':alias']))
 				continue;
 			
-			$val = $el->formatData($data[$el->options['name']]);
-			
-			if($val!==false && !is_null($val))
-				$els[$el->options['name']] = $el->setValue($val);
+			$val = $el->prepareData();
+			if($val[0]!==false && !is_null($val[0])) $els[$k] = $val;
 		}
 		
 		return sizeof($els) ? $els : false;
 	}
 	
-	public function validate($data){
-		foreach($this->elements as $el){
+	public function validate(){
+		foreach($this->elements as $k => $el){
 			unset($v);
 			if(!in_array($el->type, self::$formElements) || !$el->options[':validate'])
 				continue;
 			
-			$val = Data::clean($data[$el->options['name']]);
+			$val = $el->getValue();
 			if(!$val){
 				if(!$el->options[':empty'] && $el->options[':validate'][0]!='bool')
-					return array($el->options['name'], 'notempty');
+					return array($k, 'notempty');
 				elseif($el->options[':empty'] || $el->options[':validate'][0]=='bool')
 					continue;
 			}elseif($this->options[':length'] && (strlen((string)$val)<$this->options[':length'][0] || strlen((string)$val)>$this->options[':length'][1]))
-				return array($el->options['name'], 'length');
+				return array($k, 'length');
 			
 			$v = Validator::call($val, $el->options[':validate']);
 			
-			if($v!==true)
-				return array($el->options['name'], $el->options[':validate'][0]);
+			if($v!==true) return array($k, $el->options[':validate'][0]);
 		}
 		
 		return true;

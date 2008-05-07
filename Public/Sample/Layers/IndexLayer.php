@@ -40,18 +40,21 @@ class IndexLayer extends Layer {
 		);
 	}
 	
-	public function onSave($data, $validate, $where){
-		if($validate!==true){
-			$this->Handler->assign(array('error' => 'Yuck! Something got wrong: '))->assign(implode(' - ', $validate));
-			return;
-		}
-		
-		$this->form->setValue(array(
+	public function onSave(){
+		// Need a way to distinguish between edit/noedit -> this->where enough?
+		// -> Should be possible to access the edited row
+		// ?-> print_r(db::getInstance()->select($this->table)->where($this->where)->fetch());
+		return;$this->form->setValue(array(
 			'time' => time(),
-			'pagetitle' => $this->getPagetitle($data['title'], $where),
+			'pagetitle' => $this->getPagetitle($this->form->getValue('title'), $this->where),
 		));
 		
-		$this->save();
+		// Here should go an Exception Handler =)
+		$ret = $this->save();
+		if($ret!==true){
+			// Validation Problem [...]
+			return;
+		}
 		
 		$this->Handler->assign(array(
 			'Some Output: Saved!', 'Id: ', db::getInstance()->getId(),
