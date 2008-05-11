@@ -1,5 +1,6 @@
 <?php
-class filecache {
+class Filecache {
+	
 	public $prefix = null,
 		$root = null,
 		$time = null;

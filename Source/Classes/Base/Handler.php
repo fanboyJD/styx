@@ -150,7 +150,8 @@ class Handler extends Runner {
 			
 			return $this;
 		}
-		foreach($this->data as $k => &$val)
+		
+		foreach($this->data as $k => $val)
 			if(!startsWith($k, $string))
 				unset($this->data[$k]);
 		

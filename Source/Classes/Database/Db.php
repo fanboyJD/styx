@@ -153,7 +153,7 @@ class db {
 	}
 	
 	public function next($key = 0){
-		if(!$this->cache[$i])
+		if(!$this->cache[$key])
 			return false;
 		
 		$f = $this->fetch($this->cache[$key]);

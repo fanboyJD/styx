@@ -1,5 +1,6 @@
 <?php
-class eacceleratorcache {
+class Eacceleratorcache {
+	
 	public $prefix = null,
 		$root = null;
 	
