@@ -36,6 +36,8 @@ class Handler extends Runner {
 		$parsed = null,
 		$name = null,
 		$master = false,
+		$base = 'Handler',
+		$obj = null,
 		$enabled = true;
 	
 	private function __construct($name = null){
@@ -62,7 +64,7 @@ class Handler extends Runner {
 		return self::$Instances[$name];
 	}
 	
-	private static function setHeader($name, $value = null){
+	public static function setHeader($name, $value = null){
 		if(is_array($name)){
 			foreach($name as $k => $v)
 				self::setHeader($k, $v);
@@ -70,7 +72,9 @@ class Handler extends Runner {
 			return;
 		}
 		
-		header($name.': '.$value);
+		try{
+			header($name.': '.$value);
+		}catch(Exception $e){}
 	}
 	
 	public static function setType($type = null){
@@ -125,8 +129,24 @@ class Handler extends Runner {
 	/**
 	 * @return Handler
 	 */
-	public function setTemplate($template){
-		$this->template = Template::map('Handler', $template)->object($this);
+	public function setBase($base){
+		$this->base = func_get_args();
+		if(sizeof($this->base)==1) $this->base = splat($this->base[0]);
+		
+		return $this;
+	}
+	
+	/**
+	 * @return Handler
+	 */
+	public function setTemplate(){
+		$args = func_get_args();
+		if(sizeof($args)==1) $args = splat($args[0]);
+		
+		foreach(array_reverse(splat($this->base)) as $v)
+			array_unshift($args, $v);
+		
+		$this->template = Template::map($args);
 		
 		return $this;
 	}
@@ -136,6 +156,15 @@ class Handler extends Runner {
 	 */
 	public function assign($array){
 		$this->data = array_extend($this->data, splat($array));
+		
+		return $this;
+	}
+	
+	/**
+	 * @return Handler
+	 */
+	public function object($obj){
+		$this->obj = $obj;
 		
 		return $this;
 	}
@@ -179,6 +208,7 @@ class Handler extends Runner {
 			$this->parsed = call_user_func($callback, $this->data);
 		
 		if($this->template){
+			$this->template->object($this->obj ? $this->obj : $this);
 			if(is_array($this->parsed)) $this->template->assign($this->parsed);
 			
 			return $this->template->assign($this->data)->parse($return);

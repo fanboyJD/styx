@@ -89,7 +89,7 @@ abstract class Layer extends Runner {
 		$event = array(strtolower($event));
 		$event[] = 'on'.ucfirst($event[0]);
 		
-		$this->Handler = Handler::getInstance('layer.'.$this->name);
+		$this->Handler = Handler::getInstance('layer.'.$this->name)->setBase('Layers', ucfirst($this->name))->object($this);
 		
 		$this->get = $get ? $get : $_GET;
 		$this->post = $post ? $post : $_POST;
@@ -157,11 +157,13 @@ abstract class Layer extends Runner {
 		
 		$validate = $this->form->validate();
 		if($validate!==true)
-			return $validate;
+			throw new ValidatorException($validate);
 		
 		$data = $this->form->prepareData();
-		if(!$data || !$this->table)
-			return;
+		if(!$data)
+			throw new NoDataException();
+		elseif(!$this->table)
+			throw new NoTableException();
 		
 		if($where)
 			db::getInstance()->update($this->table)->set($data)->where($where)->query();

@@ -5,7 +5,8 @@ class QueryHandler {
 	
 	protected $Storage,
 		$type = '',
-		$table = '';
+		$table = '',
+		$formatted = null;
 	
 	public function __construct($table, $type){
 		if(!in_array($type, self::$Types))
@@ -82,6 +83,8 @@ class QueryHandler {
 	 * @return QueryHandler
 	 */
 	public function set($data){
+		unset($this->formatted);
+		
 		$this->Storage->store('set', $data);
 		
 		return $this;
@@ -92,6 +95,8 @@ class QueryHandler {
 	 * @return QueryHandler
 	 */
 	public function where($data){
+		unset($this->formatted);
+		
 		$this->Storage->store('where', $data);
 		
 		return $this;
@@ -103,6 +108,8 @@ class QueryHandler {
 	 * @return QueryHandler
 	 */
 	public function limit($limit, $val = null){
+		unset($this->formatted);
+		
 		if($val)
 			$limit = array($limit, $val);
 		elseif(!is_array($limit))
@@ -114,6 +121,8 @@ class QueryHandler {
 	}
 	
 	public function format(){
+		if($this->formatted) return $this->formatted;
+		
 		$out = ' '.$this->formatWhere().' '.$this->formatLimit();
 		
 		if($this->type=='update')
@@ -123,7 +132,7 @@ class QueryHandler {
 		elseif($this->type=='delete')
 			$out = 'DELETE FROM '.$this->table.$out;
 		
-		return $out;
+		return $this->formatted = $out;
 	}
 	
 	public function __toString(){

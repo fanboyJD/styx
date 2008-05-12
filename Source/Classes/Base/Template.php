@@ -60,7 +60,7 @@ class Template {
 	 * @param mixed $file
 	 * @return Template
 	 */
-	public static function map($file){
+	public static function map(){
 		if(!self::$paths)
 			self::$paths = array(
 				'root' => realpath(Core::retrieve('path').'Templates/'),
@@ -68,8 +68,7 @@ class Template {
 			);
 		
 		$args = func_get_args();
-		if(sizeof($args)==1 && !is_array($file))
-			$args = splat($file);
+		if(sizeof($args)==1) $args = splat($args[0]);
 		
 		return new Template($args);
 	}

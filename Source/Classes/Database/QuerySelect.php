@@ -27,6 +27,8 @@ class QuerySelect extends QueryHandler implements Iterator {
 	 * @return QuerySelect
 	 */
 	public function fields($data){
+		unset($this->formatted);
+		
 		$this->Storage->store('fields', $data);
 		
 		return $this;
@@ -37,15 +39,19 @@ class QuerySelect extends QueryHandler implements Iterator {
 	 * @return QuerySelect
 	 */
 	public function order($data){
+		unset($this->formatted);
+		
 		$this->Storage->store('order', $data);
 		
 		return $this;
 	}
 	
 	public function format(){
+		if($this->formatted) return $this->formatted;
+		
 		$out = parent::format();
 		
-		return 'SELECT '.$this->formatFields().' FROM '.$this->table.$out.$this->formatOrder();
+		return $this->formatted = 'SELECT '.$this->formatFields().' FROM '.$this->table.$out.$this->formatOrder();
 	}
 	
 	public function fetch($type = null){
