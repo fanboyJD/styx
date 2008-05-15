@@ -41,11 +41,11 @@ class IndexLayer extends Layer {
 	}
 	
 	public function onSave(){
-		// Need a way to distinguish between edit/noedit -> this->where enough?
-		// -> unset($this->where) = no edit possible
+		if($this->editing){
+			$data = $this->data->where($this->where)->fetch();
+			$this->Handler->assign(array('Editing: '.$data['title']));
+		}
 		
-		// -> Should be possible to access the edited row in an easy way
-		// ?-> print_r(db::getInstance()->select($this->table)->where($this->where)->fetch());
 		$this->form->setValue(array(
 			'time' => time(),
 			'pagetitle' => $this->getPagetitle($this->form->getValue('title'), $this->where),
@@ -54,9 +54,7 @@ class IndexLayer extends Layer {
 		try{
 			$this->save();
 			
-			$this->Handler->assign(array(
-				'Some Output: Saved!', 'Id: ', db::getInstance()->getId(),
-			));
+			$this->Handler->assign(array('saved' => 'Some Output: Saved! Id: '.db::getInstance()->getId()));
 		}catch(ValidatorException $e){
 			//print_r($e->error);
 		}catch(Exception $e){
@@ -70,16 +68,20 @@ class IndexLayer extends Layer {
 	}
 	
 	public function onEdit(){
-		$this->Handler->assign($this->edit());
-		/*return array(
+		/*$this->edit(array(
 			'edit' => array('uid' => 1),
 			'preventDefault' => true,
-		);*/
+		));*/
+		$out = $this->edit();
 		
+		if($this->editing)
+			$this->Handler->assign('Editing: '.$this->form->getValue('title'));
+		
+		$this->Handler->assign(array('edit' => $out));
 	}
 	
 	public function onView(){
-		$this->data = db::getInstance()->select('news')->limit(0)->order('time DESC')->retrieve();
+		$this->data->limit(0)->order('time DESC')->retrieve();
 		
 		$this->Handler->setTemplate('view.php');
 	}

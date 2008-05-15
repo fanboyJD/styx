@@ -10,5 +10,9 @@ Core::registerClasses('Element', array(
 // Here's the basic configuration
 Core::store(array(
 	'debugMode' => false,
+	'tpl.standard' => 'tpl',
+	'tpl.execute' => array('php', 'phtml'),
+	
+	'identifer.id' => 'id',
 ));
 ?>

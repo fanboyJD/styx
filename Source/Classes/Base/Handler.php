@@ -1,23 +1,17 @@
 <?php
-class Handler extends Runner {
+class Handler extends Template {
 	
-	private static $Master,
-		$Instances = array();
-	
-	/**
-	 * Template Class
-	 *
-	 * @var Template
-	 */
-	private $template = null;
-	
-	private static $type = null,
-		$handlers = array(
+	private static $Instances = array(
+			'master' => null,
+			'slaves' => array(),
+		),
+		$Type = null,
+		$Types = array(
 			'html' => array(
 				'headers' => array(
 					'Content-Type' => 'text/html; charset=utf8',
 				),
-				'defaultCallback' => 'implode',
+				'defaultCallback' => 'implode', // For the sake of php inconsistency this works as we want
 			),
 			'json' => array(
 				'headers' => array(
@@ -32,36 +26,31 @@ class Handler extends Runner {
 			),
 		);
 	
-	private $data = array(),
-		$parsed = null,
+	private $parsed = null,
 		$name = null,
 		$master = false,
 		$base = 'Handler',
-		$obj = null,
 		$enabled = true;
 	
-	private function __construct($name = null){
+	protected function __construct($name = null){
 		$this->name = $name;
 		if(!$name) $this->master = true;
+		
+		$this->object($this);
 	}
-	private function __clone(){}
 	
 	/**
 	 * @param string $name
 	 * @return Handler
 	 */
-	public static function getInstance($name = null){
-		if(!$name){
-			if(!self::$Master)
-				self::$Master = new Handler();
-			
-			return self::$Master;
-		}
+	public static function map($name = null){
+		if(!$name) $type = $name = 'master';
+		else $type = 'slaves';
 		
-		if(!self::$Instances[$name])
-			self::$Instances[$name] = new Handler($name);
+		if(!self::$Instances[$type][$name])
+			self::$Instances[$type][$name] = new Handler($name=='master' ? null : $name);
 		
-		return self::$Instances[$name];
+		return self::$Instances[$type][$name];
 	}
 	
 	public static function setHeader($name, $value = null){
@@ -78,34 +67,31 @@ class Handler extends Runner {
 	}
 	
 	public static function setType($type = null){
-		if(self::$type)
+		if(self::$Type)
 			return;
 		
 		$type = strtolower($type);
-		if(!self::$handlers[$type]){
-			reset(self::$handlers);
-			$type = key(self::$handlers);
+		if(!self::$Types[$type]){
+			reset(self::$Types);
+			$type = key(self::$Types);
 		}
 		
-		self::$type = $type;
+		self::$Type = $type;
 	}
 	
 	public static function setHandlers($handlers){
-		foreach(self::$handlers as $k => $v)
+		foreach(self::$Types as $k => $v)
 			if(!in_array($k, $handlers))
-				unset(self::$handlers[$k]);
+				unset(self::$Types[$k]);
 	}
 	
-	/**
-	 * @return Handler
-	 */
-	public function behaviour(){
+	public static function behaviour(){
 		$types = func_get_args();
 		foreach($types as $v)
-			if(self::$type==$v)
-				return $this;
+			if(self::$Type==$v)
+				return true;
 		
-		return new EmptyClass();
+		return false;
 	}
 	
 	/**
@@ -146,27 +132,7 @@ class Handler extends Runner {
 		foreach(array_reverse(splat($this->base)) as $v)
 			array_unshift($args, $v);
 		
-		$this->template = Template::map($args);
-		
-		return $this;
-	}
-	
-	/**
-	 * @return Handler
-	 */
-	public function assign($array){
-		$this->data = array_extend($this->data, splat($array));
-		
-		return $this;
-	}
-	
-	/**
-	 * @return Handler
-	 */
-	public function object($obj){
-		$this->obj = $obj;
-		
-		return $this;
+		return $this->initialize($args);
 	}
 	
 	/**
@@ -180,11 +146,17 @@ class Handler extends Runner {
 			return $this;
 		}
 		
-		foreach($this->data as $k => $val)
+		foreach($this->assigned as $k => &$val)
 			if(!startsWith($k, $string))
-				unset($this->data[$k]);
+				unset($val);
 		
 		return $this;
+	}
+	
+	public function callback($callback = 'callback'){
+		$c = self::$Types[self::$Type][$callback];
+		if($c && ((is_array($c) && method_exists($c[0], $c[1])) || function_exists($c)))
+			$this->parsed = call_user_func($c, $this->assigned);
 	}
 	
 	public function parse($return = false){
@@ -192,34 +164,28 @@ class Handler extends Runner {
 			return;
 		
 		if($this->master){
-			self::setHeader(self::$handlers[self::$type]['headers']);
+			self::setHeader(self::$Types[self::$Type]['headers']);
 			
-			foreach(self::$Instances as $k => $v)
+			foreach(self::$Instances['slaves'] as $k => $v)
 				$assign[$k] = $v->parse(true);
 			
-			$assign['layer'] = $assign['layer.'.Route::getMainLayer()];
+			$main = Route::getMainLayer();
+			if($main) $assign['layer'] = $assign['layer.'.$main];
 			
 			$this->assign($assign);
 		}
 		
+		$this->callback();
 		
-		$callback = self::$handlers[self::$type]['callback'];
-		if($callback && ((is_array($callback) && method_exists($callback[0], $callback[1])) || function_exists($callback)))
-			$this->parsed = call_user_func($callback, $this->data);
-		
-		if($this->template){
-			$this->template->object($this->obj ? $this->obj : $this);
-			if(is_array($this->parsed)) $this->template->assign($this->parsed);
+		if(sizeof($this->file)){
+			if(is_array($this->parsed)) $this->assign($this->parsed);
 			
-			return $this->template->assign($this->data)->parse($return);
+			return parent::parse($return);
 		}else{
-			$callback = self::$handlers[self::$type]['defaultCallback'];
-			if($callback && ((is_array($callback) && method_exists($callback[0], $callback[1])) || function_exists($callback)))
-				$this->parsed = call_user_func($callback, $this->data);
+			$this->callback('defaultCallback');
 		}
 		
-		if($return)
-			return $this->parsed;
+		if($return) return $this->parsed;
 		
 		echo $this->parsed;
 		flush();

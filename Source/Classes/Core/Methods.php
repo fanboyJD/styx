@@ -1,12 +1,4 @@
 <?php
-	class EmptyClass {
-		
-		public function __call($name, $args){
-			return $this;
-		}
-		
-	}
-	
 	abstract class Runner {
 		
 		public function execute(){

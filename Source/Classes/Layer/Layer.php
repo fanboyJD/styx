@@ -25,10 +25,16 @@ abstract class Layer extends Runner {
 			'javascript' => array(),
 		);
 	
-	private $event = null,
+	protected $event = null,
 		$get = array(),
 		$post = array(),
-		$where = null;
+		$where = null,
+		$editing = false;
+	
+	/**
+	 * @var QuerySelect
+	 */
+	protected $data;
 	
 	public static function run($layerName, $event, &$get = null, &$post = null){
 		if(!$layerName || !Core::autoload($layerName, 'Layers'))
@@ -51,8 +57,8 @@ abstract class Layer extends Runner {
 		
 		$initialize = $this->initialize();
 		
-		if($initialize['table'])
-			$this->table = $initialize['table'];
+		if(key_exists('table', $initialize))
+			$this->table = $initialize['table'] ? $initialize['table'] : null;
 		
 		array_extend($this->options, $initialize['options']);
 		
@@ -89,7 +95,8 @@ abstract class Layer extends Runner {
 		$event = array(strtolower($event));
 		$event[] = 'on'.ucfirst($event[0]);
 		
-		$this->Handler = Handler::getInstance('layer.'.$this->name)->setBase('Layers', ucfirst($this->name))->object($this);
+		$this->data = db::getInstance()->select($this->table);
+		$this->Handler = Handler::map('layer.'.$this->name)->setBase('Layers', ucfirst($this->name))->object($this);
 		
 		$this->get = $get ? $get : $_GET;
 		$this->post = $post ? $post : $_POST;
@@ -116,6 +123,7 @@ abstract class Layer extends Runner {
 				)));
 				
 				$this->form->setValue($data);
+				$this->editing = true;
 			}
 		}
 		
@@ -147,6 +155,7 @@ abstract class Layer extends Runner {
 			);
 			
 			unset($data[$this->options['identifier']['internal']]);
+			$this->editing = true;
 		}
 		
 		$this->form->setValue($data, true);
