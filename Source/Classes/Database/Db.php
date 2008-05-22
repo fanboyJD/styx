@@ -120,14 +120,14 @@ class db {
 				Script::log(mysql_error(), 'error');
 		}
 		
-		return $query ? $query : false;
+		return pick($query, false);
 	}
 	
 	public function fetch($query, $type = null){
 		if(!$query) return false;
 		
 		$row = mysql_fetch_array($query, ($type ? $type : MYSQL_ASSOC));
-		return $row ? $row : false;
+		return pick($row, false);
 	}
 	
 	public function getId(){
@@ -145,6 +145,7 @@ class db {
 			$rows[] = $row;
 		
 		mysql_free_result($query);
+		
 		return Data::nullify($rows);
 	}
 	
@@ -162,6 +163,7 @@ class db {
 		
 		mysql_free_result($this->cache[$key]);
 		unset($this->cache[$key]);
+		
 		return false;
 	}
 	
@@ -173,7 +175,7 @@ class db {
 			$sql = 'SELECT FOUND_ROWS()';
 		
 		$count = $this->fetch($this->query($sql), MYSQL_NUM);
-		return $count[0] ? $count[0] : 0;
+		return pick($count[0], 0);
 	}
 }
 ?>
