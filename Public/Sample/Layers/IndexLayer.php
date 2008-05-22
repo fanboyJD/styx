@@ -8,7 +8,7 @@ class IndexLayer extends Layer {
 				'identifier' => 'id',
 			),
 			'form' => new Form(array(
-					
+					'name' => 'Index',
 				),
 				new Input(array(
 					'name' => 'title',
@@ -64,7 +64,7 @@ class IndexLayer extends Layer {
 	}
 	
 	public function onAdd(){
-		$this->Handler->assign($this->add());
+		$this->Handler->template('edit')->assign($this->add());
 	}
 	
 	public function onEdit(){
@@ -77,13 +77,13 @@ class IndexLayer extends Layer {
 		if($this->editing)
 			$this->Handler->assign('Editing: '.$this->form->getValue('title'));
 		
-		$this->Handler->assign(array('edit' => $out));
+		$this->Handler->assign($out);
 	}
 	
 	public function onView(){
 		$this->data->limit(0)->order('time DESC')->retrieve();
 		
-		$this->Handler->setTemplate('view.php');
+		$this->Handler->template('view.php');
 	}
 }
 ?>

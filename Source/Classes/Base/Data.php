@@ -103,6 +103,10 @@ class Data {
 		return $key.' IN ('.implode(',', $array).')';
 	}
 	
+	public static function implode($array){
+		return implode('', array_flatten($array));
+	}
+	
 	public static function clean($array, $whitespaces = false){
 		if(is_array($array)){
 			foreach($array as &$val){

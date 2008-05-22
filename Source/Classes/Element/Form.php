@@ -1,6 +1,8 @@
 <?php
 class Form extends Elements {
 	
+	protected static $prefix = false;
+	
 	public function __construct(){
 		parent::__construct(func_get_args(), get_class());
 		
@@ -8,8 +10,15 @@ class Form extends Elements {
 			$this->options['method'] = 'post';
 	}
 	
-	public function format($tpl = null){
-		return '<form'.$this->implode('skipName').'>'.parent::format($tpl).'</form>';
+	public function format(){
+		$out = array('form.top' => '<form'.$this->implode('skipName').'>');
+		array_extend($out, parent::format());
+		$out['form.bottom'] = '</form>';
+		
+		if(self::$prefix===false)
+			self::$prefix = pick(Core::retrieve('elements.prefix'), null);
+		
+		return self::$prefix ? array(self::$prefix => $out) : $out;
 	}
 	
 	//this method needs to be redone!

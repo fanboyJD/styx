@@ -159,18 +159,15 @@ class Elements extends Element {
 		parent::__construct($options, $name ? $name : get_class());
 	}
 	
-	public function format($tpl = null){
+	public function format(){
 		$els = array();
-		foreach($this->elements as $el)
-			if(!in_array($el->options['type'], array('field')))
-				$els[$el->options['name']] = $el->format();
+		foreach($this->elements as $n => $el)
+			if(!in_array($el->options['type'], array('field')) && !$el->options[':readOnly']){
+				$format = $el->format();
+				if($format) $els[$n] = $format;
+			}
 		
-		if($tpl)
-			$out = Template::map('Element', $tpl)->assign($els)->parse(true);
-		else
-			$out = implode($els);
-		
-		return $out;
+		return $els;
 	}
 	
 	public function addElement($el){

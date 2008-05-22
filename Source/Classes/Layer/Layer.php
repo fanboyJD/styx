@@ -96,7 +96,7 @@ abstract class Layer extends Runner {
 		$event[] = 'on'.ucfirst($event[0]);
 		
 		$this->data = db::getInstance()->select($this->table);
-		$this->Handler = Handler::map('layer.'.$this->name)->setBase('Layers', ucfirst($this->name))->object($this);
+		$this->Handler = Handler::map('layer.'.$this->name)->base('Layers', ucfirst($this->name))->object($this);
 		
 		$this->get = $get ? $get : $_GET;
 		$this->post = $post ? $post : $_POST;

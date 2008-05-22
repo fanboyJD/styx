@@ -39,6 +39,10 @@
 		return $array = !is_array($array) ? (is_null($array) ? array() : array($array)) : $array;
 	}
 	
+	function pick($a, $b){
+		return $a ? $a : $b;
+	}
+	
 	function endsWith($string, $look){
 		return strrpos($string, $look)===strlen($string)-strlen($look);
 	}

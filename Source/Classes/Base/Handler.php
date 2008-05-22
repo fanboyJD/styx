@@ -11,7 +11,7 @@ class Handler extends Template {
 				'headers' => array(
 					'Content-Type' => 'text/html; charset=utf8',
 				),
-				'defaultCallback' => 'implode', // For the sake of php inconsistency this works as we want
+				'defaultCallback' => array('Data', 'implode'),
 			),
 			'json' => array(
 				'headers' => array(
@@ -115,7 +115,7 @@ class Handler extends Template {
 	/**
 	 * @return Handler
 	 */
-	public function setBase($base){
+	public function base($base){
 		$this->base = func_get_args();
 		if(sizeof($this->base)==1) $this->base = splat($this->base[0]);
 		
@@ -125,7 +125,7 @@ class Handler extends Template {
 	/**
 	 * @return Handler
 	 */
-	public function setTemplate(){
+	public function template(){
 		$args = func_get_args();
 		if(sizeof($args)==1) $args = splat($args[0]);
 		

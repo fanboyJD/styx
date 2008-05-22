@@ -2,7 +2,7 @@
 	include('../../../Source/index.php');
 	
 	if(Handler::behaviour('html'))
-		Handler::map()->setTemplate('index')->assign(array(
+		Handler::map()->template('index')->assign(array(
 			'appName' => Core::retrieve('appName'),
 			'appLink' => Core::retrieve('appLink'),
 			'body' => '',

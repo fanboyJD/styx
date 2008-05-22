@@ -14,5 +14,7 @@ Core::store(array(
 	'tpl.execute' => array('php', 'phtml'),
 	
 	'identifer.id' => 'id',
+	
+	'elements.prefix' => 'el',
 ));
 ?>
