@@ -49,13 +49,13 @@ class Core extends StaticStorage {
 	public static function initialize(){
 		if(self::$Initialized) return;
 		
-		$c = Cache::getInstance(self::retrieve('cacheOptions', array()));
+		$c = Cache::getInstance(self::retrieve('cache', array()));
 		
-		$isDebug = self::retrieve('debugMode');
+		$isDebug = self::retrieve('debug');
 		
 		foreach(array(
 			'Classes' => self::retrieve('path').'/Classes/*/*.php',
-			'Layers' => self::retrieve('appPath').'/Layers/*.php',
+			'Layers' => self::retrieve('app.path').'/Layers/*.php',
 		) as $key => $dir){
 			$List = $c->retrieve('Core', $key);
 			if(!$List || $isDebug){
@@ -86,7 +86,7 @@ class Core extends StaticStorage {
 			$v = explode(':', $v, 2);
 			if($polluted['p'][$v[0]]) continue;
 			
-			$polluted['p'][$v[0]] = $v[1] ? $v[1] : $v[0];
+			$polluted['p'][$v[0]] = pick($v[1], $v[0]);
 			if($v[0]!='handler')
 				$polluted['n'][] = $v[0];
 		}
@@ -97,6 +97,7 @@ class Core extends StaticStorage {
 		
 		if(!$polluted['p']['handler']) $polluted['p']['handler'] = 'html';
 		
+		unset($_GET['n'], $_GET['p']);
 		$_GET = array_merge($_GET, $polluted);
 		
 		if(sizeof($_POST) && get_magic_quotes_gpc())

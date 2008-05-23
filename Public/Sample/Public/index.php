@@ -3,9 +3,8 @@
 	
 	if(Handler::behaviour('html'))
 		Handler::map()->template('index')->assign(array(
-			'appName' => Core::retrieve('appName'),
-			'appLink' => Core::retrieve('appLink'),
-			'body' => '',
+			'app.name' => Core::retrieve('app.name'),
+			'app.link' => Core::retrieve('app.link'),
 		))->parse();
 	else
 		Handler::map()->disable();
@@ -21,14 +20,15 @@
 	
 	if(Handler::behaviour('xml'))
 		Handler::map()->assign(array(
-			'appName' => Core::retrieve('appName'),
-			'appMail' => 'christoph.pojer@gmail.com',
-			'appLink' => 'http://domain.com',
+			'app.name' => Core::retrieve('app.name'),
+			'app.link' => Core::retrieve('app.link'),
+			'app.mail' => Core::retrieve('app.mail'),
 			'news' => array(
 				'something' => array(
 					'title' => 'asdf',
 					'descr' => 'yes',
 				),
 			),
-		))->setTemplate('rss.php')->parse();*/
+		))->setTemplate('rss.php')->parse();
+	*/
 ?>

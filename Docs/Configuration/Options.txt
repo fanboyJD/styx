@@ -1,12 +1,29 @@
 The following configuration keys exist:
 
-appPath - (string) The path of the application [user not allowed to set it]
+app.path - (string) The path of the application [user not allowed to set it]
 path - (string) The path of the framework [user not allowed to set it]
 
-debugMode - (boolean) Whether the debug mode should be activated or not
-appName - (string) The Name of the application
+debug - (boolean) Whether the debug mode should be activated or not
 
-cacheOptions - (array) The user is able to set custom options for the cache
+app.name - (string) The name of the application
+app.link - (string) The base link of the application
+app.mail - (string) The contact email
+
+tpl.standard - (string) the file extension that is used for the templates (does not execute php-code)
+tpl.execute - (array) the file extensions used for templates and php code that gets executed
+
+identifier.id - (string) The field name of the 'id' in the database
+
+elements.prefix - (string) The prefix added to all elements in a form (like el.title where el is the prefix)
+
+cache - (array) The user is able to set custom options for the cache
 	engine - (string) The engine to be used (default: eaccelerator). Currently only eaccelerator is available
 	prefix - (string) The engine's prefix to be used (for running more than one application)
 	root - (string) Path to the cache directory for file-based cache
+
+secure - (string) A random string that should be set for the application to be safe
+
+languages - (array) The available languages
+
+user.type - (string) The storage for login data to be used (currently only "cookie" is supported)
+user.cookie - (string) The prefix for the user cookie (when using Cookies for logins) like $_COOKIE[user.cookie][name]

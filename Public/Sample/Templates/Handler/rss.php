@@ -1,16 +1,16 @@
 <?php echo '<?xml version="1.0" encoding="UTF-8"?>'; ?>
 <rss version="2.0">
 	<channel>
-		<title>${appName}</title>
-		<link>${appLink}</link>
+		<title>${app.name}</title>
+		<link>${app.link}</link>
 		<description>This is a sample description</description>
 		<language>en-US</language>
 
 		<pubDate><?php echo date('r'); ?></pubDate>
 		<lastBuildDate><?php echo date('r'); ?></lastBuildDate>
-		<generator>${appName}</generator>
-		<managingEditor>${appMail}</managingEditor>
-		<webMaster>${appMail}</webMaster>
+		<generator>${app.name}</generator>
+		<managingEditor>${app.mail}</managingEditor>
+		<webMaster>${app.mail}</webMaster>
 		<?php
 			/* Still searching for a proper sample image =)
 			<image>
@@ -28,7 +28,7 @@
 			foreach($db->select('news')->order('time DESC') as $n)
 				echo '<item>
 					<title>'.$n['title'].'</title>
-					<link>${appLink}'.$n['pagetitle'].'</link>
+					<link>${app.link}'.$n['pagetitle'].'</link>
 					<description>
 						<![CDATA[
 							'.substr($n['content'], 0, 200).'...

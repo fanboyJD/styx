@@ -14,7 +14,7 @@ class Template extends Runner {
 		if(!self::$init)
 			self::$init = array(
 				'root' => realpath(Core::retrieve('path').'Templates/'),
-				'appRoot' => realpath(Core::retrieve('appPath').'Templates/'),
+				'app.root' => realpath(Core::retrieve('app.path').'Templates/'),
 				'tpl.standard' => Core::retrieve('tpl.standard'),
 				'tpl.execute' => Core::retrieve('tpl.execute'),
 			);
@@ -25,9 +25,9 @@ class Template extends Runner {
 	}
 	
 	protected static function getFileName($file){
-		$loadFile = self::$init['appRoot'].$file;
+		$loadFile = self::$init['app.root'].'/'.$file;
 		if(!file_exists($loadFile)){
-			$loadFile = self::$init['root'].$file;
+			$loadFile = self::$init['root'].'/'.$file;
 			if(!file_exists($loadFile))
 				return false;
 		}
@@ -57,7 +57,7 @@ class Template extends Runner {
 			}
 		}
 		
-		if(!Core::retrieve('debugMode')){
+		if(!Core::retrieve('debug')){
 			$tpl = $c->retrieve('Templates', $file);
 			if($tpl) return $tpl;
 		}

@@ -1,6 +1,6 @@
 <?php
 class Cache extends DynamicStorage {
-	private $prefix = 'framework_',
+	private $prefix = 'framework',
 		$root = './Cache/',
 		$engine = false,
 		$engineInstance = null,

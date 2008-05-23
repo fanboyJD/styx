@@ -1,9 +1,15 @@
 <?php
 $_CONFIGURATION = array(
-	'appName' => 'My Sample Application',
-	'appLink' => 'http://svn/Framework/trunk/Public/Sample/Public/index.php/',
+	'app.name' => 'My Sample Application',
+	'app.link' => 'http://svn/Framework/trunk/Public/Sample/Public/index.php/',
+	'app.link' => 'http://localhost/trunk/Public/Sample/Public/index.php/',
+	'app.mail' => 'someone@nowhere.ru',
 	
-	'debugMode' => true,
+	'debug' => true,
+	
+	'cache' => array(
+		'prefix' => 'sample',
+	),
 	
 	'database' => array(
 		'host' => 'localhost',
@@ -13,5 +19,12 @@ $_CONFIGURATION = array(
 	),
 	
 	'handler' => array('html', 'json', 'xml'),
+	
+	'secure' => '32lms/(d902_3-k2"§$jsd',
+	
+	'languages' => array('en'),
+	
+	'user.type' => 'cookie',
+	'user.cookie' => 'app',
 );
 ?>
