@@ -27,4 +27,3 @@ $_CONFIGURATION = array(
 	'user.type' => 'cookie',
 	'user.cookie' => 'app',
 );
-?>

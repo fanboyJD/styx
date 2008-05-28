@@ -31,4 +31,3 @@
 			),
 		))->setTemplate('rss.php')->parse();
 	*/
-?>

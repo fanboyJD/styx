@@ -4,4 +4,3 @@
 			'.$n['content'].'<br/>
 			<small><i>'.Lang::get('news.posted', $n['uid'], date('r', $n['time'])).'</i></small><hr/>';
 	}
-?>

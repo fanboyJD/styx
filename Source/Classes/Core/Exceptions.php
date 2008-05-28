@@ -13,4 +13,3 @@ class ValidatorException extends Exception {
 class NoTableException extends Exception {}
 
 class NoDataException extends Exception {}
-?>

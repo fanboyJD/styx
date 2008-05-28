@@ -16,4 +16,3 @@ class Route {
 		return self::$mainLayer;
 	}
 }
-?>

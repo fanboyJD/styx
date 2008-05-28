@@ -192,4 +192,3 @@ class Handler extends Template {
 	}
 	
 }
-?>

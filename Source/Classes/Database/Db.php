@@ -181,4 +181,3 @@ class db {
 		return pick($count[0], 0);
 	}
 }
-?>

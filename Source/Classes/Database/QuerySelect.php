@@ -96,4 +96,3 @@ class QuerySelect extends QueryHandler implements Iterator {
 	}
 
 }
-?>

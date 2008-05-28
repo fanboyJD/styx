@@ -86,4 +86,3 @@ class IndexLayer extends Layer {
 		$this->Handler->template('view.php');
 	}
 }
-?>

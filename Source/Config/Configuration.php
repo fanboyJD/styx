@@ -21,4 +21,3 @@ Core::store(array(
 	'user.cookie' => 'app',
 	
 ));
-?>

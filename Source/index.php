@@ -47,4 +47,3 @@
 	Handler::setType($_GET['p']['handler']);
 	
 	Route::initialize($_GET, $_POST);
-?>

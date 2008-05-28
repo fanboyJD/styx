@@ -120,4 +120,3 @@ class Form extends Elements {
 		return true;
 	}
 }
-?>

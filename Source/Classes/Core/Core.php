@@ -121,4 +121,3 @@ class Core extends StaticStorage {
 		self::store('Classes', $Classes);
 	}
 }
-?>

@@ -199,4 +199,3 @@ abstract class Layer extends Runner {
 		return Data::pagetitle($title, $options);
 	}
 }
-?>

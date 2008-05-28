@@ -71,4 +71,3 @@
 	);
 	
 	echo $form->format();
-?>

@@ -119,4 +119,3 @@ class Template extends Runner {
 		flush();
 	}
 }
-?>

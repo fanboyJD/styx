@@ -18,4 +18,3 @@ class Script {
 		return Template::map('Core', 'script')->assign(Data::clean(self::$script, true))->parse(true);
 	}
 }
-?>

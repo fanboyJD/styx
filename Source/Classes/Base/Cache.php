@@ -108,4 +108,3 @@ class Cache extends DynamicStorage {
 			$this->filecacheInstance->erase('*/*', $force);
 	}
 }
-?>

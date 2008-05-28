@@ -1,11 +1,11 @@
 <?php
 class User {
 	
-	private $type;
-	private $user;
+	private static $type = 'cookie',
+		$user = null;
 	
 	public static function initialize(){
-		self::$type = Core::retrieve('user.type');
+		self::$type = pick(Core::retrieve('user.type'), self::$type);
 	}
 	
 	public static function store($user){
@@ -117,4 +117,3 @@ class User {
 	}
 	
 }
-?>

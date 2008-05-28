@@ -54,4 +54,3 @@ class Filecache {
 		}catch(Exception $e){}
 	}
 }
-?>

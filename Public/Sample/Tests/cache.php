@@ -44,4 +44,3 @@
 	is($c->retrieve('user', 'hello', 'file'), 'Yea');
 	$c->erase('user', 'hello', 'file');
 	is($c->retrieve('user', 'hello', 'file'));
-?>

@@ -50,4 +50,3 @@
 	function startsWith($string, $look){
 		return strpos($string, $look)===0;
 	}
-?>

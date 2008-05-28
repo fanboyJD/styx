@@ -304,4 +304,3 @@ class RichText extends Textarea {
 	}
 	
 }
-?>

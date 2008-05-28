@@ -38,4 +38,3 @@ class Eacceleratorcache {
 				$this->erase(substr($val['name'], strrpos($val['name'], $this->prefix)+strlen($this->prefix)));
 	}
 }
-?>
