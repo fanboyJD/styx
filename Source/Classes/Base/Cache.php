@@ -8,7 +8,9 @@ class Cache extends DynamicStorage {
 	
 	private static $Instance;
 	
-	private function __construct($options = array()){
+	private function __construct(){
+		$options = Core::retrieve('cache');
+		
 		if((!$options['engine'] || $options['engine']=='eaccelerator') && function_exists('eaccelerator_get'))
 			$this->engine = array(
 				'type' => 'eaccelerator',
@@ -36,9 +38,8 @@ class Cache extends DynamicStorage {
 	 * @param array $options
 	 * @return Cache
 	 */
-	public static function getInstance($options = null){
-		if(!self::$Instance)
-			self::$Instance = new Cache($options);
+	public static function getInstance(){
+		if(!self::$Instance) self::$Instance = new Cache();
 		
 		return self::$Instance;
 	}
@@ -57,7 +58,7 @@ class Cache extends DynamicStorage {
 			
 			if(!$content) return null;
 			
-			if($decode)	$content = json_decode($content, true);
+			if($decode) $content = json_decode($content, true);
 			parent::store($key.'/'.$id, $content);
 		}
 		

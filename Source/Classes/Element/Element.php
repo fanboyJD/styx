@@ -1,6 +1,6 @@
 <?php
 /* ELEMENT CLASS */
-abstract class Element extends Runner {
+class Element extends Runner {
 	
 	public $name = null,
 		$type = null,
@@ -17,37 +17,50 @@ abstract class Element extends Runner {
 				:empty (input value could be empty too?)
 				:detail (dont show in view->all if detail is true)
 				:elements
+				:unknown (name/id does not get set automatically when not given)
+				:tag (type/name given by options)
+				:standalone (for elements without template; if element gets closed inside the tag (like <img />)
 			*/
 		);
 	
-	private static $uid = 0;
-	protected static $formElements = array('input', 'checkbox', 'radio', 'select', 'textarea', 'richtext');
+	protected static $uid = 0,
+		$formElements = array('input', 'checkbox', 'radio', 'select', 'textarea', 'richtext');
 	
-	public function __construct($options, $name, $type = 'element'){
-		$this->options = $options;
-		$this->name = $name;
-		$this->type = $type ? $type : 'element';
-		
-		if($this->options[':validate'])
-			splat($this->options[':validate']);
-		
-		if(!$this->options['id'])
-			$this->options['id'] = $this->options['name'].'_'.(self::$uid++);
-		elseif(!$this->options['name'])
-			$this->options['name'] = $this->options['id'];
-		else
-			$this->options['name'] = $this->options['id'] = $this->type.'_'.(self::$uid++);
-		
-		if($this->options['class']){
-			if(!is_array($this->options['class']))
-				$this->options['class'] = explode(' ', $this->options['class']);
+	public function __construct($options, $name = null, $type = null){
+		if($options[':tag']){
+			$this->name = $this->type = $options[':tag'];
 		}else{
-			$this->options['class'] = array();
+			$this->name = $name;
+			$this->type = $type ? $type : 'element';
 		}
+		
+		splat($options[':validate']);
+		
+		if(!$options['id'] && $options['name'])
+			$options['id'] = $options['name'].'_'.(self::$uid++);
+		elseif($options['id'] && !$options['name'])
+			$options['name'] = $options['id'];
+		elseif(!$options[':unknown'])
+			$options['name'] = $options['id'] = $this->type.'_'.(self::$uid++);
+		
+		if($options['class']){
+			if(!is_array($options['class']))
+				$options['class'] = explode(' ', $options['class']);
+		}else{
+			$options['class'] = array();
+		}
+		
+		$this->options = $options;
 	}
 	
 	public function format($pass = null){
-		return Template::map('Element', $this->name)->object($this)->assign($this->options)->assign($pass ? $pass : array('attributes' => $this->implode()))->parse(true);
+		if(!$pass) $pass = array('attributes' => $this->implode());
+		
+		$out = Template::map('Element', $this->name)->object($this)->assign($this->options)->assign($pass)->parse(true);
+		
+		if($out) return $out;
+		
+		return '<'.$this->type.$pass['attributes'].($this->options[':standalone'] ? ' />' : '>'.$this->options[':caption'].'</'.$this->type.'>');
 	}
 	
 	public static function skipable($key){

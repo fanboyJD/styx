@@ -17,6 +17,7 @@
 		Handler::map()->template('index')->assign(array(
 			'app.name' => Core::retrieve('app.name'),
 			'app.link' => Core::retrieve('app.link'),
+			'scripts' => Script::get(),
 		))->parse();
 	else
 		Handler::map()->disable();

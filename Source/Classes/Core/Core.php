@@ -80,6 +80,8 @@ class Core extends StaticStorage {
 		$vars = explode('/', $_SERVER['PATH_INFO']);
 		array_shift($vars);
 		
+		$version = self::retrieve('app.version');
+		
 		foreach($vars as $k => $v){
 			$v = Data::clean($v);
 			if(!$v) continue;
@@ -87,8 +89,8 @@ class Core extends StaticStorage {
 			$v = explode(':', $v, 2);
 			if($polluted['p'][$v[0]]) continue;
 			
-			if(!$k && strpos($v[0], '.')){
-				$polluted['package'] = $v[0];
+			if(!$k && $version==$v[0] && strpos($vars[$k+1], '.')){
+				$polluted['package'] = $vars[$k+1];
 				continue;
 			}
 			

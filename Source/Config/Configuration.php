@@ -9,10 +9,14 @@ Core::registerClasses('Element', array(
 
 // Here's the basic configuration
 Core::store(array(
+	'app.version' => '1',
+	
 	'debug' => false,
 	
 	'tpl.standard' => 'tpl',
 	'tpl.execute' => array('php', 'phtml'),
+	
+	'handler' => array('html', 'json', 'xml'),
 	
 	'identifer.id' => 'id',
 	
@@ -20,4 +24,5 @@ Core::store(array(
 	
 	'user.cookie' => 'app',
 	
+	'expiration' => 31536000, // A long time
 ));

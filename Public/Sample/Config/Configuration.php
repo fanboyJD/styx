@@ -3,8 +3,9 @@ $_CONFIGURATION = array(
 	'app.name' => 'My Sample Application',
 	'app.link' => 'http://svn/Framework/trunk/Public/Sample/Public/index.php/',
 	'app.mail' => 'someone@nowhere.ru',
+	'app.version' => '0.01',
 	
-	'debug' => 9,
+	'debug' => true,
 	
 	'cache' => array(
 		'prefix' => 'sample',
@@ -16,8 +17,6 @@ $_CONFIGURATION = array(
 		'password' => '',
 		'db' => 'framework'
 	),
-	
-	'handler' => array('html', 'json', 'xml'),
 	
 	'secure' => '32lms/(d902_3-k2"§$jsd',
 	

@@ -17,7 +17,9 @@ class db {
 		$isConnected = false,
 		$cache = array();
 	
-	private function __construct($options = null){
+	private function __construct(){
+		$options = Core::retrieve('database');
+		
 		if(is_array($options))
 			$this->Configuration = $options;
 		
@@ -34,9 +36,8 @@ class db {
 	 * @param array $options
 	 * @return Db
 	 */
-	public static function getInstance($options = null){
-		if(!self::$Instance)
-			self::$Instance = new db($options);
+	public static function getInstance(){
+		if(!self::$Instance) self::$Instance = new db();
 		
 		return self::$Instance;
 	}

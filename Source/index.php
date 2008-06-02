@@ -58,8 +58,6 @@
 		
 		User::initialize();
 		
-		db::getInstance(Core::retrieve('database'));
-		
 		Handler::setType($_GET['p']['handler']);
 		Handler::setHeader();
 		

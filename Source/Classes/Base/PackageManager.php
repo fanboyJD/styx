@@ -6,8 +6,25 @@ class PackageManager {
 			'css' => '../Css',
 		),
 		$Elements = array(
-			'js' => '<script type="text/javascript" src="{package}"></script>',
-			'css' => '<link rel="stylesheet" media="all" type="text/css" href="{package}" />',
+			'js' => array(
+				'attribute' => 'src',
+				'options' => array(
+					':tag' => 'script',
+					':unknown' => true,
+					'type' => 'text/javascript',
+				),
+			),
+			'css' => array(
+				'attribute' => 'href',
+				'options' => array(
+					':tag' => 'link',
+					':unknown' => true,
+					':standalone' => true,
+					'rel' => 'stylesheet',
+					'media' => 'all',
+					'type' => 'text/css',
+				),
+			),
 		),
 		$Packages = array(),
 		$Package = null,
@@ -17,6 +34,7 @@ class PackageManager {
 	public static function add($name, $options = array(
 		'type' => '',
 		'files' => array(),
+		'options' => array(),
 	)){
 		splat($options['files']);
 		
@@ -36,8 +54,16 @@ class PackageManager {
 	}
 	
 	public static function assignToMaster(){
-		foreach(self::$Packages as $name => $package)
-			$assigned['package.'.$name] = str_replace('{package}', $name, self::$Elements[$package['type']]);
+		$version = Core::retrieve('app.version');
+		
+		foreach(self::$Packages as $name => $package){
+			array_extend($element = self::$Elements[$package['type']], splat($package['options']));
+			$element['options'][$element['attribute']] = $version.'/'.$name;
+			
+			$el = new Element($element['options']);
+			
+			$assigned['package.'.$name] = $el->format();
+		}
 		
 		$assigned['packages'] = implode($assigned);
 		
@@ -46,10 +72,8 @@ class PackageManager {
 	
 	public static function compress(){
 		$package = self::$Packages[self::$Package];
-		
 		$compress = self::checkGzipCompress();
-		
-		//$debug = Core::retrieve('debug');
+		$debug = Core::retrieve('debug');
 		
 		if($compress)
 			Handler::setHeader(array(
@@ -58,10 +82,16 @@ class PackageManager {
 			));
 		
 		$c = Cache::getInstance();
-		//if(!$debug){
+		if(!$debug){
+			$expiration = Core::retrieve('expiration');
+			Handler::setHeader(array(
+				'Expires' => date('r', time()+$expiration),
+				'Cache-Control' => 'public, max-age='.$expiration,
+			));
+			
 			$output = $c->retrieve('Compressed', self::$Package.($compress ? '1' : ''), 'file', false);
 			if($output) return $output;
-		//}
+		}
 		
 		foreach($package['files'] as $file)
 			$source[] = file_get_contents(realpath(self::$Directories[$package['type']].'/'.$file.'.'.$package['type']));

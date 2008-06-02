@@ -56,7 +56,7 @@ class User {
 	
 	public static function login($user){
 		if($user['session'])
-			cache::getInstance()->clear('User', 'userdata_'.$user['session']);
+			Cache::getInstance()->clear('User', 'userdata_'.$user['session']);
 		
 		mt_srand((double)microtime()*1000000);
 		$rand = Core::retrieve('secure').mt_rand(0, 100000);
@@ -83,7 +83,7 @@ class User {
 	}
 	
 	public static function logout(){
-		cache::getInstance()->clear('User', 'userdata_'.$_COOKIE['bg']['session']);
+		Cache::getInstance()->clear('User', 'userdata_'.$_COOKIE['bg']['session']);
 		
 		if(self::$type=='cookie'){
 			$pre = Core::retrieve('user.cookie');
