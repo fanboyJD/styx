@@ -13,7 +13,7 @@ class DynamicStorage {
 		
 		if(!$this->Storage[$key] || $this->Storage[$key]!=$value){
 			$this->Storage[$key] = $value;
-			if(!$value) $this->erase($key);
+			if(!$value) unset($this->Storage[$key]);
 		}
 		
 		return $value;

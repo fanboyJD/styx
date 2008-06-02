@@ -102,7 +102,7 @@ class Template extends Runner {
 		
 		array_flatten($this->assigned);
 		
-		preg_match_all('/\\${([A-z0-9\-_\.\:]+?)\}/i', $out, $vars);
+		preg_match_all('/\\$\{([\w\.:]+)\}/i', $out, $vars);
 		
 		$rep = array(array_values($vars[0]));
 		foreach($vars[1] as $val)

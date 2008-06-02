@@ -13,16 +13,33 @@ class Handler extends Template {
 				),
 				'defaultCallback' => array('Data', 'implode'),
 			),
+			
 			'json' => array(
 				'headers' => array(
 					'Content-Type' => 'application/json; charset=utf8',
 				),
 				'callback' => 'json_encode',
 			),
+			
 			'xml' => array(
 				'headers' => array(
 					'Content-Type' => 'application/xhtml+xml; charset=utf8',
 				),
+			),
+		),
+		$ExtendedTypes = array(
+			'js' => array(
+				'headers' => array(
+					'Content-Type' => 'text/javascript; charset=utf8',
+				),
+				'callback' => array('PackageManager', 'compress'),
+			),
+			
+			'css' => array(
+				'headers' => array(
+					'Content-Type' => 'text/css; charset=utf8',
+				),
+				'callback' => array('PackageManager', 'compress'),
 			),
 		);
 	
@@ -53,22 +70,20 @@ class Handler extends Template {
 		return self::$Instances[$type][$name];
 	}
 	
-	public static function setHeader($name, $value = null){
-		if(is_array($name)){
-			foreach($name as $k => $v)
-				self::setHeader($k, $v);
-			
-			return;
-		}
+	public static function useExtendedTypes(){
+		self::$Types = array_merge(self::$Types, self::$ExtendedTypes);	
+	}
+	
+	public static function setHeader($headers = null){
+		if(!$headers) $headers = self::$Types[self::$Type]['headers'];
 		
-		try{
-			header($name.': '.$value);
-		}catch(Exception $e){}
+		if(is_array($headers))
+			foreach($headers as $k => $v)
+				header($k.': '.$v);
 	}
 	
 	public static function setType($type = null){
-		if(self::$Type)
-			return;
+		if(self::$Type) return;
 		
 		$type = strtolower($type);
 		if(!self::$Types[$type]){
@@ -164,8 +179,6 @@ class Handler extends Template {
 			return;
 		
 		if($this->master){
-			self::setHeader(self::$Types[self::$Type]['headers']);
-			
 			foreach(self::$Instances['slaves'] as $k => $v)
 				$assign[$k] = $v->parse(true);
 			

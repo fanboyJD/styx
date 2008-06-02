@@ -1,6 +1,18 @@
 <?php
 	include('../../../Source/index.php');
 	
+	function initialize(){
+		PackageManager::add('package1.js', array(
+			'type' => 'js',
+			'files' => 'mootools',
+		));
+		
+		PackageManager::add('style.css', array(
+			'type' => 'css',
+			'files' => 'style',
+		));
+	}
+	
 	if(Handler::behaviour('html'))
 		Handler::map()->template('index')->assign(array(
 			'app.name' => Core::retrieve('app.name'),

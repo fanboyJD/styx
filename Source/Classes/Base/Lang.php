@@ -24,12 +24,12 @@ class Lang extends StaticStorage {
 		if(!$file || !file_exists($file))
 			return;
 		
-		$content = file($file);
-		foreach($content as $v){
-			$v = explode('=', $v, 2);
-			
-			$array[trim($v[0])] = substr(trim($v[1]), 1, -1);
-		}
+		$content = file_get_contents($file);
+		preg_match_all('/^([\w\.]+)\s*=\s*([\'\"])(.*?[^\\\]|)\2;/ism', $content, $m);
+		
+		if(is_array($m[1]))
+			foreach($m[1] as $k => $v)
+				$array[$v] = str_replace("\'", "'", $m[3][$k]);
 		
 		self::store($c->store('Lang', self::$lang, $array, ONE_DAY));
 	}

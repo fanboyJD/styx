@@ -47,7 +47,7 @@ class Cache extends DynamicStorage {
 		return $this->engine;
 	}
 	
-	public function retrieve($key, $id, $ttl = null){
+	public function retrieve($key, $id, $ttl = null, $decode = true){
 		$content = parent::retrieve($key.'/'.$id);
 		if(!$content){
 			if($this->engineInstance && $ttl!='file')
@@ -57,23 +57,23 @@ class Cache extends DynamicStorage {
 			
 			if(!$content) return null;
 			
-			$content = json_decode($content, true);
+			if($decode)	$content = json_decode($content, true);
 			parent::store($key.'/'.$id, $content);
 		}
 		
 		return $content;
 	}
 	
-	public function store($key, $id, $input, $ttl = 3600){
+	public function store($key, $id, $input, $ttl = 3600, $encode = true){
 		if(!$input) return;
 		
-		$content = Data::clean($input);
-		parent::store($key.'/'.$id, $content);
+		parent::store($key.'/'.$id, $input);
 		
+		$content = $encode ? json_encode(Data::clean($input)) : $input;
 		if($this->engineInstance && $ttl!='file')
-			$this->engineInstance->store($key.'/'.$id, json_encode($content), $ttl);
+			$this->engineInstance->store($key.'/'.$id, $content, $ttl);
 		else
-			$this->filecacheInstance->store($key.'/'.$id, json_encode($content), $ttl);
+			$this->filecacheInstance->store($key.'/'.$id, $content, $ttl);
 		
 		return $input;
 	}

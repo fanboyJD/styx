@@ -2,10 +2,9 @@
 $_CONFIGURATION = array(
 	'app.name' => 'My Sample Application',
 	'app.link' => 'http://svn/Framework/trunk/Public/Sample/Public/index.php/',
-	'app.link' => 'http://localhost/trunk/Public/Sample/Public/index.php/',
 	'app.mail' => 'someone@nowhere.ru',
 	
-	'debug' => true,
+	'debug' => 9,
 	
 	'cache' => array(
 		'prefix' => 'sample',

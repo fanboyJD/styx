@@ -1,1 +1,5 @@
-news.posted = 'Posted by %s on %s'
+news.posted = 'Posted by %s on %s';
+
+#test me blah = 'asdf'; asdf 
+
+news.other = 'Some \' other news';

@@ -26,24 +26,44 @@
 	}
 	
 	Core::initialize();
+	
+	if(function_exists('initialize')) initialize();
+	
 	Core::pollute();
 	
-	$languages = Core::retrieve('languages');
-	
-	if(is_array($languages)){
-		/* We set the first language in the array as default language */
-		Lang::setLanguage(array_shift($languages));
-		
-		/* And overwrite with the selected language, in that way it keeps missing language strings */
-		if($_GET['p']['lang'] && sizeof($languages) && in_array($_GET['p']['lang'], $languages))
-			Lang::setLanguage($_GET['p']['lang']);
-	}
-	
-	User::initialize();
-	
-	db::getInstance(Core::retrieve('database'));
-	
 	Handler::setHandlers(Core::retrieve('handler'));
-	Handler::setType($_GET['p']['handler']);
 	
-	Route::initialize($_GET, $_POST);
+	if(PackageManager::has($_GET['package'])){
+		PackageManager::setPackage($_GET['package']);
+		
+		Handler::useExtendedTypes();
+		
+		Handler::setType(PackageManager::getType());
+		Handler::setHeader();
+		
+		Handler::map()->parse();
+		
+		die;
+	}else{
+		$languages = Core::retrieve('languages');
+		
+		if(is_array($languages)){
+			/* We set the first language in the array as default language */
+			Lang::setLanguage(array_shift($languages));
+			
+			/* And overwrite with the selected language, in that way it keeps missing language strings */
+			if($_GET['p']['lang'] && sizeof($languages) && in_array($_GET['p']['lang'], $languages))
+				Lang::setLanguage($_GET['p']['lang']);
+		}
+		
+		User::initialize();
+		
+		db::getInstance(Core::retrieve('database'));
+		
+		Handler::setType($_GET['p']['handler']);
+		Handler::setHeader();
+		
+		PackageManager::assignToMaster();
+		
+		Route::initialize($_GET, $_POST);
+	}

@@ -78,17 +78,22 @@ class Core extends StaticStorage {
 	public static function pollute(){
 		$polluted = array();
 		$vars = explode('/', $_SERVER['PATH_INFO']);
+		array_shift($vars);
 		
-		foreach($vars as $v){
+		foreach($vars as $k => $v){
 			$v = Data::clean($v);
 			if(!$v) continue;
 			
 			$v = explode(':', $v, 2);
 			if($polluted['p'][$v[0]]) continue;
 			
+			if(!$k && strpos($v[0], '.')){
+				$polluted['package'] = $v[0];
+				continue;
+			}
+			
 			$polluted['p'][$v[0]] = pick($v[1], $v[0]);
-			if($v[0]!='handler')
-				$polluted['n'][] = $v[0];
+			if($v[0]!='handler') $polluted['n'][] = $v[0];
 		}
 		
 		foreach(array('index', 'view') as $k => $v)
@@ -97,7 +102,7 @@ class Core extends StaticStorage {
 		
 		if(!$polluted['p']['handler']) $polluted['p']['handler'] = 'html';
 		
-		unset($_GET['n'], $_GET['p']);
+		unset($_GET['n'], $_GET['p'], $_GET['package']);
 		$_GET = array_merge($_GET, $polluted);
 		
 		if(sizeof($_POST) && get_magic_quotes_gpc())
