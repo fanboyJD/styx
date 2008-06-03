@@ -26,10 +26,13 @@ class QuerySelect extends QueryHandler implements Iterator {
 	 * @param array $data
 	 * @return QuerySelect
 	 */
-	public function fields($data){
+	public function fields(){
 		unset($this->formatted);
 		
-		$this->Storage->store('fields', $data);
+		$fields = func_get_args();
+		if(sizeof($fields)==1) $fields = splat($fields[0]);
+		
+		$this->Storage->store('fields', $fields);
 		
 		return $this;
 	}

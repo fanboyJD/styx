@@ -96,9 +96,25 @@ class PackageManager {
 		foreach($package['files'] as $file)
 			$source[] = file_get_contents(realpath(self::$Directories[$package['type']].'/'.$file.'.'.$package['type']));
 		
-		$compressor = new JavaScriptPacker(implode($source), 'None', false);
-			
-		$content = $compressor->pack();
+		$content = implode($source);
+		
+		if($package['type']=='js'){
+			$compressor = new JavaScriptPacker($content, 'None', false);
+			$content = $compressor->pack();
+		}else{
+			$content = str_replace(';}', '}',
+				preg_replace('/^\s+/', '',
+					preg_replace('/[\s]*([\{\},;:])[\s]*/', '\1',
+						preg_replace('#/\*.*?\*/#', '',
+							preg_replace('/[\r\n\t\s]+/s', ' ',
+								preg_replace('!//[^\n\r]+!', '', $content)
+							)
+						)
+					)
+				)
+			);
+		}
+		
 		$c->store('Compressed', self::$Package, $content, 'file', false);
 		
 		$gzipcontent = gzencode($content, 9, FORCE_GZIP);
