@@ -12,31 +12,36 @@ abstract class Layer extends Runner {
 	
 	protected $name,
 		$table,
+		
 		$events = array(
 			'save' => 'save',
 			'error' => 'error',
 		),
+		
 		$javascript = array(
 			'helper' => '',
 			'helpername' => '',
 		),
+		
 		$options = array(
 			'identifier' => null,
 			'javascript' => array(),
-		);
-	
-	protected $event = null,
+		),
+		
+		$event = null,
 		$get = array(),
 		$post = array(),
 		$where = null,
 		$editing = false;
+	
+	protected static $hide = false;
 	
 	/**
 	 * @var QuerySelect
 	 */
 	protected $data;
 	
-	public static function run($layerName, $event, &$get = null, &$post = null){
+	public static function run($layerName, $event, &$get = null, &$post = null, $isRouted = false){
 		if(!$layerName || !Core::autoload($layerName, 'Layers'))
 			return false;
 		
@@ -44,6 +49,9 @@ abstract class Layer extends Runner {
 		$class = ucfirst($layerName).'Layer';
 		
 		if(!is_subclass_of($class, 'Layer'))
+			return false;
+		
+		if($isRouted && method_exists($class, 'hide') && call_user_func(array($class, 'hide')))
 			return false;
 		
 		$layer = new $class($layerName);
@@ -198,4 +206,5 @@ abstract class Layer extends Runner {
 		
 		return Data::pagetitle($title, $options);
 	}
+	
 }

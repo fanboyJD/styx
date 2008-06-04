@@ -1,7 +1,7 @@
 <?php
 $_CONFIGURATION = array(
 	'app.name' => 'My Sample Application',
-	'app.link' => 'http://svn/Framework/trunk/Public/Sample/Public/index.php/',
+	'app.link' => 'http://svn/Framework/trunk/Public/Sample/Public/',
 	'app.mail' => 'someone@nowhere.ru',
 	'app.version' => '0.01',
 	

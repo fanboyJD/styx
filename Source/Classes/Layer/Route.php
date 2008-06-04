@@ -7,9 +7,10 @@ class Route {
 	private function __clone(){}
 	
 	public static function initialize(&$get, &$post){
-		self::$mainLayer = $get['n'][0];
+		if(self::$mainLayer) return;
 		
-		Layer::run($get['n'][0], $get['n'][1], $get, $post);
+		if(Layer::run($get['n'][0], $get['n'][1], $get, $post, true))
+			self::$mainLayer = $get['n'][0];
 	}
 	
 	public static function getMainLayer(){
