@@ -41,6 +41,9 @@ abstract class Layer extends Runner {
 	 */
 	protected $data;
 	
+	/**
+	 * @return Layer
+	 */
 	public static function run($layerName, $event, &$get = null, &$post = null, $isRouted = false){
 		if(!$layerName || !Core::autoload($layerName, 'Layers'))
 			return false;
@@ -205,6 +208,18 @@ abstract class Layer extends Runner {
 			$options['id'] = Data::call($where[$this->options['identifier']['internal']][0], $where[$this->options['identifier']['internal']][1]);
 		
 		return Data::pagetitle($title, $options);
+	}
+	
+	/**
+	 * This Method parses the Handler of the given Layer and
+	 * removes it from the Handler-Instances
+	 */
+	public function parse($return = true, $remove = true){
+		$out = $this->Handler->parse($return);
+
+		if($remove) Handler::remove($this->Handler->getName());
+		
+		return $out;
 	}
 	
 }

@@ -109,6 +109,14 @@ class Handler extends Template {
 		return false;
 	}
 	
+	public static function remove($name, $slave = true){
+		unset(self::$Instances[$slave ? 'slaves' : 'master'][$name]);
+	}
+	
+	public function getName(){
+		return $this->name;
+	}
+	
 	/**
 	 * @return Handler
 	 */
