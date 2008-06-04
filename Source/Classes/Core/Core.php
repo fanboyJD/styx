@@ -49,7 +49,7 @@ class Core extends StaticStorage {
 	public static function initialize(){
 		if(self::$Initialized) return;
 		
-		$c = Cache::getInstance(self::retrieve('cache', array()));
+		$c = Cache::getInstance();
 		
 		$isDebug = self::retrieve('debug');
 		
@@ -77,6 +77,7 @@ class Core extends StaticStorage {
 	
 	public static function pollute(){
 		$polluted = array();
+		
 		$vars = explode('/', $_SERVER['PATH_INFO']);
 		array_shift($vars);
 		
