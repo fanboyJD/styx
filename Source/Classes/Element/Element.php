@@ -197,6 +197,10 @@ class Elements extends Element {
 	public function hasElement($el){
 		return !!$this->elements[$el->options['name']];
 	}
+	
+	public function getElement($name){
+		return $this->elements[$name];
+	}
 }
 
 /* INPUT CLASS */

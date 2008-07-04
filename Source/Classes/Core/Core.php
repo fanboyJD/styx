@@ -95,7 +95,7 @@ class Core extends StaticStorage {
 				continue;
 			}
 			
-			$polluted['p'][$v[0]] = pick($v[1], $v[0]);
+			$polluted['p'][$v[0]] = pick($v[1], null);
 			if($v[0]!='handler') $polluted['n'][] = $v[0];
 		}
 		

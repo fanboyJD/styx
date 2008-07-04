@@ -75,7 +75,7 @@ class QuerySelect extends QueryHandler implements Iterator {
 	
 	public function rewind(){
 		if(!$this->queried){
-			$this->cache = $this->retrieve();
+			$this->cache = pick($this->retrieve(), array());
 			$this->queried = true;
 		}
 		
