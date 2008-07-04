@@ -245,8 +245,28 @@ class Field extends Element {
 	
 }
 
+/* TEMPLATE CLASS FOR RADIO AND SELECT */
+class TemplateRadioSelect extends Element {
+	
+	public function addElement($el){
+		if(!$this->hasElement($el))
+			$this->options[':elements'][] = $el;
+		
+		return $el;
+	}
+	
+	public function removeElement($el){
+		array_remove($this->options[':elements'], $el);
+	}
+	
+	public function hasElement($el){
+		return in_array($el, $this->options[':elements']);
+	}
+	
+}
+
 /* RADIO CLASS */
-class Radio extends Element {
+class Radio extends TemplateRadioSelect {
 	
 	public function __construct($options){
 		$options['type'] = 'radio';
@@ -257,7 +277,7 @@ class Radio extends Element {
 }
 
 /* SELECT CLASS */
-class Select extends Element {
+class Select extends TemplateRadioSelect {
 	
 	public function __construct($options){
 		parent::__construct($options, get_class().'.php', 'select');
@@ -283,7 +303,7 @@ class Checkbox extends Element {
 	public function format(){
 		return parent::format(array(
 			'attributes' => $this->implode('skipValue'),
-			'checked' => ($this->options[':default']==$this->options['value'] ? 'checked="checked" ' : ''),
+			'checked' => ($this->options[':default']===$this->options['value'] ? 'checked="checked" ' : ''),
 		));
 	}
 	

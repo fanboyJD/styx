@@ -25,10 +25,14 @@ class Lang extends StaticStorage {
 			return;
 		
 		$regex = '/^|\s+([\w\.]+)\s*=\s*([\'\"])(.*?[^\\\]|)\2;/ism';
+		$str_rpl = array(
+			array("\'", "\{", "\}"),
+			array("'", "{", "}"),
+		);
 		
 		$content = file_get_contents($file);
 		
-		preg_match_all('/namespace\s+([\w\.]+)\s*\{(.*)\}/ism', $content, $m);
+		preg_match_all('/namespace\s+([\w\.]+)\s*\{(.*?[^\\\}\{]|)\}/ism', $content, $m);
 		
 		if(is_array($m[1]))
 			foreach($m[1] as $key => $val){
@@ -39,7 +43,7 @@ class Lang extends StaticStorage {
 				if(is_array($vars[1]))
 					foreach($vars[1] as $k => $v)
 						if($v && $vars[3][$k])
-							$array[$val.'.'.$v] = str_replace("\'", "'", $vars[3][$k]);
+							$array[$val.'.'.$v] = str_replace($str_rpl[0], $str_rpl[1], $vars[3][$k]);
 			}
 		
 		preg_match_all($regex, $content, $m);
@@ -47,7 +51,7 @@ class Lang extends StaticStorage {
 		if(is_array($m[1]))
 			foreach($m[1] as $k => $v)
 				if($v && $m[3][$k])
-					$array[$v] = str_replace("\'", "'", $m[3][$k]);
+					$array[$v] = str_replace($str_rpl[0], $str_rpl[1], $m[3][$k]);
 		
 		self::store($c->store('Lang', self::$lang, $array, ONE_DAY));
 	}

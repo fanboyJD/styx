@@ -3,3 +3,9 @@ news.posted = 'Posted by %s on %s';
 #test me blah = 'asdf'; asdf 
 
 news.other = 'Some \' other news';
+
+# Remember to escape \{ and \} properly :)
+namespace test {
+	blah = 'Testing';
+	another = 'This \{ is a \} test with \'escaping\' some stuff';
+}
