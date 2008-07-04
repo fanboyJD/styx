@@ -24,8 +24,24 @@ class Lang extends StaticStorage {
 		if(!$file || !file_exists($file))
 			return;
 		
+		$regex = '/^|\t+([\w\.]+)\s*=\s*([\'\"])(.*?[^\\\]|)\2;/ism';
+		
 		$content = file_get_contents($file);
-		preg_match_all('/^([\w\.]+)\s*=\s*([\'\"])(.*?[^\\\]|)\2;/ism', $content, $m);
+		
+		preg_match_all('/namespace\s+([\w\.]+)\s*\{(.*)\}/ism', $content, $m);
+		
+		if(is_array($m[1]))
+			foreach($m[1] as $key => $val){
+				$content = str_replace($m[0][$key], '', $content);
+				
+				preg_match_all($regex, $m[2][$key], $vars);
+				
+				if(is_array($vars[1]))
+					foreach($vars[1] as $k => $v)
+						$array[$val.'.'.$v] = str_replace("\'", "'", $vars[3][$k]);
+			}
+		
+		preg_match_all($regex, $content, $m);
 		
 		if(is_array($m[1]))
 			foreach($m[1] as $k => $v)
