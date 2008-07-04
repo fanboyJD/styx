@@ -88,6 +88,8 @@ abstract class Layer extends Runner {
 		
 		$this->form = $initialize['form'];
 		
+		//$this->form->set('name', $name);
+		
 		$this->javascript['helper'] = 'Helpers.'.$this->form->options['id'];
 		$this->javascript['helpername'] = 'Helper';
 	}
