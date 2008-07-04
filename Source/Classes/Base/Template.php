@@ -106,7 +106,12 @@ class Template extends Runner {
 		
 		$rep = array(array_values($vars[0]));
 		foreach($vars[1] as $val)
-			$rep[1][] = $this->assigned[$val];
+			if($this->assigned[$val])
+				$rep[1][] = $this->assigned[$val];
+			elseif(startsWith($val, 'lang.'))
+				$rep[1][] = Lang::retrieve(substr($val, 5));
+			else
+				$rep[1][] = '';
 		
 		$rep[0][] = "\t";
 		$rep[1][] = '';

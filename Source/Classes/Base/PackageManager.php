@@ -82,13 +82,23 @@ class PackageManager {
 			));
 		
 		$c = Cache::getInstance();
-		if(!$debug){
+		
+		if($debug){
+			/* We check here if the files have been modified */
+			foreach($package['files'] as $file)
+				$time = max($time, filemtime(realpath(self::$Directories[$package['type']].'/'.$file.'.'.$package['type'])));
+			
+			if($time<$c->retrieve('CompressedTime', self::$Package, 'file'))
+				$debug = false;
+		}else{
 			$expiration = Core::retrieve('expiration');
 			Handler::setHeader(array(
 				'Expires' => date('r', time()+$expiration),
 				'Cache-Control' => 'public, max-age='.$expiration,
 			));
-			
+		}
+		
+		if(!$debug){
 			$output = $c->retrieve('Compressed', self::$Package.($compress ? '1' : ''), 'file', false);
 			if($output) return $output;
 		}
@@ -103,7 +113,6 @@ class PackageManager {
 			$content = $compressor->pack();
 		}else{
 			// Thanks to: http://gadelkareem.com/2007/06/23/compressing-your-html-css-and-javascript-using-simple-php-code/
-			
 			$content = str_replace(';}', '}',
 				preg_replace('/^\s+/', '',
 					preg_replace('/[\s]*([\{\},;:])[\s]*/', '\1',
@@ -117,10 +126,12 @@ class PackageManager {
 			);
 		}
 		
-		$c->store('Compressed', self::$Package, $content, 'file', false);
-		
 		$gzipcontent = gzencode($content, 9, FORCE_GZIP);
+		
+		$c->store('Compressed', self::$Package, $content, 'file', false);
 		$c->store('Compressed', self::$Package.'1', $gzipcontent, 'file', false);
+		
+		$c->store('CompressedTime', self::$Package, time(), 'file');
 		
 		return $compress && $gzipcontent ? $gzipcontent : $content;
 	}
