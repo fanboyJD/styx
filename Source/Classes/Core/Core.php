@@ -100,8 +100,10 @@ class Core extends StaticStorage {
 		}
 		
 		foreach(array('index', 'view') as $k => $v)
-			if(!$polluted['n'][$k])
-				$polluted['p'][$v] = $polluted['n'][$k] = $v;
+			if(!$polluted['n'][$k]){
+				$polluted['n'][$k] = $v;
+				$polluted['p'][$v] = null;
+			}
 		
 		if(!$polluted['p']['handler']) $polluted['p']['handler'] = 'html';
 		
