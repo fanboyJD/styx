@@ -123,10 +123,10 @@ class QueryHandler {
 		return $this;
 	}
 	
-	public function format(){
+	public function format($part = false){
 		if($this->formatted) return $this->formatted;
 		
-		$out = ' '.$this->formatWhere().' '.$this->formatLimit();
+		$out = ' '.$this->formatWhere();
 		
 		if($this->type=='update')
 			$out = 'UPDATE '.$this->table.' SET '.$this->formatSet().$out;
@@ -135,7 +135,9 @@ class QueryHandler {
 		elseif($this->type=='delete')
 			$out = 'DELETE FROM '.$this->table.$out;
 		
-		return $this->formatted = $out;
+		if($part) return array($out, ' '.$this->formatLimit());
+		
+		return $this->formatted = $out.' '.$this->formatLimit();
 	}
 	
 	public function __toString(){

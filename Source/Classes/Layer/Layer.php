@@ -116,7 +116,10 @@ abstract class Layer extends Runner {
 		if($this->getDefaultEvent('save')==$this->event && is_array($this->post) && sizeof($this->post))
 			$this->prepareData($this->post);
 		
-		$this->{$event[1]}($this->get['p'][$event[0]]);
+		if(method_exists($this, $event[1]))
+			$this->{$event[1]}($this->get['p'][$event[0]]);
+		/*else
+			show some Error*/
 	}
 	
 	/* EditHandler Begin */

@@ -52,9 +52,9 @@ class QuerySelect extends QueryHandler implements Iterator {
 	public function format(){
 		if($this->formatted) return $this->formatted;
 		
-		$out = parent::format();
+		$out = parent::format(true);
 		
-		return $this->formatted = 'SELECT '.$this->formatFields().' FROM '.$this->table.$out.$this->formatOrder();
+		return $this->formatted = 'SELECT '.$this->formatFields().' FROM '.$this->table.$out[0].$this->formatOrder().$out[1];
 	}
 	
 	public function fetch($type = null){
