@@ -22,7 +22,7 @@ class Form extends Elements {
 	}
 	
 	//this method needs to be redone!
-	public function getFields($options = array(
+	/*public function getFields($options = array(
 		'all' => false,
 		'detail' => true,
 		'db' => false,
@@ -57,7 +57,7 @@ class Form extends Elements {
 				$els[] = $el->options['name'];
 		}
 		return $els;
-	}
+	}*/
 	
 	public function getEvents($helper){
 		$els = array();
@@ -90,8 +90,7 @@ class Form extends Elements {
 			if($el->type=='button' || (!$alias && ($el->options[':alias'] || $el->options[':readOnly'])) || ($alias && !$this->options[':alias']))
 				continue;
 			
-			$val = $el->prepareData();
-			if($val[0]!==false && !is_null($val[0])) $els[$k] = $val;
+			$els[$k] = $el->getValue();
 		}
 		
 		return sizeof($els) ? $els : false;
@@ -100,21 +99,24 @@ class Form extends Elements {
 	public function validate(){
 		foreach($this->elements as $k => $el){
 			unset($v);
-			if(!in_array($el->type, self::$formElements) || !$el->options[':validate'])
+			if(!in_array($el->type, self::$formElements))
 				continue;
 			
 			$val = $el->getValue();
 			if(!$val){
-				if(!$el->options[':empty'] && $el->options[':validate'][0]!='bool')
-					return array($k, 'notempty');
+				if(!$el->options[':empty'] && $el->options[':validate'][0]!='bool' && $el->options[':preset'])
+					return array('notempty', $k, $el->options[':caption']);
 				elseif($el->options[':empty'] || $el->options[':validate'][0]=='bool')
 					continue;
 			}elseif($this->options[':length'] && (strlen((string)$val)<$this->options[':length'][0] || strlen((string)$val)>$this->options[':length'][1]))
-				return array($k, 'length');
+				return array('length', $k, $el->options[':caption']);
+			
+			if(!$el->options[':validate'][0])
+				continue;
 			
 			$v = Validator::call($val, $el->options[':validate']);
 			
-			if($v!==true) return array($k, $el->options[':validate'][0]);
+			if($v!==true) return array($el->options[':validate'][0], $k, $el->options[':caption']);
 		}
 		
 		return true;

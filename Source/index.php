@@ -7,7 +7,6 @@
 	
 	require_once('Classes/Core/Methods.php');
 	require_once('Classes/Core/Storage.php');
-	require_once('Classes/Core/Exceptions.php');
 	require_once('Classes/Core/Core.php');
 	
 	spl_autoload_register(array('Core', 'autoload'));
@@ -17,6 +16,7 @@
 	
 	Core::loadClass('Base', 'Cache');
 	Core::loadClass('Base', 'Data');
+	require_once('Classes/Base/Exceptions.php');
 	
 	require_once($path.'Config/Configuration.php');
 	unset($path);

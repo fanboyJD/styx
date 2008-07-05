@@ -138,7 +138,7 @@ abstract class Layer extends Runner {
 			}
 		}
 		
-		$this->form->get('action', $this->name.'/'.$this->getDefaultEvent('save').($data ? ':'.$data[$this->options['identifier']['internal']] : ''));
+		$this->form->get('action', $this->name.'/'.$this->getDefaultEvent('save').($data ? ':'.$data[$this->options['identifier']['external']] : ''));
 		
 		/*array_extend($options = array(
 			'fields' => $this->form->getFields(array('js' => true)),

@@ -20,6 +20,7 @@ class Element extends Runner {
 				:unknown (name/id does not get set automatically when not given)
 				:tag (type/name given by options)
 				:standalone (for elements without template; if element gets closed inside the tag (like <img />)
+				:preset stores the initial value for the validator
 			*/
 		);
 	
@@ -27,6 +28,8 @@ class Element extends Runner {
 		$formElements = array('input', 'checkbox', 'radio', 'select', 'textarea', 'richtext');
 	
 	public function __construct($options, $name = null, $type = null){
+		$type = strtolower($type);
+		
 		if($options[':tag']){
 			$this->name = $this->type = $options[':tag'];
 		}else{
@@ -49,6 +52,8 @@ class Element extends Runner {
 		}else{
 			$options['class'] = array();
 		}
+		
+		$options[':preset'] = $options['value'];
 		
 		$this->options = $options;
 	}
@@ -86,6 +91,9 @@ class Element extends Runner {
 	}
 	
 	public function getValue(){
+		if($this->options[':length'][1])
+			$this->options['value'] = substr($this->options['value'], 0, $this->options[':length'][1]);
+		
 		return $this->options['value'];
 	}
 	
@@ -142,13 +150,6 @@ class Element extends Runner {
 				$s[] = $key.'="'.$val.'"';
 		
 		return is_array($s) ? ' '.implode(' ', $s) : '';
-	}
-	
-	public function prepareData(){
-		if($this->options[':length'][1])
-			$this->options['value'] = substr($this->options['value'], 0, $this->options[':length'][1]);
-		
-		return array($this->options['value'], $this->options[':validate']);
 	}
 	
 }
@@ -309,6 +310,14 @@ class Checkbox extends Element {
 			'attributes' => $this->implode('skipValue'),
 			'checked' => ($this->options[':default']==$this->options['value'] ? 'checked="checked" ' : ''),
 		));
+	}
+	
+	public function setValue($v){
+		$this->options[':default'] = $v;
+	}
+	
+	public function getValue(){
+		return $this->options['checked'] ? 1 : 0;
 	}
 	
 }

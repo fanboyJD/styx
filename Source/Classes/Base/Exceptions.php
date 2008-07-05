@@ -1,12 +1,12 @@
 <?php
 class ValidatorException extends Exception {
 	
-	public $error = array();
-	
 	public function __construct($error){
-		$this->error = $error;
+		splat($error);
+		$lang = Lang::retrieve('validator.'.$error[0]);
+		if(!$lang) $lang = Lang::retrieve('validator.default');
 		
-		parent::__construct();
+		parent::__construct(sprintf($lang, $error[2]));
 	}
 }
 
