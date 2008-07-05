@@ -39,7 +39,7 @@ class User {
 					return $user;
 			}
 			
-			$user = db::getInstance()->select('users')->where(array(
+			$user = db::select('users')->where(array(
 				'pwd' => $data['pwd'],
 				'AND',
 				'session' => $data['session'],
@@ -63,7 +63,7 @@ class User {
 		
 		$user['session'] = md5($rand.uniqid($rand, true));
 		
-		db::getInstance()->update('users')->set(array(
+		db::update('users')->set(array(
 			'session' => $user['session'],
 		))->where(array(
 			'id' => $user['id'],

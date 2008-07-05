@@ -307,7 +307,7 @@ class Checkbox extends Element {
 	public function format(){
 		return parent::format(array(
 			'attributes' => $this->implode('skipValue'),
-			'checked' => ($this->options[':default']===$this->options['value'] ? 'checked="checked" ' : ''),
+			'checked' => ($this->options[':default']==$this->options['value'] ? 'checked="checked" ' : ''),
 		));
 	}
 	

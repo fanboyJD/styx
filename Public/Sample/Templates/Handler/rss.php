@@ -24,8 +24,7 @@
 			// We can do anything we want here and more like iterating through $this->data :)
 		
 			/* @var $db db */
-			$db = db::getInstance();
-			foreach($db->select('news')->order('time DESC') as $n)
+			foreach(db::select('news')->order('time DESC') as $n)
 				echo '<item>
 					<title>'.$n['title'].'</title>
 					<link>${app.link}'.$n['pagetitle'].'</link>

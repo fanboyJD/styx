@@ -106,7 +106,7 @@ abstract class Layer extends Runner {
 		$event = array(strtolower($event));
 		$event[] = 'on'.ucfirst($event[0]);
 		
-		$this->data = db::getInstance()->select($this->table);
+		$this->data = db::select($this->table);
 		$this->Handler = Handler::map('layer.'.$this->name)->base('Layers', ucfirst($this->name))->object($this);
 		
 		$this->get = $get ? $get : $_GET;
@@ -116,7 +116,7 @@ abstract class Layer extends Runner {
 		if($this->getDefaultEvent('save')==$this->event && is_array($this->post) && sizeof($this->post))
 			$this->prepareData($this->post);
 		
-		$this->{$event[1]}();
+		$this->{$event[1]}($this->get['p'][$event[0]]);
 	}
 	
 	/* EditHandler Begin */
@@ -127,7 +127,7 @@ abstract class Layer extends Runner {
 			);
 		
 		if(Validator::check($pass['edit']) && $this->table){
-			$data = db::getInstance()->select($this->table)->where($pass['edit'])->fetch();
+			$data = db::select($this->table)->where($pass['edit'])->fetch();
 			if($data){
 				$this->form->addElement(new HiddenInput(array(
 					'name' => $this->options['identifier']['internal']
@@ -186,9 +186,9 @@ abstract class Layer extends Runner {
 			throw new NoTableException();
 		
 		if($where)
-			db::getInstance()->update($this->table)->set($data)->where($where)->query();
+			db::update($this->table)->set($data)->where($where)->query();
 		else
-			db::getInstance()->insert($this->table)->set($data)->query();
+			db::insert($this->table)->set($data)->query();
 	}
 	/* SaveHandler End */
 	
@@ -202,7 +202,7 @@ abstract class Layer extends Runner {
 	
 	public function getPagetitle($title, $where){
 		if($this->table)
-			$options['contents'] = db::getInstance()->select($this->table)->fields('id, pagetitle')->retrieve();
+			$options['contents'] = db::select($this->table)->fields('id, pagetitle')->retrieve();
 		
 		if($where[$this->options['identifier']['internal']])
 			$options['id'] = Data::call($where[$this->options['identifier']['internal']][0], $where[$this->options['identifier']['internal']][1]);

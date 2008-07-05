@@ -70,7 +70,7 @@ class db {
 	 * @param string $table
 	 * @return QuerySelect
 	 */
-	public function select($table){
+	public static function select($table){
 		return new QuerySelect($table);
 	}
 	
@@ -78,7 +78,7 @@ class db {
 	 * @param string $table
 	 * @return QueryHandler
 	 */
-	public function update($table){
+	public static function update($table){
 		return new QueryHandler($table, 'update');
 	}
 	
@@ -86,7 +86,7 @@ class db {
 	 * @param string $table
 	 * @return QueryHandler
 	 */
-	public function insert($table){
+	public static function insert($table){
 		return new QueryHandler($table, 'insert');
 	}
 	
@@ -94,7 +94,7 @@ class db {
 	 * @param string $table
 	 * @return QueryHandler
 	 */
-	public function delete($table){
+	public static function delete($table){
 		return new QueryHandler($table, 'delete');
 	}
 	
