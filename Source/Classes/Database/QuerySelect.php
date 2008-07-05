@@ -69,13 +69,15 @@ class QuerySelect extends QueryHandler implements Iterator {
 	}
 	
 	public function retrieve(){
-		return db::getInstance()->retrieve($this->format());
+		$this->queried = false;
+		
+		return $this->cache = pick(db::getInstance()->retrieve($this->format()), array());
 	}
 	
 	
 	public function rewind(){
 		if(!$this->queried){
-			$this->cache = pick($this->retrieve(), array());
+			$this->retrieve();
 			$this->queried = true;
 		}
 		
@@ -97,5 +99,9 @@ class QuerySelect extends QueryHandler implements Iterator {
 	public function valid(){
 		return !is_null($this->key());
 	}
-
+	
+	public function reset(){
+		return reset($this->cache);
+	}
+	
 }
