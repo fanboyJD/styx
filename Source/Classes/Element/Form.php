@@ -90,7 +90,12 @@ class Form extends Elements {
 			if($el->type=='button' || (!$alias && ($el->options[':alias'] || $el->options[':readOnly'])) || ($alias && !$this->options[':alias']))
 				continue;
 			
-			$els[$k] = $el->getValue();
+			$val = $el->getValue();
+			
+			if($el->options[':validate'][0])
+				$val = Data::call($val, $el->options[':validate']);
+			
+			$els[$k] = $val;
 		}
 		
 		return sizeof($els) ? $els : false;

@@ -313,6 +313,9 @@ class Checkbox extends Element {
 	}
 	
 	public function setValue($v){
+		if($this->options['value']==$v)
+			$this->options['checked'] = 1;
+		
 		$this->options[':default'] = $v;
 	}
 	

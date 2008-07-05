@@ -44,7 +44,7 @@ abstract class Layer extends Runner {
 	/**
 	 * @return Layer
 	 */
-	public static function run($layerName, $event, &$get = null, &$post = null, $isRouted = false){
+	public static function run($layerName, $event, $get = null, $post = null, $isRouted = false){
 		if(!$layerName || !Core::autoload($layerName, 'Layers'))
 			return false;
 		
@@ -102,7 +102,7 @@ abstract class Layer extends Runner {
 		);*/
 	}
 	
-	public function handle($event, &$get = null, &$post = null){
+	public function handle($event, $get = null, $post = null){
 		$event = array(strtolower($event));
 		$event[] = 'on'.ucfirst($event[0]);
 		

@@ -158,4 +158,10 @@ class Data {
 		return $title.(self::id($i) ? (!endsWith($title, '_') ? '_' : '').$i : '');
 	}
 	
+	public static function purify($data, $options = array()){
+		$purify = new Safehtml($options);
+		
+		return $purify->parse($data);
+	}
+	
 }

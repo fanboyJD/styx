@@ -94,7 +94,10 @@ class QueryHandler {
 	 * @param array $data
 	 * @return QueryHandler
 	 */
-	public function where($data){
+	public function where(){
+		$data = func_get_args();
+		if(sizeof($data)==1) $data = splat($data[0]);
+		
 		unset($this->formatted);
 		
 		$this->Storage->store('where', $data);
