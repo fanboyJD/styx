@@ -41,8 +41,11 @@ class QuerySelect extends QueryHandler implements Iterator {
 	 * @param mixed $data
 	 * @return QuerySelect
 	 */
-	public function order($data){
+	public function order(){
 		unset($this->formatted);
+		
+		$data = func_get_args();
+		if(sizeof($data)==1) $data = splat($data[0]);
 		
 		$this->Storage->store('order', $data);
 		

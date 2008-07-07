@@ -207,11 +207,11 @@ class Elements extends Element {
 /* INPUT CLASS */
 class Input extends Element {
 	
-	public function __construct($options){
+	public function __construct($options, $name = null){
 		if(!$options['type'])
 			$options['type'] = 'text';
 		
-		parent::__construct($options, get_class(), 'input');
+		parent::__construct($options, $name ? $name : get_class(), 'input');
 	}
 	
 }
@@ -268,6 +268,14 @@ class TemplateRadioSelect extends Element {
 		return in_array($el, $this->options[':elements']);
 	}
 	
+	public function getValue(){
+		foreach($this->options[':elements'] as $el)
+			if($this->options['value']==$el['value'])
+				return $this->options['value'];
+		
+		return $this->options[':preset'];
+	}
+	
 }
 
 /* RADIO CLASS */
@@ -277,6 +285,8 @@ class Radio extends TemplateRadioSelect {
 		$options['type'] = 'radio';
 		
 		parent::__construct($options, get_class().'.php', 'radio');
+		
+		$this->addClass('radio');
 	}
 	
 }
@@ -303,6 +313,8 @@ class Checkbox extends Element {
 		$options['type'] = 'checkbox';
 		
 		parent::__construct($options, get_class(), 'checkbox');
+		
+		$this->addClass('checkbox');
 	}
 	
 	public function format(){
@@ -347,7 +359,7 @@ class Textarea extends Element {
 class RichText extends Textarea {
 	
 	public function __construct($options){
-		parent::__construct($options, get_class(), 'richtext');
+		parent::__construct($options, get_class());
 		
 		$this->addClass('richtext');
 	}
