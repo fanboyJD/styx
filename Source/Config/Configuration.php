@@ -9,6 +9,8 @@ Core::registerClasses('Element', array(
 
 // Here's the basic configuration
 Core::store(array(
+	'path.separator' => ':',
+	
 	'app.version' => '1',
 	
 	'debug' => false,
@@ -18,7 +20,7 @@ Core::store(array(
 	
 	'handler' => array('html', 'json', 'xml'),
 	
-	'identifer.id' => 'id',
+	'identifier.id' => 'id',
 	
 	'elements.prefix' => 'el',
 	

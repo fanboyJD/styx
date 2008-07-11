@@ -72,8 +72,7 @@ class Template extends Runner {
 	 * @return Template
 	 */
 	public static function map(){
-		$args = func_get_args();
-		if(sizeof($args)==1) $args = splat($args[0]);
+		$args = Hash::args(func_get_args());
 		
 		$instance = new Template();
 		return $instance->initialize($args);
@@ -92,7 +91,8 @@ class Template extends Runner {
 	 * @return Template
 	 */
 	public function assign($array){
-		$this->assigned = array_extend($this->assigned, splat($array));
+		$args = func_get_args();
+		$this->assigned = Hash::extend($this->assigned, Hash::args($args));
 		
 		return $this;
 	}
@@ -100,7 +100,7 @@ class Template extends Runner {
 	public function parse($return = false){
 		$out = $this->getFile();
 		
-		array_flatten($this->assigned);
+		Hash::flatten($this->assigned);
 		
 		preg_match_all('/\\$\{([\w\.:]+)\}/i', $out, $vars);
 		

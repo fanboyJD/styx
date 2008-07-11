@@ -139,8 +139,7 @@ class Handler extends Template {
 	 * @return Handler
 	 */
 	public function base($base){
-		$this->base = func_get_args();
-		if(sizeof($this->base)==1) $this->base = splat($this->base[0]);
+		$this->base = Hash::args(func_get_args());
 		
 		return $this;
 	}
@@ -149,10 +148,9 @@ class Handler extends Template {
 	 * @return Handler
 	 */
 	public function template(){
-		$args = func_get_args();
-		if(sizeof($args)==1) $args = splat($args[0]);
+		$args = Hash::args(func_get_args());
 		
-		foreach(array_reverse(splat($this->base)) as $v)
+		foreach(array_reverse(Hash::splat($this->base)) as $v)
 			array_unshift($args, $v);
 		
 		return $this->initialize($args);

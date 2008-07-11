@@ -1,5 +1,15 @@
 <?php
+
+abstract class Runner {
+	
+	public function execute(){
+		include(func_get_arg(0));
+	}
+	
+}
+
 class Core extends StaticStorage {
+	
 	private static $Initialized = false,
 		$onInitialize = array();
 	
@@ -7,22 +17,17 @@ class Core extends StaticStorage {
 	private function __clone(){}
 	
 	public static function classExists($class, $toLoad = null){
-		$toLoad = in_array($toLoad, array('Classes', 'Layers')) ? $toLoad : 'Classes';
-		
 		$class = strtolower($class);
-		if($toLoad=='Layers')
-			$class .= 'layer';
 		
-		$List = self::retrieve($toLoad);
+		$List = self::retrieve(in_array($toLoad, array('Classes', 'Layers')) ? $toLoad : 'Classes');
 		
 		return class_exists($class) || $List[$class] ? $List[$class] : false;	
 	}
 	
-	public static function autoload($class, $toLoad = null){
-		$file = self::classExists($class, $toLoad);
+	public static function autoload($class){
+		$file = self::classExists($class, endsWith($class, 'layer') && strlen($class)>5 ? 'Layers' : 'Classes');
 		
-		if($file && !class_exists($class))
-			require_once($file);
+		if($file && !class_exists($class)) require_once($file);
 		
 		return $file;
 	}
@@ -36,12 +41,11 @@ class Core extends StaticStorage {
 	 * @return bool
 	 */
 	public static function loadClass($dir, $class){
-		$file = self::retrieve('path').'Classes/'.$dir.'/'.strtolower($class).'.php';
-		if(!file_exists($file))
-			return false;
+		$file = self::retrieve('path').'Classes/'.$dir.'/'.ucfirst(strtolower($class)).'.php';
 		
-		if(!class_exists($class))
-			require_once($file);
+		if(!file_exists($file)) return false;
+		
+		if(!class_exists($class)) require_once($file);
 		
 		return true;
 	}
@@ -50,15 +54,15 @@ class Core extends StaticStorage {
 		if(self::$Initialized) return;
 		
 		$c = Cache::getInstance();
-		
-		$isDebug = self::retrieve('debug');
+		$debug = self::retrieve('debug');
 		
 		foreach(array(
 			'Classes' => self::retrieve('path').'/Classes/*/*.php',
 			'Layers' => self::retrieve('app.path').'/Layers/*.php',
 		) as $key => $dir){
 			$List = $c->retrieve('Core', $key);
-			if(!$List || $isDebug){
+			
+			if(!$List || $debug){
 				$files = glob($dir);
 				if(is_array($files))
 					foreach($files as $file)
@@ -66,6 +70,7 @@ class Core extends StaticStorage {
 				
 				if($List) $c->store('Core', $key, $List);
 			}
+			
 			self::store($key, $List);
 		}
 		
@@ -82,16 +87,17 @@ class Core extends StaticStorage {
 		array_shift($vars);
 		
 		$version = self::retrieve('app.version');
+		$separator = self::retrieve('path.separator');
 		
 		foreach($vars as $k => $v){
 			$v = Data::clean($v);
 			if(!$v) continue;
 			
-			$v = explode(':', $v, 2);
+			$v = explode($separator, $v, 2);
 			if($polluted['p'][$v[0]]) continue;
 			
 			if(!$k && $version==$v[0] && strpos($vars[$k+1], '.')){
-				$polluted['package'] = $vars[$k+1];
+				$polluted['m']['package'] = $vars[$k+1];
 				continue;
 			}
 			
@@ -107,7 +113,7 @@ class Core extends StaticStorage {
 		
 		if(!$polluted['p']['handler']) $polluted['p']['handler'] = 'html';
 		
-		unset($_GET['n'], $_GET['p'], $_GET['package']);
+		unset($_GET['n'], $_GET['p'], $_GET['m']);
 		$_GET = array_merge($_GET, $polluted);
 		
 		if(sizeof($_POST) && get_magic_quotes_gpc())
@@ -130,4 +136,5 @@ class Core extends StaticStorage {
 		
 		self::store('Classes', $Classes);
 	}
+	
 }

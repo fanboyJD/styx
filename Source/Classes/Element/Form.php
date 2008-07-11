@@ -12,7 +12,7 @@ class Form extends Elements {
 	
 	public function format(){
 		$out = array('form.top' => '<form'.$this->implode('skipName').'>');
-		array_extend($out, parent::format());
+		Hash::extend($out, parent::format());
 		$out['form.bottom'] = '</form>';
 		
 		if(self::$prefix===false)
@@ -52,7 +52,7 @@ class Form extends Elements {
 				if(!$el->options['empty'] && $el->options['validate'][0]!='bool')
 					$els[$el->options['name']][] = 'notempty';
 				if($el->options['jsvalidate'])
-					$els[$el->options['name']] = array_extend($els[$el->options['name']], $el->options['jsvalidate']);
+					$els[$el->options['name']] = Hash::extend($els[$el->options['name']], $el->options['jsvalidate']);
 			}else
 				$els[] = $el->options['name'];
 		}

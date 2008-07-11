@@ -2,7 +2,7 @@
 class ValidatorException extends Exception {
 	
 	public function __construct($error){
-		splat($error);
+		Hash::splat($error);
 		$lang = Lang::retrieve('validator.'.$error[0]);
 		if(!$lang) $lang = Lang::retrieve('validator.default');
 		

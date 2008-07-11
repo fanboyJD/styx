@@ -37,7 +37,7 @@ class Element extends Runner {
 			$this->type = $type ? $type : 'element';
 		}
 		
-		splat($options[':validate']);
+		Hash::splat($options[':validate']);
 		
 		if(!$options['id'] && $options['name'])
 			$options['id'] = $options['name'].'_'.(self::$uid++);
@@ -102,7 +102,7 @@ class Element extends Runner {
 	}
 	
 	public function removeClass($class){
-		array_remove($this->options['class'], $class);
+		Hash::remove($this->options['class'], $class);
 	}
 	
 	public function hasClass($class){
@@ -192,7 +192,7 @@ class Elements extends Element {
 	}
 	
 	public function removeElement($el){
-		array_remove($this->elements, $el);
+		Hash::remove($this->elements, $el);
 	}
 	
 	public function hasElement($el){
@@ -261,7 +261,7 @@ class TemplateRadioSelect extends Element {
 	}
 	
 	public function removeElement($el){
-		array_remove($this->options[':elements'], $el);
+		Hash::remove($this->options[':elements'], $el);
 	}
 	
 	public function hasElement($el){

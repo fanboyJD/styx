@@ -36,7 +36,7 @@ class PackageManager {
 		'files' => array(),
 		'options' => array(),
 	)){
-		splat($options['files']);
+		Hash::splat($options['files']);
 		
 		self::$Packages[$name] = $options;
 	}
@@ -57,7 +57,7 @@ class PackageManager {
 		$version = Core::retrieve('app.version');
 		
 		foreach(self::$Packages as $name => $package){
-			array_extend($element = self::$Elements[$package['type']], splat($package['options']));
+			Hash::extend($element = self::$Elements[$package['type']], Hash::splat($package['options']));
 			$element['options'][$element['attribute']] = $version.'/'.$name;
 			
 			$el = new Element($element['options']);

@@ -21,7 +21,7 @@ class Validator {
 		if(!self::$Instance)
 			self::$Instance = new Validator();
 		
-		splat($options);
+		Hash::splat($options);
 		if(method_exists(self::$Instance, $options[0]))
 			return self::$Instance->{$options[0]}($data, $options[1]);
 		

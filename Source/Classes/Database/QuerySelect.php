@@ -19,7 +19,7 @@ class QuerySelect extends QueryHandler implements Iterator {
 	protected function formatOrder(){
 		$data = $this->Storage->retrieve('order');
 		
-		return $data ? ' ORDER BY '.implode(',', splat($data)) : '';
+		return $data ? ' ORDER BY '.implode(',', Hash::splat($data)) : '';
 	}
 	
 	/**
@@ -29,10 +29,8 @@ class QuerySelect extends QueryHandler implements Iterator {
 	public function fields(){
 		unset($this->formatted);
 		
-		$fields = func_get_args();
-		if(sizeof($fields)==1) $fields = splat($fields[0]);
-		
-		$this->Storage->store('fields', $fields);
+		$data = Hash::args(func_get_args());
+		$this->Storage->store('fields', $data);
 		
 		return $this;
 	}
@@ -44,9 +42,7 @@ class QuerySelect extends QueryHandler implements Iterator {
 	public function order(){
 		unset($this->formatted);
 		
-		$data = func_get_args();
-		if(sizeof($data)==1) $data = splat($data[0]);
-		
+		$data = Hash::args(func_get_args());
 		$this->Storage->store('order', $data);
 		
 		return $this;

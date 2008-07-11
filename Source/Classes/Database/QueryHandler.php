@@ -95,11 +95,9 @@ class QueryHandler {
 	 * @return QueryHandler
 	 */
 	public function where(){
-		$data = func_get_args();
-		if(sizeof($data)==1) $data = splat($data[0]);
-		
 		unset($this->formatted);
 		
+		$data = Hash::args(func_get_args());
 		$this->Storage->store('where', $data);
 		
 		return $this;

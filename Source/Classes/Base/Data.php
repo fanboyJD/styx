@@ -10,7 +10,7 @@ class Data {
 	private function __clone(){}
 	
 	public static function call($data, $options){
-		splat($options);
+		Hash::splat($options);
 		if(method_exists('Data', $options[0]))
 			return call_user_func(array('Data', $options[0]), $data, $options[1]);
 		
@@ -104,7 +104,7 @@ class Data {
 	}
 	
 	public static function implode($array){
-		return implode('', array_flatten($array));
+		return implode('', Hash::flatten($array));
 	}
 	
 	public static function clean($array, $whitespaces = false){
@@ -135,27 +135,27 @@ class Data {
 			);
 		
 		$title = trim(substr(preg_replace('/\_{2,}/i', '_', preg_replace('/[^\w]/i', '_', str_replace(self::$titleRegex[0], self::$titleRegex[1], $title))), 0, 64));
-		if(self::id($title))
-			$title = '_'.$title;
+		if(self::id($title)) $title = '_'.$title;
 		
-		if($options['contents'])
-			$title = self::checkTitle($title, 0, $options);
+		if($options['contents']) return self::checkTitle($title, $options);
 		
 		return $title;
 	}
 	
-	private static function checkTitle($title, $i, $options = array(
+	private static function checkTitle($title, $options = array(
 		'contents' => null,
 		'id' => null,
-	)){
-		if(!is_array($options['contents']))
-			return $title;
+	), $i = 0){
+		if(!is_array($options['contents'])) return $title;
 		
-		foreach($options['contents'] as $content)
-			if((!$options['id'] || $options['id']!=$content['id']) && strtolower($content['pagetitle'])==strtolower($title.(self::id($i) ? (!endsWith($title, '_') ? '_' : '').$i : '')))
-				return self::checkTitle($title, ++$i, $options);
+		foreach($options['contents'] as $content){
+			if(!is_array($content)) $content = array('pagetitle' => $content);
+			
+			if((!$options['id'] || $options['id']!=$content['id']) && strtolower($content['pagetitle'])==strtolower($title.(self::id($i) ? (endsWith($title, '_') ? '' : '_').$i : '')))
+				return self::checkTitle($title, $options, ++$i);
+		}
 		
-		return $title.(self::id($i) ? (!endsWith($title, '_') ? '_' : '').$i : '');
+		return $title.(self::id($i) ? (endsWith($title, '_') ? '' : '_').$i : '');
 	}
 	
 	public static function purify($data, $options = array()){

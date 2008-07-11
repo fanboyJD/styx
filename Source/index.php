@@ -33,8 +33,8 @@
 	
 	Handler::setHandlers(Core::retrieve('handler'));
 	
-	if(PackageManager::has($_GET['package'])){
-		PackageManager::setPackage($_GET['package']);
+	if(PackageManager::has($_GET['m']['package'])){
+		PackageManager::setPackage($_GET['m']['package']);
 		
 		Handler::useExtendedTypes();
 		

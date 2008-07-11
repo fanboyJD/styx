@@ -2,10 +2,17 @@
 class User {
 	
 	private static $type = 'cookie',
+		$table = 'users',
+		$fields = array('name', 'pwd'),
+		$sessionfield = 'session',
 		$user = null;
 	
 	public static function initialize(){
-		self::$type = pick(Core::retrieve('user.type'), self::$type);
+		foreach(array('type', 'table', 'fields', 'sessionfield') as $v)
+			self::$$v = pick(Core::retrieve('user.'.$v), self::$$v);
+		
+		self::$fields[] = self::$sessionfield;
+		self::handlelogin();
 	}
 	
 	public static function store($user){
@@ -19,7 +26,7 @@ class User {
 	private static function getLoginData(){
 		if(self::$type=='cookie'){
 			$pre = Core::retrieve('user.cookie');
-			foreach(array('name', 'pwd', 'session') as $v){
+			foreach(self::$fields as $v){
 				$content = trim($_COOKIE[$pre][$v]);
 				
 				if($content) $data[$v] = $content;
@@ -33,63 +40,67 @@ class User {
 		$data = self::getLoginData();
 		
 		if($data){
+			$id = Core::retrieve('identifier.id');
 			if(!$forceQuery){
-				$user = Cache::getInstance()->get('User', 'userdata_'.$data['session']);
-				if($user && $user[Core::retrieve('identifier.id')] && $user['pwd']==$data['pwd'] && $user['session']==$data['session'] && $user['name']==$data['name'])
-					return $user;
+				$user = Cache::getInstance()->retrieve('User', 'userdata_'.$data[self::$sessionfield]);
+				if($user && $user[$id]){
+					foreach(self::$fields as $v)
+						if($user[$v]!=$data[$v])
+							$forceQuery = true;
+						
+					if(!$forceQuery) return self::store($user);
+				}
 			}
 			
-			$user = db::select('users')->where(array(
-				'pwd' => $data['pwd'],
-				'AND',
-				'session' => $data['session'],
-				'AND',
-				'name' => $data['name'],
-			))->fetch();
+			foreach(self::$fields as $v){
+				$fields[$v] = $data[$v];
+				$fields[] = 'AND';
+			}
+			array_pop($fields);
 			
-			if($user[Core::retrieve('identifier.id')])
-				return self::store(Cache::getInstance()->set('User', 'userdata_'.$user['session'], $user, ONE_DAY));
+			$user = db::select(self::$table)->where($fields)->fetch();
+			
+			if($user[$id]) return self::store(Cache::getInstance()->store('User', 'userdata_'.$user[self::$sessionfield], $user, ONE_DAY));
 			
 			self::logout();
 		}
 	}
 	
 	public static function login($user){
-		if($user['session'])
-			Cache::getInstance()->clear('User', 'userdata_'.$user['session']);
+		if($user[self::$sessionfield]) Cache::getInstance()->erase('User', 'userdata_'.$user[self::$sessionfield]);
 		
 		mt_srand((double)microtime()*1000000);
 		$rand = Core::retrieve('secure').mt_rand(0, 100000);
+		$user[self::$sessionfield] = md5($rand.uniqid($rand, true));
 		
-		$user['session'] = md5($rand.uniqid($rand, true));
-		
+		$id = Core::retrieve('identifier.id');
 		db::update('users')->set(array(
-			'session' => $user['session'],
+			self::$sessionfield => $user[self::$sessionfield],
 		))->where(array(
-			'id' => $user['id'],
-		));
+			$id => $user[$id],
+		))->query();
 		
 		if(self::$type=='cookie'){
 			$pre = Core::retrieve('user.cookie');
+			$time = time()+8640000;
 			
-			foreach(array('name', 'pwd', 'session') as $v){
-				$time = time()+8640000;
+			foreach(self::$fields as $v){
 				setcookie($pre.'['.$v.']', $user[$v], $time, '/');
 				$_COOKIE[$pre][$v] = $user[$v];
 			}
 		}
 		
-		return User::handlelogin(true);
+		return self::handlelogin(true);
 	}
 	
 	public static function logout(){
-		Cache::getInstance()->clear('User', 'userdata_'.$_COOKIE['bg']['session']);
-		
 		if(self::$type=='cookie'){
 			$pre = Core::retrieve('user.cookie');
+			$time = time()-3600;
 			
-			foreach(array('name', 'pwd', 'session') as $v){
-				$time = time()-3600;
+			Cache::getInstance()->erase('User', 'userdata_'.$_COOKIE[$pre][self::$sessionfield]);
+			
+			foreach(self::$fields as $v){
 				setcookie($pre.'['.$v.']', false, $time, '/');
 				unset($_COOKIE[$pre][$v]);
 			}
@@ -102,16 +113,12 @@ class User {
 		$user = self::retrieve();
 		$data = self::getLoginData();
 		
-		if(!$user) return false;
-		
-		if(self::$type=='cookie'){
-			if($user['session']!=$sid || $data['session']!=$sid)
-				return false;
+		if(!$user || $user[self::$sessionfield]!=$sid || $data[self::$sessionfield]!=$sid)
+			return false;
 
-			foreach(array('name', 'pwd', 'session') as $v)
-				if(!$user[$v] || !$data[$v] || $user[$v]!=$data[$v])
-					return false;
-		}
+		foreach(self::$fields as $v)
+			if(!$user[$v] || !$data[$v] || $user[$v]!=$data[$v])
+				return false;
 		
 		return true;
 	}
