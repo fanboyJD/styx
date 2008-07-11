@@ -132,6 +132,9 @@ abstract class Layer extends Runner {
 		);*/
 	}
 	
+	/**
+	 * @return Layer
+	 */
 	public function handle($event, $get = null, $post = null){
 		if(!in_array($event, $this->methods)){
 			$default = $this->getDefaultEvent('view');
@@ -187,7 +190,7 @@ abstract class Layer extends Runner {
 					'name' => $this->options['identifier']['internal']
 				)));
 				
-				$this->form->setValue($data);
+				$this->form->setValue($data, true);
 				$this->editing = true;
 			}
 		}
@@ -202,7 +205,9 @@ abstract class Layer extends Runner {
 			".$this->javascript['helper']." = new ".$this->javascript['helpername']."('".$this->form->options['id']."', ".json_encode($options).");
 			".$this->form->getEvents($this->javascript['helper'])."
 		");*/
-		
+	}
+	
+	public function format(){
 		return $this->form->format();
 	}
 	

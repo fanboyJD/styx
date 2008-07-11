@@ -72,7 +72,7 @@ class Form extends Elements {
 		foreach($data as $k => $v)
 			if($this->elements[$k]){
 				$el = $this->elements[$k];
-				if($raw && (!in_array($el->type, self::$formElements) || $el->options[':readOnly']))
+				if(!$raw && (!in_array($el->type, self::$formElements) || $el->options[':readOnly']))
 					continue;
 				
 				$el->setValue(Data::clean($v));

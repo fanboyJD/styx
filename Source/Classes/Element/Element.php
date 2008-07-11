@@ -184,6 +184,9 @@ class Elements extends Element {
 		return $els;
 	}
 	
+	/**
+	 * @return Element
+	 */
 	public function addElement($el){
 		if(!$this->hasElement($el))
 			$this->elements[$el->options['name']] = $el;
@@ -199,6 +202,9 @@ class Elements extends Element {
 		return !!$this->elements[$el->options['name']];
 	}
 	
+	/**
+	 * @return Element
+	 */
 	public function getElement($name){
 		return $this->elements[$name];
 	}

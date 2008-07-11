@@ -64,7 +64,9 @@ class IndexLayer extends Layer {
 	}
 	
 	public function onAdd(){
-		$this->Handler->template('edit')->assign($this->add());
+		$this->add();
+		
+		$this->Handler->template('edit')->assign($this->format());
 	}
 	
 	public function onEdit(){
@@ -72,12 +74,12 @@ class IndexLayer extends Layer {
 			'edit' => array('uid' => 1),
 			'preventDefault' => true,
 		));*/
-		$out = $this->edit();
+		$this->edit();
 		
 		if($this->editing)
 			$this->Handler->assign('Editing: '.$this->form->getValue('title'));
 		
-		$this->Handler->assign($out);
+		$this->Handler->assign($this->format);
 	}
 	
 	public function onView(){
