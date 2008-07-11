@@ -21,58 +21,19 @@ class Form extends Elements {
 		return self::$prefix ? array(self::$prefix => $out) : $out;
 	}
 	
-	//this method needs to be redone!
-	/*public function getFields($options = array(
-		'all' => false,
-		'detail' => true,
-		'db' => false,
-		'js' => false,
-	)){
-		$els = array();
-		foreach($this->elements as $el){
-			if($el->type=='button' || (!$options['all'] && !in_array($el->type, self::$formElements)))
-				continue;
-			if(!$options['detail'] && !$options['js'] && $el->options['detail'])
-				continue;
-			if($options['db'] && $el->options['alias'])
-				continue;
-			if($el->options['readOnly'] && !$options['db'])
-				continue;
-			if(in_array($el->options['name'], $els))
-				continue;
-			if($options['js']){
-				$els[$el->options['name']] = array();
-				if($el->options['validate'] && !in_array($el->options['validate'][0], array('specialchars', 'bool', 'pagetitle')))
-					$els[$el->options['name']][] = $el->options['validate'];
-				elseif($el->options['validate'][0]=='bool')
-					$els[$el->options['name']][] = array('numericrange', array(0, 1));
-				
-				if($el->options['length'])
-					$els[$el->options['name']][] = array('length', $el->options['length']);
-				if(!$el->options['empty'] && $el->options['validate'][0]!='bool')
-					$els[$el->options['name']][] = 'notempty';
-				if($el->options['jsvalidate'])
-					$els[$el->options['name']] = Hash::extend($els[$el->options['name']], $el->options['jsvalidate']);
-			}else
-				$els[] = $el->options['name'];
-		}
-		return $els;
-	}*/
-	
-	public function getEvents($helper){
-		$els = array();
-		
-		foreach($this->elements as $el)
-			$els[] = $el->getEvents($helper);
-		
-		return implode($els);
-	}
-	
+	/**
+	 * Sets value for elements inside the given form.
+	 * If the second parameter is set true it does not set hidden elements like
+	 * field-elements
+	 *
+	 * @param array $data
+	 * @param bool $raw
+	 */
 	public function setValue($data, $raw = false){
 		foreach($data as $k => $v)
 			if($this->elements[$k]){
 				$el = $this->elements[$k];
-				if(!$raw && (!in_array($el->type, self::$formElements) || $el->options[':readOnly']))
+				if($raw && (!in_array($el->type, self::$formElements) || $el->options[':alias']))
 					continue;
 				
 				$el->setValue(Data::clean($v));
@@ -87,7 +48,7 @@ class Form extends Elements {
 		$els = array();
 		
 		foreach($this->elements as $k => $el){
-			if($el->type=='button' || (!$alias && ($el->options[':alias'] || $el->options[':readOnly'])) || ($alias && !$this->options[':alias']))
+			if($el->type=='button' || $el->options[':readOnly'] || ($alias xor $el->options[':alias']))
 				continue;
 			
 			$val = $el->getValue();

@@ -7,25 +7,23 @@ class Element extends Runner {
 		$options = array(
 			/*Keys:
 				:caption
-				:alias (no db field (for username etc.))
-				:readOnly (only read from db)
-				:events
-				:default (for checkbox, defaultvalue)
+				:alias - no db field (for username etc.)
+				:readOnly - it is not possible to change this element's value in the db
+				:default - for checkbox, defaultvalue
 				:validate
-				:jsvalidate
 				:length
-				:empty (input value could be empty too?)
-				:detail (dont show in view->all if detail is true)
+				:empty - input value can be empty
 				:elements
-				:unknown (name/id does not get set automatically when not given)
-				:tag (type/name given by options)
-				:standalone (for elements without template; if element gets closed inside the tag (like <img />)
-				:preset stores the initial value for the validator
+				:unknown - name/id does not get set automatically when not given)
+				:tag - type/name given by options
+				:standalone - for elements without template; if element gets closed inside the tag (like <img />)
+				:preset - stores the initial value for the validator
+				:realName - only internally; used in OptionList
 			*/
 		);
 	
 	protected static $uid = 0,
-		$formElements = array('input', 'checkbox', 'radio', 'select', 'textarea', 'richtext');
+		$formElements = array('input', 'checkbox', 'radio', 'select', 'textarea', 'richtext', 'optionlist');
 	
 	public function __construct($options, $name = null, $type = null){
 		$type = strtolower($type);
@@ -72,22 +70,11 @@ class Element extends Runner {
 		return startsWith($key, ':');
 	}
 	
-	//have a look at this one
-	public function getEvents($helper){
-		if(!is_array($this->options[':events']))
+	public function setValue($v){
+		if($this->options[':readOnly'])
 			return;
 		
-		$events = array();
-		foreach($this->options[':events'] as $key => $ev){
-			$event = !Data::id($key) && $key!==0 ? $ev : 'start';
-			$events[] = "$('".$this->options['id']."').addEvent('".(!Data::id($key) && $key!==0 ? $key : $ev)."', ".(strpos($event, '.') ? $event : $helper.".".$event).".bindWithEvent(".$helper.", $('".$this->options['id']."')));";
-		}
-		
-		return implode($events);
-	}
-	
-	public function setValue($v){
-		return $this->options['value'] = $v;
+		$this->options['value'] = $v;
 	}
 	
 	public function getValue(){
@@ -162,26 +149,32 @@ class Elements extends Element {
 		$elements = func_get_args();
 		if(is_subclass_of($this, 'Elements')){
 			$name = $elements[1];
+			$type = $elements[2];
 			$elements = $elements[0];
 		}
-		if(is_array($elements[0]))
-			$options = array_shift($elements);
+		if(is_array($elements[0])) $options = array_shift($elements);
 		
 		foreach($elements as $el)
 			$this->elements[$el->options['name']] = $el;
 		
-		parent::__construct($options, $name ? $name : get_class());
+		parent::__construct($options, $name ? $name : get_class(), $type);
 	}
 	
 	public function format(){
 		$els = array();
 		foreach($this->elements as $n => $el)
-			if(!in_array($el->options['type'], array('field')) && !$el->options[':readOnly']){
-				$format = $el->format();
-				if($format) $els[$n] = $format;
-			}
+			if(!in_array($el->options['type'], array('field')) && !$el->options[':readOnly'])
+				if($format = $el->format())
+					$els[$n] = $format;
 		
 		return $els;
+	}
+	
+	/**
+	 * @return Element
+	 */
+	public function getElement($name){
+		return $this->elements[$name];
 	}
 	
 	/**
@@ -200,13 +193,6 @@ class Elements extends Element {
 	
 	public function hasElement($el){
 		return !!$this->elements[$el->options['name']];
-	}
-	
-	/**
-	 * @return Element
-	 */
-	public function getElement($name){
-		return $this->elements[$name];
 	}
 }
 
@@ -239,6 +225,8 @@ class Button extends Element {
 	
 	public function __construct($options){
 		parent::__construct($options, get_class(), 'button');
+		
+		$this->options['type'] = 'submit';
 	}
 	
 }
@@ -257,7 +245,21 @@ class Field extends Element {
 }
 
 /* TEMPLATE CLASS FOR RADIO AND SELECT */
-class TemplateRadioSelect extends Element {
+class Radio extends Element {
+	
+	public function __construct($options, $name = null, $type = null){
+		if(!$name && !$type){
+			$options['type'] = $type = 'radio';
+			$name = get_class().'.php';
+		}
+		
+		parent::__construct($options, $name, $type);
+		
+		// This class returns the preset value if wrong value is set
+		$this->options[':empty'] = true;
+		
+		if($type=='radio') $this->addClass('radio');
+	}
 	
 	public function addElement($el){
 		if(!$this->hasElement($el))
@@ -284,21 +286,8 @@ class TemplateRadioSelect extends Element {
 	
 }
 
-/* RADIO CLASS */
-class Radio extends TemplateRadioSelect {
-	
-	public function __construct($options){
-		$options['type'] = 'radio';
-		
-		parent::__construct($options, get_class().'.php', 'radio');
-		
-		$this->addClass('radio');
-	}
-	
-}
-
 /* SELECT CLASS */
-class Select extends TemplateRadioSelect {
+class Select extends Radio {
 	
 	public function __construct($options){
 		parent::__construct($options, get_class().'.php', 'select');
@@ -317,6 +306,9 @@ class Checkbox extends Element {
 	
 	public function __construct($options){
 		$options['type'] = 'checkbox';
+		$options['value'] = 1;
+		$options[':validate'] = 'bool';
+		if($options[':default']!=1) $options[':default'] = 0;
 		
 		parent::__construct($options, get_class(), 'checkbox');
 		
@@ -325,12 +317,15 @@ class Checkbox extends Element {
 	
 	public function format(){
 		return parent::format(array(
-			'attributes' => $this->implode('skipValue'),
+			'attributes' => $this->implode('skipChecked'),
 			'checked' => ($this->options[':default']==$this->options['value'] ? 'checked="checked" ' : ''),
 		));
 	}
 	
 	public function setValue($v){
+		if($this->options[':readOnly'])
+			return;
+		
 		if($this->options['value']==$v)
 			$this->options['checked'] = 1;
 		
@@ -368,6 +363,50 @@ class RichText extends Textarea {
 		parent::__construct($options, get_class());
 		
 		$this->addClass('richtext');
+	}
+	
+}
+
+/* JSON OPTIONS CLASS */
+
+class OptionList extends Elements {
+	
+	public function __construct(){
+		parent::__construct(func_get_args(), get_class(), 'optionlist');
+		
+		foreach($this->options[':elements'] as $el){
+			$el[':realName'] = $el['name'];
+			$el['name'] = $this->options['name'].'['.$el['name'].']';
+			
+			$this->elements[$el['name']] = new Checkbox($el);
+		}
+		
+		unset($this->options[':elements']);
+	}
+	
+	public function format(){
+		return implode(parent::format());
+	}
+	
+	public function setValue($v){
+		if($v && !is_array($v)) $v = json_decode($v, true);
+		
+		if(!is_array($v)) return;
+		
+		foreach($this->elements as $el){
+			if(!$v[$el->options[':realName']]) continue;
+			
+			$el->setValue($v[$el->options[':realName']]);
+		}
+	}
+	
+	public function getValue(){
+		$json = array();
+		
+		foreach($this->elements as $el)
+			$json[$el->options[':realName']] = $el->getValue();
+		
+		return json_encode($json);
 	}
 	
 }

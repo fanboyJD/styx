@@ -29,14 +29,17 @@ class PackageManager {
 		$Packages = array(),
 		$Package = null,
 		$compress = null,
+		$uagent = null,
 		$encoding = null;
 	
 	public static function add($name, $options = array(
 		'type' => '',
 		'files' => array(),
 		'options' => array(),
+		'condition' => array(),
 	)){
 		Hash::splat($options['files']);
+		Hash::splat($options['condition']);
 		
 		self::$Packages[$name] = $options;
 	}
@@ -57,6 +60,13 @@ class PackageManager {
 		$version = Core::retrieve('app.version');
 		
 		foreach(self::$Packages as $name => $package){
+			if(sizeof($package['condition'])){
+				if(!$uagent) $uagent = self::parseUAgent();
+				
+				if($package['condition']['browser']!=$uagent['browser'] && (!$package['condition']['version'] || !in_array($package['condition']['version'], Hash::splat($uagent['version']))))
+					continue;
+			}
+			
 			Hash::extend($element = self::$Elements[$package['type']], Hash::splat($package['options']));
 			$element['options'][$element['attribute']] = $version.'/'.$name;
 			
@@ -108,22 +118,24 @@ class PackageManager {
 		
 		$content = implode($source);
 		
-		if($package['type']=='js'){
-			$compressor = new JavaScriptPacker($content, 'None', false);
-			$content = $compressor->pack();
-		}else{
-			// Thanks to: http://gadelkareem.com/2007/06/23/compressing-your-html-css-and-javascript-using-simple-php-code/
-			$content = str_replace(';}', '}',
-				preg_replace('/^\s+/', '',
-					preg_replace('/[\s]*([\{\},;:])[\s]*/', '\1',
-						preg_replace('#/\*.*?\*/#', '',
-							preg_replace('/[\r\n\t\s]+/s', ' ',
-								preg_replace('!//[^\n\r]+!', '', $content)
+		if(!$package['keepReadable']){
+			if($package['type']=='js'){
+				$compressor = new JavaScriptPacker($content, 'None', false);
+				$content = $compressor->pack();
+			}else{
+				// Thanks to: http://gadelkareem.com/2007/06/23/compressing-your-html-css-and-javascript-using-simple-php-code/
+				$content = str_replace(';}', '}',
+					preg_replace('/^\s+/', '',
+						preg_replace('/[\s]*([\{\},;:])[\s]*/', '\1',
+							preg_replace('#/\*.*?\*/#', '',
+								preg_replace('/[\r\n\t\s]+/s', ' ',
+									preg_replace('!//[^\n\r]+!', '', $content)
+								)
 							)
 						)
 					)
-				)
-			);
+				);
+			}
 		}
 		
 		$gzipcontent = gzencode($content, 9, FORCE_GZIP);
@@ -136,12 +148,32 @@ class PackageManager {
 		return $compress && $gzipcontent ? $gzipcontent : $content;
 	}
 	
+	private static function parseUAgent(){
+		if(is_array(self::$uagent)) return self::$uagent;
+		
+		$uagent = $_SERVER['HTTP_USER_AGENT'];
+		
+		if(preg_match('/msie ([0-9]).*[0-9]*b*;/i', $uagent, $m))
+			self::$uagent = array(
+				'browser' => 'ie',
+				'version' => $m[1][0],
+			);
+		else
+			self::$uagent = array(
+				'browser' => 'compatible',
+			);
+		
+		if(strpos($uagent, 'SV1')!==false)
+			self::$uagent['features']['servicePack'] = true;
+		
+		return self::$uagent;
+	}
+	
 	private static function checkGzipCompress(){
 		if(self::$compress===null){
 			self::$compress = false;
 			
-			$uagent = $_SERVER['HTTP_USER_AGENT'];
-			
+			$uagent = self::parseUAgent();
 			
 			$encodings = array();
 			if($_SERVER['HTTP_ACCEPT_ENCODING'])
@@ -150,9 +182,7 @@ class PackageManager {
 			if((in_array('gzip', $encodings) || in_array('x-gzip', $encodings)) && !ini_get('zlib.output_compression'))
 				self::$encoding = (in_array('x-gzip', $encodings) ? 'x-' : '').'gzip';
 			
-			if(self::$encoding && !preg_match('/msie (4|5|6).*[0-9]*b*;/i', $uagent))
-				self::$compress = true;
-			elseif(self::$encoding && strpos($uagent, 'SV1')!==false)
+			if(self::$encoding && ($uagent['browser']!='ie' || $uagent['version']>6 || $uagent['features']['servicePack']))
 				self::$compress = true;
 		}
 		

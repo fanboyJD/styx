@@ -1,1 +1,1 @@
-<label><input value="${:default}"${attributes}${checked}/> ${:caption}</label>
+<label><input ${attributes}${checked}/> ${:caption}</label>

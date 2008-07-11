@@ -107,6 +107,8 @@ class User {
 			
 			unset($_COOKIE[$pre]);
 		}
+		
+		self::store(false);
 	}
 	
 	public static function checkSession($sid){

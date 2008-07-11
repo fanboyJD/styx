@@ -19,14 +19,8 @@ abstract class Layer extends Runner {
 			'save' => 'save',
 		),
 		
-		$javascript = array(
-			'helper' => '',
-			'helpername' => '',
-		),
-		
 		$options = array(
 			'identifier' => null,
-			'javascript' => array(),
 		),
 		
 		$methods = array(),
@@ -117,9 +111,6 @@ abstract class Layer extends Runner {
 		}
 		
 		$this->form = $initialize['form'];
-		
-		$this->javascript['helper'] = 'Helpers.'.$this->form->options['id'];
-		$this->javascript['helpername'] = 'Helper';
 	}
 	
 	public function initialize(){
@@ -187,24 +178,16 @@ abstract class Layer extends Runner {
 			$data = db::select($this->table)->where($options['edit'])->fetch();
 			if($data){
 				$this->form->addElement(new HiddenInput(array(
-					'name' => $this->options['identifier']['internal']
+					'name' => $this->options['identifier']['internal'],
+					':alias' => true,
 				)));
 				
-				$this->form->setValue($data, true);
+				$this->form->setValue($data);
 				$this->editing = true;
 			}
 		}
 		
 		$this->form->get('action', $this->name.'/'.$this->getDefaultEvent('save').($data ? Core::retrieve('path.separator').$data[$this->options['identifier']['external']] : ''));
-		
-		/*Hash::extend($options = array(
-			'fields' => $this->form->getFields(array('js' => true)),
-		), $this->options['javascript']);
-		
-		Script::set("
-			".$this->javascript['helper']." = new ".$this->javascript['helpername']."('".$this->form->options['id']."', ".json_encode($options).");
-			".$this->form->getEvents($this->javascript['helper'])."
-		");*/
 	}
 	
 	public function format(){
@@ -272,11 +255,14 @@ abstract class Layer extends Runner {
 		return Data::pagetitle($title, $options);
 	}
 	
-	public function link($title, $action = null){
+	public function link($title = null, $action = null){
+		if(!$title && !$action) return $this->name;
+		
 		$default = $this->getDefaultEvent('view');
 		if(!$action || !in_array($action, $this->methods))
 			$action = $default;
 		
+		if(!$title) return $this->name.'/'.$action;
 		
 		return $this->name.'/'.(in_array($title, $this->methods) || $action!=$default ? $action.Core::retrieve('path.separator') : '').$title;
 	}
