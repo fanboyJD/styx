@@ -16,11 +16,11 @@ class User {
 	}
 	
 	public static function store($user){
-		return self::$user = is_array($user) ? $user : false;
+		return self::$user = (is_array($user) ? $user : false);
 	}
 	
 	public static function retrieve(){
-		return self::$user;
+		return is_array(self::$user) ? self::$user : false;
 	}
 	
 	private static function getLoginData(){
@@ -74,7 +74,7 @@ class User {
 		$user[self::$sessionfield] = md5($rand.uniqid($rand, true));
 		
 		$id = Core::retrieve('identifier.id');
-		db::update('users')->set(array(
+		db::update(self::$table)->set(array(
 			self::$sessionfield => $user[self::$sessionfield],
 		))->where(array(
 			$id => $user[$id],

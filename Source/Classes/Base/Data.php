@@ -53,10 +53,7 @@ class Data {
 	}
 	
 	public static function bool($data){
-		if($data=='true' || self::id($data))
-			return true;
-		
-		return false;
+		return $data=='false' ? false : !!$data;
 	}
 	
 	public static function numericrange($data, $options){

@@ -90,7 +90,7 @@ class Template extends Runner {
 	/**
 	 * @return Template
 	 */
-	public function assign($array){
+	public function assign(){
 		$args = func_get_args();
 		$this->assigned = Hash::extend($this->assigned, Hash::args($args));
 		

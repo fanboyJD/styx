@@ -109,10 +109,10 @@ class Form extends Elements {
 			
 			$val = $el->getValue();
 			if(!$val){
-				if(!$el->options[':empty'] && $el->options[':validate'][0]!='bool' && $el->options[':preset'])
-					return array('notempty', $k, $el->options[':caption']);
-				elseif($el->options[':empty'] || $el->options[':validate'][0]=='bool')
+				if($el->options[':empty'] || $el->options[':validate'][0]=='bool' || ($el->options[':validate'][0]=='numericrange' && $el->options[':validate'][1][0]==0))
 					continue;
+				elseif(!$el->options[':empty'])
+					return array('notempty', $k, $el->options[':caption']);
 			}elseif($this->options[':length'] && (strlen((string)$val)<$this->options[':length'][0] || strlen((string)$val)>$this->options[':length'][1]))
 				return array('length', $k, $el->options[':caption']);
 			

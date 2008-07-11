@@ -17,7 +17,6 @@ abstract class Layer extends Runner {
 		$events = array(
 			'view' => 'view',
 			'save' => 'save',
-			'error' => 'error',
 		),
 		
 		$javascript = array(
@@ -59,7 +58,7 @@ abstract class Layer extends Runner {
 		$layerName = strtolower($layerName);
 		$class = ucfirst($layerName).'Layer';
 		
-		if(!is_subclass_of($class, 'Layer'))
+		if(!class_exists($class) || !is_subclass_of($class, 'Layer'))
 			return false;
 		
 		if($isRouted && method_exists($class, 'hide') && call_user_func(array($class, 'hide')))
@@ -153,17 +152,20 @@ abstract class Layer extends Runner {
 		
 		$exec = true;
 		if($this->event==$this->getDefaultEvent('save')){
-			if(is_array($this->post) && sizeof($this->post))
+			if(is_array($this->post) && sizeof($this->post)){
 				$this->prepareData($this->post);
-			else
+			}else{
 				$exec = false;
-				/* throw some error */
+				$this->Handler->assign(Lang::retrieve('validator.nodata'));
+			}
 		}
 		
-		if(method_exists($this, $event[1]) && $exec)
-			$this->{$event[1]}($this->get['p'][$event[0]]);
-		/*else
-			show some Error*/
+		if(!method_exists($this, $event[1])){
+			$ev = $this->getDefaultEvent('view');
+			$event = array($ev, 'on'.ucfirst($ev));
+		}
+		
+		if($exec) $this->{$event[1]}($this->get['p'][$event[0]]);
 		
 		return $this;
 	}
@@ -190,7 +192,7 @@ abstract class Layer extends Runner {
 			}
 		}
 		
-		$this->form->get('action', $this->name.'/'.$this->getDefaultEvent('save').($data ? ':'.$data[$this->options['identifier']['external']] : ''));
+		$this->form->get('action', $this->name.'/'.$this->getDefaultEvent('save').($data ? Core::retrieve('path.separator').$data[$this->options['identifier']['external']] : ''));
 		
 		/*Hash::extend($options = array(
 			'fields' => $this->form->getFields(array('js' => true)),
@@ -211,6 +213,11 @@ abstract class Layer extends Runner {
 	/* EditHandler End */
 	
 	/* SaveHandler Begin */
+	public function validate(){
+		$validate = $this->form->validate();
+		if($validate!==true) throw new ValidatorException($validate);
+	}
+	
 	public function prepareData($data){
 		if($data[$this->options['identifier']['internal']]){
 			$this->where = array(
@@ -231,8 +238,7 @@ abstract class Layer extends Runner {
 		
 		if($options['preventDefault']) unset($where);
 		
-		$validate = $this->form->validate();
-		if($validate!==true) throw new ValidatorException($validate);
+		$this->validate();
 		
 		$data = $this->form->prepareData();
 		if(!$data) throw new NoDataException();

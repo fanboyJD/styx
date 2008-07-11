@@ -33,8 +33,7 @@ class Validator {
 	}
 	
 	public function mail($data){
-		if(!$data)
-			return false;
+		if(!$data) return false;
 		
 		foreach(array('@', '.') as $v){
 			$pos = strpos($data, $v);
