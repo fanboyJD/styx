@@ -12,6 +12,7 @@ abstract class Layer extends Runner {
 	
 	protected $name,
 		$layername,
+		$base,
 		$table,
 		
 		$events = array(
@@ -24,7 +25,7 @@ abstract class Layer extends Runner {
 		),
 		
 		$methods = array(),
-		$rights = array(),
+		$rights = null,
 		
 		$event = null,
 		$where = null,
@@ -78,7 +79,7 @@ abstract class Layer extends Runner {
 	}
 	
 	public function __construct($name){
-		$this->layername = $this->name = $this->table = $name;
+		$this->base = $this->layername = $this->name = $this->table = $name;
 		if(in_array($this->layername, self::$Layers['List']))
 			$this->layername = Data::pagetitle($this->layername, array(
 				'contents' => self::$Layers['List'],
@@ -117,7 +118,8 @@ abstract class Layer extends Runner {
 		if(is_array($rights[$this->name]))
 			foreach($rights[$this->name] as $right)
 				$this->rights[strtolower($right)] = true;
-		
+		elseif($rights[$this->name])
+			$this->rights = 1;
 	}
 	
 	public function initialize(){
@@ -167,10 +169,8 @@ abstract class Layer extends Runner {
 		}
 		
 		if($exec){
-			if(!$this->rights[$event[0]] || ($this->rights[$event[0]] && $this->hasRight($event[0])))
-				$this->{$event[1]}($this->get['p'][$event[0]]);
-			else
-				$this->error('rights');
+			if($this->hasRight($event[0])) $this->{$event[1]}($this->get['p'][$event[0]]);
+			else $this->error('rights');
 		}
 		
 		return $this;
@@ -276,25 +276,24 @@ abstract class Layer extends Runner {
 	}
 	
 	public function link($title = null, $action = null){
-		if(!$title && !$action) return $this->name;
+		if(!$title && !$action) return $this->base;
 		
 		$default = $this->getDefaultEvent('view');
 		if(!$action || !in_array($action, $this->methods))
 			$action = $default;
 		
-		if(!$title) return $this->name.'/'.$action;
+		if(!$title) return $this->base.'/'.$action;
 		
-		return $this->name.'/'.(in_array($title, $this->methods) || $action!=$default ? $action.Core::retrieve('path.separator') : '').$title;
+		return $this->base.'/'.(in_array($title, $this->methods) || $action!=$default ? $action.Core::retrieve('path.separator') : '').$title;
 	}
 	
 	public function hasRight(){
 		$args = func_get_args();
 		
-		if(!sizeof($this->rights) || !in_array(implode('.', $args), $this->rights))
+		if(!$this->rights || (is_array($this->rights) && !in_array(implode('.', $args), $this->rights)))
 			return true;
 		
 		array_unshift($args, 'layer', $this->name);
-		
 		return User::hasRight($args);
 	}
 	
