@@ -24,6 +24,7 @@ abstract class Layer extends Runner {
 		),
 		
 		$methods = array(),
+		$rights = array(),
 		
 		$event = null,
 		$where = null,
@@ -111,6 +112,12 @@ abstract class Layer extends Runner {
 		}
 		
 		$this->form = $initialize['form'];
+		
+		$rights = Core::retrieve('rights.layer');
+		if(is_array($rights[$this->name]))
+			foreach($rights[$this->name] as $right)
+				$this->rights[strtolower($right)] = true;
+		
 	}
 	
 	public function initialize(){
@@ -150,7 +157,7 @@ abstract class Layer extends Runner {
 				$this->prepareData($this->post);
 			}else{
 				$exec = false;
-				$this->Handler->assign(Lang::retrieve('validator.nodata'));
+				$this->error('data');
 			}
 		}
 		
@@ -159,7 +166,12 @@ abstract class Layer extends Runner {
 			$event = array($ev, 'on'.ucfirst($ev));
 		}
 		
-		if($exec) $this->{$event[1]}($this->get['p'][$event[0]]);
+		if($exec){
+			if(!$this->rights[$event[0]] || ($this->rights[$event[0]] && $this->hasRight($event[0])))
+				$this->{$event[1]}($this->get['p'][$event[0]]);
+			else
+				$this->error('rights');
+		}
 		
 		return $this;
 	}
@@ -169,7 +181,12 @@ abstract class Layer extends Runner {
 		'edit' => null,
 		'preventDefault' => false,
 	)){
-		if(!$options['edit'] && !$options['preventDefault'] && $this->event && $this->get['p'][$this->event])
+		if(!$this->hasRight($this->event, 'add')){
+			$this->error('rights');
+			return;
+		}
+		
+		if(!$options['edit'] && !$options['preventDefault'] && $this->event && $this->get['p'][$this->event] && $this->hasRight($this->event, 'modify'))
 			$options['edit'] = array(
 				$this->options['identifier']['external'] => array($this->get['p'][$this->event], $this->options['identifier']['external']),
 			);
@@ -207,7 +224,7 @@ abstract class Layer extends Runner {
 	}
 	
 	public function prepareData($data){
-		if($data[$this->options['identifier']['internal']]){
+		if($data[$this->options['identifier']['internal']] && $this->hasRight($this->event, 'modify')){
 			$this->where = array(
 				$this->options['identifier']['internal'] => array($data[$this->options['identifier']['internal']], $this->options['identifier']['internal']),
 			);
@@ -222,6 +239,9 @@ abstract class Layer extends Runner {
 	public function save($where = null, $options = array(
 		'preventDefault' => false,
 	)){
+		if(!$this->hasRight($this->event, 'add'))
+			throw new ValidatorException('rights');
+		
 		if(!$where) $where = $this->where;
 		
 		if($options['preventDefault']) unset($where);
@@ -265,6 +285,25 @@ abstract class Layer extends Runner {
 		if(!$title) return $this->name.'/'.$action;
 		
 		return $this->name.'/'.(in_array($title, $this->methods) || $action!=$default ? $action.Core::retrieve('path.separator') : '').$title;
+	}
+	
+	public function hasRight(){
+		$args = func_get_args();
+		
+		if(!sizeof($this->rights) || !in_array(implode('.', $args), $this->rights))
+			return true;
+		
+		array_unshift($args, 'layer', $this->name);
+		
+		return User::hasRight($args);
+	}
+	
+	public function error($error){
+		try {
+			throw new ValidatorException($error);
+		}catch(ValidatorException $e){
+			$this->Handler->assign($e->getMessage());
+		}
 	}
 	
 	/**

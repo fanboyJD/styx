@@ -5,10 +5,12 @@ class User {
 		$table = 'users',
 		$fields = array('name', 'pwd'),
 		$sessionfield = 'session',
+		$rightsfield = null,
+		$rights = array(),
 		$user = null;
 	
 	public static function initialize(){
-		foreach(array('type', 'table', 'fields', 'sessionfield') as $v)
+		foreach(array('type', 'table', 'fields', 'sessionfield', 'rightsfield') as $v)
 			self::$$v = pick(Core::retrieve('user.'.$v), self::$$v);
 		
 		self::$fields[] = self::$sessionfield;
@@ -16,7 +18,15 @@ class User {
 	}
 	
 	public static function store($user){
-		return self::$user = (is_array($user) ? $user : false);
+		self::$user = false;
+		
+		if(is_array($user)){
+			self::$user = $user;
+			
+			if(self::$rightsfield) self::setRights(self::$user[self::$rightsfield]);
+		}
+		
+		return self::$user;
 	}
 	
 	public static function retrieve(){
@@ -41,7 +51,7 @@ class User {
 		
 		if($data){
 			$id = Core::retrieve('identifier.id');
-			if(!$forceQuery){
+			/*if(!$forceQuery){
 				$user = Cache::getInstance()->retrieve('User', 'userdata_'.$data[self::$sessionfield]);
 				if($user && $user[$id]){
 					foreach(self::$fields as $v)
@@ -50,7 +60,7 @@ class User {
 						
 					if(!$forceQuery) return self::store($user);
 				}
-			}
+			}*/
 			
 			foreach(self::$fields as $v){
 				$fields[$v] = $data[$v];
@@ -123,6 +133,30 @@ class User {
 				return false;
 		
 		return true;
+	}
+	
+	public static function setRights($rights){
+		if($rights && !is_array($rights)) $rights = json_decode($rights, true);
+		
+		self::$rights = Hash::flatten(Hash::splat($rights));
+	}
+	
+	private static function checkRight($rights){
+		if(!is_array($rights)) return false;
+		
+		foreach($rights as $right){
+			$prefix[] = $right;
+			if(self::$rights[implode('.', $prefix)]==1)
+				return true;
+		}
+		
+		return false;
+	}
+	
+	public static function hasRight(){
+		$args = Hash::args(func_get_args());
+		
+		return self::retrieve() && self::checkRight($args);
 	}
 	
 }
