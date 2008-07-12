@@ -1,4 +1,4 @@
-<label>${:caption}</label>
+<label>${:caption}${:add}</label>
 <div id="${id}">
 <?php
 foreach($this->options[':elements'] as $val)

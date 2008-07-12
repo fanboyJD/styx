@@ -155,12 +155,10 @@ abstract class Layer extends Runner {
 		
 		$exec = true;
 		if($this->event==$this->getDefaultEvent('save')){
-			if(is_array($this->post) && sizeof($this->post)){
+			if(is_array($this->post) && sizeof($this->post))
 				$this->prepareData($this->post);
-			}else{
-				$exec = false;
-				$this->error('data');
-			}
+			else
+				$exec = $this->error('data');
 		}
 		
 		if(!method_exists($this, $event[1])){
@@ -181,10 +179,8 @@ abstract class Layer extends Runner {
 		'edit' => null,
 		'preventDefault' => false,
 	)){
-		if(!$this->hasRight($this->event, 'add')){
-			$this->error('rights');
-			return;
-		}
+		if(!$this->hasRight($this->event, 'add'))
+			return $this->error('rights');
 		
 		if(!$options['edit'] && !$options['preventDefault'] && $this->event && $this->get['p'][$this->event] && $this->hasRight($this->event, 'modify'))
 			$options['edit'] = array(
@@ -199,16 +195,12 @@ abstract class Layer extends Runner {
 					':alias' => true,
 				)));
 				
-				$this->form->setValue($data);
+				$this->setValue($data);
 				$this->editing = true;
 			}
 		}
 		
 		$this->form->get('action', $this->name.'/'.$this->getDefaultEvent('save').($data ? Core::retrieve('path.separator').$data[$this->options['identifier']['external']] : ''));
-	}
-	
-	public function format(){
-		return $this->form->format();
 	}
 	
 	public function add($options = null){
@@ -233,7 +225,7 @@ abstract class Layer extends Runner {
 			$this->editing = true;
 		}
 		
-		$this->form->setValue($data, true);
+		$this->setValue($data, true);
 	}
 	
 	public function save($where = null, $options = array(
@@ -275,16 +267,16 @@ abstract class Layer extends Runner {
 		return Data::pagetitle($title, $options);
 	}
 	
-	public function link($title = null, $action = null){
-		if(!$title && !$action) return $this->base;
+	public function link($title = null, $event = null){
+		if(!$title && !$event) return $this->base;
 		
 		$default = $this->getDefaultEvent('view');
-		if(!$action || !in_array($action, $this->methods))
-			$action = $default;
+		if(!$event || !in_array($event, $this->methods))
+			$event = $default;
 		
-		if(!$title) return $this->base.'/'.$action;
+		if(!$title) return $this->base.'/'.$event;
 		
-		return $this->base.'/'.(in_array($title, $this->methods) || $action!=$default ? $action.Core::retrieve('path.separator') : '').$title;
+		return $this->base.'/'.(in_array($title, $this->methods) || $event!=$default ? $event.Core::retrieve('path.separator') : '').$title;
 	}
 	
 	public function hasRight(){
@@ -303,6 +295,8 @@ abstract class Layer extends Runner {
 		}catch(ValidatorException $e){
 			$this->Handler->assign($e->getMessage());
 		}
+		
+		return false;
 	}
 	
 	/**
@@ -315,6 +309,24 @@ abstract class Layer extends Runner {
 		if($remove) Handler::remove($this->Handler->getName());
 		
 		return $out;
+	}
+	
+	/* Form methods: mapped */
+	
+	public function format(){
+		return $this->form->format();
+	}
+	
+	public function getValue($name){
+		return $this->form->getValue($name);
+	}
+	
+	public function setValue($data, $raw = false){
+		$this->form->setValue($data, $raw);
+	}
+	
+	public function getElement($name){
+		return $this->form->getElement($name);
 	}
 	
 }

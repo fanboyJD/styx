@@ -19,6 +19,7 @@ class Element extends Runner {
 				:standalone - for elements without template; if element gets closed inside the tag (like <img />)
 				:preset - stores the initial value for the validator
 				:realName - only internally; used in OptionList
+				:add - For Checkbox, Input, Radio, Select and Textarea - additional caption
 			*/
 		);
 	

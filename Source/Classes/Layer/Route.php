@@ -71,7 +71,7 @@ class Route {
 				if(!$route['match']) $route['match'] = $route[0];
 				if(!$route['type']) $route['type'] = $route[1];
 				
-				$urlpart = $get['n'][$i].$sep.$get['p'][$get['n'][$i]];
+				$urlpart = $get['n'][$i].($get['p'][$get['n'][$i]] ? $sep.$get['p'][$get['n'][$i]] : '');
 				
 				if(
 					!$route['match']
@@ -99,12 +99,10 @@ class Route {
 	}
 	
 	public static function connect($route, $action = null, $priority = 50){
-		$route = Hash::splat($route);
-		
 		self::$rules[Data::pagetitle($priority, array(
 			'contents' => array_keys(self::$rules),
 		))] = array(
-			'route' => $route,
+			'route' => Hash::splat($route),
 			'action' => $action
 		);
 	}

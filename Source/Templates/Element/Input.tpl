@@ -1,2 +1,2 @@
-<label>${:caption}</label>
+<label>${:caption}${:add}</label>
 <input${attributes}/>
