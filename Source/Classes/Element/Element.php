@@ -135,7 +135,7 @@ class Element extends Runner {
 		
 		foreach($a as $key => $val)
 			if($val!==false && !in_array('skip'.ucfirst($key), $options) && !self::skipable($key))
-				$s[] = $key.'="'.$val.'"';
+				$s[] = $key.'="'.($key=='style' ? str_replace('"', "'", $val) : htmlspecialchars($val, ENT_COMPAT, 'UTF-8', false)).'"';
 		
 		return is_array($s) ? ' '.implode(' ', $s) : '';
 	}
@@ -375,12 +375,9 @@ class OptionList extends Elements {
 	public function __construct(){
 		parent::__construct(func_get_args(), get_class(), 'optionlist');
 		
-		foreach($this->options[':elements'] as $el){
-			$el[':realName'] = $el['name'];
-			$el['name'] = $this->options['name'].'['.$el['name'].']';
-			
-			$this->elements[$el['name']] = new Checkbox($el);
-		}
+		if(is_array($this->options[':elements']))
+			foreach($this->options[':elements'] as $el)
+				$this->createElement($el);
 		
 		unset($this->options[':elements']);
 	}
@@ -408,6 +405,24 @@ class OptionList extends Elements {
 			$json[$el->options[':realName']] = $el->getValue();
 		
 		return json_encode($json);
+	}
+	
+	/**
+	 * @return Element
+	 */
+	public function addElement($el){
+		return $this->createElement($el);
+	}
+	
+	private function createElement($el){
+		$el[':realName'] = $el['name'];
+		$el['name'] = $this->options['name'].'['.$el['name'].']';
+		
+		$element = new Checkbox($el);
+		if(!$this->hasElement($element))
+			$this->elements[$el['name']] = $element;
+			
+		return $this->elements[$el['name']];
 	}
 	
 }

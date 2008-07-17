@@ -116,8 +116,8 @@ abstract class Layer extends Runner {
 		
 		$rights = Core::retrieve('rights.layer');
 		if(is_array($rights[$this->name]))
-			foreach($rights[$this->name] as $right)
-				$this->rights[strtolower($right)] = true;
+			foreach($rights[$this->name] as $name => $right)
+				$this->rights[strtolower($name)] = true;
 		elseif($rights[$this->name])
 			$this->rights = 1;
 	}
