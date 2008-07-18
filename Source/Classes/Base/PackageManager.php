@@ -36,10 +36,10 @@ class PackageManager {
 		'type' => '',
 		'files' => array(),
 		'options' => array(),
-		'condition' => array(),
+		'require' => array(),
 	)){
 		Hash::splat($options['files']);
-		Hash::splat($options['condition']);
+		Hash::splat($options['require']);
 		
 		self::$Packages[$name] = $options;
 	}
@@ -60,12 +60,8 @@ class PackageManager {
 		$version = Core::retrieve('app.version');
 		
 		foreach(self::$Packages as $name => $package){
-			if(sizeof($package['condition'])){
-				if(!$uagent) $uagent = self::parseUAgent();
-				
-				if($package['condition']['browser']!=$uagent['browser'] && (!$package['condition']['version'] || !in_array($package['condition']['version'], Hash::splat($uagent['version']))))
-					continue;
-			}
+			if(!self::checkRequired($package['require']))
+				continue;
 			
 			Hash::extend($element = self::$Elements[$package['type']], Hash::splat($package['options']));
 			$element['options'][$element['attribute']] = $version.'/'.$name;
@@ -82,6 +78,9 @@ class PackageManager {
 	
 	public static function compress(){
 		$package = self::$Packages[self::$Package];
+		if(!self::checkRequired($package['require']))
+			return '';
+		
 		$compress = self::checkGzipCompress();
 		$debug = Core::retrieve('debug');
 		
@@ -187,6 +186,20 @@ class PackageManager {
 		}
 		
 		return self::$compress && self::$encoding;
+	}
+	
+	private static function checkRequired($require){
+		if(sizeof($require)){
+			$uagent = self::parseUAgent();
+			
+			if($require['login'] && !User::retrieve())
+				return false;
+			
+			if($require['browser'] && $require['browser']!=$uagent['browser'] && (!$require['version'] || !in_array($require['version'], Hash::splat($uagent['version']))))
+				return false;
+		}
+		
+		return true;
 	}
 	
 }

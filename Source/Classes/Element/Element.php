@@ -20,6 +20,8 @@ class Element extends Runner {
 				:preset - stores the initial value for the validator
 				:realName - only internally; used in OptionList
 				:add - For Checkbox, Input, Radio, Select and Textarea - additional caption
+				:template - For use of a custom template
+				:custom.* - Reserved for any custom value (to pass to a template for example)
 			*/
 		);
 	
@@ -39,7 +41,7 @@ class Element extends Runner {
 		Hash::splat($options[':validate']);
 		
 		if(!$options['id'] && $options['name'])
-			$options['id'] = $options['name'].'_'.(self::$uid++);
+			$options['id'] = preg_replace('/\W/', '_', $options['name'].'_'.(self::$uid++));
 		elseif($options['id'] && !$options['name'])
 			$options['name'] = $options['id'];
 		elseif(!$options[':unknown'])
@@ -60,7 +62,7 @@ class Element extends Runner {
 	public function format($pass = null){
 		if(!$pass) $pass = array('attributes' => $this->implode());
 		
-		$out = Template::map('Element', $this->name)->object($this)->assign($this->options)->assign($pass)->parse(true);
+		$out = Template::map('Element', pick($this->options[':template'], $this->name))->object($this)->assign($this->options)->assign($pass)->parse(true);
 		
 		if($out) return $out;
 		
@@ -165,8 +167,15 @@ class Elements extends Element {
 		$els = array();
 		foreach($this->elements as $n => $el)
 			if(!in_array($el->options['type'], array('field')) && !$el->options[':readOnly'])
-				if($format = $el->format())
-					$els[$n] = $format;
+				if($format = $el->format()){
+					if($el->name=='HiddenInput')
+						$els['form.hidden'][] = $format;
+					else
+						$els[$n] = $format;
+				}
+		
+		if(is_array($els['form.hidden']))
+			$els['form.hidden'] = implode($els['form.hidden']);
 		
 		return $els;
 	}

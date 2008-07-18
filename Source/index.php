@@ -33,6 +33,8 @@
 	
 	Handler::setHandlers(Core::retrieve('handler'));
 	
+	User::initialize();
+	
 	if(PackageManager::has($_GET['m']['package'])){
 		PackageManager::setPackage($_GET['m']['package']);
 		
@@ -55,8 +57,6 @@
 			if($_GET['p']['lang'] && sizeof($languages) && in_array($_GET['p']['lang'], $languages))
 				Lang::setLanguage($_GET['p']['lang']);
 		}
-		
-		User::initialize();
 		
 		Handler::setType($_GET['p']['handler']);
 		Handler::setHeader();

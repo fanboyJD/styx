@@ -1,6 +1,11 @@
 <?php
 class User {
 	
+	/**
+	 * @var Rights
+	 */
+	private static $Rights;
+	
 	private static $type = 'cookie',
 		$table = 'users',
 		$fields = array('name', 'pwd'),
@@ -14,6 +19,9 @@ class User {
 			self::$$v = pick(Core::retrieve('user.'.$v), self::$$v);
 		
 		self::$fields[] = self::$sessionfield;
+		
+		self::$Rights = new Rights();
+		
 		self::handlelogin();
 	}
 	
@@ -23,7 +31,7 @@ class User {
 		if(is_array($user)){
 			self::$user = $user;
 			
-			if(self::$rightsfield) self::setRights(self::$user[self::$rightsfield]);
+			if(self::$rightsfield) self::$Rights->setRights(self::$user[self::$rightsfield]);
 		}
 		
 		return self::$user;
@@ -31,6 +39,10 @@ class User {
 	
 	public static function retrieve(){
 		return is_array(self::$user) ? self::$user : false;
+	}
+	
+	public static function get($name){
+		return is_array(self::$user) && self::$user[$name] ? self::$user[$name] : null;
 	}
 	
 	private static function getLoginData(){
@@ -135,28 +147,10 @@ class User {
 		return true;
 	}
 	
-	public static function setRights($rights){
-		if($rights && !is_array($rights)) $rights = json_decode($rights, true);
-		
-		self::$rights = Hash::flatten(Hash::splat($rights));
-	}
-	
-	private static function checkRight($rights){
-		if(!is_array($rights)) return false;
-		
-		foreach($rights as $right){
-			$prefix[] = $right;
-			if(self::$rights[implode('.', $prefix)]==1)
-				return true;
-		}
-		
-		return false;
-	}
-	
 	public static function hasRight(){
 		$args = Hash::args(func_get_args());
 		
-		return self::retrieve() && self::checkRight($args);
+		return self::retrieve() && self::$Rights->hasRight($args);
 	}
 	
 }

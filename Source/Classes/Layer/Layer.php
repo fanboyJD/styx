@@ -13,6 +13,7 @@ abstract class Layer extends Runner {
 	protected $name,
 		$layername,
 		$base,
+		$baseRights = 'edit',
 		$table,
 		
 		$events = array(
@@ -29,7 +30,8 @@ abstract class Layer extends Runner {
 		
 		$event = null,
 		$where = null,
-		$editing = false;
+		$editing = false,
+		$preparation = false;
 	
 	public $get = array(),
 		$post = array();
@@ -179,10 +181,10 @@ abstract class Layer extends Runner {
 		'edit' => null,
 		'preventDefault' => false,
 	)){
-		if(!$this->hasRight($this->event, 'add'))
+		if(!$this->hasRight(pick($this->baseRights, $this->event), 'add'))
 			return $this->error('rights');
 		
-		if(!$options['edit'] && !$options['preventDefault'] && $this->event && $this->get['p'][$this->event] && $this->hasRight($this->event, 'modify'))
+		if(!$options['edit'] && !$options['preventDefault'] && $this->event && $this->get['p'][$this->event] && $this->hasRight(pick($this->baseRights, $this->event), 'modify'))
 			$options['edit'] = array(
 				$this->options['identifier']['external'] => array($this->get['p'][$this->event], $this->options['identifier']['external']),
 			);
@@ -200,7 +202,9 @@ abstract class Layer extends Runner {
 			}
 		}
 		
-		$this->form->get('action', $this->name.'/'.$this->getDefaultEvent('save').($data ? Core::retrieve('path.separator').$data[$this->options['identifier']['external']] : ''));
+		$this->populate();
+		
+		$this->form->get('action', $this->link($data[$this->options['identifier']['external']], $this->getDefaultEvent('save')));
 	}
 	
 	public function add($options = null){
@@ -216,7 +220,9 @@ abstract class Layer extends Runner {
 	}
 	
 	public function prepareData($data){
-		if($data[$this->options['identifier']['internal']] && $this->hasRight($this->event, 'modify')){
+		$this->preparation = true;
+		
+		if($data[$this->options['identifier']['internal']] && $this->hasRight(pick($this->baseRights, $this->event), 'modify')){
 			$this->where = array(
 				$this->options['identifier']['internal'] => array($data[$this->options['identifier']['internal']], $this->options['identifier']['internal']),
 			);
@@ -225,14 +231,19 @@ abstract class Layer extends Runner {
 			$this->editing = true;
 		}
 		
+		$this->populate();
+		
 		$this->setValue($data, true);
 	}
 	
 	public function save($where = null, $options = array(
 		'preventDefault' => false,
 	)){
-		if(!$this->hasRight($this->event, 'add'))
+		if(!$this->hasRight(pick($this->baseRights, $this->event), 'add'))
 			throw new ValidatorException('rights');
+		
+		if(!$this->checkSession())
+			throw new ValidatorException('session');
 		
 		if(!$where) $where = $this->where;
 		
@@ -280,9 +291,9 @@ abstract class Layer extends Runner {
 	}
 	
 	public function hasRight(){
-		$args = func_get_args();
+		$args = Hash::args(func_get_args());
 		
-		if(!$this->rights || (is_array($this->rights) && !in_array(implode('.', $args), $this->rights)))
+		if(!$this->rights || (is_array($this->rights) && !$this->rights[implode('.', $args)]))
 			return true;
 		
 		array_unshift($args, 'layer', $this->name);
@@ -297,6 +308,26 @@ abstract class Layer extends Runner {
 		}
 		
 		return false;
+	}
+	
+	public function generateSessionName(){
+		return $this->name.'_session_'.md5($this->name.'.'.Core::retrieve('secure'));
+	}
+	
+	public function requireSession(){
+		$this->form->addElement(new HiddenInput(array(
+			'name' => $this->generateSessionName(),
+			'value' => !$this->preparation ? User::get('session') : null,
+			':templateAlias' => 'session',
+		)));
+	}
+	
+	public function checkSession(){
+		return User::checkSession($this->form->getValue($this->generateSessionName()));
+	}
+	
+	protected function populate(){
+		/* doSomething(); */
 	}
 	
 	/**
@@ -325,6 +356,10 @@ abstract class Layer extends Runner {
 		$this->form->setValue($data, $raw);
 	}
 	
+	/**
+	 * @param string $name
+	 * @return Element
+	 */
 	public function getElement($name){
 		return $this->form->getElement($name);
 	}
