@@ -315,15 +315,20 @@ abstract class Layer extends Runner {
 	}
 	
 	public function requireSession(){
+		$name = $this->generateSessionName();
+		
 		$this->form->addElement(new HiddenInput(array(
-			'name' => $this->generateSessionName(),
-			'value' => !$this->preparation ? User::get('session') : null,
-			':templateAlias' => 'session',
+			'name' => $name,
+			'value' => $this->preparation ? $this->post[$name] : User::get(Core::retrieve('user.sessionfield')),
+			':alias' => true,
 		)));
 	}
 	
 	public function checkSession(){
-		return User::checkSession($this->form->getValue($this->generateSessionName()));
+		$name = $this->generateSessionName();
+		$el = $this->getElement($name);
+		
+		return !$el || ($el && User::checkSession($el->getValue()));
 	}
 	
 	protected function populate(){
