@@ -87,18 +87,31 @@ class Element extends Runner {
 		return $this->options['value'];
 	}
 	
+	/**
+	 * @return Element
+	 */
 	public function addClass($class){
 		if(!$this->hasClass($class)) array_push($this->options['class'], $class);
+		
+		return $this;
 	}
 	
+	/**
+	 * @return Element
+	 */
 	public function removeClass($class){
 		Hash::remove($this->options['class'], $class);
+		
+		return $this;
 	}
 	
 	public function hasClass($class){
 		return in_array($class, $this->options['class']);
 	}
 	
+	/**
+	 * @return Element
+	 */
 	public function set($key, $value = null){
 		if(is_array($key)){
 			foreach($key as $k => $val)
@@ -110,6 +123,8 @@ class Element extends Runner {
 			$this->options[$key] = $value;
 			if(!$value) unset($this->options[$key]);
 		}
+		
+		return $this;
 	}
 	
 	public function get($key, $value = null){
@@ -204,6 +219,7 @@ class Elements extends Element {
 	public function hasElement($el){
 		return !!$this->elements[$el->options['name']];
 	}
+	
 }
 
 /* INPUT CLASS */
@@ -263,6 +279,7 @@ class Radio extends Element {
 			$name = get_class().'.php';
 		}
 		
+		Hash::splat($options[':elements']);
 		parent::__construct($options, $name, $type);
 		
 		// This class returns the preset value if wrong value is set

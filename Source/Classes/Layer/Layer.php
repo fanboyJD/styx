@@ -118,7 +118,7 @@ abstract class Layer extends Runner {
 		
 		$rights = Core::retrieve('rights.layer');
 		if(is_array($rights[$this->name]))
-			foreach($rights[$this->name] as $name => $right)
+			foreach(Hash::flatten($rights[$this->name]) as $name => $right)
 				$this->rights[strtolower($name)] = true;
 		elseif($rights[$this->name])
 			$this->rights = 1;
@@ -198,6 +198,7 @@ abstract class Layer extends Runner {
 				)));
 				
 				$this->setValue($data);
+				$this->where = $options['edit'];
 				$this->editing = true;
 			}
 		}
