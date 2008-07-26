@@ -79,14 +79,14 @@ class Data {
 	
 	public static function nullify($data){
 		if(is_array($data))
-			foreach($data as &$val){
+			foreach($data as $k => &$val){
 				$num = array(
 					is_numeric($val) && $val==0,
 					ctype_digit((string)$val),
 				);
 				
 				if(!$val && !$num[0])
-					unset($val);
+					unset($data[$k]);
 				elseif($num[0] || $num[1])
 					$val = self::id($val);
 				elseif(is_array($val))
@@ -97,7 +97,7 @@ class Data {
 	}
 	
 	public static function in($key, $array){
-		return $key.' IN ('.implode(',', $array).')';
+		return $key.' IN ('.implode(',', Hash::splat($array)).')';
 	}
 	
 	public static function implode($array){
@@ -106,16 +106,14 @@ class Data {
 	
 	public static function clean($array, $whitespaces = false){
 		if(is_array($array)){
-			foreach($array as &$val){
+			foreach($array as $k => &$val){
 				$val = self::clean($val, $whitespaces);
 				
-				if(!$val && $val!==0) unset($val);
+				if(!$val && $val!==0) unset($array[$k]);
 			}
 		}else{
 			$array = trim($array);
-			if($whitespaces)
-				$array = str_replace(array("\t", "\n", "\r"), array("", " ", ""), $array);
-			
+			if($whitespaces) $array = str_replace(array("\t", "\n", "\r"), array("", " ", ""), $array);
 		}
 		
 		return $array;

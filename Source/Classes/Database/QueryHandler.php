@@ -15,15 +15,15 @@ class QueryHandler {
 		$this->type = $type;
 		$this->table = $table;
 		
-		// We cannot extend from DynamicStorage du to the
+		// We cannot extend from DynamicStorage due to the
 		// use of store/retrieve in QuerySelect
 		$this->Storage = new DynamicStorage();
 	}
 	
 	/*
 		UPDATE and INSERT allow two input methods:
-			fields = (string) "myField='something', myOtherField=10"
-			fields = array(field=>value)
+			(string) "myField='something', myOtherField=10"
+			array(field=>value)
 	*/
 	
 	protected function formatSet(){
@@ -38,11 +38,11 @@ class QueryHandler {
 	}
 	
 	/*
-		SELECT allows the following input methods:
-			data = (int) 15 => "id='15'"
-			data = (string) "id='15'"
-			data = array(id=>15, 'AND', Data::in('uid', array(1, 2, 3)))
-			data = array(array('id' => 5), 'OR', array('id' => 6))
+		WHERE allows the following input methods:
+			(int) 15 => "id='15'"
+			(string) "id='15'"
+			array(id=>15, 'AND', Data::in('uid', array(1, 2, 3)))
+			array(array('id' => 5), 'OR', array('id' => 6))
 	*/
 	protected function formatWhere($deep = null){
 		if($deep)

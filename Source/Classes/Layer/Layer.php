@@ -25,6 +25,8 @@ abstract class Layer extends Runner {
 			'identifier' => null,
 		),
 		
+		$handlers = array('html'),
+		
 		$methods = array(),
 		$rights = null,
 		
@@ -92,6 +94,7 @@ abstract class Layer extends Runner {
 		self::$Layers['Instances'][$this->layername] = $this;
 		
 		$initialize = $this->initialize();
+		Hash::splat($initialize);
 		
 		foreach(get_class_methods($this) as $m)
 			if(startsWith($m, 'on') && strlen($m)>=3)
@@ -157,6 +160,9 @@ abstract class Layer extends Runner {
 		$this->event = $event[0];
 		
 		$exec = true;
+		if(!Handler::behaviour($this->handlers))
+			$exec = $this->error('handler');
+		
 		if($this->event==$this->getDefaultEvent('save')){
 			if(is_array($this->post) && sizeof($this->post))
 				$this->prepareData($this->post);

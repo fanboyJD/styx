@@ -47,7 +47,8 @@ class Handler extends Template {
 		$name = null,
 		$master = false,
 		$base = 'Handler',
-		$enabled = true;
+		$enabled = true,
+		$substitution;
 	
 	protected function __construct($name = null){
 		$this->name = $name;
@@ -101,7 +102,7 @@ class Handler extends Template {
 	}
 	
 	public static function behaviour(){
-		$types = func_get_args();
+		$types = Hash::args(func_get_args());
 		foreach($types as $v)
 			if(self::$Type==$v)
 				return true;
@@ -167,9 +168,22 @@ class Handler extends Template {
 			return $this;
 		}
 		
-		foreach($this->assigned as $k => &$val)
+		foreach($this->assigned as $k => $val)
 			if(!startsWith($k, $string))
-				unset($val);
+				unset($this->assigned[$k]);
+		
+		return $this;
+	}
+	
+	/**
+	 * Useful for JSON-Handler: This Method sets a key for later substitution. Only the
+	 * assigned variable with the given key will be send to output and it will replace
+	 * the original assignment array. 
+	 * 
+	 * @return Handler
+	 */
+	public function substitute($key){
+		$this->substitution = $key;
 		
 		return $this;
 	}
@@ -194,10 +208,13 @@ class Handler extends Template {
 			$this->assign($assign);
 		}
 		
-		$this->callback();
+		if($this->substitution) $this->assigned = $this->assigned[$this->substitution];
+		
+		if($this->master) $this->callback();
+		else $this->parsed = $this->assigned;
 		
 		if(sizeof($this->file)){
-			if(is_array($this->parsed)) $this->assign($this->parsed);
+			if($this->master && is_array($this->parsed)) $this->assign($this->parsed);
 			
 			return parent::parse($return);
 		}else{
