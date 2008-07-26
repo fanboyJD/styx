@@ -99,6 +99,20 @@ class Handler extends Template {
 		foreach(self::$Types as $k => $v)
 			if(!in_array($k, $handlers))
 				unset(self::$Types[$k]);
+		
+		self::setDefaultHeaders();
+	}
+	
+	public static function setDefaultHeaders(){
+		$time = time();
+		$headers = array(
+			'Expires' => date('r', $time-1000000),
+			'Last-Modified' => date('r', $time),
+			'Cache-Control' => 'no-cache, no-store, must-revalidate'
+		);
+		
+		foreach(self::$Types as $k => $type)
+			Hash::extend(self::$Types[$k]['headers'], $headers);
 	}
 	
 	public static function behaviour(){
