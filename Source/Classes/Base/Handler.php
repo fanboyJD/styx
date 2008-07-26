@@ -18,7 +18,9 @@ class Handler extends Template {
 				'headers' => array(
 					'Content-Type' => 'application/json; charset=utf8',
 				),
-				'callback' => 'json_encode',
+				'callback' => array('Data', 'encode', array(
+					'whitespace' => 'clean',
+				)),
 			),
 			
 			'xml' => array(
@@ -204,8 +206,9 @@ class Handler extends Template {
 	
 	public function callback($callback = 'callback'){
 		$c = self::$Types[self::$Type][$callback];
-		if($c && ((is_array($c) && method_exists($c[0], $c[1])) || function_exists($c)))
-			$this->parsed = call_user_func($c, $this->assigned);
+		$class = is_array($c);
+		if($c && (($class && method_exists($c[0], $c[1])) || function_exists($c)))
+			$this->parsed = call_user_func_array($class ? array($c[0], $c[1]) : $c, array($this->assigned, $class ? $c[2] : null));
 	}
 	
 	public function parse($return = false){

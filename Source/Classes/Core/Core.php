@@ -50,6 +50,14 @@ class Core extends StaticStorage {
 		return true;
 	}
 	
+	public static function loadAsset($file){
+		$file = realpath(self::retrieve('app.path').'/Assets/'.$file.'.php');
+		
+		if(file_exists($file)) require_once($file);
+		
+		return true;
+	}
+	
 	public static function initialize(){
 		if(self::$Initialized) return;
 		

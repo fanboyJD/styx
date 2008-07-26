@@ -113,7 +113,7 @@ class Data {
 			}
 		}else{
 			$array = trim($array);
-			if($whitespaces) $array = str_replace(array("\t", "\n", "\r"), array("", " ", ""), $array);
+			if($whitespaces) $array = str_replace(array("\t", "\n", "\r"), array("", $whitespaces=='clean' ? "\n" : " ", ""), $array);
 		}
 		
 		return $array;
@@ -176,4 +176,11 @@ class Data {
 		
 		return ($options['purify'] ? self::purify($data) : $data).'...';
 	}
+	
+	public static function encode($data, $options = array(
+		'whitespace' => true,
+	)){
+		return json_encode(Data::clean($data, $options['whitespace']));
+	}
+	
 }
