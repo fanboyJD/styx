@@ -41,7 +41,8 @@ abstract class Layer extends Runner {
 	 */
 	protected $data;
 	
-	protected static $Layers = array(
+	protected static $Config,
+		$Layers = array(
 			'List' => array(),
 			'Instances' => array(),
 		);
@@ -166,6 +167,8 @@ abstract class Layer extends Runner {
 		if(!method_exists($this, $event[1])){
 			$ev = $this->getDefaultEvent('view');
 			$event = array($ev, 'on'.ucfirst($ev));
+			if(!method_exists($this, $event[1]))
+				$exec = $this->error('handler');
 		}
 		
 		if($exec){
@@ -280,6 +283,12 @@ abstract class Layer extends Runner {
 	}
 	
 	public function link($title = null, $event = null){
+		/* Yes, you heard me: Layer static, not self */
+		if(!Layer::$Config)
+			Layer::$Config = array(
+				'path.separator' => Core::retrieve('path.separator'),
+			);
+		
 		if(!$title && !$event) return $this->base;
 		
 		$default = $this->getDefaultEvent('view');
@@ -288,7 +297,7 @@ abstract class Layer extends Runner {
 		
 		if(!$title) return $this->base.'/'.$event;
 		
-		return $this->base.'/'.(in_array($title, $this->methods) || $event!=$default ? $event.Core::retrieve('path.separator') : '').$title;
+		return $this->base.'/'.(in_array($title, $this->methods) || $event!=$default ? $event.Layer::$Config['path.separator'] : '').$title;
 	}
 	
 	public function hasRight(){

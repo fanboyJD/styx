@@ -161,4 +161,21 @@ class Data {
 		return $purify->parse($data);
 	}
 	
+	public static function excerpt($data, $options = array(
+		'length' => 400,
+		'purify' => true,
+	)){
+		if(strlen($data)<$options['length']) return $data;
+		
+		$data = substr($data, 0, $options['length']);
+		
+		preg_match('/(\s+(?!([^<]+)?>)(?!.*\s+).*)/is', $data, $m);
+		
+		if($m[1]){
+			$pos = strrpos($data, $m[1]);
+			if($pos!==false) $data = substr($data, 0, $pos);
+		}
+		
+		return ($options['purify'] ? self::purify($data) : $data).'...';
+	}
 }

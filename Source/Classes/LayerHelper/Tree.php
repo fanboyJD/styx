@@ -27,7 +27,7 @@ class Tree {
 			return $this->populatedTree;
 		
 		if(!$this->tree)
-			foreach($this->select->limit(0) as $t)
+			foreach($this->select as $t)
 				$this->tree[$t[$this->recursive]][] = $t;
 		
 		$array = array();

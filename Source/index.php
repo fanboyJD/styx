@@ -54,8 +54,8 @@
 			Lang::setLanguage(array_shift($languages));
 			
 			/* And overwrite with the selected language, in that way it keeps missing language strings */
-			if($_GET['p']['lang'] && sizeof($languages) && in_array($_GET['p']['lang'], $languages))
-				Lang::setLanguage($_GET['p']['lang']);
+			if($_GET['m']['lang'] && sizeof($languages) && in_array($_GET['m']['lang'], $languages))
+				Lang::setLanguage($_GET['m']['lang']);
 		}
 		
 		Handler::setType($_GET['p']['handler']);

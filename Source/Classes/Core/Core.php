@@ -99,6 +99,9 @@ class Core extends StaticStorage {
 			if(!$k && $version==$v[0] && strpos($vars[$k+1], '.')){
 				$polluted['m']['package'] = $vars[$k+1];
 				continue;
+			}elseif($v[0]=='lang'){
+				$polluted['m']['lang'] = $v[1];
+				continue;
 			}
 			
 			$polluted['p'][$v[0]] = pick($v[1], null);
