@@ -9,14 +9,14 @@ class Handler extends Template {
 		$Types = array(
 			'html' => array(
 				'headers' => array(
-					'Content-Type' => 'text/html; charset=utf8',
+					'Content-Type' => 'text/html; charset=UTF-8',
 				),
 				'defaultCallback' => array('Data', 'implode'),
 			),
 			
 			'json' => array(
 				'headers' => array(
-					'Content-Type' => 'application/json; charset=utf8',
+					'Content-Type' => 'application/json; charset=UTF-8',
 				),
 				'callback' => array('Data', 'encode', array(
 					'whitespace' => 'clean',
@@ -25,21 +25,21 @@ class Handler extends Template {
 			
 			'xml' => array(
 				'headers' => array(
-					'Content-Type' => 'application/xhtml+xml; charset=utf8',
+					'Content-Type' => 'application/xhtml+xml; charset=UTF-8',
 				),
 			),
 		),
 		$ExtendedTypes = array(
 			'js' => array(
 				'headers' => array(
-					'Content-Type' => 'text/javascript; charset=utf8',
+					'Content-Type' => 'text/javascript; charset=UTF-8',
 				),
 				'callback' => array('PackageManager', 'compress'),
 			),
 			
 			'css' => array(
 				'headers' => array(
-					'Content-Type' => 'text/css; charset=utf8',
+					'Content-Type' => 'text/css; charset=UTF-8',
 				),
 				'callback' => array('PackageManager', 'compress'),
 			),
