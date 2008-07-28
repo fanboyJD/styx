@@ -1709,7 +1709,7 @@ class Upload {
                     }                     
                     $this->file_src_error = 0; 
                     // determine whether the file is an image
-                    if (array_key_exists($this->file_src_mime, $this->image_supported)) {
+                    if ($this->file_src_mime && array_key_exists($this->file_src_mime, $this->image_supported)) {
                         $this->file_is_image = true;
                         $this->image_src_type = $this->image_supported[$this->file_src_mime];
                     }

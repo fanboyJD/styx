@@ -62,7 +62,7 @@ class Element extends Runner {
 	public function format($pass = null){
 		if(!$pass) $pass = array('attributes' => $this->implode());
 		
-		$out = Template::map('Element', pick($this->options[':template'], $this->name))->object($this)->assign($this->options)->assign($pass)->parse(true);
+		$out = Template::map('Element', pick($this->options[':template'], $this->name))->bind($this)->assign($this->options)->assign($pass)->parse(true);
 		
 		if($out) return $out;
 		

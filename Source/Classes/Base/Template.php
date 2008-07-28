@@ -3,7 +3,7 @@ class Template extends Runner {
 	
 	protected $assigned = array(),
 		$file = array(),
-		$obj = null;
+		$bind = null;
 	
 	protected static $init = null;
 	
@@ -42,13 +42,13 @@ class Template extends Runner {
 		$file = implode('/', $this->file).(!$ext ? $ext = '.'.self::$init['tpl.standard'] : '');
 		
 		if(in_array($ext, self::$init['tpl.execute'])){
-			if($this->obj && method_exists($this->obj, 'execute')){
+			if($this->bind && method_exists($this->bind, 'execute')){
 				ob_start();
 				
 				$filename = self::getFileName($file);
 				if(!$filename) return;
 				
-				$this->obj->execute($filename);
+				$this->bind->execute($filename);
 				return ob_get_clean();
 			}else{
 				// We stop here if the extension is not a template for 
@@ -81,8 +81,8 @@ class Template extends Runner {
 	/**
 	 * @return Template
 	 */
-	public function object($obj){
-		if(is_object($obj)) $this->obj = $obj;
+	public function bind($bind){
+		if(is_object($bind)) $this->bind = $bind;
 		
 		return $this;
 	}
@@ -102,7 +102,7 @@ class Template extends Runner {
 		
 		Hash::flatten($this->assigned);
 		
-		preg_match_all('/\\$\{([\w\.:]+)\}/i', $out, $vars);
+		preg_match_all('/\\$\{([A-z0-9\.:]+)\}/i', $out, $vars);
 		
 		$rep = array(array_values($vars[0]));
 		foreach($vars[1] as $val)

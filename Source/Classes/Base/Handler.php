@@ -56,7 +56,7 @@ class Handler extends Template {
 		$this->name = $name;
 		if(!$name) $this->master = true;
 		
-		$this->object($this);
+		$this->bind($this);
 	}
 	
 	/**
