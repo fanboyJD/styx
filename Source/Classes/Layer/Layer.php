@@ -365,18 +365,20 @@ abstract class Layer extends Runner {
 		/* doSomething(); */
 	}
 	
-	public function allowHandler($method, $handler){
-		if(!in_array($method, $this->methods))
-			return;
-		
-		$this->allowedHandlers[$method] = array_unique(array_merge(Hash::splat($this->allowedHandlers[$method]), Hash::splat($handler)));
+	public function allowHandler($methods, $handler){
+		foreach(Hash::splat($methods) as $method){
+			if(!in_array($method, $this->methods)) continue;
+			
+			$this->allowedHandlers[$method] = array_unique(array_merge(Hash::splat($this->allowedHandlers[$method]), Hash::splat($handler)));
+		}
 	}
 	
-	public function disallowHandler($method, $handler){
-		if(!in_array($method, $this->methods))
-			return;
-		
-		$this->disallowedHandlers[$method] = array_unique(array_merge(Hash::splat($this->disallowedHandlers[$method]), Hash::splat($handler)));
+	public function disallowHandler($methods, $handler){
+		foreach(Hash::splat($methods) as $method){
+			if(!in_array($method, $this->methods)) continue;
+			
+			$this->disallowedHandlers[$method] = array_unique(array_merge(Hash::splat($this->disallowedHandlers[$method]), Hash::splat($handler)));
+		}
 	}
 	
 	/**

@@ -24,7 +24,7 @@ class Lang extends StaticStorage {
 		if(!$file || !file_exists($file))
 			return;
 		
-		$regex = '/^|\s+([\w\.]+)\s*=\s*([\'\"])(.*?[^\\\]|)\2;/ism';
+		$regex = '/\s*([\w\.]+)\s*=\s*([\'\"])(.*?[^\\\]|)\2;/ism';
 		$str_rpl = array(
 			array("\'", "\{", "\}"),
 			array("'", "{", "}"),
