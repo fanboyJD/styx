@@ -1886,8 +1886,8 @@ class Upload {
      * @param  integer $mode Optional permissions
      * @return boolean Success
      */
-    function rmkdir($path, $mode = 0777) {
-        return is_dir($path) || ( $this->rmkdir(dirname($path), $mode) && $this->_mkdir($path, $mode) );
+    public static function rmkdir($path, $mode = 0777) {
+        return is_dir($path) || ( self::rmkdir(dirname($path), $mode) && self::_mkdir($path, $mode) );
     }
 
 
@@ -1899,7 +1899,7 @@ class Upload {
      * @param  integer $mode Optional permissions
      * @return boolean Success
      */
-    function _mkdir($path, $mode = 0777) {
+    public static function _mkdir($path, $mode = 0777) {
         $old = umask(0);
         $res = @mkdir($path, $mode);
         umask($old);
@@ -2331,7 +2331,7 @@ class Upload {
             if ($this->processed && !file_exists($this->file_dst_path)) {
                 if ($this->dir_auto_create) {
                     $this->log .= '- ' . $this->file_dst_path . ' doesn\'t exist. Attempting creation:';
-                    if (!$this->rmkdir($this->file_dst_path, $this->dir_chmod)) {
+                    if (!self::rmkdir($this->file_dst_path, $this->dir_chmod)) {
                         $this->log .= ' failed<br />';
                         $this->processed = false;
                         $this->error = $this->translate('destination_dir');

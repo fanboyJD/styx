@@ -26,6 +26,8 @@ abstract class Layer extends Runner {
 		),
 		
 		$handlers = array('html'),
+		$allowedHandlers = array(),
+		$disallowedHandlers = array(),
 		
 		$methods = array(),
 		$rights = null,
@@ -62,7 +64,7 @@ abstract class Layer extends Runner {
 		if(!class_exists($class) || !is_subclass_of($class, 'Layer'))
 			return false;
 		
-		if($isRouted && method_exists($class, 'hide') && call_user_func(array($class, 'hide')))
+		if($isRouted && call_user_func(array($class, 'hide')))
 			return false;
 		
 		$layer = new $class($layerName);
@@ -70,6 +72,10 @@ abstract class Layer extends Runner {
 		if($event) $layer->handle($event, $get, $post);
 		
 		return $layer;
+	}
+	
+	public static function hide(){
+		return false;
 	}
 	
 	/**
@@ -93,12 +99,12 @@ abstract class Layer extends Runner {
 		self::$Layers['List'][] = $this->layername;
 		self::$Layers['Instances'][$this->layername] = $this;
 		
-		$initialize = $this->initialize();
-		Hash::splat($initialize);
-		
 		foreach(get_class_methods($this) as $m)
 			if(startsWith($m, 'on') && strlen($m)>=3)
 				$this->methods[] = strtolower(substr($m, 2));
+		
+		$initialize = $this->initialize();
+		Hash::splat($initialize);
 		
 		if(key_exists('table', $initialize))
 			$this->table = $initialize['table'] ? $initialize['table'] : null;
@@ -160,8 +166,6 @@ abstract class Layer extends Runner {
 		$this->event = $event[0];
 		
 		$exec = true;
-		if(!Handler::behaviour($this->handlers))
-			$exec = $this->error('handler');
 		
 		if($this->event==$this->getDefaultEvent('save')){
 			if(is_array($this->post) && sizeof($this->post))
@@ -175,6 +179,16 @@ abstract class Layer extends Runner {
 			$event = array($ev, 'on'.ucfirst($ev));
 			if(!method_exists($this, $event[1]))
 				$exec = $this->error('handler');
+		}
+		
+		/* When the allowed/disabled Handler arrays are set it checks for their contents
+		   otherwise it checks for the global array that is responsible for the whole layer
+		*/
+		if(sizeof(Hash::splat($this->allowedHandlers[$event[0]])) || sizeof(Hash::splat($this->disabledHandlers[$event[0]]))){
+			if(!Handler::behaviour($this->allowedHandlers[$event[0]]) && Handler::behaviour($this->disallowedHandlers[$event[0]]))
+				$exec = $this->error('handler');
+		}elseif(!Handler::behaviour($this->handlers)){
+			$exec = $this->error('handler');
 		}
 		
 		if($exec){
@@ -349,6 +363,20 @@ abstract class Layer extends Runner {
 	
 	protected function populate(){
 		/* doSomething(); */
+	}
+	
+	public function allowHandler($method, $handler){
+		if(!in_array($method, $this->methods))
+			return;
+		
+		$this->allowedHandlers[$method] = array_unique(array_merge(Hash::splat($this->allowedHandlers[$method]), Hash::splat($handler)));
+	}
+	
+	public function disallowHandler($method, $handler){
+		if(!in_array($method, $this->methods))
+			return;
+		
+		$this->disallowedHandlers[$method] = array_unique(array_merge(Hash::splat($this->disallowedHandlers[$method]), Hash::splat($handler)));
 	}
 	
 	/**

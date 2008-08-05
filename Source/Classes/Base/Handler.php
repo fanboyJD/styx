@@ -119,11 +119,8 @@ class Handler extends Template {
 	
 	public static function behaviour(){
 		$types = Hash::args(func_get_args());
-		foreach($types as $v)
-			if(self::$Type==$v)
-				return true;
 		
-		return false;
+		return in_array(self::$Type, $types);
 	}
 	
 	public static function remove($name, $slave = true){

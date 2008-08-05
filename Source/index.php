@@ -20,6 +20,7 @@
 	
 	require_once($path.'Config/Configuration.php');
 	unset($path);
+	
 	if(is_array($_CONFIGURATION)){
 		Core::store($_CONFIGURATION);
 		unset($_CONFIGURATION);
@@ -57,6 +58,8 @@
 			if($_GET['m']['lang'] && sizeof($languages) && in_array($_GET['m']['lang'], $languages))
 				Lang::setLanguage($_GET['m']['lang']);
 		}
+		
+		unset($languages);
 		
 		Handler::setType($_GET['p']['handler']);
 		Handler::setHeader();
