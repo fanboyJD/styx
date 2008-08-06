@@ -63,7 +63,7 @@ class Tree {
 			if($id && ($id==$data[$this->identifier] || in_array($id, $data['parents'])))
 				continue;
 			
-			$array[] = $data;
+			$array[$data[$this->identifier]] = $data;
 		}
 		
 		return $array;

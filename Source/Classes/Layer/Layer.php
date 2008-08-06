@@ -184,7 +184,7 @@ abstract class Layer extends Runner {
 		/* When the allowed/disabled Handler arrays are set it checks for their contents
 		   otherwise it checks for the global array that is responsible for the whole layer
 		*/
-		if(sizeof(Hash::splat($this->allowedHandlers[$event[0]])) || sizeof(Hash::splat($this->disabledHandlers[$event[0]]))){
+		if($this->hasCustomHandler($event[0])){
 			if(!Handler::behaviour($this->allowedHandlers[$event[0]]) && Handler::behaviour($this->disallowedHandlers[$event[0]]))
 				$exec = $this->error('handler');
 		}elseif(!Handler::behaviour($this->handlers)){
@@ -302,7 +302,7 @@ abstract class Layer extends Runner {
 		return Data::pagetitle($title, $options);
 	}
 	
-	public function link($title = null, $event = null){
+	public function link($title = null, $event = null, $handler = null){
 		/* Yes, you heard me: Layer static, not self */
 		if(!Layer::$Config)
 			Layer::$Config = array(
@@ -317,7 +317,15 @@ abstract class Layer extends Runner {
 		
 		if(!$title) return $this->base.'/'.$event;
 		
-		return $this->base.'/'.(in_array($title, $this->methods) || $event!=$default ? $event.Layer::$Config['path.separator'] : '').$title;
+		if($handler){
+			if($this->hasCustomHandler($event)){
+				if(!in_array($handler, $this->allowedHandlers[$event]))
+					unset($handler);
+			}elseif(!in_array($handler, $this->handlers)){
+				unset($handler);
+			}
+		}
+		return ($handler ? 'handler'.Layer::$Config['path.separator'].$handler.'/' : '').$this->base.'/'.(in_array($title, $this->methods) || $event!=$default ? $event.Layer::$Config['path.separator'] : '').$title;
 	}
 	
 	public function hasRight(){
@@ -347,7 +355,7 @@ abstract class Layer extends Runner {
 	public function requireSession(){
 		$name = $this->generateSessionName();
 		
-		$this->form->addElement(new HiddenInput(array(
+		return $this->form->addElement(new HiddenInput(array(
 			'name' => $name,
 			'value' => $this->preparation ? $this->post[$name] : User::get(Core::retrieve('user.sessionfield')),
 			':alias' => true,
@@ -379,6 +387,10 @@ abstract class Layer extends Runner {
 			
 			$this->disallowedHandlers[$method] = array_unique(array_merge(Hash::splat($this->disallowedHandlers[$method]), Hash::splat($handler)));
 		}
+	}
+	
+	public function hasCustomHandler($event){
+		return sizeof(Hash::splat($this->allowedHandlers[$event])) || sizeof(Hash::splat($this->disabledHandlers[$event]));
 	}
 	
 	/**

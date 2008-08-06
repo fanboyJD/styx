@@ -104,6 +104,8 @@ class QuerySelect extends QueryHandler implements Iterator {
 	}
 	
 	public function length(){
+		if(!$this->queried) $this->rewind();
+		
 		return sizeof($this->cache);
 	}
 	
