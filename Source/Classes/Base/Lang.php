@@ -24,6 +24,7 @@ class Lang extends StaticStorage {
 		if(!$file || !file_exists($file))
 			return;
 		
+		/* Big thanks to sorccu from the MooTools-Chan =) */
 		$regex = '/\s*([\w\.]+)\s*=\s*([\'\"])(.*?[^\\\]|)\2;/ism';
 		$str_rpl = array(
 			array("\'", "\{", "\}"),
@@ -32,7 +33,7 @@ class Lang extends StaticStorage {
 		
 		$content = file_get_contents($file);
 		
-		preg_match_all('/namespace\s+([\w\.]+)\s*\{(.*?[^\\\}\{]|)\}/ism', $content, $m);
+		preg_match_all('/namespace\s+([\w\.]+)\s*\{((?:([\"\'])(?:.*?[^\\\\]|)\3|[^\}])*)\}/ism', $content, $m);
 		
 		if(is_array($m[1]))
 			foreach($m[1] as $key => $val){
