@@ -23,19 +23,16 @@ class Filecache {
 	
 	public function store($key, $content, $ttl){
 		$file = $this->root.$this->prefix.'/'.$key.'.txt';
+		
 		if(!file_exists($file)){
 			try{
-				$dir = dirname($file);
-				if(!is_dir($dir)){
-					if(!is_dir($this->root.$this->prefix))
-						mkdir($this->root.$this->prefix, 0777);
-					
-					mkdir($dir, 0777);
-				}
+				Core::mkdir(dirname($file));
+				
 				touch($file); 
 				chmod($file, 0777);
 			}catch(Exception $e){}
 		}
+		
 		file_put_contents($file, ($ttl=='file' ? 'file' : $this->time+$ttl).'|'.$content);
 	}
 	

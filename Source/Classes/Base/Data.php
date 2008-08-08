@@ -22,8 +22,7 @@ class Data {
 	}
 	
 	public static function strip($string){
-		if(!$string)
-			return '';
+		if(!$string) return '';
 		
 		if(is_array($string)){
 			foreach($string as &$val)
@@ -40,8 +39,7 @@ class Data {
 	}
 	
 	public static function id($int, $divider = 0){
-		if(!is_numeric($int) || $int<0)
-			return 0;
+		if(!is_numeric($int) || $int<0) return 0;
 		
 		if($divider){
 			$remainder = $int/$divider;
@@ -68,8 +66,7 @@ class Data {
 		$data = explode($options['separator'] ? $options['separator'] : '.', $data);
 		
 		foreach(str_split($options['order'] ? $options['order'] : 'dmy') as $k => $v){
-			if(!self::id($data[$k]))
-				return null;
+			if(!self::id($data[$k])) return null;
 			
 			$input[$v] = $data[$k];
 		}
@@ -85,12 +82,9 @@ class Data {
 					ctype_digit((string)$val),
 				);
 				
-				if(!$val && !$num[0])
-					unset($data[$k]);
-				elseif($num[0] || $num[1])
-					$val = self::id($val);
-				elseif(is_array($val))
-					$val = self::nullify($val);
+				if(!$val && !$num[0]) unset($data[$k]);
+				elseif($num[0] || $num[1]) $val = self::id($val);
+				elseif(is_array($val)) $val = self::nullify($val);
 			}
 		
 		return $data;

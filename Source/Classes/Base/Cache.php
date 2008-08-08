@@ -28,7 +28,7 @@ class Cache extends DynamicStorage {
 		if($this->engine['type'] && Core::loadClass('Cache', $class))
 			$this->engineInstance = new $class($this->prefix, $this->root);
 		
-		Core::loadClass('Cache', 'filecache');
+		Core::loadClass('Cache', 'Filecache');
 		$this->filecacheInstance = new filecache($this->prefix, $this->root);
 	}
 	
