@@ -1,4 +1,4 @@
-<h1>${lang.menu.news}</h1>
+<h1>${lang.news.name}</h1>
 <div class="inner">
 <?php
 	foreach($this->data as $n){

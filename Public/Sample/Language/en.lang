@@ -10,6 +10,8 @@ deleted = 'The entry has been deleted!';
 source = 'View Source';
 
 namespace news {
+	name = 'News';
+	
 	posted = 'Posted by <b>%s</b> on %s';
 	
 	add = 'Add news';
