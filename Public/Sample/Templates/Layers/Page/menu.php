@@ -1,3 +1,4 @@
+<div id="menuleft"></div>
 <ul id="menu">
 <?php
 foreach($this->data as $data)

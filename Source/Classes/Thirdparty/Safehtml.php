@@ -225,8 +225,21 @@ class Safehtml {
 					if(!$allow) continue;
 				}
 				
-				if(!$allow && ((!$this->keepClasses && $name=='class' && !in_array($value, $this->allowedClasses)) || strpos($name, 'on')===0 || strpos($name, 'data')===0 || !in_array($name, $this->allowedAttributes) || (!preg_match("/^[a-z0-9]+$/i", $name)) || (is_array($this->removeAttribIfNotInElement[$name]) && !in_array($tag, $this->removeAttribIfNotInElement[$name]))))
+				if(!$allow && (strpos($name, 'on')===0 || strpos($name, 'data')===0 || !in_array($name, $this->allowedAttributes) || (!preg_match("/^[a-z0-9]+$/i", $name)) || (is_array($this->removeAttribIfNotInElement[$name]) && !in_array($tag, $this->removeAttribIfNotInElement[$name]))))
 					continue;
+				
+				if($name=='class' && !$this->keepClasses){
+					$new = array();
+					
+					$classes = explode(' ', $value);
+					if(is_array($classes))
+						foreach($classes as $class)
+							if(in_array($class, $this->allowedClasses))
+								$new[] = $class;
+					
+					if(sizeof($new)) $value = implode(' ', $new);
+					else continue;
+				}
 				
 				if($value===true || is_null($value)) $value = $name;
 				

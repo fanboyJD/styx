@@ -1,6 +1,4 @@
 <script type="text/javascript">
-	window.addEvent('domready', function(){
-		${ready}
-	});
-	${add}
+${add}
+window.addEvent('domready', function(){ ${ready} });
 </script>

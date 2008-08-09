@@ -27,7 +27,9 @@ class IndexLayer extends Layer {
 				new Textarea(array(
 					'name' => 'content',
 					':caption' => Lang::retrieve('text'),
-					':validate' => 'purify',
+					':validate' => array('purify', array( // These are the options for the Data-Class method "purify". In this case the classes in the HTML to be kept
+						'classes' => array('green', 'blue', 'b', 'icon', 'bold', 'italic'),
+					)),
 				)),
 				
 				new Button(array(
@@ -75,7 +77,9 @@ class IndexLayer extends Layer {
 	public function onEdit(){
 		$this->edit();
 		
-		$this->Handler->assign($this->format());
+		$this->Handler->template('edit')->assign(array(
+			'headline' => Lang::retrieve('news.'.($this->editing ? 'edit' : 'add')),
+		))->assign($this->format());
 	}
 	
 	public function onDelete($title){
@@ -112,7 +116,7 @@ class IndexLayer extends Layer {
 		foreach($this->data as $n)
 			$users[] = $n['uid'];
 		
-		foreach(db::select('users')->fields('id, name')->where(Data::in('id', $users))->limit(0)->retrieve() as $user)
+		foreach(db::select('users')->fields('id, name')->where(Data::in('id', $users))->limit(0) as $user)
 			$this->usernames[$user['id']] = $user['name'];
 		
 		if(Handler::behaviour('html'))

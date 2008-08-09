@@ -6,6 +6,19 @@ html, body {
 	height: 100%;
 }
 
+
+body {
+	font-family: Tahoma, sans-serif;
+	font-size: 13px;
+	
+	background: #fff url(../Images/bg.gif) repeat-x;
+}
+
+body, div, ul {
+	margin: 0;
+	padding: 0;
+}
+
 .wrapper {
 	min-height: 100%;
 	height: auto !important;
@@ -13,136 +26,83 @@ html, body {
 	margin: 0 auto -10px;
 }
 
-body, div {
-	font-family: Tahoma, sans-serif;
-	font-size: 13px;
-	margin: 0;
-}
-
-.bottomm {
-	margin-bottom: 10px;
-}
-
 .topp5 {
 	padding-top: 5px;
 }
 
 div#content {
-	margin: 0 auto;
-	background: url('../Images/content.png') no-repeat;
 	width: 502px;
 	height: 282px;
-	color: #ffffff;
-	font-weight: bold;
-	padding: 30px;
+	
 	overflow: hidden;
-}
-
-div#text {
-	margin: 0 auto 30px;
-	width: 532px;
-	color: #5e5e5e;
-}
-
-div#text div.inner {
-	margin: 30px;
+	margin: -16px auto 0;
+	padding: 30px;
+	
+	color: #fff;
+	font-weight: bold;
+	font-size: 14px;
+	font-family: Calibri, Tahoma, sans-serif;
+	
+	background: url('../Images/content.png') no-repeat;
 }
 
 div#logo a {
-	position: relative;
-	z-index: 2;
-	margin: 20px 0 10px 119px;
+	width: 377px;
+	height: 195px;
+	
+	margin: 10px 0 10px 70px;
 	display: block;
-	width: 347px;
-	height: 176px;
-	background: url('../Images/styx.png') no-repeat;
+	
+	background: url('../Images/Styx.png') no-repeat;
 }
 
-div#top {
-	position: relative;
-	margin: 0 auto;
-	width: 80%;
+div#menuleft {
+	position: absolute;
+	width: 7px;
+	height: 130px;
+	top: 32px;
+	right: 400px;
+	z-index: 1;
+	
+	background: url('../Images/menuleft.png');
 }
 
 ul#menu {
-	z-index: 1;
-	top: -14px;
-	right: 123px;
 	position: absolute;
-	margin: 0;
-	padding: 0;
-	background: url('../Images/navi.png') no-repeat 0 18px;
-	width: 294px;
-	height: 151px;
+	width: 400px;
+	height: 130px;
+	top: 32px;
+	right: 0;
+	z-index: 1;
+	
+	background: url('../Images/menu.png');
 }
 
 ul#menu li {
-	position: absolute;
-	top: -4px;
-	right: 0;
 	list-style-type: none;
 }
 
 ul#menu li a {
+	height: 25px;
+	line-height: 25px;
+	padding: 1px 0 0 7px;
 	display: block;
-	font-size: 22px;
-	font-weight: bold;
-	color: #49608b;
-	height: 32px;
-	margin: 0;
-	padding: 0;
+	
+	color: #757575;
+	font-size: 17px;
 	text-decoration: none;
-	font-variant: small-caps;
-}
-
-ul#menu li#m2 {
-	top: 28px;
-}
-
-ul#menu li#m3 {
-	top: 60px;
-}
-
-ul#menu li#m4 {
-	top: 92px;
-}
-
-ul#menu li#m5 {
-	top: 124px;
-}
-
-ul#menu li#m1_hover a {
-	padding-right: 10px;
-	color: #a2d025;
-}
-
-ul#menu li#m2_hover a {
-	padding-right: 10px;
-	color: #8ac021;
-}
-
-ul#menu li#m3_hover a {
-	padding-right: 10px;
-	color: #5ea31a;
-}
-
-ul#menu li#m4_hover a {
-	padding-right: 10px;
-	color: #459217;
-}
-
-ul#menu li#m5_hover a {
-	padding-right: 10px;
-	color: #2c8113;
+	text-transform: uppercase;
+	letter-spacing: -1px;
 }
 
 div#footer {
-	background: url('../Images/footer.png') repeat-x;
 	width: 100%;
 	height: 30px;
 	margin-top: 10px;
 	line-height: 34px;
 	overflow: hidden;
+	
+	background: url('../Images/footer.png') repeat-x;
 }
 
 div#footer div {
@@ -166,35 +126,47 @@ div#footer div a:hover {
 	text-decoration: underline;
 }
 
-
-span.blue {
-	color: #1f52b0;
-	font-variant: small-caps;
+.clear {
+	clear: both;
 }
 
-span.b {
+div#text {
+	width: 532px;
+	margin: 0 auto 30px;
+	
+	color: #5e5e5e;
+}
+
+div#text div.inner {
+	background: #e9e9e9;
+	
+	padding: 5px 10px;
+	margin: 25px;
+	
 	font-weight: bold;
+	font-family: Calibri, Tahoma, sans-serif;
+	
+	border-radius: 10px;
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
 }
 
-h1 {
-	font-size: 20px;
-	width: 100%;
-	color: #2d8213;
-	margin: 3px 0 10px 0;
-	padding: 0;
-	background: url('../Images/line.png') repeat-x 0 20px;
-	font-variant: small-caps;
+div#text div.inner small {
+	color: #aaa;
 	font-family: Calibri, Tahoma, sans-serif;
 }
 
-h2 {
-	font-size: 14px;
-}
-
-hr {
-	border: 1px #5ea31a solid;
+h1 {
 	width: 100%;
-	margin: 5% 0 1%;
+	margin: 0 0 10px;
+	padding: 0;
+	border-bottom: 2px #9c9b9b solid;
+	height: 20px;
+	
+	color: #9c9b9b;
+	font-family: Calibri, Tahoma, sans-serif;
+	font-size: 20px;
+	text-transform: uppercase;
 }
 
 a {
@@ -212,6 +184,20 @@ img, a img {
 
 div#content a {
 	color: #f7f7f7;
+}
+
+span.blue {
+	color: #1f52b0;
+	font-variant: small-caps;
+}
+
+span.green {
+	color: #7db71f;
+	font-variant: small-caps;
+}
+
+.b {
+	font-weight: bold;
 }
 
 .bold, .icon, .italic {

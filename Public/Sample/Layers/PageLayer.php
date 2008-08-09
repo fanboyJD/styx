@@ -19,7 +19,9 @@ class PageLayer extends Layer {
 				new Textarea(array(
 					'name' => 'content',
 					':caption' => Lang::retrieve('text'),
-					':validate' => 'purify',
+					':validate' => array('purify', array( // These are the options for the Data-Class method "purify". In this case the classes in the HTML to be kept
+						'classes' => array('green', 'blue', 'b', 'icon', 'bold', 'italic'),
+					)),
 				)),
 				
 				new Button(array(
@@ -69,7 +71,12 @@ class PageLayer extends Layer {
 			return;
 		}
 		
-		$this->Handler->assign($this->format());
+		/* We put some styling here as we don't want to add a new Template for that :) */
+		$this->Handler->assign('<div class="inner">
+			'.Data::implode($this->format()).'
+			<div class="clear"></div>
+			</div>'
+		);
 	}
 	
 	public function onView($title){
@@ -77,7 +84,9 @@ class PageLayer extends Layer {
 			$data = $this->data->where(array(
 				'pagetitle' => array($title, 'pagetitle'),
 			))->fetch();
-		}else{
+		}
+		
+		if(!$data['id']){
 			$this->Handler->assign(Lang::retrieve('page.notavailable'));
 			return;
 		}

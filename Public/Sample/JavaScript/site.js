@@ -5,11 +5,20 @@ window.addEvent('domready', function(){
 			morph: {duration: 300},
 			events: {
 				mouseenter: function(){
-					this.morph('ul#menu li#'+this.getParent().id+'_hover a');
+					this.morph({
+						paddingLeft: 12,
+						color: '#2c8113'
+					});
 				},
 				mouseleave: function(){
-					this.morph('ul#menu li a');
+					this.morph({
+						paddingLeft: 7,
+						color: '#757575'
+					});
 				}
+			},
+			styles: {
+				fontWeight: Browser.Engine.webkit ? 'normal' : 'bold'
 			}
 		});
 	})();
@@ -28,7 +37,7 @@ window.addEvent('domready', function(){
 						new Request.JSON({
 							url: el,
 							data: {
-								session: User.session,
+								session: User.session
 							},
 							onSuccess: function(j){
 								if(j && j.out){

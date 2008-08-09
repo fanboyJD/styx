@@ -15,16 +15,23 @@ namespace news {
 	posted = 'Posted by <b>%s</b> on %s';
 	
 	add = 'Add news';
+	edit = 'Edit news';
 	
-	saved = '<b>Your entry has been saved.</b><br/><br/>
-		<a href="%s" class="go icon">Go to the News-Entry</a>';
+	saved = '<div class="inner">
+			<b>Your entry has been saved.</b><br/><br/>
+			<a href="%s" class="go icon">Go to the News-Entry</a>
+		</div>';
 }
 
 namespace page {
-	saved = '<b>Your page has been saved.</b><br/><br/>
-		<a href="%s" class="go icon">Go to the Page</a>';
+	saved = '<div class="inner">
+			<b>Your page has been saved.</b><br/><br/>
+			<a href="%s" class="go icon">Go to the Page</a>
+		</div>';
 	
-	notavailable = '<span class="icon go">This page is not available.</span>';
+	notavailable = '<div class="inner">
+			<span class="icon go">This page is not available.</span>
+		</div>';
 }
 
 # The namespace for the framework :)
@@ -49,13 +56,17 @@ namespace user {
 	
 	hello = 'Hello %s';
 	
-	loggedin = '<h1>Administration</h1>
-		<span class="bold go">Welcome %s</span>';
+	loggedin = '<div class="inner">
+			<h1>Administration</h1>
+			<span class="bold go">Welcome %s</span>
+		</div>';
 }
 
 namespace validator {
-	prefix = '<span class="icon go">';
-	suffix = '</span>';
+	prefix = '<div class="inner">
+		<span class="icon go">';
+	
+	suffix = '</span></div>';
 	
 	# Default
 	rights = 'You don\'t have the necessary rights to access this page.';
