@@ -79,6 +79,6 @@ namespace validator {
 	default = 'The field "<b>%s</b>" contains an invalid value.';
 	
 	# Custom
-	
+	login = 'You have entered an invalid username or password.';
 	onlyedit = 'You can only edit pages but not add new ones.';
 }
