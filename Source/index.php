@@ -1,5 +1,5 @@
 <?php
-	$_CONFIGURATION = null; 
+	$_CONFIGURATION = null;
 	require_once('../Config/Configuration.php');
 	
 	$path = dirname(__FILE__).'/';
