@@ -2,7 +2,7 @@
 	foreach($this->data as $n)
 		echo '<item>
 			<title>'.$n['title'].'</title>
-			<link>${app.link}'.$n['pagetitle'].'</link>
+			<link>'.$this->link($n['pagetitle']).'</link>
 			<description>
 				<![CDATA[
 					'.Data::excerpt($n['content']).'

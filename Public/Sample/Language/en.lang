@@ -28,7 +28,13 @@ namespace page {
 # The namespace for the framework :)
 namespace framework {
 	description = '<span class="blue">Styx</span> is a PHP-Framework in an early alpha
-		stage.<br/><br/>Here goes some interesting text about the Framework, seriously.';
+		stage.<br/><br/>
+		You can checkout the code by doing<br/>
+			<span class="blue icon">svn checkout http://framework.og5.net/svn/</span>
+		<br/><br/>
+		If you want to help / work on it / write access to svn or whatever, please contact
+		me: <a href="mailto:christoph.pojer@gmail.com">E-Mail</a> |
+		<a href="http://og5.net/christoph" target="portfolio">Portfolio</a>';
 }
 
 namespace user {
