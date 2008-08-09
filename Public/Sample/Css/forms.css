@@ -42,6 +42,10 @@ textarea {
 	display: block;
 	width: 98%;
 	height: 150px;
+	
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border-radius: 10px;
 }
 
 button {
