@@ -11,30 +11,11 @@
 		<generator>${app.name}</generator>
 		<managingEditor>${app.mail}</managingEditor>
 		<webMaster>${app.mail}</webMaster>
-		<?php
-			/* Still searching for a proper sample image =)
-			<image>
-				<url></url>
-				<title></title>
-				<link/>
-			</image>
-			*/
-		?>
-		<?php
-			// We can do anything we want here and more like iterating through $this->data :)
-		
-			/* @var $db db */
-			foreach(db::select('news')->order('time DESC') as $n)
-				echo '<item>
-					<title>'.$n['title'].'</title>
-					<link>${app.link}'.$n['pagetitle'].'</link>
-					<description>
-						<![CDATA[
-							'.substr($n['content'], 0, 200).'...
-						]]>
-					</description>
-					<pubDate>'.date('r', $n['time']).'</pubDate>
-				</item>';
-		?>
+		<image>
+			<url>${app.link}Images/styx.png</url>
+			<title>${app.name}</title>
+			<link/>
+		</image>
+		${layer}
 	</channel>
 </rss>

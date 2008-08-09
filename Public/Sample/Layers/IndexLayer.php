@@ -1,38 +1,48 @@
 <?php
 class IndexLayer extends Layer {
 	
+	public $isIndex = false;
+	
+	public $usernames; // For: View
+	
 	public function initialize(){
+		$this->allowHandler('view', array('html', 'xml'));
+		$this->allowHandler('delete', 'json');
+		$this->disallowHandler('delete', array('html', 'xml'));
+		
 		return array(
 			'table' => 'news',
 			'options' => array(
-				'identifier' => 'id',
-			),
-			'form' => new Form(array(
-					'name' => 'Index',
+				'identifier' => array(
+					'internal' => 'id',
+					'external' => 'pagetitle',
 				),
+			),
+			'form' => new Form(
 				new Input(array(
 					'name' => 'title',
-					':caption' => 'Titel',
+					':caption' => Lang::retrieve('title'),
 				)),
-				new Input(array(
-					'name' => 'uid',
-					':caption' => 'UserID',
-					':validate' => 'id',
-				)),
+				
 				new Textarea(array(
 					'name' => 'content',
-					'cols' => 20,
-					'rows' => 5,
-					':caption' => 'Text',
-					':validate' => 'specialchars',
+					':caption' => Lang::retrieve('text'),
+					':validate' => 'purify',
 				)),
+				
 				new Button(array(
 					'name' => 'bsave',
-					':caption' => 'EinTest',
+					':caption' => Lang::retrieve('save'),
 				)),
+				
+				new Field(array(
+					'name' => 'uid',
+				)),
+				
 				new Field(array(
 					'name' => 'pagetitle',
 				)),
+				
 				new Field(array(
 					'name' => 'time',
 				))
@@ -41,50 +51,82 @@ class IndexLayer extends Layer {
 	}
 	
 	public function onSave(){
-		if($this->editing){
+		if($this->editing)
 			$data = $this->data->where($this->where)->fetch();
-			$this->Handler->assign(array('Editing: '.$data['title']));
-		}
 		
 		$this->form->setValue(array(
-			'time' => time(),
+			'uid' => $this->editing ? $data['uid'] : User::get('id'),
+			'time' => $this->editing ? $data['time'] : time(),
 			'pagetitle' => $this->getPagetitle($this->form->getValue('title'), $this->where),
 		));
 		
 		try{
 			$this->save();
 			
-			$this->Handler->assign(array('saved' => 'Some Output: Saved! Id: '.db::getInstance()->getId()));
+			$this->Handler->assign(Lang::get('news.saved', $this->link($this->getValue('pagetitle'))));
 		}catch(ValidatorException $e){
-			//print_r($e->error);
+			$this->Handler->assign($e->getMessage());
 		}catch(Exception $e){
 			
 		}
 		
 	}
 	
-	public function onAdd(){
-		$this->add();
-		
-		$this->Handler->template('edit')->assign($this->format());
-	}
-	
 	public function onEdit(){
-		/*$this->edit(array(
-			'edit' => array('uid' => 1),
-			'preventDefault' => true,
-		));*/
 		$this->edit();
 		
-		if($this->editing)
-			$this->Handler->assign('Editing: '.$this->form->getValue('title'));
-		
-		$this->Handler->assign($this->format);
+		$this->Handler->assign($this->format());
 	}
 	
-	public function onView(){
-		$this->data->limit(0)->order('time DESC')->retrieve();
+	public function onDelete($title){
+		if(!User::checkSession($this->post['session'])){
+			$this->Handler->assign(array(
+				'out' => 'error',
+				'msg' => Lang::retrieve('validator.session'),
+			));
+			
+			return;
+		}
 		
-		$this->Handler->template('view.php');
+		db::delete($this->table)->where(array(
+			'pagetitle' => array($title, 'pagetitle'),
+		))->query();
+		
+		$this->Handler->assign(array(
+			'out' => 'success',
+			'msg' => Lang::retrieve('deleted'),
+		));
+	}
+	
+	public function onView($title){
+		$this->data->limit(0)->order('time DESC');
+		if($title)
+			$this->data->where(array(
+				'pagetitle' => array($title, 'pagetitle'),
+			))->limit(1);
+		else
+			$this->isIndex = true;
+		
+		$this->data->retrieve();
+		
+		foreach($this->data as $n)
+			$users[] = $n['uid'];
+		
+		foreach(db::select('users')->fields('id, name')->where(Data::in('id', $users))->limit(0)->retrieve() as $user)
+			$this->usernames[$user['id']] = $user['name'];
+		
+		if(Handler::behaviour('html'))
+			$this->Handler->template('view.php');
+		elseif(Handler::behaviour('xml'))
+			$this->Handler->template('xmlview.php');
+	}
+	
+	public function populate(){
+		/*
+			This method gets automatically called by the edit and save handler
+			to populate some stuff with data you may need :)
+		*/
+		
+		$this->requireSession(); // Adds an invisible element with the current session so everything is safe :)
 	}
 }

@@ -1,11 +1,65 @@
-news.posted = 'Posted by %s on %s';
+rss.title = 'News-Feed';
+title = 'Title';
+text = 'Content';
+save = 'Save';
+edit = 'Edit';
+delete = 'Delete';
+confirmdelete = 'Are you sure to delete this entry?';
+deleted = 'The entry has been deleted!';
 
-#test me blah = 'asdf'; asdf 
+source = 'View Source';
 
-news.other = 'Some \' other news';
+namespace news {
+	posted = 'Posted by <b>%s</b> on %s';
+	
+	add = 'Add news';
+	
+	saved = '<b>Your entry has been saved.</b><br/><br/>
+		<a href="%s" class="go icon">Go to the News-Entry</a>';
+}
 
-# Remember to escape \{ and \} properly :)
-namespace test {
-	blah = 'Testing';
-	another = 'This \{ is a \} test with \'escaping\' some stuff';
+namespace page {
+	saved = '<b>Your page has been saved.</b><br/><br/>
+		<a href="%s" class="go icon">Go to the Page</a>';
+	
+	notavailable = '<span class="icon go">This page is not available.</span>';
+}
+
+# The namespace for the framework :)
+namespace framework {
+	description = '<span class="blue">Styx</span> is a PHP-Framework in an early alpha
+		stage.<br/><br/>Here goes some interesting text about the Framework, seriously.';
+}
+
+namespace user {
+	name = 'Username';
+	pwd = 'Password';
+	login = 'Login';
+	logout = 'Logout';
+	
+	admin = 'Administration';
+	
+	hello = 'Hello %s';
+	
+	loggedin = '<h1>Administration</h1>
+		<span class="bold go">Welcome %s</span>';
+}
+
+namespace validator {
+	prefix = '<span class="icon go">';
+	suffix = '</span>';
+	
+	# Default
+	rights = 'You don\'t have the necessary rights to access this page.';
+	session = 'Your session has been expired. Please try again.';
+	handler = 'The Webserver does not know how to process your request.';
+	notempty = 'The field "<b>%s</b>" must not be empty';
+	
+	data = 'It was not possible to process your input data. Please try again.';
+	pagetitle = 'The field "<b>%s</b>" can only contain letters, numbers or an underscore (_).';
+	default = 'The field "<b>%s</b>" contains an invalid value.';
+	
+	# Custom
+	
+	onlyedit = 'You can only edit pages but not add new ones.';
 }

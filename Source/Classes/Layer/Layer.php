@@ -303,19 +303,16 @@ abstract class Layer extends Runner {
 	}
 	
 	public function link($title = null, $event = null, $handler = null){
-		/* Yes, you heard me: Layer static, not self */
+		/* Yes, you heard me: Layer static, not self - just for speed purposes */
 		if(!Layer::$Config)
 			Layer::$Config = array(
 				'path.separator' => Core::retrieve('path.separator'),
+				'app.link' => Core::retrieve('app.link'),
 			);
-		
-		if(!$title && !$event) return $this->base;
 		
 		$default = $this->getDefaultEvent('view');
 		if(!$event || !in_array($event, $this->methods))
 			$event = $default;
-		
-		if(!$title) return $this->base.'/'.$event;
 		
 		if($handler){
 			if($this->hasCustomHandler($event)){
@@ -325,7 +322,12 @@ abstract class Layer extends Runner {
 				unset($handler);
 			}
 		}
-		return ($handler ? 'handler'.Layer::$Config['path.separator'].$handler.'/' : '').$this->base.'/'.(in_array($title, $this->methods) || $event!=$default ? $event.Layer::$Config['path.separator'] : '').$title;
+		
+		$base = Layer::$Config['app.link'].($handler ? 'handler'.Layer::$Config['path.separator'].$handler.'/' : '').$this->base;
+		
+		if(!$title && (!$event || $event==$default)) return $base;
+		
+		return $base.'/'.(!$title ? $event : (in_array($title, $this->methods) || $event!=$default ? $event.Layer::$Config['path.separator'] : '').$title);
 	}
 	
 	public function hasRight(){

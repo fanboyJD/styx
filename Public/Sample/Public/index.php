@@ -2,45 +2,63 @@
 	include('../../../Source/index.php');
 	
 	function initialize(){
+		Script::set('
+			if(!window.console) window.console = {log: $empty};
+			
+			var Config = '.json_encode(array(
+				'separator' => Core::retrieve('path.separator'),
+			)).';
+		', true);
+		
 		PackageManager::add('package1.js', array(
 			'type' => 'js',
-			'files' => 'mootools',
+			'files' => array('mootools', 'site'),
 		));
 		
 		PackageManager::add('style.css', array(
 			'type' => 'css',
-			'files' => 'style',
+			'files' => array('style', 'forms'),
 		));
+		
+		Route::connect(array(
+			array('logout', 'equalsAll')
+		), array('login', 'logout'));
+		
+		Route::connect(array(
+			array('admin', 'equalsAll')
+		), 'admin.php');
 	}
 	
+	$user = User::retrieve();
+	if($user) Script::set('User = '.json_encode(array(
+			'session' => $user['session'],
+		)).';');
+	
 	if(Handler::behaviour('html'))
-		Handler::map()->template('index')->assign(array(
+		Handler::map()->template('html.php')->assign(array(
 			'app.name' => Core::retrieve('app.name'),
 			'app.link' => Core::retrieve('app.link'),
 			'scripts' => Script::get(),
-		))->parse();
-	else
-		Handler::map()->disable();
-	
-	/*
-	if(Handler::behaviour('json'))
-		Handler::map()->assign(array(
-			'test' => 'a',
-			'body' => array(
-				'here goes something that could be used for an API :)',
+			
+			'source' => 'http://framework.og5.net/dev/browser/trunk/Public/Sample',
+			
+			'menu' => Layer::run('page', 'menu')->parse(),
+			
+			'rss' => array(
+				'link' => Layer::retrieve('index')->link(null, null, 'xml'),
+				'title' => Lang::retrieve('rss.title'),
 			),
-		))->filter('body')->parse();
-	
-	if(Handler::behaviour('xml'))
+			
+			'user' => ($user ? Lang::get('user.hello', $user['name']).' | <a href="admin">'.Lang::retrieve('user.admin').'</a> | ' : '').'
+				<a href="'.Layer::retrieve('login')->link(null, $user ? 'logout' : null).'">'.Lang::retrieve('user.'.($user ? 'logout' : 'login')).'</a>'
+		))->parse();
+	elseif(Handler::behaviour('json'))
+		Handler::map()->substitute('layer')->parse();
+	elseif(Handler::behaviour('xml'))
 		Handler::map()->assign(array(
 			'app.name' => Core::retrieve('app.name'),
 			'app.link' => Core::retrieve('app.link'),
 			'app.mail' => Core::retrieve('app.mail'),
-			'news' => array(
-				'something' => array(
-					'title' => 'asdf',
-					'descr' => 'yes',
-				),
-			),
-		))->setTemplate('rss.php')->parse();
-	*/
+		))->template('rss.php')->parse();
+	else
+		Handler::map()->disable();

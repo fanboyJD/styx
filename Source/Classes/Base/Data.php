@@ -91,7 +91,7 @@ class Data {
 	}
 	
 	public static function in($key, $array){
-		return $key.' IN ('.implode(',', Hash::splat($array)).')';
+		return $key.' IN ('.implode(',', array_unique(Hash::splat($array))).')';
 	}
 	
 	public static function implode($array){

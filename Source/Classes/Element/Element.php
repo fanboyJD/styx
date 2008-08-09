@@ -183,10 +183,8 @@ class Elements extends Element {
 		foreach($this->elements as $n => $el)
 			if(!in_array($el->options['type'], array('field')) && !$el->options[':readOnly'])
 				if($format = $el->format()){
-					if($el->name=='HiddenInput')
-						$els['form.hidden'][] = $format;
-					else
-						$els[$n] = $format;
+					if($el->name=='HiddenInput') $els['form.hidden'][] = $format;
+					else $els[$n] = $format;
 				}
 		
 		if(is_array($els['form.hidden']))
