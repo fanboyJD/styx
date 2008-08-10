@@ -209,7 +209,7 @@ abstract class Layer extends Runner {
 		'preventDefault' => false,
 	)){
 		if(!$this->hasRight(pick($this->baseRights, $this->event), 'add'))
-			return $this->error('rights');
+			throw new ValidatorException('rights');
 		
 		if(!$options['edit'] && !$options['preventDefault'] && $this->event && $this->get['p'][$this->event] && $this->hasRight(pick($this->baseRights, $this->event), 'modify'))
 			$options['edit'] = array(
