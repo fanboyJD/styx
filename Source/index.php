@@ -16,7 +16,6 @@
 	
 	Core::loadClass('Base', 'Cache');
 	Core::loadClass('Base', 'Data');
-	require_once('Classes/Base/Exceptions.php');
 	
 	require_once($path.'Config/Configuration.php');
 	unset($path);

@@ -165,35 +165,39 @@ abstract class Layer extends Runner {
 		$this->post = $post ? $post : $_POST;
 		$this->event = $event[0];
 		
-		$exec = true;
-		
-		if($this->event==$this->getDefaultEvent('save')){
-			if(is_array($this->post) && sizeof($this->post))
-				$this->prepareData($this->post);
+		try{
+			if($this->event==$this->getDefaultEvent('save')){
+				if(is_array($this->post) && sizeof($this->post))
+					$this->prepareData($this->post);
+				else
+					throw new ValidatorException('data');
+			}
+			
+			if(!method_exists($this, $event[1])){
+				$ev = $this->getDefaultEvent('view');
+				$event = array($ev, 'on'.ucfirst($ev));
+				if(!method_exists($this, $event[1]))
+					throw new ValidatorException('handler');
+			}
+			
+			/* When the allowed/disabled Handler arrays are set it checks for their contents
+			   otherwise it checks for the global array that is responsible for the whole layer
+			*/
+			if($this->hasCustomHandler($event[0])){
+				if(!Handler::behaviour($this->allowedHandlers[$event[0]]) && Handler::behaviour($this->disallowedHandlers[$event[0]]))
+					throw new ValidatorException('handler');
+			}elseif(!Handler::behaviour($this->handlers)){
+				throw new ValidatorException('handler');
+			}
+			
+			if($this->hasRight($event[0]))
+				$this->{$event[1]}($this->get['p'][$event[0]]);
 			else
-				$exec = $this->error('data');
-		}
-		
-		if(!method_exists($this, $event[1])){
-			$ev = $this->getDefaultEvent('view');
-			$event = array($ev, 'on'.ucfirst($ev));
-			if(!method_exists($this, $event[1]))
-				$exec = $this->error('handler');
-		}
-		
-		/* When the allowed/disabled Handler arrays are set it checks for their contents
-		   otherwise it checks for the global array that is responsible for the whole layer
-		*/
-		if($this->hasCustomHandler($event[0])){
-			if(!Handler::behaviour($this->allowedHandlers[$event[0]]) && Handler::behaviour($this->disallowedHandlers[$event[0]]))
-				$exec = $this->error('handler');
-		}elseif(!Handler::behaviour($this->handlers)){
-			$exec = $this->error('handler');
-		}
-		
-		if($exec){
-			if($this->hasRight($event[0])) $this->{$event[1]}($this->get['p'][$event[0]]);
-			else $this->error('rights');
+				throw new ValidatorException('rights');
+		}catch(ValidatorException $e){
+			$this->Handler->assign($e->getMessage());
+		}catch(Exception $e){
+			
 		}
 		
 		return $this;
@@ -276,8 +280,8 @@ abstract class Layer extends Runner {
 		$this->validate();
 		
 		$data = $this->form->prepareData();
-		if(!$data) throw new NoDataException();
-		elseif(!$this->table) throw new NoTableException();
+		if(!$data) throw new ValidatorException('data');
+		elseif(!$this->table) throw new ValidatorException();
 		
 		if($where) db::update($this->table)->set($data)->where($where)->query();
 		else db::insert($this->table)->set($data)->query();
@@ -338,16 +342,6 @@ abstract class Layer extends Runner {
 		
 		array_unshift($args, 'layer', $this->name);
 		return User::hasRight($args);
-	}
-	
-	public function error($error){
-		try {
-			throw new ValidatorException($error);
-		}catch(ValidatorException $e){
-			$this->Handler->assign($e->getMessage());
-		}
-		
-		return false;
 	}
 	
 	public function generateSessionName(){

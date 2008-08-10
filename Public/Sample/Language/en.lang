@@ -63,10 +63,9 @@ namespace user {
 }
 
 namespace validator {
-	prefix = '<div class="inner">
-		<span class="icon go">';
-	
-	suffix = '</span></div>';
+	content = '<div class="inner">
+			<span class="icon go">%s</span>
+		</div>';
 	
 	# Default
 	rights = 'You don\'t have the necessary rights to access this page.';

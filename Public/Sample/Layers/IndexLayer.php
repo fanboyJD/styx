@@ -62,16 +62,9 @@ class IndexLayer extends Layer {
 			'pagetitle' => $this->getPagetitle($this->form->getValue('title'), $this->where),
 		));
 		
-		try{
-			$this->save();
-			
-			$this->Handler->assign(Lang::get('news.saved', $this->link($this->getValue('pagetitle'))));
-		}catch(ValidatorException $e){
-			$this->Handler->assign($e->getMessage());
-		}catch(Exception $e){
-			
-		}
+		$this->save();
 		
+		$this->Handler->assign(Lang::get('news.saved', $this->link($this->getValue('pagetitle'))));
 	}
 	
 	public function onEdit(){

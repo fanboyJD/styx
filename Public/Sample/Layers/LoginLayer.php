@@ -28,22 +28,18 @@ class LoginLayer extends Layer {
 	}
 	
 	public function onHandle(){
-		try{
-			$this->validate();
+		$this->validate();
 			
-			$user = $this->data->where(array(
-				'name' => $this->getValue('name'),
-				'AND',
-				'pwd' => md5(Core::retrieve('secure').$this->getValue('pwd')),
-			))->fetch();
-			if(!is_array($user)) throw new ValidatorException('login');
-			
-			$loggedin = User::login($user);
-			
-			$this->Handler->assign(Lang::get('user.loggedin', $user['name']));
-		}catch(ValidatorException $e){
-			$this->Handler->assign($e->getMessage());
-		}
+		$user = $this->data->where(array(
+			'name' => $this->getValue('name'),
+			'AND',
+			'pwd' => md5(Core::retrieve('secure').$this->getValue('pwd')),
+		))->fetch();
+		if(!is_array($user)) throw new ValidatorException('login');
+		
+		$loggedin = User::login($user);
+		
+		$this->Handler->assign(Lang::get('user.loggedin', $user['name']));
 	}
 	
 	public function onLogin(){

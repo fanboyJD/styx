@@ -37,39 +37,25 @@ class PageLayer extends Layer {
 	}
 	
 	public function onSave(){
-		try{
-			if(!$this->editing)
-				throw new ValidatorException('onlyedit');
-			
-			$data = $this->data->where($this->where)->fetch();
-			
-			$this->form->setValue(array(
-				'pagetitle' => $this->getPagetitle($this->form->getValue('title'), $this->where),
-			));
-			
-			$this->save();
-			
-			$this->Handler->assign(Lang::get('page.saved', $this->link($this->getValue('pagetitle'))));
-		}catch(ValidatorException $e){
-			$this->Handler->assign($e->getMessage());
-		}catch(Exception $e){
-			
-		}
+		if(!$this->editing)
+			throw new ValidatorException('onlyedit');
 		
+		$data = $this->data->where($this->where)->fetch();
+		
+		$this->form->setValue(array(
+			'pagetitle' => $this->getPagetitle($this->form->getValue('title'), $this->where),
+		));
+		
+		$this->save();
+		
+		$this->Handler->assign(Lang::get('page.saved', $this->link($this->getValue('pagetitle'))));
 	}
 	
 	public function onEdit(){
 		$this->edit();
 		
-		if(!$this->editing){
-			try{
-				throw new ValidatorException('onlyedit');
-			}catch(ValidatorException $e){
-				$this->Handler->assign($e->getMessage());
-			}
-			
-			return;
-		}
+		if(!$this->editing)
+			throw new ValidatorException('onlyedit');
 		
 		/* We put some styling here as we don't want to add a new Template for that :) */
 		$this->Handler->assign('<div class="inner">
