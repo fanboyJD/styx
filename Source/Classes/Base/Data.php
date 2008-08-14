@@ -60,12 +60,13 @@ class Data {
 	}
 	
 	public static function date($data, $options = array(
-		'separator' => '.',
-		'order' => 'dmy',
+		'separator' => null,
+		'order' => null,
+		'future' => false,
 	)){
-		$data = explode($options['separator'] ? $options['separator'] : '.', $data);
+		$data = explode(pick($options['separator'], '.'), $data);
 		
-		foreach(str_split($options['order'] ? $options['order'] : 'dmy') as $k => $v){
+		foreach(str_split(pick($options['order'], 'dmy')) as $k => $v){
 			if(!self::id($data[$k])) return null;
 			
 			$input[$v] = $data[$k];

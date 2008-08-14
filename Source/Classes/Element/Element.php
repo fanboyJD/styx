@@ -87,6 +87,15 @@ class Element extends Runner {
 		return $this->options['value'];
 	}
 	
+	public function prepareData(){
+		$val = $this->getValue();
+		
+		if($this->options[':validate'][0])
+			$val = Data::call($val, $this->options[':validate']);
+		
+		return $val;
+	}
+	
 	/**
 	 * @return Element
 	 */

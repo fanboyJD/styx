@@ -66,7 +66,7 @@ class Validator {
 	
 	public function date($data, $options = array()){
 		$time = Data::date($data, $options);
-		if(!$time || $time>time() || $time<-2051222961)
+		if(!$time || (!$options['future'] && $time>time()) || $time<-2051222961)
 			return false;
 		
 		return true;

@@ -33,7 +33,7 @@ class Form extends Elements {
 		foreach($data as $k => $v)
 			if($this->elements[$k]){
 				$el = $this->elements[$k];
-				if($raw && (!in_array($el->type, self::$formElements) || $el->options[':alias']))
+				if($raw && (!in_array($el->type, self::$formElements)))
 					continue;
 				
 				$el->setValue(Data::clean($v));
@@ -51,12 +51,7 @@ class Form extends Elements {
 			if($el->type=='button' || $el->options[':readOnly'] || ($alias xor $el->options[':alias']))
 				continue;
 			
-			$val = $el->getValue();
-			
-			if($el->options[':validate'][0])
-				$val = Data::call($val, $el->options[':validate']);
-			
-			$els[$k] = $val;
+			$els[$k] = $el->prepareData();
 		}
 		
 		return sizeof($els) ? $els : false;
