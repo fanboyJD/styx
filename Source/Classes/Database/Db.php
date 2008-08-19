@@ -171,14 +171,10 @@ class db {
 		return false;
 	}
 	
-	//revise this method; escape strings; add the where stuff
-	public function countAll($table = null, $where = null, $field = 'id'){
-		if($table)
-			$sql = 'SELECT COUNT('.$field.') FROM '.$table.' '.$where;
-		else
-			$sql = 'SELECT FOUND_ROWS()';
+	/* Maybe move that to QuerySelect :) */
+	public function count($table = null, $where = null, $field = 'id'){
+		$count = db::select($table)->fields('COUNT('.$field.')')->where($where)->fetch(MYSQL_NUM);
 		
-		$count = $this->fetch($this->query($sql), MYSQL_NUM);
 		return pick($count[0], 0);
 	}
 }

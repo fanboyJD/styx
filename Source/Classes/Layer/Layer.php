@@ -244,6 +244,7 @@ abstract class Layer extends Runner {
 	/* SaveHandler Begin */
 	public function validate(){
 		$validate = $this->form->validate();
+		
 		if($validate!==true) throw new ValidatorException($validate);
 	}
 	
@@ -306,7 +307,7 @@ abstract class Layer extends Runner {
 		return Data::pagetitle($title, $options);
 	}
 	
-	public function link($title = null, $event = null, $handler = null){
+	public function link($title = null, $event = null, $handler = null, $add = null){
 		/* Yes, you heard me: Layer static, not self - just for speed purposes */
 		if(!Layer::$Config)
 			Layer::$Config = array(
@@ -331,7 +332,12 @@ abstract class Layer extends Runner {
 		
 		if(!$title && (!$event || $event==$default)) return $base;
 		
-		return $base.'/'.(!$title ? $event : (in_array($title, $this->methods) || $event!=$default ? $event.Layer::$Config['path.separator'] : '').$title);
+		$array = array();
+		if(is_array($add))
+			foreach($add as $k => $v)
+				$array[] = $k.Layer::$Config['path.separator'].$v;
+		
+		return $base.'/'.(!$title ? $event : (in_array($title, $this->methods) || $event!=$default ? $event.Layer::$Config['path.separator'] : '').$title).(sizeof($array) ? '/'.implode('/', $array) : '');
 	}
 	
 	public function hasRight(){

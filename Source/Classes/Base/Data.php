@@ -34,6 +34,10 @@ class Data {
 		return stripslashes($string);
 	}
 	
+	public static function entities($string){
+		return htmlspecialchars($string, ENT_COMPAT, 'UTF-8', false);
+	}
+	
 	public static function specialchars($string){
 		return trim(htmlspecialchars($string));
 	}

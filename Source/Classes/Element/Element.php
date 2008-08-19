@@ -161,7 +161,7 @@ class Element extends Runner {
 		
 		foreach($a as $key => $val)
 			if($val!==false && !in_array('skip'.ucfirst($key), $options) && !self::skipable($key))
-				$s[] = $key.'="'.($key=='style' ? str_replace('"', "'", $val) : htmlspecialchars($val, ENT_COMPAT, 'UTF-8', false)).'"';
+				$s[] = $key.'="'.($key=='style' ? str_replace('"', "'", $val) : Data::entities($val)).'"';
 		
 		return is_array($s) ? ' '.implode(' ', $s) : '';
 	}
