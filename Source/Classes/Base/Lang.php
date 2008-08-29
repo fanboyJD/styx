@@ -13,6 +13,10 @@ class Lang {
 		self::$Fileparser = new Fileparser('Language/'.self::$lang.'.lang');
 	}
 	
+	public static function getLanguage(){
+		return self::$lang;
+	}
+	
 	public static function retrieve($string){
 		if(!self::$Fileparser) return;
 		

@@ -189,7 +189,7 @@ class Safehtml {
 		$parser->set_element_handler('_openHandler', '_closeHandler');
 		$parser->set_data_handler('_dataHandler');
 		$parser->set_escape_handler('_escapeHandler');
-	
+		
 		$parser->parse($doc);
 		
 		while($tag = array_pop($this->_stack))

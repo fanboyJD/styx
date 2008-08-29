@@ -307,35 +307,48 @@ abstract class Layer extends Runner {
 		return Data::pagetitle($title, $options);
 	}
 	
-	public function link($title = null, $event = null, $handler = null, $add = null){
+	public function link($title = null, $event = null, $options = null){
 		/* Yes, you heard me: Layer static, not self - just for speed purposes */
 		if(!Layer::$Config)
 			Layer::$Config = array(
 				'path.separator' => Core::retrieve('path.separator'),
 				'app.link' => Core::retrieve('app.link'),
+				'language' => Lang::getLanguage(),
 			);
+		
+		if(is_array($title)) $title = $title[$this->options['identifier']['external']];
+		
+		if($options && !is_array($options))
+			$options = array('handler' => $options);
+		
+		if(!$options['lang'])
+			$options['lang'] = Layer::$Config['language'];
 		
 		$default = $this->getDefaultEvent('view');
 		if(!$event || !in_array($event, $this->methods))
 			$event = $default;
 		
-		if($handler){
+		if($options['handler']){
 			if($this->hasCustomHandler($event)){
-				if(!in_array($handler, $this->allowedHandlers[$event]))
-					unset($handler);
-			}elseif(!in_array($handler, $this->handlers)){
-				unset($handler);
+				if(!in_array($options['handler'], $this->allowedHandlers[$event]))
+					unset($options['handler']);
+			}elseif(!in_array($options['handler'], $this->handlers)){
+				unset($options['handler']);
 			}
 		}
 		
-		$base = Layer::$Config['app.link'].($handler ? 'handler'.Layer::$Config['path.separator'].$handler.'/' : '').$this->base;
+		$base = Layer::$Config['app.link'].($options['handler'] ? 'handler'.Layer::$Config['path.separator'].$options['handler'].'/' : '').$this->base;
 		
 		if(!$title && (!$event || $event==$default)) return $base;
 		
+		unset($options['handler']);
+		if($options['lang'] && strtolower($options['lang'])==Layer::$Config['language'])
+			unset($options['lang']);
+		
 		$array = array();
-		if(is_array($add))
-			foreach($add as $k => $v)
-				$array[] = $k.Layer::$Config['path.separator'].$v;
+		if(is_array($options) && sizeof($options))
+			foreach($options as $k => $v)
+				$array[] = $k.($v ? Layer::$Config['path.separator'].$v : '');
 		
 		return $base.'/'.(!$title ? $event : (in_array($title, $this->methods) || $event!=$default ? $event.Layer::$Config['path.separator'] : '').$title).(sizeof($array) ? '/'.implode('/', $array) : '');
 	}
