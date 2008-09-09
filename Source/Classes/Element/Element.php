@@ -227,6 +227,10 @@ class Elements extends Element {
 		return !!$this->elements[$el->options['name']];
 	}
 	
+	public function getElements(){
+		return $this->elements;
+	}
+	
 }
 
 /* INPUT CLASS */
@@ -290,7 +294,8 @@ class Radio extends Element {
 		parent::__construct($options, $name, $type);
 		
 		// This class returns the preset value if wrong value is set
-		$this->options[':empty'] = true;
+		if(!key_exists(':empty', $this->options))
+			$this->options[':empty'] = true;
 		
 		if($type=='radio') $this->addClass('radio');
 	}
@@ -316,6 +321,16 @@ class Radio extends Element {
 				return $this->options['value'];
 		
 		return $this->options[':preset'];
+	}
+	
+	public function getSelectedElement(){
+		$val = $this->getValue();
+		
+		foreach($this->options[':elements'] as $el)
+			if($el['value']==$val)
+				return $el;
+		
+		return null;
 	}
 	
 }

@@ -119,7 +119,8 @@ class Data {
 	}
 	
 	public static function pagetitle($title, $options = array(
-		'id' => null,
+		'id' => null, // Key may be different
+		'identifier' => null,
 		'contents' => null,
 	)){
 		if(!self::$titleRegex)
@@ -132,21 +133,28 @@ class Data {
 		
 		if(self::id($title)) $title = '_'.$title;
 		
+		if(!$options['identifier'])
+			$options['identifier'] = array(
+				'internal' => 'id',
+				'external' => 'pagetitle',
+			);
+		
 		if($options['contents']) return self::checkTitle($title, $options);
 		
 		return $title;
 	}
 	
 	private static function checkTitle($title, $options = array(
+		'id' => null, // Key may be different
+		'identifier' => null,
 		'contents' => null,
-		'id' => null,
 	), $i = 0){
 		if(!is_array($options['contents'])) return $title;
 		
 		foreach($options['contents'] as $content){
-			if(!is_array($content)) $content = array('pagetitle' => $content);
+			if(!is_array($content)) $content = array($options['identifier']['external'] => $content);
 			
-			if((!$options['id'] || $options['id']!=$content['id']) && strtolower($content['pagetitle'])==strtolower($title.(self::id($i) ? (endsWith($title, '_') ? '' : '_').$i : '')))
+			if((!$options[$options['identifier']['internal']] || $options[$options['identifier']['internal']]!=$content[$options['identifier']['internal']]) && strtolower($content[$options['identifier']['external']])==strtolower($title.(self::id($i) ? (endsWith($title, '_') ? '' : '_').$i : '')))
 				return self::checkTitle($title, $options, ++$i);
 		}
 		

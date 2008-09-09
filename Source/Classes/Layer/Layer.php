@@ -18,6 +18,8 @@ abstract class Layer extends Runner {
 		
 		$events = array(
 			'view' => 'view',
+			'edit' => 'edit',
+			'add' => 'edit',
 			'save' => 'save',
 		),
 		
@@ -33,6 +35,8 @@ abstract class Layer extends Runner {
 		$rights = null,
 		
 		$event = null,
+		$errorMessage = null,
+		$errorPrefix = null,
 		$where = null,
 		$editing = false,
 		$preparation = false;
@@ -124,6 +128,9 @@ abstract class Layer extends Runner {
 			);
 		}
 		
+		$prefix = Core::retrieve('elements.prefix');
+		$this->errorPrefix = ($prefix ? $prefix.'.' : '').'form.message';
+		
 		$this->form = $initialize['form'];
 		
 		$rights = Core::retrieve('rights.layer');
@@ -195,7 +202,9 @@ abstract class Layer extends Runner {
 			else
 				throw new ValidatorException('rights');
 		}catch(ValidatorException $e){
-			$this->Handler->assign($e->getMessage());
+			$this->Handler->assign(array(
+				$this->errorPrefix => $e->getMessage(),
+			));
 		}catch(Exception $e){
 			
 		}
@@ -230,6 +239,13 @@ abstract class Layer extends Runner {
 			}
 		}
 		
+		if($this->errorMessage){
+			$prefix = Core::retrieve('elements.prefix');
+			$this->Handler->assign(array(
+				$this->errorPrefix => $this->errorMessage,
+			));
+		}
+		
 		$this->populate();
 		
 		$this->form->get('action', $this->link($data[$this->options['identifier']['external']], $this->getDefaultEvent('save')));
@@ -237,6 +253,7 @@ abstract class Layer extends Runner {
 	
 	public function add($options = null){
 		$array = array('preventDefault' => true);
+		
 		return $this->edit($options ? Hash::extend($options, $array) : $array);
 	}
 	/* EditHandler End */
@@ -245,7 +262,17 @@ abstract class Layer extends Runner {
 	public function validate(){
 		$validate = $this->form->validate();
 		
-		if($validate!==true) throw new ValidatorException($validate);
+		if($validate!==true){
+			try{
+				throw new ValidatorException($validate);
+			}catch(Exception $e){
+				$this->errorMessage = $e->getMessage();
+				
+				$this->handle($this->getDefaultEvent($this->editing ? 'edit' : 'add'));
+			}
+			
+			throw new ValidatorException($validate); // I trick you :)
+		}
 	}
 	
 	public function prepareData($data){
@@ -297,12 +324,14 @@ abstract class Layer extends Runner {
 		return $this->events[$event] = strtolower($name);
 	}
 	
-	public function getPagetitle($title, $where){
+	public function getPagetitle($title, $where, $options = array()){
 		if($this->table)
-			$options['contents'] = db::select($this->table)->fields('id, pagetitle')->retrieve();
+			$options['contents'] = Hash::extend(Hash::splat($options['contents']), db::select($this->table)->fields(array_unique($this->options['identifier']))->retrieve());
 		
 		if($where[$this->options['identifier']['internal']])
-			$options['id'] = Data::call($where[$this->options['identifier']['internal']][0], $where[$this->options['identifier']['internal']][1]);
+			$options[$this->options['identifier']['internal']] = Data::call($where[$this->options['identifier']['internal']][0], $where[$this->options['identifier']['internal']][1]);
+		
+		$options['identifier'] = $this->options['identifier'];
 		
 		return Data::pagetitle($title, $options);
 	}
@@ -339,8 +368,6 @@ abstract class Layer extends Runner {
 		
 		$base = Layer::$Config['app.link'].($options['handler'] ? 'handler'.Layer::$Config['path.separator'].$options['handler'].'/' : '').$this->base;
 		
-		if(!$title && (!$event || $event==$default)) return $base;
-		
 		unset($options['handler']);
 		if($options['lang'] && strtolower($options['lang'])==Layer::$Config['language'])
 			unset($options['lang']);
@@ -350,7 +377,12 @@ abstract class Layer extends Runner {
 			foreach($options as $k => $v)
 				$array[] = $k.($v ? Layer::$Config['path.separator'].$v : '');
 		
-		return $base.'/'.(!$title ? $event : (in_array($title, $this->methods) || $event!=$default ? $event.Layer::$Config['path.separator'] : '').$title).(sizeof($array) ? '/'.implode('/', $array) : '');
+		if(sizeof($array)) $array = '/'.implode('/', $array);
+		else $array = null;
+		
+		if(!$title && (!$event || $event==$default)) return $base.$array;
+		
+		return $base.'/'.(!$title ? $event : (in_array($title, $this->methods) || $event!=$default ? $event.Layer::$Config['path.separator'] : '').$title).$array;
 	}
 	
 	public function hasRight(){

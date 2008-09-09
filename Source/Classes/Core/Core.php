@@ -149,7 +149,7 @@ class Core extends StaticStorage {
 	}
 	
 	public static function mkdir($path, $mode = 0777){
-		return is_dir($path) || ( self::mkdir(dirname($path), $mode) && self::rmkdir($path, $mode));
+		return is_dir($path) || (self::mkdir(dirname($path), $mode) && self::rmkdir($path, $mode));
 	}
 	
 	private static function rmkdir($path, $mode = 0777){

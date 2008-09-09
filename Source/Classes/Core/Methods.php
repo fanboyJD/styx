@@ -1,6 +1,6 @@
 <?php
 	
-	function pick($a, $b){
+	function pick($a, $b = null){
 		return $a ? $a : $b;
 	}
 	
