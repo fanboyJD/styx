@@ -195,7 +195,7 @@ class PackageManager {
 			if($require['login'] && !User::retrieve())
 				return false;
 			
-			if($require['browser'] && $require['browser']!=$uagent['browser'] && (!$require['version'] || !in_array($require['version'], Hash::splat($uagent['version']))))
+			if($require['browser'] && $require['browser']!=$uagent['browser'] && (!$require['version'] || !in_array($uagent['version'], Hash::splat($require['version']))))
 				return false;
 		}
 		
