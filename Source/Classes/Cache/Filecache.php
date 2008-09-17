@@ -25,9 +25,9 @@ class Filecache {
 		$file = $this->root.$this->prefix.'/'.$key.'.txt';
 		
 		if(!file_exists($file)){
+			Core::mkdir(dirname($file));
+			
 			try{
-				Core::mkdir(dirname($file));
-				
 				touch($file); 
 				chmod($file, 0777);
 			}catch(Exception $e){}
@@ -38,7 +38,7 @@ class Filecache {
 	
 	public function erase($key, $force = false){
 		$files = glob($this->root.$this->prefix.'/'.$key.'.txt');
-		if(!is_array($files))
+		if(!is_array($files) || !sizeof($files))
 			return;
 		
 		try{

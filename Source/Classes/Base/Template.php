@@ -102,16 +102,25 @@ class Template extends Runner {
 		
 		Hash::flatten($this->assigned);
 		
-		preg_match_all('/\\$\{([A-z0-9\.:]+)\}/i', $out, $vars);
+		preg_match_all('/\\$\{([A-z0-9\.:\s|]+)\}/i', $out, $vars);
 		
 		$rep = array(array_values($vars[0]));
-		foreach($vars[1] as $val)
-			if($this->assigned[$val])
-				$rep[1][] = $this->assigned[$val];
-			elseif(startsWith($val, 'lang.'))
-				$rep[1][] = Lang::retrieve(substr($val, 5));
-			else
-				$rep[1][] = '';
+		$i = 0;
+		foreach($vars[1] as $v){
+			foreach(Hash::splat(Data::clean(explode('|', $v))) as $val){
+				if($this->assigned[$val]){
+					$rep[1][$i] = $this->assigned[$val];
+					break;
+				}elseif(startsWith($val, 'lang.') && $lang = Lang::retrieve(substr($val, 5))){
+					$rep[1][$i] = $lang;
+					break;
+				}
+			}
+			
+			if(!$rep[1][$i]) $rep[1][$i] = '';
+			
+			$i++;
+		}
 		
 		$rep[0][] = "\t";
 		$rep[1][] = '';

@@ -14,7 +14,7 @@
 	Core::store('path', $path);
 	Core::store('app.path', realpath('../').'/');
 	
-	Core::loadClass('Base', 'Cache');
+	Core::loadClass('Cache', 'Cache');
 	Core::loadClass('Base', 'Data');
 	
 	require_once($path.'Config/Configuration.php');

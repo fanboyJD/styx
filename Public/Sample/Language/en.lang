@@ -62,6 +62,11 @@ namespace user {
 		</div>';
 }
 
+namespace admin {
+	cache = 'Clear Cache';
+	erased = 'Cache cleared';
+}
+
 namespace validator {
 	content = '<div class="inner">
 			<span class="icon go">%s</span>

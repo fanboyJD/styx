@@ -1,5 +1,5 @@
 <?php
-	include('../../../Source/index.php');
+	include('../../../Source/Styx.php');
 	
 	function initialize(){
 		Script::set('

@@ -9,6 +9,9 @@ Core::registerClasses('Element', array(
 
 // Here's the basic configuration
 Core::store(array(
+	'styx.version' => '0.2dev',
+	'styx.name' => 'Styx PHP Framework',
+	
 	'path.separator' => ':',
 	
 	'app.version' => '1',
