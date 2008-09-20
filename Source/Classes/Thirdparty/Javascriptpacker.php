@@ -1,70 +1,12 @@
 <?php
-/* 9 April 2008. version 1.1
- * 
- * This is the php version of the Dean Edwards JavaScript's Packer,
- * Based on :
- * 
- * ParseMaster, version 1.0.2 (2005-08-19) Copyright 2005, Dean Edwards
- * a multi-pattern parser.
- * KNOWN BUG: erroneous behavior when using escapeChar with a replacement
- * value that is a function
- * 
- * packer, version 2.0.2 (2005-08-19) Copyright 2004-2005, Dean Edwards
- * 
- * License: http://creativecommons.org/licenses/LGPL/2.1/
- * 
- * Ported to PHP by Nicolas Martin.
- * 
- * ----------------------------------------------------------------------
- * changelog:
- * 1.1 : correct a bug, '\0' packed then unpacked becomes '\'.
- * ----------------------------------------------------------------------
- * 
- * examples of usage :
- * $myPacker = new JavaScriptPacker($script, 62, true, false);
- * $packed = $myPacker->pack();
- * 
- * or
- * 
- * $myPacker = new JavaScriptPacker($script, 'Normal', true, false);
- * $packed = $myPacker->pack();
- * 
- * or (default values)
- * 
- * $myPacker = new JavaScriptPacker($script);
- * $packed = $myPacker->pack();
- * 
- * 
- * params of the constructor :
- * $script:       the JavaScript to pack, string.
- * $encoding:     level of encoding, int or string :
- *                0,10,62,95 or 'None', 'Numeric', 'Normal', 'High ASCII'.
- *                default: 62.
- * $fastDecode:   include the fast decoder in the packed result, boolean.
- *                default : true.
- * $specialChars: if you are flagged your private and local variables
- *                in the script, boolean.
- *                default: false.
- * 
- * The pack() method return the compressed JavasScript, as a string.
- * 
- * see http://dean.edwards.name/packer/usage/ for more information.
- * 
- * Notes :
- * # need PHP 5 . Tested with PHP 5.1.2, 5.1.3, 5.1.4, 5.2.3
- * 
- * # The packed result may be different than with the Dean Edwards
- *   version, but with the same length. The reason is that the PHP
- *   function usort to sort array don't necessarily preserve the
- *   original order of two equal member. The Javascript sort function
- *   in fact preserve this order (but that's not require by the
- *   ECMAScript standard). So the encoded keywords order can be
- *   different in the two results.
- * 
- * # Be careful with the 'High ASCII' Level encoding if you use
- *   UTF-8 in your files... 
+/*
+ * JavaScriptPacker - Lesser GNU General Public License 2.1
+ * Author: Nicolas Martin
+ * URL: http://joliclic.free.fr/php/javascript-packer/en/
+ *
+ * Usage: Compresses JavaScript files
+ *
  */
-
 
 class JavaScriptPacker {
 	// constants

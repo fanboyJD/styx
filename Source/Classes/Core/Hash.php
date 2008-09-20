@@ -1,4 +1,12 @@
 <?php
+/*
+ * Styx::Hash - MIT-style License
+ * Author: christoph.pojer@gmail.com
+ *
+ * Usage: Provides useful methods for altering Arrays
+ *
+ */
+
 class Hash {
 	
 	public static function remove(&$array, $value){

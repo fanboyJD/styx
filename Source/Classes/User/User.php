@@ -1,4 +1,12 @@
 <?php
+/*
+ * Styx::User - MIT-style License
+ * Author: christoph.pojer@gmail.com
+ *
+ * Usage: Handles user login and user data
+ *
+ */
+
 class User {
 	
 	/**

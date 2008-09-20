@@ -1,5 +1,12 @@
 <?php
-/* ELEMENT CLASS */
+/*
+ * Styx::Element - MIT-style License
+ * Author: christoph.pojer@gmail.com
+ *
+ * Usage: Various classes for use in forms to automate data input and processing
+ *
+ */
+
 class Element extends Runner {
 	
 	public $name = null,
@@ -70,7 +77,7 @@ class Element extends Runner {
 	}
 	
 	public static function skipable($key){
-		return startsWith($key, ':');
+		return String::starts($key, ':');
 	}
 	
 	public function setValue($v){

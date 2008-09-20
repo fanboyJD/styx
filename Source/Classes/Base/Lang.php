@@ -1,4 +1,12 @@
 <?php
+/*
+ * Styx::Lang - MIT-style License
+ * Author: christoph.pojer@gmail.com
+ *
+ * Usage: Reads the language file and provides an interface to retrieve the data
+ *
+ */
+
 class Lang {
 	
 	/**

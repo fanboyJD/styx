@@ -1,4 +1,9 @@
 <?php
+/*
+ * Styx - MIT-style License
+ * Author: christoph.pojer@gmail.com
+ */
+
 define('ONE_DAY', 86400);
 define('ONE_WEEK', 604800);
 

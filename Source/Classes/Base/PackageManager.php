@@ -1,4 +1,12 @@
 <?php
+/*
+ * Styx::PackageManager - MIT-style License
+ * Author: christoph.pojer@gmail.com
+ *
+ * Usage: Manages, compresses and streams packages (CSS/JavaScript/...) for the application to the client
+ *
+ */
+
 class PackageManager {
 	
 	private static $Directories = array(

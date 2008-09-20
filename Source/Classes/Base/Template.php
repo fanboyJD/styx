@@ -1,4 +1,13 @@
 <?php
+/*
+ * Styx::Template - MIT-style License
+ * Author: christoph.pojer@gmail.com
+ *
+ * Usage: Parses files and replaces their contents with dynamic data
+ *
+ */
+
+
 class Template extends Runner {
 	
 	protected $assigned = array(),
@@ -111,7 +120,7 @@ class Template extends Runner {
 				if($this->assigned[$val]){
 					$rep[1][$i] = $this->assigned[$val];
 					break;
-				}elseif(startsWith($val, 'lang.') && $lang = Lang::retrieve(substr($val, 5))){
+				}elseif(String::starts($val, 'lang.') && $lang = Lang::retrieve(substr($val, 5))){
 					$rep[1][$i] = $lang;
 					break;
 				}

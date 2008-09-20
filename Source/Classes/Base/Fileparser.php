@@ -1,4 +1,12 @@
 <?php
+/*
+ * Styx::Fileparser - MIT-style License
+ * Author: christoph.pojer@gmail.com
+ *
+ * Usage: Parse files to retrieve their values (e.g. for Language-Strings)
+ *
+ */
+
 class Fileparser extends DynamicStorage {
 	
 	/* Big thanks to sorccu from the MooTools-Channel =) */

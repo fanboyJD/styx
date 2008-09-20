@@ -1,4 +1,12 @@
 <?php
+/*
+ * Styx::Route - MIT-style License
+ * Author: christoph.pojer@gmail.com
+ *
+ * Usage: Checks whether to connect to a certain file or layer
+ *
+ */
+
 class Route {
 	
 	private static $mainLayer = null,
@@ -80,7 +88,7 @@ class Route {
 					||
 					(($route['type']=='equalsAll') && $urlpart==$route['match'])
 					||
-					($route['type']=='startsWith' && startsWith($urlpart, $route['match']))
+					($route['type']=='startsWith' && String::starts($urlpart, $route['match']))
 					||
 					($route['type']=='regex' && preg_match('/'.$route['match'].'/', $urlpart))
 				){

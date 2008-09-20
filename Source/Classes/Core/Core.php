@@ -1,4 +1,15 @@
 <?php
+/*
+ * Styx::Core - MIT-style License
+ * Author: christoph.pojer@gmail.com
+ *
+ * Usage: Initializes the Styx Framework and handles basic stuff
+ *
+ */
+
+function pick($a, $b = null){
+	return $a ? $a : $b;
+}
 
 abstract class Runner {
 	
@@ -25,7 +36,7 @@ class Core extends StaticStorage {
 	}
 	
 	public static function autoload($class){
-		$file = self::classExists($class, endsWith($class, 'layer') && strlen($class)>5 ? 'Layers' : 'Classes');
+		$file = self::classExists($class, String::ends($class, 'layer') && strlen($class)>5 ? 'Layers' : 'Classes');
 		
 		if($file && !class_exists($class)) require_once($file);
 		

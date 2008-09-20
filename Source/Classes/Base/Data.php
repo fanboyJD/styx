@@ -1,7 +1,12 @@
 <?php
 /*
-	Used for formatting/validating/sanitizing database input stuff
-*/
+ * Styx::Data - MIT-style License
+ * Author: christoph.pojer@gmail.com
+ *
+ * Usage: Format/Validate/Sanitize Input-data
+ *
+ */
+
 class Data {
 	
 	private static $titleRegex = null;
@@ -154,11 +159,11 @@ class Data {
 		foreach($options['contents'] as $content){
 			if(!is_array($content)) $content = array($options['identifier']['external'] => $content);
 			
-			if((!$options[$options['identifier']['internal']] || $options[$options['identifier']['internal']]!=$content[$options['identifier']['internal']]) && strtolower($content[$options['identifier']['external']])==strtolower($title.(self::id($i) ? (endsWith($title, '_') ? '' : '_').$i : '')))
+			if((!$options[$options['identifier']['internal']] || $options[$options['identifier']['internal']]!=$content[$options['identifier']['internal']]) && strtolower($content[$options['identifier']['external']])==strtolower($title.(self::id($i) ? (String::ends($title, '_') ? '' : '_').$i : '')))
 				return self::checkTitle($title, $options, ++$i);
 		}
 		
-		return $title.(self::id($i) ? (endsWith($title, '_') ? '' : '_').$i : '');
+		return $title.(self::id($i) ? (String::ends($title, '_') ? '' : '_').$i : '');
 	}
 	
 	public static function purify($data, $options = array()){

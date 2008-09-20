@@ -1,4 +1,12 @@
 <?php
+/*
+ * Styx::Storage - MIT-style License
+ * Author: christoph.pojer@gmail.com
+ *
+ * Usage: Provides an interface to store certain data
+ *
+ */
+
 class DynamicStorage {
 	
 	protected $Storage = array();
@@ -32,7 +40,7 @@ class DynamicStorage {
 	
 	public function eraseBy($key){
 		foreach($this->Storage as $k => $v)
-			if(startsWith($k, $key))
+			if(String::starts($k, $key))
 				unset($this->Storage[$k]);
 	}
 	

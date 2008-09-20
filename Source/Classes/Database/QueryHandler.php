@@ -1,4 +1,12 @@
 <?php
+/*
+ * Styx::QueryHandler - MIT-style License
+ * Author: christoph.pojer@gmail.com
+ *
+ * Usage: Handles and processes UPDATE/INSERT/DELETE SQL-Statements
+ *
+ */
+
 class QueryHandler {
 	
 	protected static $Types = array('update', 'insert', 'delete');
@@ -10,22 +18,23 @@ class QueryHandler {
 	
 	public function __construct($table, $type){
 		if(!in_array($type, self::$Types))
-			$type = 'select';
+			$type = 'update';
 		
 		$this->type = $type;
 		$this->table = $table;
 		
-		// We cannot extend from DynamicStorage due to the
-		// use of store/retrieve in QuerySelect
+		/*
+		 * We cannot extend from DynamicStorage due to the
+		 * use of store/retrieve in QuerySelect
+		 */
 		$this->Storage = new DynamicStorage();
 	}
 	
 	/*
-		UPDATE and INSERT allow two input methods:
-			(string) "myField='something', myOtherField=10"
-			array(field=>value)
-	*/
-	
+	 *	UPDATE and INSERT allow two input methods:
+	 *		(string) "myField='something', myOtherField=10"
+	 *		array(field=>value)
+	 */
 	protected function formatSet(){
 		$data = $this->Storage->retrieve('set');
 		if(!is_array($data))
@@ -38,12 +47,12 @@ class QueryHandler {
 	}
 	
 	/*
-		WHERE allows the following input methods:
-			(int) 15 => "id='15'"
-			(string) "id='15'"
-			array(id=>15, 'AND', Data::in('uid', array(1, 2, 3)))
-			array(array('id' => 5), 'OR', array('id' => 6))
-	*/
+	 *	WHERE allows the following input methods:
+	 *		(int) 15 => "id='15'"
+	 *		(string) "id='15'"
+	 *		array(id=>15, 'AND', Data::in('uid', array(1, 2, 3)))
+	 *		array(array('id' => 5), 'OR', array('id' => 6))
+	 */
 	protected function formatWhere($deep = null){
 		if($deep)
 			$data = &$deep;

@@ -1,4 +1,12 @@
 <?php
+/*
+ * Styx::Script - MIT-style License
+ * Author: christoph.pojer@gmail.com
+ *
+ * Usage: Holds certain JavaScript to be streamed to the client
+ *
+ */
+
 class Script {
 	private static $script = array(),
 		$API = array('log', 'debug', 'info', 'warn', 'error', 'assert', 'dir', 'dirxml', 'trace', 'group', 'groupEnd', 'time', 'timeEnd', 'profile', 'profileEnd', 'count');

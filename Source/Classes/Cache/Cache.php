@@ -1,4 +1,13 @@
 <?php
+/*
+ * Styx::Cache - MIT-style License
+ * Author: christoph.pojer@gmail.com
+ *
+ * Usage: Caches certain data (automatically) to an extension or to the harddisk
+ *
+ */
+
+
 class Cache extends DynamicStorage {
 	private $prefix = 'framework',
 		$root = './Cache/',
@@ -51,10 +60,7 @@ class Cache extends DynamicStorage {
 	public function retrieve($key, $id, $ttl = null, $decode = true){
 		$content = parent::retrieve($key.'/'.$id);
 		if(!$content){
-			if($this->engineInstance && $ttl!='file')
-				$content = $this->engineInstance->retrieve($key.'/'.$id);
-			else
-				$content = $this->filecacheInstance->retrieve($key.'/'.$id);
+			$content = $this->{$this->engineInstance && $ttl!='file' ? 'engineInstance' : 'filecacheInstance'}->retrieve($key.'/'.$id);
 			
 			if(!$content) return null;
 			
@@ -68,35 +74,33 @@ class Cache extends DynamicStorage {
 	public function store($key, $id, $input, $ttl = 3600, $encode = true){
 		if(!$input) return;
 		
-		parent::store($key.'/'.$id, $input);
-		
 		$content = $encode ? json_encode(Data::clean($input)) : $input;
-		if($this->engineInstance && $ttl!='file')
-			$this->engineInstance->store($key.'/'.$id, $content, $ttl);
-		else
-			$this->filecacheInstance->store($key.'/'.$id, $content, $ttl);
 		
-		return $input;
+		$this->{$this->engineInstance && $ttl!='file' ? 'engineInstance' : 'filecacheInstance'}->store($key.'/'.$id, $content, $ttl);
+		
+		return parent::store($key.'/'.$id, $input);;
 	}
 	
 	public function erase($key, $id, $force = false){
-		parent::erase($key.'/'.$id);
+		$name = $key.'/'.$id;
+		parent::erase($name);
 		
 		if($this->engineInstance)
-			$this->engineInstance->erase($key.'/'.$id);
+			$this->engineInstance->erase($name);
 		
 		if($force || !$this->engineInstance)
-			$this->filecacheInstance->erase($key.'/'.$id, $force);
+			$this->filecacheInstance->erase($name, $force);
 	}
 	
 	public function eraseBy($key, $id, $force = false){
-		parent::eraseBy($key.'/'.$id);
+		$name = $key.'/'.$id;
+		parent::eraseBy($name);
 		
 		if($this->engineInstance)
-			$this->engineInstance->eraseBy($key.'/'.$id);
+			$this->engineInstance->eraseBy($name);
 
 		if($force || !$this->engineInstance)
-			$this->filecacheInstance->erase($key.'/'.$id.'*', $force);
+			$this->filecacheInstance->eraseBy($name, $force);
 	}
 	
 	public function eraseAll($force = false){
@@ -106,6 +110,6 @@ class Cache extends DynamicStorage {
 			$this->engineInstance->eraseAll();
 		
 		if($force || !$this->engineInstance)
-			$this->filecacheInstance->erase('*/*', $force);
+			$this->filecacheInstance->eraseAll($force);
 	}
 }

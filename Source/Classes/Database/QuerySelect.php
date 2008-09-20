@@ -1,4 +1,12 @@
 <?php
+/*
+ * Styx::QuerySelect - MIT-style License
+ * Author: christoph.pojer@gmail.com
+ *
+ * Usage: Handles and processes SELECT SQL-Statements
+ *
+ */
+
 class QuerySelect extends QueryHandler implements Iterator {
 	
 	private $cache = array(),

@@ -1,4 +1,13 @@
 <?php
+/*
+ * Styx::Filecache - MIT-style License
+ * Author: christoph.pojer@gmail.com
+ *
+ * Usage: Cache-Interface for Harddisk-Storage
+ *
+ */
+
+
 class Filecache {
 	
 	public $prefix = null,
@@ -44,10 +53,19 @@ class Filecache {
 		try{
 			foreach($files as $file){
 				$content = explode('|', file_get_contents($file), 2);
-				if($content[0]=='file' && $force!='file')
+				if($content[0]=='file' && !$force)
 					continue;
+				
 				unlink($file);
 			}
 		}catch(Exception $e){}
+	}
+	
+	public function eraseBy($key, $force = false){
+		$this->eraseBy($key.'*', $force);
+	}
+	
+	public function eraseAll($force = false){
+		$this->erase('*/*', $force);
 	}
 }

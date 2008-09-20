@@ -1,4 +1,12 @@
 <?php
+/*
+ * Styx::Layer - MIT-style License
+ * Author: christoph.pojer@gmail.com
+ *
+ * Usage: Responsible for all kind of data in- and output
+ *
+ */
+
 abstract class Layer extends Runner {
 	/**
 	 * @var Form
@@ -104,7 +112,7 @@ abstract class Layer extends Runner {
 		self::$Layers['Instances'][$this->layername] = $this;
 		
 		foreach(get_class_methods($this) as $m)
-			if(startsWith($m, 'on') && strlen($m)>=3)
+			if(String::starts($m, 'on') && strlen($m)>=3)
 				$this->methods[] = strtolower(substr($m, 2));
 		
 		$initialize = $this->initialize();

@@ -1,4 +1,13 @@
 <?php
+/*
+ * Styx::ValidatorException - MIT-style License
+ * Author: christoph.pojer@gmail.com
+ *
+ * Usage: This exception is raised mostly somewhere in a Layer
+ *
+ */
+
+
 class ValidatorException extends Exception {
 	
 	protected static $content = false;

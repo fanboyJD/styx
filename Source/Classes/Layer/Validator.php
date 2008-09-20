@@ -1,4 +1,12 @@
 <?php
+/*
+ * Styx::Validator - MIT-style License
+ * Author: christoph.pojer@gmail.com
+ *
+ * Usage: Validates input data to enable feedback to be send to the client
+ *
+ */
+
 class Validator {
 	
 	private static $Instance;

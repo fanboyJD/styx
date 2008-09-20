@@ -1,4 +1,13 @@
 <?php
+/*
+ * Styx::Tree - MIT-style License
+ * Author: christoph.pojer@gmail.com
+ *
+ * Usage: Creates a tree of (database) data to allow certain operations on it
+ *
+ */
+
+
 class Tree {
 	
 	/**

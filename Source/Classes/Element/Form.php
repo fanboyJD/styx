@@ -1,4 +1,12 @@
 <?php
+/*
+ * Styx::Form - MIT-style License
+ * Author: christoph.pojer@gmail.com
+ *
+ * Usage: Holds different Elements and executes methods on them
+ *
+ */
+
 class Form extends Elements {
 	
 	protected static $prefix = false;

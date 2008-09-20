@@ -1,4 +1,12 @@
 <?php
+/*
+ * Styx::Handler - MIT-style License
+ * Author: christoph.pojer@gmail.com
+ *
+ * Usage: Sets the output-header and parses all data to stream it to the client
+ *
+ */
+
 class Handler extends Template {
 	
 	private static $Instances = array(
@@ -182,7 +190,7 @@ class Handler extends Template {
 		}
 		
 		foreach($this->assigned as $k => $val)
-			if(!startsWith($k, $string))
+			if(!String::starts($k, $string))
 				unset($this->assigned[$k]);
 		
 		return $this;

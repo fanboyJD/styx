@@ -1,4 +1,12 @@
 <?php
+/*
+ * Styx::Rights - MIT-style License
+ * Author: christoph.pojer@gmail.com
+ *
+ * Usage: Rights management for logged-in users
+ *
+ */
+
 class Rights {
 	
 	private $rights = array();

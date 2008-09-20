@@ -1,15 +1,18 @@
 <?php
-/**
- * 
- * Parses HTML-Input and purifies/sanitizes/fixes bad input.
- * 
+/*
+ * Styx::Safehtml - MIT-style License
+ * Author: christoph.pojer@gmail.com
+ *
+ * Usage: Parses HTML-Input and purifies/sanitizes/fixes bad input
+ *
  * This Script is based on the Pear Package "HTML_Safe" but has been heavily
- * modified by Christoph Pojer to be more secure and to suit this Framework.
+ * modified to be more secure and to suit the Styx Framework.
  * 
- * Remember: This Class is to prevent Cross-Site-Scripting and may not always
- * produce valid output.
+ * Remember: This Class is there to prevent Cross-Site-Scripting and may not always
+ * produce valid output (in terms of W3C).
  * 
  * http://pear.php.net/package/HTML_Safe
+ * 
  */
 
 class Safehtml {
@@ -210,7 +213,7 @@ class Safehtml {
 					if(is_array($this->cleanupAttributes[$name])){
 						if($name=='codebase')
 							foreach($this->cleanupAttributes[$name] as $base)
-								if(startsWith($value, $base))
+								if(String::starts($value, $base))
 									$allow = true;
 							
 						if(in_array($value, $this->cleanupAttributes[$name]))
