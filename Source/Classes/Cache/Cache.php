@@ -9,7 +9,7 @@
 
 
 class Cache extends DynamicStorage {
-	private $prefix = 'framework',
+	private $prefix = null,
 		$root = './Cache/',
 		$engine = false,
 		$engineInstance = null,
@@ -25,8 +25,7 @@ class Cache extends DynamicStorage {
 				'type' => 'eaccelerator',
 			);
 		
-		if($options['prefix'])
-			$this->prefix = $options['prefix'];
+		$this->prefix = pick($options['prefix'], Core::retrieve('prefix'));
 		
 		if($options['root'])
 			$this->root = realpath($options['root']);

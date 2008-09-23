@@ -28,7 +28,7 @@ class Tree {
 		
 		if($options['recursive']) $this->recursive = $options['recursive'];
 
-		$this->identifier = pick($options['identifier'], Core::retrieve('identifier.id'));
+		$this->identifier = pick($options['identifier'], Core::retrieve('identifier.internal'));
 	}
 	
 	private function createTree($cat = 0, $deep = 0, $parents = null){

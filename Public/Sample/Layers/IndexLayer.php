@@ -112,10 +112,8 @@ class IndexLayer extends Layer {
 		foreach(db::select('users')->fields('id, name')->where(Data::in('id', $users))->limit(0) as $user)
 			$this->usernames[$user['id']] = $user['name'];
 		
-		if(Handler::behaviour('html'))
-			$this->Handler->template('view.php');
-		elseif(Handler::behaviour('xml'))
-			$this->Handler->template('xmlview.php');
+		// We check for the used Handler (xml or html) and assign the correct template for it
+		$this->Handler->template((Handler::behaviour('xml') ? 'xml' : '').'view.php');
 	}
 	
 	public function populate(){

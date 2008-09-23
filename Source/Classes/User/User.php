@@ -55,7 +55,7 @@ class User {
 	
 	private static function getLoginData(){
 		if(self::$type=='cookie'){
-			$pre = Core::retrieve('user.cookie');
+			$pre = Core::retrieve('prefix');
 			foreach(self::$fields as $v){
 				$content = trim($_COOKIE[$pre][$v]);
 				
@@ -70,7 +70,7 @@ class User {
 		$data = self::getLoginData();
 		
 		if($data){
-			$id = Core::retrieve('identifier.id');
+			$id = Core::retrieve('identifier.internal');
 			/*if(!$forceQuery){
 				$user = Cache::getInstance()->retrieve('User', 'userdata_'.$data[self::$sessionfield]);
 				if($user && $user[$id]){
@@ -103,7 +103,7 @@ class User {
 		$rand = Core::retrieve('secure').mt_rand(0, 100000);
 		$user[self::$sessionfield] = md5($rand.uniqid($rand, true));
 		
-		$id = Core::retrieve('identifier.id');
+		$id = Core::retrieve('identifier.internal');
 		db::update(self::$table)->set(array(
 			self::$sessionfield => $user[self::$sessionfield],
 		))->where(array(
@@ -111,7 +111,7 @@ class User {
 		))->query();
 		
 		if(self::$type=='cookie'){
-			$pre = Core::retrieve('user.cookie');
+			$pre = Core::retrieve('prefix');
 			$time = time()+8640000;
 			
 			foreach(self::$fields as $v){
@@ -125,7 +125,7 @@ class User {
 	
 	public static function logout(){
 		if(self::$type=='cookie'){
-			$pre = Core::retrieve('user.cookie');
+			$pre = Core::retrieve('prefix');
 			$time = time()-3600;
 			
 			Cache::getInstance()->erase('User', 'userdata_'.$_COOKIE[$pre][self::$sessionfield]);

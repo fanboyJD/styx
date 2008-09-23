@@ -7,19 +7,16 @@
 define('ONE_DAY', 86400);
 define('ONE_WEEK', 604800);
 
-Core::registerClasses('Element', array(
-	'Elements', 'Input', 'HiddenInput', 'Button', 'Field', 'Radio', 'Textarea',
-	'Checkbox', 'Select', 'RichText', 'OptionList',
-));
-
 // Here's the basic configuration
 Core::store(array(
-	'styx.version' => '0.2dev',
 	'styx.name' => 'Styx PHP Framework',
+	'styx.version' => '0.2dev',
 	
 	'path.separator' => ':',
 	
 	'app.version' => '1',
+	
+	'prefix' => 'framework',
 	
 	'debug' => false,
 	
@@ -28,11 +25,10 @@ Core::store(array(
 	
 	'handler' => array('html', 'json', 'xml'),
 	
-	'identifier.id' => 'id',
+	'identifier.internal' => 'id',
+	'identifier.external' => 'pagetitle',
 	
 	'elements.prefix' => 'el',
-	
-	'user.cookie' => 'app',
 	
 	'expiration' => 31536000, // A long time
 ));

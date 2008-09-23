@@ -32,6 +32,8 @@ if(is_array($_CONFIGURATION)){
 
 Core::initialize();
 
+Core::autoload('Element'); // We need to load Element as there are several Classes that are always needed
+
 if(function_exists('initialize')) initialize();
 
 Core::pollute();

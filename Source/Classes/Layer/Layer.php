@@ -123,18 +123,16 @@ abstract class Layer extends Runner {
 		
 		if(is_array($initialize['options'])) Hash::extend($this->options, $initialize['options']);
 		
-		if(!$this->options['identifier']){
-			$id = Core::retrieve('identifier.id');
+		if(!$this->options['identifier'])
 			$this->options['identifier'] = array(
-				'internal' => $id,
-				'external' => $id,
+				'internal' => Core::retrieve('identifier.internal'),
+				'external' => Core::retrieve('identifier.external'),
 			);
-		}elseif(!is_array($this->options['identifier'])){
+		elseif(!is_array($this->options['identifier']))
 			$this->options['identifier'] = array(
 				'internal' => $this->options['identifier'],
 				'external' => $this->options['identifier'],
 			);
-		}
 		
 		$prefix = Core::retrieve('elements.prefix');
 		$this->errorPrefix = ($prefix ? $prefix.'.' : '').'form.message';

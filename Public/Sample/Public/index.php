@@ -72,7 +72,9 @@
 			),
 			
 			'user' => ($user ? Lang::get('user.hello', $user['name']).' | <a href="admin">'.Lang::retrieve('user.admin').'</a> | ' : '').'
-				<a href="'.Layer::retrieve('login')->link(null, $user ? 'logout' : null).'">'.Lang::retrieve('user.'.($user ? 'logout' : 'login')).'</a>'
+				<a href="'.Layer::retrieve('login')->link(null, $user ? 'logout' : null).'">'.Lang::retrieve('user.'.($user ? 'logout' : 'login')).'</a>',
+			
+			'styx' => Core::retrieve('styx.name').' '.Core::retrieve('styx.version'),
 		))->parse();
 	elseif(Handler::behaviour('json'))
 		Handler::map()->substitute('layer')->parse();

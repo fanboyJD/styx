@@ -9,9 +9,11 @@ $_CONFIGURATION = array(
 	
 	'debug' => true, // When debug is set to true no cache is used etc.
 	
-	'cache' => array(
-		'prefix' => 'sample', // Some unique prefix for your Application
-	),
+	'prefix' => 'sample', // Some unique [a-z] prefix for your Application
+	
+	/*'cache' => array(
+		// Here are maybe some options for other engines
+	),*/
 	
 	'database' => array(
 		'host' => 'localhost',
@@ -25,7 +27,6 @@ $_CONFIGURATION = array(
 	'languages' => array('en'),
 	
 	'user.type' => 'cookie',
-	'user.cookie' => 'sample',
 	'user.table' => 'users',
 	'user.fields' => array('name', 'pwd'),
 	'user.sessionfield' => 'session',

@@ -28,6 +28,7 @@
 	<div>${user}</div>
 	<div style="float: left; margin-left: 10px;">
 	<a href="${source}" target="trac">${lang.source}</a>
+	<small>${styx}</small>
 	</div>
 </div>
 </body>

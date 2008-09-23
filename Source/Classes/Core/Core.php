@@ -11,6 +11,24 @@ function pick($a, $b = null){
 	return $a ? $a : $b;
 }
 
+class PHPExtensionFilter extends FilterIterator {
+	
+	private $it;
+	
+	public function __construct(RecursiveIteratorIterator $it){
+		parent::__construct($it);
+		$this->it = $it;
+	}
+	
+	public function accept(){
+		if(!$this->it->isDir())
+			return strtolower(pathinfo($this->current(), PATHINFO_EXTENSION))=='php';
+		
+		return true;
+	}
+	
+}
+
 abstract class Runner {
 	
 	public function execute(){
@@ -21,31 +39,13 @@ abstract class Runner {
 
 class Core extends StaticStorage {
 	
-	private static $Initialized = false,
-		$onInitialize = array();
-	
 	private function __construct(){}
 	private function __clone(){}
 	
-	public static function classExists($class, $toLoad = null){
-		$class = strtolower($class);
-		
-		$List = self::retrieve(in_array($toLoad, array('Classes', 'Layers')) ? $toLoad : 'Classes');
-		
-		return class_exists($class) || $List[$class] ? $List[$class] : false;	
-	}
-	
-	public static function autoload($class){
-		$file = self::classExists($class, String::ends($class, 'layer') && strlen($class)>5 ? 'Layers' : 'Classes');
-		
-		if($file && !class_exists($class)) require_once($file);
-		
-		return $file;
-	}
-	
 	/**
-	 * This method loads the given class and only returns false, when the given
-	 * classfile does not exist.
+	 * This method loads the given class and only returns false, if the given
+	 * classfile does not exist. This method is only needed to load the basic
+	 * Framework Classes before it is initialized.
 	 *
 	 * @param string $dir
 	 * @param string $class
@@ -61,42 +61,44 @@ class Core extends StaticStorage {
 		return true;
 	}
 	
-	public static function loadAsset($file){
-		$file = realpath(self::retrieve('app.path').'/Assets/'.$file.'.php');
+	public static function classExists($class){
+		$class = strtolower($class);
 		
-		if(file_exists($file)) require_once($file);
+		$List = self::retrieve('Classes');
 		
-		return true;
+		return $List[$class] || class_exists($class) ? $List[$class] : false;	
+	}
+	
+	public static function autoload($class){
+		$file = self::classExists($class);
+		
+		if($file && !class_exists($class)) require_once($file);
+		
+		return $file;
 	}
 	
 	public static function initialize(){
-		if(self::$Initialized) return;
-		
 		$c = Cache::getInstance();
-		$debug = self::retrieve('debug');
 		
-		foreach(array(
-			'Classes' => self::retrieve('path').'/Classes/*/*.php',
-			'Layers' => self::retrieve('app.path').'/Layers/*.php',
-		) as $key => $dir){
-			$List = $c->retrieve('Core', $key);
+		$List = self::store('Classes', $c->retrieve('Core', 'Classes'));
+		
+		if(!$List || self::retrieve('debug')){
+			$List = array();
 			
-			if(!$List || $debug){
-				$files = glob($dir);
-				if(is_array($files))
+			$apppath = self::retrieve('app.path');
+			foreach(array(
+				glob(self::retrieve('path').'/Classes/*/*.php'),
+				glob($apppath.'/Layers/*.php'),
+			) as $files)
+				if(is_array($files) && sizeof($files))
 					foreach($files as $file)
 						$List[strtolower(basename($file, '.php'))] = $file;
-				
-				if($List) $c->store('Core', $key, $List);
-			}
 			
-			self::store($key, $List);
+			foreach(new PHPExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($apppath.'/Assets/'))) as $file)
+				$List[strtolower(basename($file, '.php'))] = $file;
+			
+			self::store('Classes', $c->store('Core', 'Classes', $List));
 		}
-		
-		self::$Initialized = true;
-		foreach(self::$onInitialize as $value)
-			foreach($value as $fn => $v)
-				call_user_func_array(array('Core', $fn), $v);
 	}
 	
 	public static function pollute(){
@@ -141,22 +143,6 @@ class Core extends StaticStorage {
 		if(sizeof($_POST) && get_magic_quotes_gpc())
 			foreach($_POST as &$val)
 				$val = stripslashes($val);
-	}
-	
-	public static function registerClasses($base, $classes){
-		if(!self::$Initialized){
-			self::$onInitialize[] = array(
-				'registerClasses' => array($base, $classes),
-			);
-			return;
-		}
-		
-		$base = strtolower($base);
-		$Classes = self::retrieve('Classes');
-		foreach($classes as $val)
-			$Classes[strtolower($val)] = $Classes[$base];
-		
-		self::store('Classes', $Classes);
 	}
 	
 	public static function mkdir($path, $mode = 0777){
