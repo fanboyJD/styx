@@ -14,14 +14,14 @@ class Template extends Runner {
 		$file = array(),
 		$bind = null;
 	
-	protected static $init = null;
+	protected static $Configuration = null;
 	
 	protected function __construct(){}
 	protected function __clone(){}
 	
 	protected function initialize($file){
-		if(!self::$init)
-			self::$init = array(
+		if(!self::$Configuration)
+			self::$Configuration = array(
 				'root' => realpath(Core::retrieve('path').'Templates/'),
 				'app.root' => realpath(Core::retrieve('app.path').'Templates/'),
 				'tpl.standard' => Core::retrieve('tpl.standard'),
@@ -34,9 +34,9 @@ class Template extends Runner {
 	}
 	
 	protected static function getFileName($file){
-		$loadFile = self::$init['app.root'].'/'.$file;
+		$loadFile = self::$Configuration['app.root'].'/'.$file;
 		if(!file_exists($loadFile)){
-			$loadFile = self::$init['root'].'/'.$file;
+			$loadFile = self::$Configuration['root'].'/'.$file;
 			if(!file_exists($loadFile))
 				return false;
 		}
@@ -48,9 +48,9 @@ class Template extends Runner {
 		$c = Cache::getInstance();
 		
 		$ext = pathinfo(end($this->file), PATHINFO_EXTENSION);
-		$file = implode('/', $this->file).(!$ext ? $ext = '.'.self::$init['tpl.standard'] : '');
+		$file = implode('/', $this->file).(!$ext ? $ext = '.'.self::$Configuration['tpl.standard'] : '');
 		
-		if(in_array($ext, self::$init['tpl.execute'])){
+		if(in_array($ext, self::$Configuration['tpl.execute'])){
 			if($this->bind && method_exists($this->bind, 'execute')){
 				ob_start();
 				
