@@ -57,7 +57,7 @@ abstract class Layer extends Runner {
 	 */
 	protected $data;
 	
-	protected static $Config,
+	protected static $Configuration,
 		$Layers = array(
 			'List' => array(),
 			'Instances' => array(),
@@ -174,13 +174,13 @@ abstract class Layer extends Runner {
 		$this->data = db::select($this->table);
 		$this->Handler = Handler::map('layer.'.$this->layername)->base('Layers', ucfirst($this->name))->bind($this);
 		
-		$this->get = $get ? $get : $_GET;
-		$this->post = $post ? $post : $_POST;
+		$this->get = $get ? $get : Request::retrieve('get');
+		$this->post = $post ? $post : Request::retrieve('post');
 		$this->event = $event[0];
 		
 		try{
 			if($this->event==$this->getDefaultEvent('save')){
-				if(is_array($this->post) && sizeof($this->post))
+				if(Request::getMethod()=='post' && is_array($this->post) && sizeof($this->post))
 					$this->prepareData($this->post);
 				else
 					throw new ValidatorException('data');
@@ -344,8 +344,8 @@ abstract class Layer extends Runner {
 	
 	public function link($title = null, $event = null, $options = null){
 		/* Yes, you heard me: Layer static, not self - just for speed purposes */
-		if(!Layer::$Config)
-			Layer::$Config = array(
+		if(!Layer::$Configuration)
+			Layer::$Configuration = array(
 				'path.separator' => Core::retrieve('path.separator'),
 				'app.link' => Core::retrieve('app.link'),
 				'language' => Lang::getLanguage(),
@@ -357,7 +357,7 @@ abstract class Layer extends Runner {
 			$options = array('handler' => $options);
 		
 		if(!$options['lang'])
-			$options['lang'] = Layer::$Config['language'];
+			$options['lang'] = Layer::$Configuration['language'];
 		
 		$default = $this->getDefaultEvent('view');
 		if(!$event || !in_array($event, $this->methods))
@@ -372,23 +372,23 @@ abstract class Layer extends Runner {
 			}
 		}
 		
-		$base = Layer::$Config['app.link'].($options['handler'] ? 'handler'.Layer::$Config['path.separator'].$options['handler'].'/' : '').$this->base;
+		$base = Layer::$Configuration['app.link'].($options['handler'] ? 'handler'.Layer::$Configuration['path.separator'].$options['handler'].'/' : '').$this->base;
 		
 		unset($options['handler']);
-		if($options['lang'] && strtolower($options['lang'])==Layer::$Config['language'])
+		if($options['lang'] && strtolower($options['lang'])==Layer::$Configuration['language'])
 			unset($options['lang']);
 		
 		$array = array();
 		if(is_array($options) && sizeof($options))
 			foreach($options as $k => $v)
-				$array[] = $k.($v ? Layer::$Config['path.separator'].$v : '');
+				$array[] = $k.($v ? Layer::$Configuration['path.separator'].$v : '');
 		
 		if(sizeof($array)) $array = '/'.implode('/', $array);
 		else $array = null;
 		
 		if(!$title && (!$event || $event==$default)) return $base.$array;
 		
-		return $base.'/'.(!$title ? $event : (in_array($title, $this->methods) || $event!=$default ? $event.Layer::$Config['path.separator'] : '').$title).$array;
+		return $base.'/'.(!$title ? $event : (in_array($title, $this->methods) || $event!=$default ? $event.Layer::$Configuration['path.separator'] : '').$title).$array;
 	}
 	
 	public function hasRight(){

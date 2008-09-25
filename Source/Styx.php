@@ -36,14 +36,16 @@ Core::autoload('Element'); // We need to load Element as there are several Class
 
 if(function_exists('initialize')) initialize();
 
-Core::pollute();
+Request::initialize();
+
+$get = Request::retrieve('get');
 
 Handler::setHandlers(Core::retrieve('handler'));
 
 User::initialize();
 
-if(PackageManager::has($_GET['m']['package'])){
-	PackageManager::setPackage($_GET['m']['package']);
+if(PackageManager::has($get['m']['package'])){
+	PackageManager::setPackage($get['m']['package']);
 	
 	Handler::useExtendedTypes();
 	
@@ -61,16 +63,18 @@ if(PackageManager::has($_GET['m']['package'])){
 		Lang::setLanguage(array_shift($languages));
 		
 		/* And overwrite with the selected language, in that way it keeps missing language strings */
-		if($_GET['m']['lang'] && sizeof($languages) && in_array($_GET['m']['lang'], $languages))
-			Lang::setLanguage($_GET['m']['lang']);
+		if($get['m']['lang'] && sizeof($languages) && in_array($get['m']['lang'], $languages))
+			Lang::setLanguage($get['m']['lang']);
 	}
 	
 	unset($languages);
 	
-	Handler::setType($_GET['p']['handler']);
+	Handler::setType($get['p']['handler']);
 	Handler::setHeader();
 	
 	PackageManager::assignToMaster();
 	
-	Route::initialize($_GET, $_POST);
+	Route::initialize($get, Request::retrieve('post'));
 }
+
+unset($get);

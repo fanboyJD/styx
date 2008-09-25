@@ -9,9 +9,11 @@
 
 
 class Cache extends DynamicStorage {
-	private $prefix = null,
-		$root = './Cache/',
-		$engine = false,
+	private $Configuration = array(
+			'prefix' => null,
+			'root' => './Cache/',
+			'engine' => false,
+		),
 		$engineInstance = null,
 		$filecacheInstance = null;
 	
@@ -21,23 +23,21 @@ class Cache extends DynamicStorage {
 		$options = Core::retrieve('cache');
 		
 		if((!$options['engine'] || $options['engine']=='eaccelerator') && function_exists('eaccelerator_get'))
-			$this->engine = array(
+			$this->Configuration['engine'] = array(
 				'type' => 'eaccelerator',
 			);
 		
-		$this->prefix = pick($options['prefix'], Core::retrieve('prefix'));
+		$this->Configuration['prefix'] = pick($options['prefix'], Core::retrieve('prefix'));
 		
-		if($options['root'])
-			$this->root = realpath($options['root']);
-		else
-			$this->root = Core::retrieve('path').$this->root;
+		if($options['root']) $this->Configuration['root'] = realpath($options['root']);
+		else $this->Configuration['root'] = Core::retrieve('path').$this->Configuration['root'];
 		
-		$class = $this->engine['type'].'cache';
-		if($this->engine['type'] && Core::loadClass('Cache', $class))
-			$this->engineInstance = new $class($this->prefix, $this->root);
+		$class = $this->Configuration['engine']['type'].'cache';
+		if($this->Configuration['engine']['type'] && Core::loadClass('Cache', $class))
+			$this->engineInstance = new $class($this->Configuration);
 		
 		Core::loadClass('Cache', 'Filecache');
-		$this->filecacheInstance = new filecache($this->prefix, $this->root);
+		$this->filecacheInstance = new filecache($this->Configuration);
 	}
 	
 	private function __clone(){}

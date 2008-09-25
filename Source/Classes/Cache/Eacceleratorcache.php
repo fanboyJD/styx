@@ -10,40 +10,43 @@
 
 class Eacceleratorcache {
 	
-	public $prefix = null,
-		$root = null;
+	public $Configuration = array(
+			'prefix' => null,
+			'root' => null,
+		);
 	
-	public function __construct($prefix, $root){
-		$this->prefix = $prefix;
-		$this->root = $root;
+	public function __construct($Configuration){
+		$this->Configuration = $Configuration;
 	}
 	
 	public function retrieve($key){
-		return eaccelerator_get($this->prefix.$key);
+		return eaccelerator_get($this->Configuration['prefix'].$key);
 	}
 	
 	public function store($key, $content, $ttl){
-		eaccelerator_put($this->prefix.$key, $content, $ttl);
+		eaccelerator_put($this->Configuration['prefix'].$key, $content, $ttl);
 	}
 	
 	public function erase($key, $force = false){
-		eaccelerator_lock($this->prefix.$key);
-		eaccelerator_rm($this->prefix.$key);
-		eaccelerator_unlock($this->prefix.$key);
+		$key = $this->Configuration['prefix'].$key;
+		
+		eaccelerator_lock($key);
+		eaccelerator_rm($key);
+		eaccelerator_unlock($key);
 	}
 	
 	public function eraseBy($key){
 		$prefix = explode('/', $key);
 		$keys = eaccelerator_list_keys();
 		foreach($keys as $val)
-			if(String::starts($val['name'], ':'.$this->prefix.$key))
+			if(String::starts($val['name'], ':'.$this->Configuration['prefix'].$key))
 				$this->erase($prefix[0].'/'.substr($val['name'], strrpos($val['name'], '/')+1));
 	}
 	
 	public function eraseAll(){
 		$keys = eaccelerator_list_keys();
 		foreach($keys as $val)
-			if(String::starts($val['name'], ':'.$this->prefix))
-				$this->erase(substr($val['name'], strrpos($val['name'], $this->prefix)+strlen($this->prefix)));
+			if(String::starts($val['name'], ':'.$this->Configuration['prefix']))
+				$this->erase(substr($val['name'], strrpos($val['name'], $this->Configuration['prefix'])+strlen($this->Configuration['prefix'])));
 	}
 }
