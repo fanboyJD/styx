@@ -63,7 +63,7 @@ class User {
 			}
 		}
 		
-		return is_array($data) && sizeof($data)==3 ? $data : false;
+		return Hash::length($data)==3 ? $data : false;
 	}
 	
 	public static function handlelogin($forceQuery = false){

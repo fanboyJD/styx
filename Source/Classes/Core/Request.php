@@ -41,7 +41,7 @@ class Request extends StaticStorage {
 				continue;
 			}
 			
-			$polluted['p'][$v[0]] = pick($v[1], null);
+			$polluted['p'][$v[0]] = pick($v[1]);
 			if($v[0]!='handler') $polluted['n'][] = $v[0];
 		}
 		
@@ -53,15 +53,17 @@ class Request extends StaticStorage {
 		
 		if(!$polluted['p']['handler']) $polluted['p']['handler'] = 'html';
 		
-		unset($_GET['n'], $_GET['p'], $_GET['m']);
-		self::store('get', array_merge($_GET, $polluted));
+		$get = array_merge($_GET, $polluted);
+		if(Hash::length($get)) self::store('get', $get);
 		
-		$post = $_POST;
-		if(self::getMethod()=='post' && sizeof($post) && get_magic_quotes_gpc())
-			foreach($post as &$val)
-				$val = stripslashes($val);
-		
-		self::store('post', $post);
+		$post = Data::clean($_POST);
+		if(Hash::length($post)){
+			if(get_magic_quotes_gpc())
+				foreach($post as &$val)
+					$val = stripslashes($val);
+			
+			self::store('post', $post);
+		}
 	}
 	
 }

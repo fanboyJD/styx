@@ -3,25 +3,23 @@
  * Styx::ValidatorException - MIT-style License
  * Author: christoph.pojer@gmail.com
  *
- * Usage: This exception is raised mostly somewhere in a Layer
+ * Usage: This exception is raised mostly somewhere inside a Layer
  *
  */
 
 
 class ValidatorException extends Exception {
 	
-	protected static $content = false;
+	protected static $content = null;
 	
-	public function __construct($error){
-		if(self::$content===false)
-			self::$content = pick(Lang::retrieve('validator.content'), null);
+	public function __construct(){
+		if(!self::$content) self::$content = pick(Lang::retrieve('validator.content'), '%s');
 		
-		Hash::splat($error);
+		$error = Hash::args(func_get_args());
+		
 		$lang = Lang::retrieve('validator.'.$error[0]);
 		if(!$lang) $lang = Lang::retrieve('validator.default');
 		
-		$lang = sprintf($lang, $error[2]);
-		
-		parent::__construct(self::$content ? sprintf(self::$content, $lang) : $lang);
+		parent::__construct(sprintf(self::$content, sprintf($lang, $error[2])));
 	}
 }

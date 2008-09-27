@@ -21,8 +21,8 @@ abstract class Layer extends Runner {
 	protected $name,
 		$layername,
 		$base,
-		$baseRights = 'edit',
 		$table,
+		$baseRights = 'edit',
 		
 		$events = array(
 			'view' => 'view',
@@ -32,6 +32,7 @@ abstract class Layer extends Runner {
 		),
 		
 		$options = array(
+			/*'table' => null,*/
 			'identifier' => null,
 		),
 		
@@ -43,11 +44,12 @@ abstract class Layer extends Runner {
 		$rights = null,
 		
 		$event = null,
-		$errorMessage = null,
-		$errorPrefix = null,
+		$error = array(
+			'message' => null,
+			'prefix' => null,
+		),
 		$where = null,
-		$editing = false,
-		$preparation = false;
+		$editing = false;
 	
 	public $get = array(),
 		$post = array();
@@ -115,11 +117,10 @@ abstract class Layer extends Runner {
 			if(String::starts($m, 'on') && strlen($m)>=3)
 				$this->methods[] = strtolower(substr($m, 2));
 		
-		$initialize = $this->initialize();
-		Hash::splat($initialize);
+		Hash::splat($initialize = $this->initialize());
 		
 		if(key_exists('table', $initialize))
-			$this->table = $initialize['table'] ? $initialize['table'] : null;
+			$this->table = pick($initialize['table']);
 		
 		if(is_array($initialize['options'])) Hash::extend($this->options, $initialize['options']);
 		
@@ -135,7 +136,7 @@ abstract class Layer extends Runner {
 			);
 		
 		$prefix = Core::retrieve('elements.prefix');
-		$this->errorPrefix = ($prefix ? $prefix.'.' : '').'form.message';
+		$this->error['prefix'] = ($prefix ? $prefix.'.' : '').'form.message';
 		
 		$this->form = $initialize['form'];
 		
@@ -174,16 +175,14 @@ abstract class Layer extends Runner {
 		$this->data = db::select($this->table);
 		$this->Handler = Handler::map('layer.'.$this->layername)->base('Layers', ucfirst($this->name))->bind($this);
 		
-		$this->get = $get ? $get : Request::retrieve('get');
-		$this->post = $post ? $post : Request::retrieve('post');
+		$this->get = Hash::length($get) ? $get : Request::retrieve('get');
+		$this->post = Hash::length($post) ? $post : Request::retrieve('post');
 		$this->event = $event[0];
 		
 		try{
-			if($this->event==$this->getDefaultEvent('save')){
-				if(Request::getMethod()=='post' && is_array($this->post) && sizeof($this->post))
-					$this->prepareData($this->post);
-				else
-					throw new ValidatorException('data');
+			if(Request::getMethod()=='post'){
+				if($this->post) $this->prepareData($this->post);
+				else throw new ValidatorException('data');
 			}
 			
 			if(!method_exists($this, $event[1])){
@@ -193,9 +192,10 @@ abstract class Layer extends Runner {
 					throw new ValidatorException('handler');
 			}
 			
-			/* When the allowed/disabled Handler arrays are set it checks for their contents
-			   otherwise it checks for the global array that is responsible for the whole layer
-			*/
+			/* 
+			 * When the allowed/disabled Handler arrays are set it checks for their contents
+			 * otherwise it checks for the global array that is responsible for the whole layer
+			 */
 			if($this->hasCustomHandler($event[0])){
 				if(!Handler::behaviour($this->allowedHandlers[$event[0]]) && Handler::behaviour($this->disallowedHandlers[$event[0]]))
 					throw new ValidatorException('handler');
@@ -209,7 +209,7 @@ abstract class Layer extends Runner {
 				throw new ValidatorException('rights');
 		}catch(ValidatorException $e){
 			$this->Handler->assign(array(
-				$this->errorPrefix => $e->getMessage(),
+				$this->error['prefix'] => $e->getMessage(),
 			));
 		}catch(Exception $e){
 			
@@ -245,12 +245,10 @@ abstract class Layer extends Runner {
 			}
 		}
 		
-		if($this->errorMessage){
-			$prefix = Core::retrieve('elements.prefix');
+		if($this->error['message'])
 			$this->Handler->assign(array(
-				$this->errorPrefix => $this->errorMessage,
+				$this->error['prefix'] => $this->error['message'],
 			));
-		}
 		
 		$this->populate();
 		
@@ -272,7 +270,7 @@ abstract class Layer extends Runner {
 			try{
 				throw new ValidatorException($validate);
 			}catch(Exception $e){
-				$this->errorMessage = $e->getMessage();
+				$this->error['message'] = $e->getMessage();
 				
 				$this->handle($this->getDefaultEvent($this->editing ? 'edit' : 'add'));
 			}
@@ -282,8 +280,6 @@ abstract class Layer extends Runner {
 	}
 	
 	public function prepareData($data){
-		$this->preparation = true;
-		
 		if($data[$this->options['identifier']['internal']] && $this->hasRight(pick($this->baseRights, $this->event), 'modify')){
 			$this->where = array(
 				$this->options['identifier']['internal'] => array($data[$this->options['identifier']['internal']], $this->options['identifier']['internal']),
@@ -379,7 +375,7 @@ abstract class Layer extends Runner {
 			unset($options['lang']);
 		
 		$array = array();
-		if(is_array($options) && sizeof($options))
+		if(Hash::length($options))
 			foreach($options as $k => $v)
 				$array[] = $k.($v ? Layer::$Configuration['path.separator'].$v : '');
 		
@@ -401,7 +397,7 @@ abstract class Layer extends Runner {
 		return User::hasRight($args);
 	}
 	
-	public function generateSessionName(){
+	protected function generateSessionName(){
 		return $this->name.'_session_'.md5($this->name.'.'.Core::retrieve('secure'));
 	}
 	
@@ -410,14 +406,13 @@ abstract class Layer extends Runner {
 		
 		return $this->form->addElement(new HiddenInput(array(
 			'name' => $name,
-			'value' => $this->preparation ? $this->post[$name] : User::get(Core::retrieve('user.sessionfield')),
+			'value' => Request::getMethod()=='post' && $this->post[$name] ? $this->post[$name] : User::get(Core::retrieve('user.sessionfield')),
 			':alias' => true,
 		)));
 	}
 	
 	public function checkSession(){
-		$name = $this->generateSessionName();
-		$el = $this->getElement($name);
+		$el = $this->getElement($this->generateSessionName());
 		
 		return !$el || ($el && User::checkSession($el->getValue()));
 	}

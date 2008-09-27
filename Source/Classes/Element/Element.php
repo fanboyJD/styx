@@ -213,7 +213,7 @@ class Elements extends Element {
 	 * @return Element
 	 */
 	public function getElement($name){
-		return pick($this->elements[$name], null);
+		return pick($this->elements[$name]);
 	}
 	
 	/**

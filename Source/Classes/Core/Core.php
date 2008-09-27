@@ -90,7 +90,7 @@ class Core extends StaticStorage {
 				glob(self::retrieve('path').'/Classes/*/*.php'),
 				glob($apppath.'/Layers/*.php'),
 			) as $files)
-				if(is_array($files) && sizeof($files))
+				if(Hash::length($files))
 					foreach($files as $file)
 						$List[strtolower(basename($file, '.php'))] = $file;
 			

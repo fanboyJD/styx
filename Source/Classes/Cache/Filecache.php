@@ -48,7 +48,7 @@ class Filecache {
 	
 	public function erase($key, $force = false){
 		$files = glob($this->Configuration['root'].$this->Configuration['prefix'].'/'.$key.'.txt');
-		if(!is_array($files) || !sizeof($files))
+		if(!Hash::length($files))
 			return;
 		
 		try{

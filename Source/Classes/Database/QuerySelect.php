@@ -71,16 +71,17 @@ class QuerySelect extends QueryHandler implements Iterator {
 		return db::getInstance()->fetch($this->query(), $type);
 	}
 	
-	public function store($key = 0){
-		db::getInstance()->store($this->format(), $key);
-	}
-	
 	public function retrieve(){
 		$this->queried = false;
 		
 		return $this->cache = pick(db::getInstance()->retrieve($this->format()), array());
 	}
 	
+	public function count($field = 'id'){
+		$count = $this->fields('COUNT('.$field.')')->fetch(MYSQL_NUM);
+		
+		return pick($count[0], 0);
+	}
 	
 	public function rewind(){
 		if(!$this->queried){

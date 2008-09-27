@@ -24,7 +24,7 @@ class Form extends Elements {
 		$out['form.bottom'] = '</form>';
 		
 		if(self::$prefix===false)
-			self::$prefix = pick(Core::retrieve('elements.prefix'), null);
+			self::$prefix = pick(Core::retrieve('elements.prefix'));
 		
 		return self::$prefix ? array(self::$prefix => $out) : $out;
 	}

@@ -1,5 +1,6 @@
 <?php
-	if($_GET['p']['do']=='cache'){
+	$get = Request::retrieve('get');
+	if($get['p']['do']=='cache'){
 		Cache::getInstance()->eraseAll(true);
 		$msg = 'erased';
 	}

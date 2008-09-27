@@ -7,17 +7,16 @@
 $_CONFIGURATION = null;
 require_once('../Config/Configuration.php');
 
-$path = dirname(__FILE__).'/';
+$path = dirname(__FILE__).DIRECTORY_SEPARATOR;
 set_include_path(get_include_path().PATH_SEPARATOR.$path);
 
-require_once('Classes/Core/Storage.php');
-require_once('Classes/Core/Core.php');
-require_once('Classes/Core/String.php');
+foreach(array('Storage', 'Hash', 'Core', 'String') as $v)
+	require_once('Classes/Core/'.$v.'.php');
 
 spl_autoload_register(array('Core', 'autoload'));
 
 Core::store('path', $path);
-Core::store('app.path', realpath('../').'/');
+Core::store('app.path', realpath('../').DIRECTORY_SEPARATOR);
 
 Core::loadClass('Cache', 'Cache');
 Core::loadClass('Base', 'Data');

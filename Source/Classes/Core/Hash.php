@@ -9,6 +9,10 @@
 
 class Hash {
 	
+	public static function length($array){
+		return is_array($array) ? pick(sizeof($array)) : null;
+	}
+	
 	public static function remove(&$array, $value){
 		$i = array_search($value, $array);
 		if($i!==false) unset($array[$i]);
@@ -18,17 +22,15 @@ class Hash {
 		$imploded = array();
 		if($prefix) $prefix .= '.';
 		
-		foreach($array as $key => $val){
-			if(is_array($val))
-				$imploded = array_merge($imploded, self::flatten($val, $prefix.$key));
-			else
-				$imploded[$prefix.$key] = $val;
-		}
+		foreach($array as $key => $val)
+			if(is_array($val)) $imploded = array_merge($imploded, self::flatten($val, $prefix.$key));
+			else $imploded[$prefix.$key] = $val;
+		
 		return $array = $imploded;
 	}
 	
 	public static function extend(&$src, $extended){
-		if(!is_array($extended)) return $src;
+		if(!Hash::length($extended)) return $src;
 		
 		foreach($extended as $key => $val)
 			$src[$key] = is_array($val) ? self::extend($src[$key], $val) : $val;
@@ -41,9 +43,7 @@ class Hash {
 	}
 	
 	public static function args($args){
-		if(sizeof($args)==1) return self::splat($args[0]);
-		
-		return $args;
+		return sizeof($args)==1 ? self::splat($args[0]) : $args;
 	}
 	
 }
