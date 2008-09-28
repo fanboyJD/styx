@@ -1,4 +1,12 @@
 <?php
+/* 
+ * Styx::Db - MIT-style License 
+ * Author: christoph.pojer@gmail.com 
+ *
+ * Usage: Handles MySQL-Database connection 
+ *
+ */
+
 class db {
 	private static $Instance;
 	
@@ -14,8 +22,7 @@ class db {
 			'c' => null,
 			'db' => null,
 		),
-		$isConnected = false,
-		$cache = array();
+		$isConnected = false;
 	
 	private function __construct(){
 		$options = Core::retrieve('database');
@@ -45,18 +52,16 @@ class db {
 	public function connect(){
 		$this->Connection['c'] = mysql_connect($this->Configuration['host'], $this->Configuration['user'], $this->Configuration['password']);
 		$this->selectDatabase();
-		if($this->Connection['c'])
-			$this->isConnected = true;
+		
+		if($this->Connection['c']) $this->isConnected = true;
 		
 		return $this->isConnected;
 	}
 	
 	public function selectDatabase($db = null){
-		if($db)
-			$this->Configuration['db'] = $db;
+		if($db) $this->Configuration['db'] = $db;
 		
-		$this->Connection['db'] = mysql_select_db($this->Configuration['db']);
-		return $this->Connection['db'];
+		return $this->Connection['db'] = mysql_select_db($this->Configuration['db']);
 	}
 	
 	public function closeConnection(){
@@ -108,8 +113,7 @@ class db {
 		if(!$this->isConnected){
 			$this->connect();
 			
-			if(!$this->isConnected)
-				die;
+			if(!$this->isConnected) die;
 			
 			$this->query("SET NAMES 'utf8'");
 		}
@@ -119,8 +123,7 @@ class db {
 		if($this->Configuration['debug']){
 			$this->queries++;
 			Script::log($sql);
-			if(!$query)
-				Script::log(mysql_error(), 'error');
+			if(!$query) Script::log(mysql_error(), 'error');
 		}
 		
 		return pick($query, false);
@@ -129,8 +132,7 @@ class db {
 	public function fetch($query, $type = null){
 		if(!$query) return false;
 		
-		$row = mysql_fetch_array($query, ($type ? $type : MYSQL_ASSOC));
-		return pick($row, false);
+		return pick(mysql_fetch_array($query, ($type ? $type : MYSQL_ASSOC)), false);
 	}
 	
 	public function getId(){
@@ -154,28 +156,4 @@ class db {
 		return Data::nullify($rows);
 	}
 	
-	public function store($sql, $key = 0){
-		$this->cache[$key] = $this->query($sql);
-	}
-	
-	public function next($key = 0){
-		if(!$this->cache[$key])
-			return false;
-		
-		$f = $this->fetch($this->cache[$key]);
-		if(is_array($f))
-			return Data::nullify($f);
-		
-		mysql_free_result($this->cache[$key]);
-		unset($this->cache[$key]);
-		
-		return false;
-	}
-	
-	/* Maybe move that to QuerySelect :) */
-	public function count($table = null, $where = null, $field = 'id'){
-		$count = db::select($table)->fields('COUNT('.$field.')')->where($where)->fetch(MYSQL_NUM);
-		
-		return pick($count[0], 0);
-	}
 }
