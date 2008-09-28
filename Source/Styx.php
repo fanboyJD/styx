@@ -18,8 +18,8 @@ spl_autoload_register(array('Core', 'autoload'));
 Core::store('path', $path);
 Core::store('app.path', realpath('../').DIRECTORY_SEPARATOR);
 
+Core::loadClass('Core', 'Data');
 Core::loadClass('Cache', 'Cache');
-Core::loadClass('Base', 'Data');
 
 require_once($path.'Config/Configuration.php');
 unset($path);

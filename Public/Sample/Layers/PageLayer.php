@@ -5,6 +5,7 @@ class PageLayer extends Layer {
 		return array(
 			'table' => 'page',
 			'options' => array(
+				'cache' => false, // Just for testing purposes. Caching should only be deactivated if the data frequently changes or gets modified externally
 				'identifier' => array(
 					'internal' => 'id',
 					'external' => 'pagetitle',

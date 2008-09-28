@@ -145,7 +145,11 @@ class QueryHandler {
 	}
 	
 	public function query(){
-		return db::getInstance()->query($this->format());
+		$query = db::getInstance()->query($this->format());
+		
+		if($this->type!='select') Cache::getInstance()->eraseBy('QueryCache', $this->table.'_');
+		
+		return $query;
 	}
 	
 	public function __toString(){

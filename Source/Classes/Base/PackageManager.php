@@ -129,17 +129,10 @@ class PackageManager {
 				$compressor = new JavaScriptPacker($content, 'None', false);
 				$content = $compressor->pack();
 			}else{
-				// Thanks to: http://gadelkareem.com/2007/06/23/compressing-your-html-css-and-javascript-using-simple-php-code/
-				$content = str_replace(';}', '}',
-					preg_replace('/^\s+/', '',
-						preg_replace('/[\s]*([\{\},;:])[\s]*/', '\1',
-							preg_replace('#/\*.*?\*/#', '',
-								preg_replace('/[\r\n\t\s]+/s', ' ',
-									preg_replace('!//[^\n\r]+!', '', $content)
-								)
-							)
-						)
-					)
+				$content = str_replace(
+					array('{ ',' }', '; ', ';}', ': ', ', '),
+					array('{', '}', ';', '}', ':', ','),
+					Data::clean(preg_replace('/\s{2,}/', '', preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $content)), true)
 				);
 			}
 		}

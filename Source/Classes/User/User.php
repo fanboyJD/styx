@@ -66,21 +66,11 @@ class User {
 		return Hash::length($data)==3 ? $data : false;
 	}
 	
-	public static function handlelogin($forceQuery = false){
+	public static function handlelogin($cache = true){
 		$data = self::getLoginData();
 		
 		if($data){
 			$id = Core::retrieve('identifier.internal');
-			/*if(!$forceQuery){
-				$user = Cache::getInstance()->retrieve('User', 'userdata_'.$data[self::$sessionfield]);
-				if($user && $user[$id]){
-					foreach(self::$fields as $v)
-						if($user[$v]!=$data[$v])
-							$forceQuery = true;
-						
-					if(!$forceQuery) return self::store($user);
-				}
-			}*/
 			
 			foreach(self::$fields as $v){
 				$fields[$v] = $data[$v];
@@ -88,7 +78,7 @@ class User {
 			}
 			array_pop($fields);
 			
-			$user = db::select(self::$table)->where($fields)->fetch();
+			$user = db::select(self::$table, $cache)->where($fields)->fetch();
 			
 			if($user[$id]) return self::store(Cache::getInstance()->store('User', 'userdata_'.$user[self::$sessionfield], $user, ONE_DAY));
 			
@@ -120,7 +110,7 @@ class User {
 			}
 		}
 		
-		return self::handlelogin(true);
+		return self::handlelogin(false);
 	}
 	
 	public static function logout(){

@@ -33,6 +33,7 @@ abstract class Layer extends Runner {
 		
 		$options = array(
 			/*'table' => null,*/
+			'cache' => true,
 			'identifier' => null,
 		),
 		
@@ -173,7 +174,7 @@ abstract class Layer extends Runner {
 		$event = array(strtolower($event));
 		$event[] = 'on'.ucfirst($event[0]);
 		
-		$this->data = db::select($this->table);
+		$this->data = db::select($this->table, $this->options['cache']);
 		$this->Handler = Handler::map('layer.'.$this->layername)->base('Layers', ucfirst($this->name))->bind($this);
 		
 		$this->get = Hash::length($get) ? $get : Request::retrieve('get');
@@ -233,7 +234,7 @@ abstract class Layer extends Runner {
 			);
 		
 		if($options['edit'] && Validator::check($options['edit']) && $this->table){
-			$data = db::select($this->table)->where($options['edit'])->fetch();
+			$data = db::select($this->table, $this->options['cache'])->where($options['edit'])->fetch();
 			if($data){
 				$this->form->addElement(new HiddenInput(array(
 					'name' => $this->options['identifier']['internal'],
@@ -288,7 +289,7 @@ abstract class Layer extends Runner {
 			);
 			
 			unset($data[$this->options['identifier']['internal']]);
-			$this->content = db::select($this->table)->where($this->where)->fetch();
+			$this->content = db::select($this->table, $this->options['cache'])->where($this->where)->fetch();
 			$this->editing = true;
 		}
 		
@@ -333,7 +334,7 @@ abstract class Layer extends Runner {
 	
 	public function getPagetitle($title, $where, $options = array()){
 		if($this->table)
-			$options['contents'] = Hash::extend(Hash::splat($options['contents']), db::select($this->table)->fields(array_unique($this->options['identifier']))->retrieve());
+			$options['contents'] = Hash::extend(Hash::splat($options['contents']), db::select($this->table, $this->options['cache'])->fields(array_unique($this->options['identifier']))->retrieve());
 		
 		if($where[$this->options['identifier']['internal']])
 			$options[$this->options['identifier']['internal']] = Data::call($where[$this->options['identifier']['internal']][0], $where[$this->options['identifier']['internal']][1]);

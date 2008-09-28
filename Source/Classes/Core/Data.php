@@ -101,7 +101,7 @@ class Data {
 	}
 	
 	public static function in($key, $array){
-		return $key.' IN ('.implode(',', array_unique(Hash::splat($array))).')';
+		return !Hash::length($array) ? $key."=''" : $key.' IN ('.implode(',', array_unique(Hash::splat($array))).')';
 	}
 	
 	public static function implode($array){
@@ -117,7 +117,7 @@ class Data {
 			}
 		}else{
 			$array = trim($array);
-			if($whitespaces) $array = str_replace(array("\t", "\n", "\r"), array("", $whitespaces=='clean' ? "\n" : " ", ""), $array);
+			if($whitespaces) $array = str_replace(array("\r\n", "\t", "\n", "\r"), array("", $whitespaces=='clean' ? "\n" : " ", ""), $array);
 		}
 		
 		return $array;
@@ -194,7 +194,7 @@ class Data {
 	public static function encode($data, $options = array(
 		'whitespace' => true,
 	)){
-		return json_encode(Data::clean($data, $options['whitespace']));
+		return json_encode(self::clean($data, $options['whitespace']));
 	}
 	
 }

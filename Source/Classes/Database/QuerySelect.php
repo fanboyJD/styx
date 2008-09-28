@@ -9,7 +9,7 @@
 
 class QuerySelect extends QueryHandler implements Iterator {
 	
-	private $cache = array(),
+	protected $cache = array(),
 		$queried = false;
 	
 	public function __construct($table){
@@ -71,7 +71,7 @@ class QuerySelect extends QueryHandler implements Iterator {
 	}
 	
 	public function count($field = null){
-		$count = $this->fields('COUNT('.($field ? $field : Core::retrieve('identifier.internal')).')')->fetch(MYSQL_NUM);
+		$count = $this->fields('COUNT('.($field ? $field : Core::retrieve('identifier.internal')).')')->limit(0)->fetch(MYSQL_NUM);
 		
 		return pick($count[0], 0);
 	}

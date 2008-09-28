@@ -51,7 +51,7 @@ class LoginLayer extends Layer {
 			return;
 		}
 		
-		$this->edit();
+		$this->add();
 		$this->Handler->template('login')->assign($this->format());
 	}
 	
