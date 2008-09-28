@@ -1,9 +1,9 @@
 <?php
-/* 
- * Styx::Db - MIT-style License 
- * Author: christoph.pojer@gmail.com 
+/*
+ * Styx::Db - MIT-style License
+ * Author: christoph.pojer@gmail.com
  *
- * Usage: Handles MySQL-Database connection 
+ * Usage: Handles MySQL-Database connection
  *
  */
 
