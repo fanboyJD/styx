@@ -49,6 +49,7 @@ abstract class Layer extends Runner {
 			'prefix' => null,
 		),
 		$where = null,
+		$content = null,
 		$editing = false;
 	
 	public $get = array(),
@@ -59,7 +60,7 @@ abstract class Layer extends Runner {
 	 */
 	protected $data;
 	
-	protected static $Configuration,
+	private static $Configuration,
 		$Layers = array(
 			'List' => array(),
 			'Instances' => array(),
@@ -240,6 +241,7 @@ abstract class Layer extends Runner {
 				)));
 				
 				$this->setValue($data);
+				$this->content = $data;
 				$this->where = $options['edit'];
 				$this->editing = true;
 			}
@@ -286,6 +288,7 @@ abstract class Layer extends Runner {
 			);
 			
 			unset($data[$this->options['identifier']['internal']]);
+			$this->content = db::select($this->table)->where($this->where)->fetch();
 			$this->editing = true;
 		}
 		
@@ -313,13 +316,15 @@ abstract class Layer extends Runner {
 		if(!$data) throw new ValidatorException('data');
 		elseif(!$this->table) throw new ValidatorException();
 		
-		if($where) db::update($this->table)->set($data)->where($where)->query();
-		else db::insert($this->table)->set($data)->query();
+		if($where) $query = db::update($this->table)->where($where);
+		else $query = db::insert($this->table);
+		
+		$query->set($data)->query();
 	}
 	/* SaveHandler End */
 	
 	public function getDefaultEvent($event){
-		return $this->events[$event];
+		return pick($this->events[$event]);
 	}
 	
 	public function setDefaultEvent($event, $name){

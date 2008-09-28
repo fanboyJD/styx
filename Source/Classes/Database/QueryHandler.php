@@ -9,19 +9,18 @@
 
 class QueryHandler {
 	
-	protected static $Types = array('update', 'insert', 'delete');
-	
-	protected $Storage,
+	protected $Types = array('update', 'insert', 'delete'),
+		$Storage,
 		$type = '',
 		$table = '',
 		$formatted = null;
 	
 	public function __construct($table, $type){
-		if(!in_array($type, self::$Types))
+		if(!in_array($type, $this->Types))
 			$type = 'update';
 		
-		$this->type = $type;
 		$this->table = $table;
+		$this->type = $type;
 		
 		/*
 		 * We cannot extend from DynamicStorage due to the
@@ -54,13 +53,11 @@ class QueryHandler {
 	 *		array(array('id' => 5), 'OR', array('id' => 6))
 	 */
 	protected function formatWhere($deep = null){
-		if($deep)
-			$data = &$deep;
-		else
-			$data = $this->Storage->retrieve('where');
+		if($deep) $data = &$deep;
+		else $data = $this->Storage->retrieve('where');
 		
 		if(!is_array($data) && is_string($data))
-			return 'WHERE '.($data ? $data : 1);
+			return ' WHERE '.($data ? $data : 1);
 		elseif(!$deep && !$data)
 			return '';
 		
@@ -73,7 +70,7 @@ class QueryHandler {
 				$out[] = $v;
 		}
 		
-		return (!$deep ? 'WHERE ' : '').($out ? implode(' ', $out) : 1);
+		return (!$deep ? ' WHERE ' : '').($out ? implode(' ', $out) : 1);
 	}
 	
 	protected function formatLimit(){
@@ -133,7 +130,7 @@ class QueryHandler {
 	public function format($part = false){
 		if($this->formatted) return $this->formatted;
 		
-		$out = ' '.$this->formatWhere();
+		$out = $this->formatWhere();
 		
 		if($this->type=='update')
 			$out = 'UPDATE '.$this->table.' SET '.$this->formatSet().$out;
@@ -147,12 +144,12 @@ class QueryHandler {
 		return $this->formatted = $out.' '.$this->formatLimit();
 	}
 	
-	public function __toString(){
-		return $this->format();
-	}
-	
 	public function query(){
 		return db::getInstance()->query($this->format());
+	}
+	
+	public function __toString(){
+		return $this->format();
 	}
 	
 }

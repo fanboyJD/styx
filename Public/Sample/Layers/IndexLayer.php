@@ -53,12 +53,9 @@ class IndexLayer extends Layer {
 	}
 	
 	public function onSave(){
-		if($this->editing)
-			$data = $this->data->where($this->where)->fetch();
-		
 		$this->form->setValue(array(
-			'uid' => $this->editing ? $data['uid'] : User::get('id'),
-			'time' => $this->editing ? $data['time'] : time(),
+			'uid' => $this->editing ? $this->content['uid'] : User::get('id'),
+			'time' => $this->editing ? $this->content['time'] : time(),
 			'pagetitle' => $this->getPagetitle($this->form->getValue('title'), $this->where),
 		));
 		
@@ -103,8 +100,6 @@ class IndexLayer extends Layer {
 			))->limit(1);
 		else
 			$this->isIndex = true;
-		
-		$this->data->retrieve();
 		
 		foreach($this->data as $n)
 			$users[] = $n['uid'];

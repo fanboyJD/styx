@@ -5,10 +5,7 @@
 	<title>${app.name}</title>
 	<base href="${app.link}"></base>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	${package.style.css}
-	${package.ie.css}
-	${package.ie.js}
-	${package.package1.js}
+	${package.style.css}${package.ie.css}${package.ie.js}${package.package1.js}
 	${scripts}
 	<link rel="alternate" type="application/rss+xml" title="${rss.title}" href="${rss.link}" />
 </head>

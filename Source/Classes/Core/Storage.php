@@ -31,7 +31,7 @@ class DynamicStorage {
 		if($value && !$this->Storage[$key])
 			$this->store($key, $value);
 		
-		return $this->Storage[$key];
+		return pick($this->Storage[$key]);
 	}
 	
 	public function erase($key){

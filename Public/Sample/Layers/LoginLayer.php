@@ -35,6 +35,7 @@ class LoginLayer extends Layer {
 			'AND',
 			'pwd' => md5(Core::retrieve('secure').$this->getValue('pwd')),
 		))->fetch();
+		
 		if(!is_array($user)) throw new ValidatorException('login');
 		
 		$loggedin = User::login($user);

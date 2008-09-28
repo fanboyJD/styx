@@ -13,7 +13,7 @@ class QuerySelect extends QueryHandler implements Iterator {
 		$queried = false;
 	
 	public function __construct($table){
-		self::$Types[] = 'select';
+		$this->Types = array('select');
 		
 		parent::__construct($table, 'select');
 	}
@@ -65,22 +65,21 @@ class QuerySelect extends QueryHandler implements Iterator {
 	}
 	
 	public function fetch($type = null){
-		// To overcome big queries
-		$this->Storage->retrieve('limit', array(0, 1));
+		$this->Storage->retrieve('limit', array(0, 1)); // To overcome big queries
 		
 		return db::getInstance()->fetch($this->query(), $type);
+	}
+	
+	public function count($field = null){
+		$count = $this->fields('COUNT('.($field ? $field : Core::retrieve('identifier.internal')).')')->fetch(MYSQL_NUM);
+		
+		return pick($count[0], 0);
 	}
 	
 	public function retrieve(){
 		$this->queried = false;
 		
 		return $this->cache = pick(db::getInstance()->retrieve($this->format()), array());
-	}
-	
-	public function count($field = 'id'){
-		$count = $this->fields('COUNT('.$field.')')->fetch(MYSQL_NUM);
-		
-		return pick($count[0], 0);
 	}
 	
 	public function rewind(){

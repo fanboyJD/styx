@@ -37,7 +37,6 @@ class PackageManager {
 		$Packages = array(),
 		$Package = null,
 		$compress = null,
-		$uagent = null,
 		$encoding = null;
 	
 	public static function add($name, $options = array(
@@ -155,32 +154,11 @@ class PackageManager {
 		return $compress && $gzipcontent ? $gzipcontent : $content;
 	}
 	
-	private static function parseUAgent(){
-		if(is_array(self::$uagent)) return self::$uagent;
-		
-		$uagent = $_SERVER['HTTP_USER_AGENT'];
-		
-		if(preg_match('/msie ([0-9]).*[0-9]*b*;/i', $uagent, $m))
-			self::$uagent = array(
-				'browser' => 'ie',
-				'version' => $m[1][0],
-			);
-		else
-			self::$uagent = array(
-				'browser' => 'compatible',
-			);
-		
-		if(strpos($uagent, 'SV1')!==false)
-			self::$uagent['features']['servicePack'] = true;
-		
-		return self::$uagent;
-	}
-	
 	private static function checkGzipCompress(){
 		if(self::$compress===null){
 			self::$compress = false;
 			
-			$uagent = self::parseUAgent();
+			$uagent = Request::getUAgent();
 			
 			$encodings = array();
 			if($_SERVER['HTTP_ACCEPT_ENCODING'])
@@ -198,7 +176,7 @@ class PackageManager {
 	
 	private static function checkRequired($require){
 		if(sizeof($require)){
-			$uagent = self::parseUAgent();
+			$uagent = Request::getUAgent();
 			
 			if($require['login'] && !User::retrieve())
 				return false;

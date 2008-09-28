@@ -2,7 +2,8 @@
 
 class Request extends StaticStorage {
 	
-	private static $method = null;
+	private static $method = null,
+		$uagent = null;
 	
 	private function __construct(){}
 	private function __clone(){}
@@ -64,6 +65,28 @@ class Request extends StaticStorage {
 			
 			self::store('post', $post);
 		}
+	}
+	
+	public static function getUAgent(){
+		if(is_array(self::$uagent)) return self::$uagent;
+		
+		$uagent = $_SERVER['HTTP_USER_AGENT'];
+		
+		if(preg_match('/msie ([0-9]).*[0-9]*b*;/i', $uagent, $m)){
+			self::$uagent = array(
+				'browser' => 'ie',
+				'version' => $m[1][0],
+			);
+			
+			if(strpos($uagent, 'SV1')!==false)
+				self::$uagent['features']['servicePack'] = true;
+		}else{
+			self::$uagent = array(
+				'browser' => 'compatible',
+			);
+		}
+		
+		return self::$uagent;
 	}
 	
 }

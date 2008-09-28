@@ -40,8 +40,6 @@ class PageLayer extends Layer {
 		if(!$this->editing)
 			throw new ValidatorException('onlyedit');
 		
-		$data = $this->data->where($this->where)->fetch();
-		
 		$this->form->setValue(array(
 			'pagetitle' => $this->getPagetitle($this->form->getValue('title'), $this->where),
 		));
