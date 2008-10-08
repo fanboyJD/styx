@@ -26,12 +26,6 @@ $_CONFIGURATION = array(
 	
 	'languages' => array('en'),
 	
-	'user.type' => 'cookie',
-	'user.table' => 'users',
-	'user.fields' => array('name', 'pwd'),
-	'user.sessionfield' => 'session',
-	'user.rightsfield' => 'rights',
-	
 	'rights.layer' => array(
 		'index' => array( // You can specify different rights for the IndexLayer like only adding or adding/modifying but not deleting
 			'edit' => array(

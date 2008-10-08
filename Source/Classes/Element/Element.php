@@ -21,7 +21,7 @@ class Element extends Runner {
 				:length
 				:empty - input value can be empty
 				:elements
-				:unknown - name/id does not get set automatically when not given)
+				:unknown - name/id won't be set automatically when empty
 				:tag - type/name given by options
 				:standalone - for elements without template; if element gets closed inside the tag (like <img />)
 				:preset - stores the initial value for the validator

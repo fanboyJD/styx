@@ -29,11 +29,11 @@ class LoginLayer extends Layer {
 	
 	public function onHandle(){
 		$this->validate();
-			
+		
 		$user = $this->data->where(array(
 			'name' => $this->getValue('name'),
 			'AND',
-			'pwd' => md5(Core::retrieve('secure').$this->getValue('pwd')),
+			'pwd' => sha1(Core::retrieve('secure').$this->getValue('pwd')),
 		))->fetch();
 		
 		if(!is_array($user)) throw new ValidatorException('login');

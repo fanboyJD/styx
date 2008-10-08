@@ -43,9 +43,7 @@ Handler::setHandlers(Core::retrieve('handler'));
 
 User::initialize();
 
-if(PackageManager::has($get['m']['package'])){
-	PackageManager::setPackage($get['m']['package']);
-	
+if($get['m']['package'] && PackageManager::setPackage($get['m']['package'])){
 	Handler::useExtendedTypes();
 	
 	Handler::setType(PackageManager::getType());

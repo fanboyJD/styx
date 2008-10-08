@@ -53,10 +53,10 @@ class IndexLayer extends Layer {
 	}
 	
 	public function onSave(){
-		$this->form->setValue(array(
+		$this->setValue(array(
 			'uid' => $this->editing ? $this->content['uid'] : User::get('id'),
 			'time' => $this->editing ? $this->content['time'] : time(),
-			'pagetitle' => $this->getPagetitle($this->form->getValue('title'), $this->where),
+			'pagetitle' => $this->getPagetitle($this->getValue('title'), $this->where),
 		));
 		
 		$this->save();

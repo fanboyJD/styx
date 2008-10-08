@@ -404,15 +404,16 @@ abstract class Layer extends Runner {
 	}
 	
 	protected function generateSessionName(){
-		return $this->name.'_session_'.md5($this->name.'.'.Core::retrieve('secure'));
+		return $this->name.'_session_'.sha1($this->name.'.'.Core::retrieve('secure'));
 	}
 	
 	public function requireSession(){
 		$name = $this->generateSessionName();
+		$user = Core::retrieve('user');
 		
 		return $this->form->addElement(new HiddenInput(array(
 			'name' => $name,
-			'value' => Request::getMethod()=='post' && $this->post[$name] ? $this->post[$name] : User::get(Core::retrieve('user.sessionfield')),
+			'value' => Request::getMethod()=='post' && $this->post[$name] ? $this->post[$name] : User::get($user['session']),
 			':alias' => true,
 		)));
 	}

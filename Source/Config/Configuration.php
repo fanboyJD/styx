@@ -23,6 +23,14 @@ Core::store(array(
 	'tpl.standard' => 'tpl',
 	'tpl.execute' => array('php', 'phtml'),
 	
+	'user' => array(
+		'type' => 'cookie',
+		'table' => 'users',
+		'fields' => array('name', 'pwd', 'session'),
+		'session' => 'session',
+		'rights' => 'rights',
+	),
+	
 	'handler' => array('html', 'json', 'xml'),
 	
 	'identifier.internal' => 'id',
@@ -31,4 +39,5 @@ Core::store(array(
 	'elements.prefix' => 'el',
 	
 	'expiration' => 31536000, // A long time
+	'cookieexpiration' => 8640000, // A long time
 ));

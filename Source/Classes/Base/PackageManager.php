@@ -9,12 +9,9 @@
 
 class PackageManager {
 	
-	private static $Directories = array(
-			'js' => '../JavaScript',
-			'css' => '../Css',
-		),
-		$Elements = array(
+	private static $Elements = array(
 			'js' => array(
+				'directory' => '../JavaScript',
 				'attribute' => 'src',
 				'options' => array(
 					':tag' => 'script',
@@ -23,6 +20,7 @@ class PackageManager {
 				),
 			),
 			'css' => array(
+				'directory' => '../Css',
 				'attribute' => 'href',
 				'options' => array(
 					':tag' => 'link',
@@ -51,12 +49,17 @@ class PackageManager {
 		self::$Packages[$name] = $options;
 	}
 	
-	public static function has($name){
+	private static function has($name){
 		return is_array(self::$Packages[$name]);
 	}
 	
 	public static function setPackage($name){
-		if(self::has($name)) self::$Package = $name;
+		if(self::has($name)){
+			self::$Package = $name;
+			return true;
+		}
+		
+		return false;
 	}
 	
 	public static function getType(){
@@ -70,7 +73,8 @@ class PackageManager {
 			if(!self::checkRequired($package['require']))
 				continue;
 			
-			Hash::extend($element = self::$Elements[$package['type']], Hash::splat($package['options']));
+			$element = self::$Elements[$package['type']];
+			Hash::extend($element['options'], Hash::splat($package['options']));
 			$element['options'][$element['attribute']] = $version.'/'.$name;
 			
 			$el = new Element($element['options']);
@@ -102,7 +106,7 @@ class PackageManager {
 		if($debug){
 			/* We check here if the files have been modified */
 			foreach($package['files'] as $file)
-				$time = max($time, filemtime(realpath(self::$Directories[$package['type']].'/'.$file.'.'.$package['type'])));
+				$time = max($time, filemtime(realpath(self::$Elements[$package['type']]['directory'].'/'.$file.'.'.$package['type'])));
 			
 			if($time<$c->retrieve('CompressedTime', self::$Package, 'file'))
 				$debug = false;
@@ -120,7 +124,7 @@ class PackageManager {
 		}
 		
 		foreach($package['files'] as $file)
-			$source[] = file_get_contents(realpath(self::$Directories[$package['type']].'/'.$file.'.'.$package['type']));
+			$source[] = file_get_contents(realpath(self::$Elements[$package['type']]['directory'].'/'.$file.'.'.$package['type']));
 		
 		$content = implode($source);
 		
@@ -144,23 +148,23 @@ class PackageManager {
 		
 		$c->store('CompressedTime', self::$Package, time(), 'file');
 		
-		return $compress && $gzipcontent ? $gzipcontent : $content;
+		return $compress ? $gzipcontent : $content;
 	}
 	
 	private static function checkGzipCompress(){
 		if(self::$compress===null){
 			self::$compress = false;
 			
-			$uagent = Request::getUAgent();
+			$client = Request::getClient();
 			
 			$encodings = array();
 			if($_SERVER['HTTP_ACCEPT_ENCODING'])
-				$encodings = explode(',', strtolower(preg_replace("/\s+/", "", $_SERVER['HTTP_ACCEPT_ENCODING'])));
+				$encodings = explode(',', strtolower(preg_replace('/\s+/', '', $_SERVER['HTTP_ACCEPT_ENCODING'])));
 		
 			if((in_array('gzip', $encodings) || in_array('x-gzip', $encodings)) && !ini_get('zlib.output_compression'))
 				self::$encoding = (in_array('x-gzip', $encodings) ? 'x-' : '').'gzip';
 			
-			if(self::$encoding && ($uagent['browser']!='ie' || $uagent['version']>6 || $uagent['features']['servicePack']))
+			if(self::$encoding && ($client['browser']!='ie' || $client['version']>6 || $client['features']['servicePack']))
 				self::$compress = true;
 		}
 		
@@ -169,12 +173,12 @@ class PackageManager {
 	
 	private static function checkRequired($require){
 		if(sizeof($require)){
-			$uagent = Request::getUAgent();
+			$client = Request::getClient();
 			
 			if($require['login'] && !User::retrieve())
 				return false;
 			
-			if($require['browser'] && ($require['browser']!=$uagent['browser'] || (!$require['version'] || !in_array($uagent['version'], Hash::splat($require['version'])))))
+			if($require['browser'] && ($require['browser']!=$client['browser'] || (!$require['version'] || !in_array($client['version'], Hash::splat($require['version'])))))
 				return false;
 		}
 		
