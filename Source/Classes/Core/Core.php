@@ -94,7 +94,7 @@ class Core extends StaticStorage {
 					foreach($files as $file)
 						$List[strtolower(basename($file, '.php'))] = $file;
 			
-			foreach(new PHPExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($apppath.'/Assets/'))) as $file)
+			foreach(new PHPExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($apppath.'/Classes/'))) as $file)
 				$List[strtolower(basename($file, '.php'))] = $file;
 			
 			$c->store('Core', 'Classes', self::store('Classes', $List));
