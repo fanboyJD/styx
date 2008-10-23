@@ -1,4 +1,8 @@
 <?php
+	$Paths = array(
+		'app.path' => realpath('../'),
+		'app.public' => realpath('./'),
+	);
 	include('../../../Source/Styx.php');
 	
 	function initialize(){

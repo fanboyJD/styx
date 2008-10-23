@@ -119,7 +119,8 @@ abstract class Layer extends Runner {
 			if(String::starts($m, 'on') && strlen($m)>=3)
 				$this->methods[] = strtolower(substr($m, 2));
 		
-		Hash::splat($initialize = $this->initialize());
+		$initialize = $this->initialize();
+		Hash::splat($initialize);
 		
 		if(key_exists('table', $initialize))
 			$this->table = pick($initialize['table']);

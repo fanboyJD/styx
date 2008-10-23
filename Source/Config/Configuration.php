@@ -40,4 +40,6 @@ Core::store(array(
 	
 	'expiration' => 31536000, // A long time
 	'cookieexpiration' => 8640000, // A long time
+	
+	'timezone' => 'Europe/Vienna',
 ));

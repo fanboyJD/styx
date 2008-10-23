@@ -5,29 +5,41 @@
  */
 
 $_CONFIGURATION = null;
-require_once('../Config/Configuration.php');
+if(!is_array($Paths))
+	$Paths = array(
+		'app.path' => realpath('../').DIRECTORY_SEPARATOR,
+		'app.public' => realpath('./').DIRECTORY_SEPARATOR,
+	);
+else
+	foreach($Paths as $k => $path)
+		if(strrpos($path, '/')===strlen($path)-1)
+			$Paths[$k] = $path.'/'; // Custom Paths may not have a slash at the end
 
-$path = dirname(__FILE__).DIRECTORY_SEPARATOR;
-set_include_path(get_include_path().PATH_SEPARATOR.$path);
+require_once($Paths['app.path'].'/Config/Configuration.php');
+
+if(!$Paths['path']) $Paths['path'] = dirname(__FILE__).DIRECTORY_SEPARATOR;
+set_include_path(get_include_path().PATH_SEPARATOR.$Paths['path']);
 
 foreach(array('Storage', 'Hash', 'Core', 'String') as $v)
 	require_once('Classes/Core/'.$v.'.php');
 
 spl_autoload_register(array('Core', 'autoload'));
 
-Core::store('path', $path);
-Core::store('app.path', realpath('../').DIRECTORY_SEPARATOR);
+Core::store($Paths);
 
 Core::loadClass('Core', 'Data');
 Core::loadClass('Cache', 'Cache');
 
-require_once($path.'Config/Configuration.php');
-unset($path);
+require_once($Paths['path'].'/Config/Configuration.php');
+
 
 if(is_array($_CONFIGURATION)){
 	Core::store($_CONFIGURATION);
 	unset($_CONFIGURATION);
 }
+unset($Paths);
+
+ini_set('date.timezone', Core::retrieve('timezone'));
 
 Core::initialize();
 
