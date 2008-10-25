@@ -17,7 +17,7 @@ class Upload {
      * @access public
      * @var string
      */
-    var $file_src_name;
+    public $file_src_name;
 
     /**
      * Uploaded file name body (i.e. without extension)
@@ -25,7 +25,7 @@ class Upload {
      * @access public
      * @var string
      */
-    var $file_src_name_body;
+    public $file_src_name_body;
 
     /**
      * Uploaded file name extension
@@ -33,7 +33,7 @@ class Upload {
      * @access public
      * @var string
      */
-    var $file_src_name_ext;
+    public $file_src_name_ext;
 
     /**
      * Uploaded file MIME type
@@ -41,7 +41,7 @@ class Upload {
      * @access public
      * @var string
      */
-    var $file_src_mime;
+    public $file_src_mime;
 
     /**
      * Uploaded file size, in bytes
@@ -49,7 +49,7 @@ class Upload {
      * @access public
      * @var double
      */
-    var $file_src_size;
+    public $file_src_size;
 
     /**
      * Holds eventual PHP error code from $_FILES
@@ -57,7 +57,7 @@ class Upload {
      * @access public
      * @var string
      */
-    var $file_src_error;
+    public $file_src_error;
 
     /**
      * Uloaded file name, including server path
@@ -65,7 +65,7 @@ class Upload {
      * @access private
      * @var string
      */
-    var $file_src_pathname;
+    public $file_src_pathname;
 
     /**
      * Uloaded file name temporary copy
@@ -73,7 +73,7 @@ class Upload {
      * @access private
      * @var string
      */
-    var $file_src_temp;
+    public $file_src_temp;
 
     /**
      * Destination file name
@@ -81,7 +81,7 @@ class Upload {
      * @access private
      * @var string
      */
-    var $file_dst_path;
+    public $file_dst_path;
 
     /**
      * Destination file name
@@ -89,7 +89,7 @@ class Upload {
      * @access public
      * @var string
      */
-    var $file_dst_name;
+    public $file_dst_name;
 
     /**
      * Destination file name body (i.e. without extension)
@@ -97,7 +97,7 @@ class Upload {
      * @access public
      * @var string
      */
-    var $file_dst_name_body;
+    public $file_dst_name_body;
 
     /**
      * Destination file extension
@@ -105,7 +105,7 @@ class Upload {
      * @access public
      * @var string
      */
-    var $file_dst_name_ext;
+    public $file_dst_name_ext;
 
     /**
      * Destination file name, including path
@@ -113,7 +113,7 @@ class Upload {
      * @access private
      * @var string
      */
-    var $file_dst_pathname;
+    public $file_dst_pathname;
 
     /**
      * Source image width
@@ -121,7 +121,7 @@ class Upload {
      * @access private
      * @var integer
      */
-    var $image_src_x;
+    public $image_src_x;
 
     /**
      * Source image height
@@ -129,7 +129,7 @@ class Upload {
      * @access private
      * @var integer
      */
-    var $image_src_y;
+    public $image_src_y;
 
     /**
      * Source image color depth
@@ -137,7 +137,7 @@ class Upload {
      * @access private
      * @var integer
      */
-    var $image_src_bits;
+    public $image_src_bits;
 
     /**
      * Number of pixels
@@ -145,7 +145,7 @@ class Upload {
      * @access private
      * @var long
      */
-    var $image_src_pixels;
+    public $image_src_pixels;
 
     /**
      * Type of image (png, gif, jpg or bmp)
@@ -153,7 +153,7 @@ class Upload {
      * @access private
      * @var string
      */
-    var $image_src_type;
+    public $image_src_type;
 
     /**
      * Destination image width
@@ -161,7 +161,7 @@ class Upload {
      * @access private
      * @var integer
      */
-    var $image_dst_x;
+    public $image_dst_x;
 
     /**
      * Destination image height
@@ -169,7 +169,7 @@ class Upload {
      * @access private
      * @var integer
      */
-    var $image_dst_y;
+    public $image_dst_y;
 
     /**
      * Supported image formats
@@ -177,7 +177,7 @@ class Upload {
      * @access private
      * @var array
      */
-    var $image_supported;
+    public $image_supported;
 
     /**
      * Flag to determine if the source file is an image
@@ -185,7 +185,7 @@ class Upload {
      * @access private
      * @var boolean
      */
-    var $file_is_image;
+    public $file_is_image;
 
     /**
      * Flag set after instanciating the class
@@ -195,7 +195,7 @@ class Upload {
      * @access public
      * @var bool
      */
-    var $uploaded;
+    public $uploaded;
 
     /**
      * Flag stopping PHP upload checks
@@ -210,7 +210,7 @@ class Upload {
      * @access public
      * @var bool
      */
-    var $no_upload_check;
+    public $no_upload_check;
 
     /**
      * Flag set after calling a process
@@ -220,7 +220,7 @@ class Upload {
      * @access public
      * @var bool
      */
-    var $processed;
+    public $processed;
 
     /**
      * Holds eventual error message in plain english
@@ -228,7 +228,7 @@ class Upload {
      * @access public
      * @var string
      */
-    var $error;
+    public $error;
 
     /**
      * Holds an HTML formatted log
@@ -236,7 +236,7 @@ class Upload {
      * @access public
      * @var string
      */
-    var $log;
+    public $log;
 
 
     // overiddable processing variables
@@ -248,7 +248,7 @@ class Upload {
      * @access public
      * @var string
      */
-    var $file_new_name_body;
+    public $file_new_name_body;
 
     /**
      * Set this variable to add a string to the faile name body
@@ -256,7 +256,7 @@ class Upload {
      * @access public
      * @var string
      */
-    var $file_name_body_add;
+    public $file_name_body_add;
 
     /**
      * Set this variable to change the file extension
@@ -264,7 +264,7 @@ class Upload {
      * @access public
      * @var string
      */
-    var $file_new_name_ext;
+    public $file_new_name_ext;
 
     /**
      * Set this variable to format the filename (spaces changed to _)
@@ -272,7 +272,7 @@ class Upload {
      * @access public
      * @var boolean
      */
-    var $file_safe_name;
+    public $file_safe_name;
 
     /**
      * Set this variable to false if you don't want to check the MIME against the allowed list
@@ -282,7 +282,7 @@ class Upload {
      * @access public
      * @var boolean
      */
-    var $mime_check;
+    public $mime_check;
 
     /**
      * Set this variable to true if you want to check the MIME type against a mime_magic file
@@ -292,7 +292,7 @@ class Upload {
      * @access public
      * @var boolean
      */
-    var $mime_magic_check;
+    public $mime_magic_check;
 
     /**
      * Set this variable to false if you don't want to turn dangerous scripts into simple text files
@@ -300,7 +300,7 @@ class Upload {
      * @access public
      * @var boolean
      */
-    var $no_script;
+    public $no_script;
 
     /**
      * Set this variable to true to allow automatic renaming of the file
@@ -315,7 +315,7 @@ class Upload {
      * @access public
      * @var bool
      */
-    var $file_auto_rename;
+    public $file_auto_rename;
 
     /**
      * Set this variable to true to allow automatic creation of the destination
@@ -326,7 +326,7 @@ class Upload {
      * @access public
      * @var bool
      */
-    var $dir_auto_create;
+    public $dir_auto_create;
 
     /**
      * Set this variable to true to allow automatic chmod of the destination
@@ -337,7 +337,7 @@ class Upload {
      * @access public
      * @var bool
      */
-    var $dir_auto_chmod;
+    public $dir_auto_chmod;
 
     /**
      * Set this variable to the default chmod you want the class to use
@@ -348,7 +348,7 @@ class Upload {
      * @access public
      * @var bool
      */
-    var $dir_chmod;
+    public $dir_chmod;
 
     /**
      * Set this variable tu true to allow overwriting of an existing file
@@ -358,7 +358,7 @@ class Upload {
      * @access public
      * @var bool
      */
-    var $file_overwrite;
+    public $file_overwrite;
 
     /**
      * Set this variable to change the maximum size in bytes for an uploaded file
@@ -368,7 +368,7 @@ class Upload {
      * @access public
      * @var double
      */
-    var $file_max_size;
+    public $file_max_size;
 
     /**
      * Set this variable to true to resize the file if it is an image
@@ -380,7 +380,7 @@ class Upload {
      * @access public
      * @var bool
      */
-    var $image_resize;
+    public $image_resize;
 
     /**
      * Set this variable to convert the file if it is an image
@@ -393,7 +393,7 @@ class Upload {
      * @access public
      * @var string
      */
-    var $image_convert;
+    public $image_convert;
 
     /**
      * Set this variable to the wanted (or maximum/minimum) width for the processed image, in pixels
@@ -403,7 +403,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $image_x;
+    public $image_x;
 
     /**
      * Set this variable to the wanted (or maximum/minimum) height for the processed image, in pixels
@@ -413,7 +413,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $image_y;
+    public $image_y;
 
     /**
      * Set this variable to keep the original size ratio to fit within {@link image_x} x {@link image_y}
@@ -423,7 +423,7 @@ class Upload {
      * @access public
      * @var bool
      */
-    var $image_ratio;
+    public $image_ratio;
 
     /**
      * Set this variable to keep the original size ratio to fit within {@link image_x} x {@link image_y}
@@ -439,7 +439,7 @@ class Upload {
      * @access public
      * @var mixed
      */
-    var $image_ratio_crop;
+    public $image_ratio_crop;
 
     /**
      * Set this variable to keep the original size ratio to fit within {@link image_x} x {@link image_y}
@@ -456,7 +456,7 @@ class Upload {
      * @access public
      * @var mixed
      */
-    var $image_ratio_fill;
+    public $image_ratio_fill;
 
     /**
      * Set this variable to a number of pixels so that {@link image_x} and {@link image_y} are the best match possible
@@ -469,7 +469,7 @@ class Upload {
      * @access public
      * @var mixed
      */
-    var $image_ratio_pixels;
+    public $image_ratio_pixels;
 
     /**
      * Set this variable to keep the original size ratio to fit within {@link image_x} x {@link image_y},
@@ -480,7 +480,7 @@ class Upload {
      * @access public
      * @var bool
      */
-    var $image_ratio_no_zoom_in;
+    public $image_ratio_no_zoom_in;
 
     /**
      * Set this variable to keep the original size ratio to fit within {@link image_x} x {@link image_y},
@@ -491,7 +491,7 @@ class Upload {
      * @access public
      * @var bool
      */
-    var $image_ratio_no_zoom_out;
+    public $image_ratio_no_zoom_out;
 
     /**
      * Set this variable to calculate {@link image_x} automatically , using {@link image_y} and conserving ratio
@@ -501,7 +501,7 @@ class Upload {
      * @access public
      * @var bool
      */
-    var $image_ratio_x;
+    public $image_ratio_x;
 
     /**
      * Set this variable to calculate {@link image_y} automatically , using {@link image_x} and conserving ratio
@@ -511,7 +511,7 @@ class Upload {
      * @access public
      * @var bool
      */
-    var $image_ratio_y;
+    public $image_ratio_y;
 
     /**
      * Set this variable to set a maximum image width, above which the upload will be invalid
@@ -521,7 +521,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $image_max_width;
+    public $image_max_width;
 
     /**
      * Set this variable to set a maximum image height, above which the upload will be invalid
@@ -531,7 +531,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $image_max_height;
+    public $image_max_height;
 
     /**
      * Set this variable to set a maximum number of pixels for an image, above which the upload will be invalid
@@ -541,7 +541,7 @@ class Upload {
      * @access public
      * @var long
      */
-    var $image_max_pixels;
+    public $image_max_pixels;
 
     /**
      * Set this variable to set a maximum image aspect ratio, above which the upload will be invalid
@@ -553,7 +553,7 @@ class Upload {
      * @access public
      * @var float
      */
-    var $image_max_ratio;
+    public $image_max_ratio;
 
     /**
      * Set this variable to set a minimum image width, below which the upload will be invalid
@@ -563,7 +563,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $image_min_width;
+    public $image_min_width;
 
     /**
      * Set this variable to set a minimum image height, below which the upload will be invalid
@@ -573,7 +573,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $image_min_height;
+    public $image_min_height;
 
     /**
      * Set this variable to set a minimum number of pixels for an image, below which the upload will be invalid
@@ -583,7 +583,7 @@ class Upload {
      * @access public
      * @var long
      */
-    var $image_min_pixels;
+    public $image_min_pixels;
 
     /**
      * Set this variable to set a minimum image aspect ratio, below which the upload will be invalid
@@ -595,7 +595,7 @@ class Upload {
      * @access public
      * @var float
      */
-    var $image_min_ratio;
+    public $image_min_ratio;
 
     /**
      * Quality of JPEG created/converted destination image
@@ -605,7 +605,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $jpeg_quality;
+    public $jpeg_quality;
 
     /**
      * Determines the quality of the JPG image to fit a desired file size
@@ -618,7 +618,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $jpeg_size;
+    public $jpeg_size;
 
     /**
      * Preserve transparency when resizing or converting an image (deprecated)
@@ -629,7 +629,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $preserve_transparency;
+    public $preserve_transparency;
 
     /**
      * Flag set to true when the image is transparent
@@ -639,7 +639,7 @@ class Upload {
      * @access public
      * @var boolean
      */
-    var $image_is_transparent;
+    public $image_is_transparent;
 
     /**
      * Transparent color in a palette
@@ -649,7 +649,7 @@ class Upload {
      * @access public
      * @var boolean
      */
-    var $image_transparent_color;
+    public $image_transparent_color;
 
     /**
      * Background color, used to paint transparent areas with
@@ -664,7 +664,7 @@ class Upload {
      * @access public
      * @var string
      */
-    var $image_background_color;
+    public $image_background_color;
 
     /**
      * Default color for non alpha-transparent images
@@ -680,7 +680,7 @@ class Upload {
      * @access public
      * @var boolean
      */
-    var $image_default_color;
+    public $image_default_color;
 
     /**
      * Flag set to true when the image is not true color
@@ -688,7 +688,7 @@ class Upload {
      * @access public
      * @var boolean
      */
-    var $image_is_palette;
+    public $image_is_palette;
 
     /**
      * Corrects the image brightness
@@ -700,7 +700,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $image_brightness;
+    public $image_brightness;
 
     /**
      * Corrects the image contrast
@@ -712,7 +712,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $image_contrast;
+    public $image_contrast;
 
     /**
      * Applies threshold filter
@@ -724,7 +724,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $image_threshold;
+    public $image_threshold;
 
     /**
      * Applies a tint on the image
@@ -736,7 +736,7 @@ class Upload {
      * @access public
      * @var string;
      */
-    var $image_tint_color;
+    public $image_tint_color;
 
     /**
      * Applies a colored overlay on the image
@@ -750,7 +750,7 @@ class Upload {
      * @access public
      * @var string;
      */
-    var $image_overlay_color;
+    public $image_overlay_color;
 
     /**
      * Sets the percentage for the colored overlay
@@ -764,7 +764,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $image_overlay_percent;
+    public $image_overlay_percent;
 
     /**
      * Inverts the color of an image
@@ -774,7 +774,7 @@ class Upload {
      * @access public
      * @var boolean;
      */
-    var $image_negative;
+    public $image_negative;
 
     /**
      * Turns the image into greyscale
@@ -784,7 +784,7 @@ class Upload {
      * @access public
      * @var boolean;
      */
-    var $image_greyscale;
+    public $image_greyscale;
 
     /**
      * Adds a text label on the image
@@ -810,7 +810,7 @@ class Upload {
      * @access public
      * @var string;
      */
-    var $image_text;
+    public $image_text;
 
     /**
      * Sets the text direction for the text label
@@ -822,7 +822,7 @@ class Upload {
      * @access public
      * @var string;
      */
-    var $image_text_direction;
+    public $image_text_direction;
 
     /**
      * Sets the text color for the text label
@@ -834,7 +834,7 @@ class Upload {
      * @access public
      * @var string;
      */
-    var $image_text_color;
+    public $image_text_color;
 
     /**
      * Sets the text visibility in the text label
@@ -846,7 +846,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $image_text_percent;
+    public $image_text_percent;
 
     /**
      * Sets the text background color for the text label
@@ -858,7 +858,7 @@ class Upload {
      * @access public
      * @var string;
      */
-    var $image_text_background;
+    public $image_text_background;
 
     /**
      * Sets the text background visibility in the text label
@@ -870,7 +870,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $image_text_background_percent;
+    public $image_text_background_percent;
 
     /**
      * Sets the text font in the text label
@@ -883,7 +883,7 @@ class Upload {
      * @access public
      * @var mixed;
      */
-    var $image_text_font;
+    public $image_text_font;
 
     /**
      * Sets the text label position within the image
@@ -904,7 +904,7 @@ class Upload {
      * @access public
      * @var string;
      */
-    var $image_text_position;
+    public $image_text_position;
 
     /**
      * Sets the text label absolute X position within the image
@@ -917,7 +917,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $image_text_x;
+    public $image_text_x;
 
     /**
      * Sets the text label absolute Y position within the image
@@ -930,7 +930,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $image_text_y;
+    public $image_text_y;
 
     /**
      * Sets the text label padding
@@ -944,7 +944,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $image_text_padding;
+    public $image_text_padding;
 
     /**
      * Sets the text label horizontal padding
@@ -958,7 +958,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $image_text_padding_x;
+    public $image_text_padding_x;
 
     /**
      * Sets the text label vertical padding
@@ -972,7 +972,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $image_text_padding_y;
+    public $image_text_padding_y;
 
     /**
      * Sets the text alignment
@@ -986,7 +986,7 @@ class Upload {
      * @access public
      * @var string;
      */
-    var $image_text_alignment;
+    public $image_text_alignment;
 
     /**
      * Sets the text line spacing
@@ -1000,7 +1000,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $image_text_line_spacing;
+    public $image_text_line_spacing;
 
     /**
      * Sets the height of the reflection
@@ -1013,7 +1013,7 @@ class Upload {
      * @access public
      * @var mixed;
      */
-    var $image_reflection_height;
+    public $image_reflection_height;
 
     /**
      * Sets the space between the source image and its relection
@@ -1027,7 +1027,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $image_reflection_space;
+    public $image_reflection_space;
 
     /**
      * Sets the color of the reflection background (deprecated)
@@ -1043,7 +1043,7 @@ class Upload {
      * @access public
      * @var string;
      */
-    var $image_reflection_color;
+    public $image_reflection_color;
 
     /**
      * Sets the initial opacity of the reflection
@@ -1058,7 +1058,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $image_reflection_opacity;
+    public $image_reflection_opacity;
 
     /**
      * Flips the image vertically or horizontally
@@ -1070,7 +1070,7 @@ class Upload {
      * @access public
      * @var string;
      */
-    var $image_flip;
+    public $image_flip;
 
     /**
      * Rotates the image by increments of 45 degrees
@@ -1082,7 +1082,7 @@ class Upload {
      * @access public
      * @var string;
      */
-    var $image_rotate;
+    public $image_rotate;
 
     /**
      * Crops an image
@@ -1112,7 +1112,7 @@ class Upload {
      * @access public
      * @var string OR array;
      */
-    var $image_crop;
+    public $image_crop;
 
     /**
      * Adds a bevel border on the image
@@ -1126,7 +1126,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $image_bevel;
+    public $image_bevel;
 
     /**
      * Top and left bevel color
@@ -1139,7 +1139,7 @@ class Upload {
      * @access public
      * @var string;
      */
-    var $image_bevel_color1;
+    public $image_bevel_color1;
 
     /**
      * Right and bottom bevel color
@@ -1152,7 +1152,7 @@ class Upload {
      * @access public
      * @var string;
      */
-    var $image_bevel_color2;
+    public $image_bevel_color2;
 
     /**
      * Adds a single-color border on the outer of the image
@@ -1172,7 +1172,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $image_border;
+    public $image_border;
 
     /**
      * Border color
@@ -1185,7 +1185,7 @@ class Upload {
      * @access public
      * @var string;
      */
-    var $image_border_color;
+    public $image_border_color;
 
     /**
      * Adds a multi-color frame on the outer of the image
@@ -1203,7 +1203,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $image_frame;
+    public $image_frame;
 
     /**
      * Sets the colors used to draw a frame
@@ -1226,7 +1226,7 @@ class Upload {
      * @access public
      * @var string OR array;
      */
-    var $image_frame_colors;
+    public $image_frame_colors;
 
     /**
      * Adds a watermark on the image
@@ -1240,7 +1240,7 @@ class Upload {
      * @access public
      * @var string;
      */
-    var $image_watermark;
+    public $image_watermark;
 
     /**
      * Sets the watermarkposition within the image
@@ -1258,7 +1258,7 @@ class Upload {
      * @access public
      * @var string;
      */
-    var $image_watermark_position;
+    public $image_watermark_position;
 
     /**
      * Sets the watermark absolute X position within the image
@@ -1271,7 +1271,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $image_watermark_x;
+    public $image_watermark_x;
 
     /**
      * Sets the twatermark absolute Y position within the image
@@ -1284,7 +1284,7 @@ class Upload {
      * @access public
      * @var integer
      */
-    var $image_watermark_y;
+    public $image_watermark_y;
 
     /**
      * Allowed MIME types
@@ -1296,7 +1296,7 @@ class Upload {
      * @access public
      * @var array
      */
-    var $allowed;
+    public $allowed;
 
     /**
      * Forbidden MIME types
@@ -1309,7 +1309,7 @@ class Upload {
      * @access public
      * @var array
      */
-    var $forbidden;
+    public $forbidden;
 
     /**
      * Array of translated error messages
@@ -1320,7 +1320,7 @@ class Upload {
      * @access public
      * @var array
      */
-    var $translation;
+    public $translation;
 
     /**
      * Language selected for the translations
@@ -1330,7 +1330,7 @@ class Upload {
      * @access public
      * @var array
      */
-    var $language;
+    public $language;
 
     /**
      * Init or re-init all the processing variables to their default values
@@ -1617,16 +1617,6 @@ class Upload {
 
         // determines the language
         $this->lang               = $lang;
-        if ($this->lang != 'en_GB' && file_exists('lang/class.upload.' . $lang . '.php')) {
-            $translation = null;
-            include('lang/class.upload.' . $lang . '.php');
-            if (is_array($translation)) {
-                $this->translation = array_merge($this->translation, $translation);
-            } else {
-                $this->lang = 'en_GB';
-            }
-        }
-
 
         // determines the supported MIME types, and matching image format
         $this->image_supported = array();
@@ -2789,9 +2779,9 @@ class Upload {
                         $image_dst = $this->imagecreatenew($this->image_dst_x, $this->image_dst_y);
 
                         if ($gd_version >= 2) {
-                            $res = imagecopyresampled($image_dst, $image_src, 0, 0, 0, 0, $this->image_dst_x, $this->image_dst_y, $this->image_src_x, $this->image_src_y);
+                            imagecopyresampled($image_dst, $image_src, 0, 0, 0, 0, $this->image_dst_x, $this->image_dst_y, $this->image_src_x, $this->image_src_y);
                         } else {
-                            $res = imagecopyresized($image_dst, $image_src, 0, 0, 0, 0, $this->image_dst_x, $this->image_dst_y, $this->image_src_x, $this->image_src_y);
+                            imagecopyresized($image_dst, $image_src, 0, 0, 0, 0, $this->image_dst_x, $this->image_dst_y, $this->image_src_x, $this->image_src_y);
                         }
 
                         $this->log .= '&nbsp;&nbsp;&nbsp;&nbsp;resized image object created<br />';
@@ -3670,7 +3660,8 @@ class Upload {
 
         // we may return the image content
         if ($return_mode) return $return_content;
-
+		
+        return '';
     }
 
     /**
@@ -3726,42 +3717,42 @@ class Upload {
         $vide = chr(0);
 
         $res = imagecreatetruecolor($bmp['width'],$bmp['height']);
-        $P = 0;
+        $J = 0;
         $Y = $bmp['height']-1;
         while ($Y >= 0) {
             $X=0;
             while ($X < $bmp['width']) {
                 if ($bmp['bits_per_pixel'] == 24)
-                    $color = unpack("V",substr($im,$P,3).$vide);
+                    $color = unpack("V",substr($im,$J,3).$vide);
                 elseif ($bmp['bits_per_pixel'] == 16) {
-                    $color = unpack("n",substr($im,$P,2));
+                    $color = unpack("n",substr($im,$J,2));
                     $color[1] = $palette[$color[1]+1];
                 } elseif ($bmp['bits_per_pixel'] == 8) {
-                    $color = unpack("n",$vide.substr($im,$P,1));
+                    $color = unpack("n",$vide.substr($im,$J,1));
                     $color[1] = $palette[$color[1]+1];
                 } elseif ($bmp['bits_per_pixel'] == 4) {
-                    $color = unpack("n",$vide.substr($im,floor($P),1));
-                    if (($P*2)%2 == 0) $color[1] = ($color[1] >> 4) ; else $color[1] = ($color[1] & 0x0F);
+                    $color = unpack("n",$vide.substr($im,floor($J),1));
+                    if (($J*2)%2 == 0) $color[1] = ($color[1] >> 4) ; else $color[1] = ($color[1] & 0x0F);
                     $color[1] = $palette[$color[1]+1];
                 } elseif ($bmp['bits_per_pixel'] == 1)  {
-                    $color = unpack("n",$vide.substr($im,floor($P),1));
-                    if     (($P*8)%8 == 0) $color[1] =  $color[1]        >>7;
-                    elseif (($P*8)%8 == 1) $color[1] = ($color[1] & 0x40)>>6;
-                    elseif (($P*8)%8 == 2) $color[1] = ($color[1] & 0x20)>>5;
-                    elseif (($P*8)%8 == 3) $color[1] = ($color[1] & 0x10)>>4;
-                    elseif (($P*8)%8 == 4) $color[1] = ($color[1] & 0x8)>>3;
-                    elseif (($P*8)%8 == 5) $color[1] = ($color[1] & 0x4)>>2;
-                    elseif (($P*8)%8 == 6) $color[1] = ($color[1] & 0x2)>>1;
-                    elseif (($P*8)%8 == 7) $color[1] = ($color[1] & 0x1);
+                    $color = unpack("n",$vide.substr($im,floor($J),1));
+                    if     (($J*8)%8 == 0) $color[1] =  $color[1]        >>7;
+                    elseif (($J*8)%8 == 1) $color[1] = ($color[1] & 0x40)>>6;
+                    elseif (($J*8)%8 == 2) $color[1] = ($color[1] & 0x20)>>5;
+                    elseif (($J*8)%8 == 3) $color[1] = ($color[1] & 0x10)>>4;
+                    elseif (($J*8)%8 == 4) $color[1] = ($color[1] & 0x8)>>3;
+                    elseif (($J*8)%8 == 5) $color[1] = ($color[1] & 0x4)>>2;
+                    elseif (($J*8)%8 == 6) $color[1] = ($color[1] & 0x2)>>1;
+                    elseif (($J*8)%8 == 7) $color[1] = ($color[1] & 0x1);
                     $color[1] = $palette[$color[1]+1];
                 } else
                     return FALSE;
                 imagesetpixel($res,$X,$Y,$color[1]);
                 $X++;
-                $P += $bmp['bytes_per_pixel'];
+                $J += $bmp['bytes_per_pixel'];
             }
             $Y--;
-            $P+=$bmp['decal'];
+            $J+=$bmp['decal'];
         }
         fclose($f1);
         return $res;

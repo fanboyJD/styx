@@ -17,14 +17,12 @@ class PHPExtensionFilter extends FilterIterator {
 	
 	public function __construct(RecursiveIteratorIterator $it){
 		parent::__construct($it);
+		
 		$this->it = $it;
 	}
 	
 	public function accept(){
-		if(!$this->it->isDir())
-			return strtolower(pathinfo($this->current(), PATHINFO_EXTENSION))=='php';
-		
-		return true;
+		return $this->it->isDir || strtolower(pathinfo($this->current(), PATHINFO_EXTENSION))=='php';
 	}
 	
 }
@@ -95,7 +93,7 @@ class Core extends StaticStorage {
 						$List[strtolower(basename($file, '.php'))] = $file;
 			
 			foreach(new PHPExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($apppath.'/Classes/'))) as $file)
-				$List[strtolower(basename($file, '.php'))] = $file;
+				$List[strtolower(basename($file->getFileName(), '.php'))] = $file->getRealPath();
 			
 			$c->store('Core', 'Classes', self::store('Classes', $List));
 		}

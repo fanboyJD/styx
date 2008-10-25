@@ -29,12 +29,8 @@ class Data {
 	public static function strip($string){
 		if(!$string) return '';
 		
-		if(is_array($string)){
-			foreach($string as &$val)
-				$val = self::strip($val);
-			
-			return $string;
-		}
+		if(is_array($string))
+			return array_map('Data::strip', $string);
 		
 		return stripslashes($string);
 	}

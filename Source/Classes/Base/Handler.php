@@ -183,8 +183,7 @@ class Handler extends Template {
 	 */
 	public function filter($string){
 		if(is_array($string)){
-			foreach($string as $v)
-				$this->filter($v);
+			array_walk($string, array($this, 'filter'));
 			
 			return $this;
 		}
