@@ -235,11 +235,6 @@ abstract class Layer extends Runner {
 		if($options['edit'] && Validator::check($options['edit']) && $this->table){
 			$data = db::select($this->table, $this->options['cache'])->where($options['edit'])->fetch();
 			if($data){
-				$this->form->addElement(new HiddenInput(array(
-					'name' => $this->options['identifier']['internal'],
-					':alias' => true,
-				)));
-				
 				$this->setValue($data);
 				$this->content = $data;
 				$this->where = $options['edit'];
@@ -282,13 +277,17 @@ abstract class Layer extends Runner {
 	}
 	
 	public function prepareData($data){
-		if($data[$this->options['identifier']['internal']] && $this->hasRight(pick($this->baseRights, $this->event), 'modify')){
-			$this->where = array(
-				$this->options['identifier']['internal'] => array($data[$this->options['identifier']['internal']], $this->options['identifier']['internal']),
+		if($this->event && $this->get['p'][$this->event] && $this->hasRight(pick($this->baseRights, $this->event), 'modify')){
+			$where = array(
+				$this->options['identifier']['external'] => array($this->get['p'][$this->event], $this->options['identifier']['external']),
 			);
 			
-			unset($data[$this->options['identifier']['internal']]);
 			$this->content = db::select($this->table, $this->options['cache'])->where($this->where)->fetch();
+			
+			$this->where = array(
+				$this->options['identifier']['internal'] => array($this->content[$this->options['identifier']['internal']], $this->options['identifier']['internal']),
+			);
+			
 			$this->editing = true;
 		}
 		

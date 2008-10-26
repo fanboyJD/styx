@@ -16,7 +16,7 @@ Core::store(array(
 	
 	'app.version' => '1',
 	
-	'prefix' => 'framework',
+	'prefix' => 'styxapp',
 	
 	'debug' => false,
 	
