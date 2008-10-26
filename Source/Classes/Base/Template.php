@@ -153,6 +153,11 @@ class Template extends Runner {
 	 * @return mixed
 	 */
 	public function parse($return = false){
+		if(!Hash::length($this->file)){
+			if($return) return implode($this->assigned);
+			else echo implode($this->assigned);
+		}
+		
 		$out = $this->getFile();
 		if(!$out && $return) return Hash::splat($this->assigned);
 		

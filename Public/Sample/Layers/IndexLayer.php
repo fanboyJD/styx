@@ -61,7 +61,7 @@ class IndexLayer extends Layer {
 		
 		$this->save();
 		
-		$this->Content->assign(Lang::get('news.saved', $this->link($this->getValue('pagetitle'))));
+		$this->Template->assign(Lang::get('news.saved', $this->link($this->getValue('pagetitle'))));
 	}
 	
 	public function onEdit(){
@@ -107,7 +107,6 @@ class IndexLayer extends Layer {
 		foreach(db::select('users')->fields('id, name')->where(Data::in('id', $users))->limit(0) as $user)
 			$this->usernames[$user['id']] = $user['name'];
 		
-		if(Page::behaviour('json')) return $this->Template->assign(array('a' => 'test'));
 		// We check for the used Handler (xml or html) and assign the correct template for it
 		$this->Template->template((Page::behaviour('xml') ? 'xml' : '').'view.php');
 	}
