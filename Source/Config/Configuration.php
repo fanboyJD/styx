@@ -20,8 +20,8 @@ Core::store(array(
 	
 	'debug' => false,
 	
-	'tpl.standard' => 'tpl',
-	'tpl.execute' => array('php', 'phtml'),
+	'template.default' => 'tpl',
+	'template.execute' => array('php', 'phtml'),
 	
 	'user' => array(
 		'type' => 'cookie',

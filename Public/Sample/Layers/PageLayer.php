@@ -47,7 +47,7 @@ class PageLayer extends Layer {
 		
 		$this->save();
 		
-		$this->Handler->assign(Lang::get('page.saved', $this->link($this->getValue('pagetitle'))));
+		$this->Template->assign(Lang::get('page.saved', $this->link($this->getValue('pagetitle'))));
 	}
 	
 	public function onEdit(){
@@ -57,7 +57,7 @@ class PageLayer extends Layer {
 			throw new ValidatorException('onlyedit');
 		
 		/* We put some styling here as we don't want to add a new Template for that :) */
-		$this->Handler->assign('<div class="inner">
+		$this->Template->assign('<div class="inner">
 			'.Data::implode($this->format()).'
 			<div class="clear"></div>
 			</div>'
@@ -72,22 +72,22 @@ class PageLayer extends Layer {
 		}
 		
 		if(!$data['id']){
-			$this->Handler->assign(Lang::retrieve('page.notavailable'));
+			$this->Template->assign(Lang::retrieve('page.notavailable'));
 			return;
 		}
 		
 		if($this->hasRight('edit'))
-			$this->Handler->assign(array(
+			$this->Template->assign(array(
 				'rights' => '<a class="hicon" href="'.$this->link($data['pagetitle'], 'edit').'"><img src="Images/pencil.png" alt="'.Lang::retrieve('edit').'"></a>',
 			));
 		
-		$this->Handler->template('view')->assign($data);
+		$this->Template->template('view')->assign($data);
 	}
 	
 	public function onMenu(){
 		$this->data->limit(0)->order('id ASC');
 		
-		$this->Handler->template('menu.php');
+		$this->Template->template('menu.php');
 	}
 	
 	public function populate(){

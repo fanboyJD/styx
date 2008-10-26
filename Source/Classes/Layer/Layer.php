@@ -18,9 +18,9 @@ abstract class Layer extends Runner {
 		$data,
 	
 	/**
-	 * @var Handler
+	 * @var Template
 	 */
-		$Handler = null,
+		$Template = null,
 		$name,
 		$layername,
 		$base,
@@ -173,7 +173,8 @@ abstract class Layer extends Runner {
 		$event[] = 'on'.ucfirst($event[0]);
 		
 		$this->data = db::select($this->table, $this->options['cache']);
-		$this->Handler = Handler::map('layer.'.$this->layername)->base('Layers', ucfirst($this->name))->bind($this);
+		$this->Template = Template::map()->base('Layers', ucfirst($this->name))->bind($this);
+		Page::register('layer.'.$this->layername, $this->Template);
 		
 		$this->get = Hash::length($get) ? $get : Request::getInstance()->retrieve('get');
 		$this->post = Hash::length($post) ? $post : Request::getInstance()->retrieve('post');
@@ -197,9 +198,9 @@ abstract class Layer extends Runner {
 			 * otherwise it checks for the global array that is responsible for the whole layer
 			 */
 			if($this->hasCustomHandler($event[0])){
-				if(!Handler::behaviour($this->allowedHandlers[$event[0]]) && Handler::behaviour($this->disallowedHandlers[$event[0]]))
+				if(!Page::behaviour($this->allowedHandlers[$event[0]]) && Page::behaviour($this->disallowedHandlers[$event[0]]))
 					throw new ValidatorException('handler');
-			}elseif(!Handler::behaviour($this->handlers)){
+			}elseif(!Page::behaviour($this->handlers)){
 				throw new ValidatorException('handler');
 			}
 			
@@ -208,7 +209,7 @@ abstract class Layer extends Runner {
 			else
 				throw new ValidatorException('rights');
 		}catch(ValidatorException $e){
-			$this->Handler->assign(array(
+			$this->Template->assign(array(
 				$this->error['prefix'] => $e->getMessage(),
 			));
 		}catch(Exception $e){
@@ -247,7 +248,7 @@ abstract class Layer extends Runner {
 		}
 		
 		if($this->error['message'])
-			$this->Handler->assign(array(
+			$this->Template->assign(array(
 				$this->error['prefix'] => $this->error['message'],
 			));
 		
@@ -376,7 +377,7 @@ abstract class Layer extends Runner {
 				$base[] = $title;
 		}
 		
-		return Handler::link($options, $base);
+		return Page::link($options, $base);
 	}
 	
 	public function hasRight(){
@@ -435,18 +436,18 @@ abstract class Layer extends Runner {
 	}
 	
 	/**
-	 * This Method parses the Handler of the given Layer and
-	 * removes it from the Handler-Instances
+	 * This Method parses the Template and
+	 * deregisters its reference inside the Page-Class
 	 */
 	public function parse($return = true, $remove = true){
-		$out = $this->Handler->parse($return);
+		$out = $this->Template->parse($return);
 		
-		if($remove) Handler::remove($this->Handler->getName());
+		if($remove) Page::deregister('layer.'.$this->layername);
 		
 		return $out;
 	}
 	
-	/* Form methods: mapped */
+	/* Form methods mapping */
 	
 	public function format(){
 		return $this->form->format();

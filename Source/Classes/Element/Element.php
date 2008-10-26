@@ -71,7 +71,7 @@ class Element extends Runner {
 		
 		$out = Template::map('Element', pick($this->options[':template'], $this->name))->bind($this)->assign($this->options)->assign($pass)->parse(true);
 		
-		if($out) return $out;
+		if(!is_array($out)) return $out;
 		
 		return '<'.$this->type.$pass['attributes'].($this->options[':standalone'] ? ' />' : '>'.$this->options[':caption'].'</'.$this->type.'>');
 	}

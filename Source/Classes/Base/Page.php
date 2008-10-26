@@ -1,19 +1,15 @@
 <?php
 /*
- * Styx::Handler - MIT-style License
+ * Styx::Page - MIT-style License
  * Author: christoph.pojer@gmail.com
  *
- * Usage: Sets the output-header and parses all data to stream it to the client
+ * Usage: Sets the output-headers and parses all data to stream it to the client
  *
  */
 
-class Handler extends Template {
+class Page extends Template {
 	
-	private static $Instances = array(
-			'master' => null,
-			'slaves' => array(),
-		),
-		$Type = null,
+	private static $Type = null,
 		$Types = array(
 			'html' => array(
 				'headers' => array(
@@ -51,34 +47,28 @@ class Handler extends Template {
 				),
 				'callback' => array('PackageManager', 'compress'),
 			),
-		);
+		),
+		$Templates = array();
 	
 	private $parsed = null,
-		$name = null,
-		$master = false,
-		$base = 'Handler',
 		$enabled = true,
-		$substitution;
+		$substitution = null;
 	
-	protected function __construct($name = null){
+	protected function __construct(){
+		$this->base = 'Page';
 		$this->name = $name;
-		if(!$name) $this->master = true;
 		
 		$this->bind($this);
 	}
 	
 	/**
 	 * @param string $name
-	 * @return Handler
+	 * @return Page
 	 */
 	public static function map($name = null){
-		if(!$name) $type = $name = 'master';
-		else $type = 'slaves';
+		static $Instance;
 		
-		if(!self::$Instances[$type][$name])
-			self::$Instances[$type][$name] = new Handler($name=='master' ? null : $name);
-		
-		return self::$Instances[$type][$name];
+		return $Instance ? $Instance : $Instance = new Page();
 	}
 	
 	public static function useExtendedTypes(){
@@ -151,10 +141,6 @@ class Handler extends Template {
 		return in_array(self::$Type, $types);
 	}
 	
-	public static function remove($name, $slave = true){
-		unset(self::$Instances[$slave ? 'slaves' : 'master'][$name]);
-	}
-	
 	public static function link($options = null, $base = null){
 		static $Configuration;	
 		if(!$Configuration)
@@ -183,12 +169,16 @@ class Handler extends Template {
 		return $Configuration['app.link'].$array;
 	}
 	
-	public function getName(){
-		return $this->name;
+	public static function register($name, $obj){
+		self::$Templates[$name] = $obj;
+	}
+	
+	public static function deregister($name){
+		unset(self::$Templates[$name]);
 	}
 	
 	/**
-	 * @return Handler
+	 * @return Page
 	 */
 	public function disable(){
 		$this->enabled = false;
@@ -197,48 +187,10 @@ class Handler extends Template {
 	}
 	
 	/**
-	 * @return Handler
+	 * @return Page
 	 */
 	public function enable(){
 		$this->enabled = true;
-		
-		return $this;
-	}
-	
-	/**
-	 * @return Handler
-	 */
-	public function base(){
-		$this->base = Hash::args(func_get_args());
-		
-		return $this;
-	}
-	
-	/**
-	 * @return Handler
-	 */
-	public function template(){
-		$args = Hash::args(func_get_args());
-		
-		foreach(array_reverse(Hash::splat($this->base)) as $v)
-			array_unshift($args, $v);
-		
-		return $this->initialize($args);
-	}
-	
-	/**
-	 * @return Handler
-	 */
-	public function filter($string){
-		if(is_array($string)){
-			array_walk($string, array($this, 'filter'));
-			
-			return $this;
-		}
-		
-		foreach($this->assigned as $k => $val)
-			if(!String::starts($k, $string))
-				unset($this->assigned[$k]);
 		
 		return $this;
 	}
@@ -248,7 +200,7 @@ class Handler extends Template {
 	 * assigned variable with the given key will be send to output and it will replace
 	 * the original assignment array. 
 	 * 
-	 * @return Handler
+	 * @return Page
 	 */
 	public function substitute($key){
 		$this->substitution = $key;
@@ -264,26 +216,21 @@ class Handler extends Template {
 	}
 	
 	public function parse($return = false){
-		if(!$this->enabled)
-			return;
+		if(!$this->enabled) return;
 		
-		if($this->master){
-			foreach(self::$Instances['slaves'] as $k => $v)
-				$assign[$k] = $v->parse(true);
-			
-			$main = Route::getMainLayer();
-			if($main) $assign['layer'] = $assign['layer.'.$main];
-			
-			$this->assign($assign);
-		}
+		foreach(self::$Templates as $k => $v)
+			$assign[$k] = $v->parse(true);
 		
+		$main = Route::getMainLayer();
+		if($main && $assign['layer.'.$main]) $assign['layer'] = $assign['layer.'.$main];
+		
+		$this->assign($assign);
 		if($this->substitution) $this->assigned = $this->assigned[$this->substitution];
 		
-		if($this->master) $this->callback();
-		else $this->parsed = $this->assigned;
+		$this->callback();
 		
 		if(count($this->file)){
-			if($this->master && is_array($this->parsed)) $this->assign($this->parsed);
+			if(is_array($this->parsed)) $this->assign($this->parsed);
 			
 			return parent::parse($return);
 		}else{

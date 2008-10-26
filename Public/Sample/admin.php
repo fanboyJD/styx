@@ -8,7 +8,7 @@
 		$msg = 'erased';
 	}
 	
-	Handler::map()->assign(array(
+	Page::map()->assign(array(
 		'layer' => '<div class="inner">
 				<h1>'.Lang::retrieve('user.admin').'</h1>
 				'.($msg ? '<span class="go icon">'.Lang::retrieve('admin.'.$msg).'</span><br/><br/>' : '').'

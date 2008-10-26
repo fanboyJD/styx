@@ -84,7 +84,7 @@ class PackageManager {
 		
 		$assigned['packages'] = implode($assigned);
 		
-		Handler::map()->assign($assigned);
+		Page::map()->assign($assigned);
 	}
 	
 	public static function compress(){
@@ -97,7 +97,7 @@ class PackageManager {
 		$path = Core::retrieve('app.path');
 		
 		if($compress)
-			Handler::setHeader(array(
+			Page::setHeader(array(
 				'Vary' => 'Accept-Encoding',
 				'Content-Encoding' => self::$encoding,
 			));
@@ -113,7 +113,7 @@ class PackageManager {
 				$debug = false;
 		}else{
 			$expiration = Core::retrieve('expiration');
-			Handler::setHeader(array(
+			Page::setHeader(array(
 				'Expires' => date('r', time()+$expiration),
 				'Cache-Control' => 'public, max-age='.$expiration,
 			));

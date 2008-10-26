@@ -40,19 +40,19 @@ class LoginLayer extends Layer {
 		
 		$loggedin = User::login($user);
 		
-		$this->Handler->assign(Lang::get('user.loggedin', $user['name']));
+		$this->Template->assign(Lang::get('user.loggedin', $user['name']));
 	}
 	
 	public function onLogin(){
 		$user = User::retrieve();
 		
 		if($user){
-			$this->Handler->assign(Lang::get('user.loggedin', $user['name']));
+			$this->Template->assign(Lang::get('user.loggedin', $user['name']));
 			return;
 		}
 		
 		$this->add();
-		$this->Handler->template('login')->assign($this->format());
+		$this->Template->template('login')->assign($this->format());
 	}
 	
 	public function onLogout(){

@@ -62,8 +62,8 @@
 			'session' => $user['session'],
 		)).';');
 	
-	if(Handler::behaviour('html'))
-		Handler::map()->template('html.php')->assign(array(
+	if(Page::behaviour('html'))
+		Page::map()->template('html.php')->assign(array(
 			'app.name' => Core::retrieve('app.name'),
 			'app.link' => Core::retrieve('app.link'),
 			'scripts' => Script::get(),
@@ -82,13 +82,13 @@
 			
 			'styx' => Core::retrieve('styx.name').' '.Core::retrieve('styx.version'),
 		))->parse();
-	elseif(Handler::behaviour('json'))
-		Handler::map()->substitute('layer')->parse();
-	elseif(Handler::behaviour('xml'))
-		Handler::map()->assign(array(
+	elseif(Page::behaviour('json'))
+		Page::map()->substitute('layer')->parse();
+	elseif(Page::behaviour('xml'))
+		Page::map()->assign(array(
 			'app.name' => Core::retrieve('app.name'),
 			'app.link' => Core::retrieve('app.link'),
 			'app.mail' => Core::retrieve('app.mail'),
 		))->template('rss.php')->parse();
 	else
-		Handler::map()->disable();
+		Page::map()->disable();

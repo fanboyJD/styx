@@ -16,41 +16,51 @@ class Template extends Runner {
 	
 	protected static $Configuration = null;
 	
-	protected function __construct(){}
-	protected function __clone(){}
+	/**
+	 * @return Template
+	 */
+	public static function map(){
+		$args = Hash::args(func_get_args());
+		
+		return new Template($args);
+	}
 	
-	protected function initialize($file){
-		if(!self::$Configuration)
-			self::$Configuration = array(
-				'root' => realpath(Core::retrieve('path').'Templates/'),
-				'app.root' => realpath(Core::retrieve('app.path').'Templates/'),
-				'tpl.standard' => Core::retrieve('tpl.standard'),
-				'tpl.execute' => Core::retrieve('tpl.execute'),
-			);
+	protected function __construct(){
+		$args = Hash::args(func_get_args());
 		
-		$this->file = $file;
-		
-		return $this;
+		if($args) $this->template($args);
 	}
 	
 	protected static function getFileName($file){
-		$loadFile = self::$Configuration['app.root'].'/'.$file;
-		if(!file_exists($loadFile)){
-			$loadFile = self::$Configuration['root'].'/'.$file;
-			if(!file_exists($loadFile))
-				return false;
-		}
+		static $Paths;
+		if(!$Paths) $Paths = array(
+				'app.root' => realpath(Core::retrieve('app.path').'Templates/'),
+				'root' => realpath(Core::retrieve('path').'Templates/'),
+			);
 		
-		return $loadFile;
+		foreach(array(
+			$Paths['app.root'].'/'.$file,
+			$Paths['root'].'/'.$file
+		) as $f)
+			if(file_exists($f))
+				return $f;
+		
+		return false;
 	}
 	
 	protected function getFile(){
+		static $Configuration;
+		if(!$Configuration) $Configuration = array(
+				'template.default' => Core::retrieve('template.default'),
+				'template.execute' => Core::retrieve('template.execute'),
+			);
+		
 		$c = Cache::getInstance();
 		
 		$ext = pathinfo(end($this->file), PATHINFO_EXTENSION);
-		$file = implode('/', $this->file).(!$ext ? $ext = '.'.self::$Configuration['tpl.standard'] : '');
+		$file = implode('/', $this->file).(!$ext ? $ext = '.'.$Configuration['template.default'] : '');
 		
-		if(in_array($ext, self::$Configuration['tpl.execute'])){
+		if(in_array($ext, $Configuration['template.execute'])){
 			if($this->bind && method_exists($this->bind, 'execute')){
 				ob_start();
 				
@@ -80,11 +90,51 @@ class Template extends Runner {
 	/**
 	 * @return Template
 	 */
-	public static function map(){
+	public function assign(){
+		$args = func_get_args();
+		$this->assigned = Hash::extend($this->assigned, Hash::args($args));
+		
+		return $this;
+	}
+	
+	/**
+	 * @return Template
+	 */
+	public function base(){
+		$this->base = Hash::args(func_get_args());
+		
+		return $this;
+	}
+	
+	/**
+	 * @return Template
+	 */
+	public function template(){
 		$args = Hash::args(func_get_args());
 		
-		$instance = new Template();
-		return $instance->initialize($args);
+		foreach(array_reverse(Hash::splat($this->base)) as $v)
+			array_unshift($args, $v);
+		
+		$this->file = $args;
+		
+		return $this;
+	}
+	
+	/**
+	 * @return Template
+	 */
+	public function filter($string){
+		if(is_array($string)){
+			array_walk($string, array($this, 'filter'));
+			
+			return $this;
+		}
+		
+		foreach($this->assigned as $k => $val)
+			if(!String::starts($k, $string))
+				unset($this->assigned[$k]);
+		
+		return $this;
 	}
 	
 	/**
@@ -97,17 +147,14 @@ class Template extends Runner {
 	}
 	
 	/**
-	 * @return Template
+	 * Either echos/returns the fully parsed template or, in case there is no template, returns an array of the assigned values
+	 *
+	 * @param bool $return
+	 * @return mixed
 	 */
-	public function assign(){
-		$args = func_get_args();
-		$this->assigned = Hash::extend($this->assigned, Hash::args($args));
-		
-		return $this;
-	}
-	
 	public function parse($return = false){
 		$out = $this->getFile();
+		if(!$out && $return) return Hash::splat($this->assigned);
 		
 		Hash::flatten($this->assigned);
 		

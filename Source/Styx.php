@@ -51,24 +51,24 @@ Request::initialize();
 
 $get = Request::getInstance()->retrieve('get');
 
-Handler::setHandlers(Core::retrieve('handler'));
+Page::setHandlers(Core::retrieve('handler'));
 
 User::initialize();
 
 if($get['m']['package'] && PackageManager::setPackage($get['m']['package'])){
-	Handler::useExtendedTypes();
+	Page::useExtendedTypes();
 	
-	Handler::setType(PackageManager::getType());
-	Handler::setHeader();
+	Page::setType(PackageManager::getType());
+	Page::setHeader();
 	
-	Handler::map()->parse();
+	Page::map()->parse();
 	
 	die;
 }else{
 	Lang::setLanguage(Request::getLanguage());
 	
-	Handler::setType($get['p']['handler']);
-	Handler::setHeader();
+	Page::setType($get['p']['handler']);
+	Page::setHeader();
 	
 	PackageManager::assignToMaster();
 	
