@@ -9,8 +9,6 @@
 
 class Form extends Elements {
 	
-	protected static $prefix = false;
-	
 	public function __construct(){
 		parent::__construct(func_get_args(), get_class());
 		
@@ -19,14 +17,16 @@ class Form extends Elements {
 	}
 	
 	public function format(){
+		static $prefix = false;
+		
 		$out = array('form.top' => '<form'.$this->implode('skipName').'>');
 		Hash::extend($out, parent::format());
 		$out['form.bottom'] = '</form>';
 		
-		if(self::$prefix===false)
-			self::$prefix = pick(Core::retrieve('elements.prefix'));
+		if($prefix===false)
+			$prefix = pick(Core::retrieve('elements.prefix'));
 		
-		return self::$prefix ? array(self::$prefix => $out) : $out;
+		return $prefix ? array($prefix => $out) : $out;
 	}
 	
 	/**
@@ -62,7 +62,7 @@ class Form extends Elements {
 			$els[$k] = $el->prepareData();
 		}
 		
-		return sizeof($els) ? $els : false;
+		return count($els) ? $els : false;
 	}
 	
 	public function validate(){

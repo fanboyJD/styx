@@ -8,10 +8,8 @@
  */
 
 class db {
-	private static $Instance;
 	
-	private
-		$queries = 0,
+	private $queries = 0,
 		$Configuration = array(
 			'host' => null,
 			'user' => null,
@@ -44,9 +42,9 @@ class db {
 	 * @return Db
 	 */
 	public static function getInstance(){
-		if(!self::$Instance) self::$Instance = new db();
+		static $Instance;
 		
-		return self::$Instance;
+		return $Instance ? $Instance : $Instance = new db();
 	}
 	
 	public function connect(){

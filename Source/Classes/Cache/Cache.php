@@ -17,8 +17,6 @@ class Cache extends DynamicStorage {
 		$engineInstance = null,
 		$filecacheInstance = null;
 	
-	private static $Instance;
-	
 	private function __construct(){
 		$options = Core::retrieve('cache');
 		
@@ -47,9 +45,9 @@ class Cache extends DynamicStorage {
 	 * @return Cache
 	 */
 	public static function getInstance(){
-		if(!self::$Instance) self::$Instance = new Cache();
+		static $Instance;
 		
-		return self::$Instance;
+		return $Instance ? $Instance : $Instance = new Cache();
 	}
 	
 	public function getEngine(){

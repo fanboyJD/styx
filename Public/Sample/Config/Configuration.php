@@ -1,11 +1,11 @@
 <?php
-$_CONFIGURATION = array(
+$CONFIGURATION['debug'] = array(
 	'path.separator' => ';', // On Linux you can safely use : But on Windows using : with Apache results in a strange bug
 	
 	'app.name' => 'Styx Framework Application',
-	'app.link' => 'http://svn/Framework/trunk/Public/Sample/Public/',
+	'app.link' => 'http://svn/Framework/trunk/Public/Sample/Public',
 	'app.mail' => 'someone@nowhere.ru',
-	'app.version' => '0.1',
+	'app.version' => '0.2dev',
 	
 	'debug' => true, // When debug is set to true no cache is used etc.
 	
@@ -22,9 +22,14 @@ $_CONFIGURATION = array(
 		'db' => 'framework'
 	),
 	
-	'secure' => '32lms/(d902_3-k2"§$jsd', // This should be unique to your application and shouldn't be exposed since it is used for security reasons
+	'secure' => '32lms/(d902_3-k2"§$jsd', // This should be unique to your application and shouldn't be exposed since it is used for additional security
 	
-	'languages' => array('en'),
+	'languages' => array(
+		'en' => array('en-us', 'en-gb', 'en'),
+		'de' => array('de-de', 'de-at', 'de-ch', 'de'),
+	),
+	'languages.cookie' => 'language',
+	'languages.querystring' => 'language',
 	
 	'rights.layer' => array(
 		'index' => array( // You can specify different rights for the IndexLayer like only adding or adding/modifying but not deleting
@@ -40,3 +45,16 @@ $_CONFIGURATION = array(
 		),
 	),
 );
+
+$CONFIGURATION['production'] = array_merge($CONFIGURATION['debug'], array(
+	'debug' => false,
+	'app.link' => 'http://styx.og5.net',
+	
+	'database' => array(
+		'host' => 'localhost',
+		'user' => 'wusch',
+		'password' => '',
+		'db' => 'wusch_framework'
+	),
+	
+));

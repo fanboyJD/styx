@@ -9,8 +9,6 @@
 
 class Validator {
 	
-	private static $Instance;
-	
 	private function __construct(){}
 	private function __clone(){}
 	
@@ -26,12 +24,12 @@ class Validator {
 	}
 	
 	public static function call($data, $options){
-		if(!self::$Instance)
-			self::$Instance = new Validator();
+		static $Instance;
+		if(!$Instance) $Instance = new Validator();
 		
 		Hash::splat($options);
-		if(method_exists(self::$Instance, $options[0]))
-			return self::$Instance->{$options[0]}($data, $options[1]);
+		if(method_exists($Instance, $options[0]))
+			return $Instance->{$options[0]}($data, $options[1]);
 		
 		return true;
 	}

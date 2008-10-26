@@ -29,11 +29,9 @@ class User {
 	public static function store($user){
 		self::$user = false;
 		
-		if(is_array($user)){
-			self::$user = $user;
-			
-			if(self::$Configuration['rights']) self::$Rights->setRights(self::$user[self::$Configuration['rights']]);
-		}
+		self::$Rights->setRights($user && self::$Configuration['rights'] ? $user[self::$Configuration['rights']] : null);
+		
+		if(is_array($user)) self::$user = $user;
 		
 		return self::$user;
 	}
@@ -48,7 +46,7 @@ class User {
 	
 	private static function getLoginData(){
 		if(self::$Configuration['type']=='cookie'){
-			$cookie = Request::retrieve('cookie');
+			$cookie = Request::getInstance()->retrieve('cookie');
 			$data = json_decode((string)$cookie[Core::retrieve('prefix')], true);
 		}
 		
@@ -90,33 +88,20 @@ class User {
 		))->query();
 		
 		if(self::$Configuration['type']=='cookie'){
-			$pre = Core::retrieve('prefix');
 			foreach(self::$Configuration['fields'] as $v)
 				$json[$v] = $user[$v];
 			
-			
-			$cookie = Request::retrieve('cookie');
-			$cookie[$pre] = json_encode($json);
-			setcookie($pre, $cookie[$pre], time()+Core::retrieve('cookieexpiration'), '/');
-			Request::store('cookie', $cookie);
+			Handler::setCookie(Core::retrieve('prefix'), json_encode($json));
 		}
 		
 		return self::handlelogin(false);
 	}
 	
 	public static function logout(){
-		if(self::$Configuration['type']=='cookie'){
-			$pre = Core::retrieve('prefix');
-			$time = time()-3600;
-			
-			$cookie = Request::retrieve('cookie');
-			$json = json_decode((string)$cookie[$pre], true);
-			Cache::getInstance()->erase('User', 'userdata_'.$json[self::$Configuration['session']]);
-			
-			setcookie($pre, false, time()-3600, '/');
-			unset($cookie[$pre]);
-			Request::store('cookie', $cookie);
-		}
+		Cache::getInstance()->erase('User', 'userdata_'.User::get(self::$Configuration['session']));
+		
+		if(self::$Configuration['type']=='cookie')
+			Handler::removeCookie(Core::retrieve('prefix'));
 		
 		self::store(false);
 	}

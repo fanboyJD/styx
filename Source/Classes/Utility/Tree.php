@@ -13,8 +13,8 @@ class Tree {
 	/**
 	 * @var QuerySelect
 	 */
-	private $select;
-	private $identifier,
+	private $select,
+		$identifier,
 		$recursive = 'cat',
 		$tree,
 		$populatedTree;
@@ -47,7 +47,7 @@ class Tree {
 		if($cat) $parents[] = $cat;
 		$parents = array_unique($parents);
 		
-		foreach($this->tree[$cat] as $k => $data){
+		foreach($this->tree[$cat] as $data){
 			$data['deep'] = $deep;
 			$data['parents'] = $parents;
 			

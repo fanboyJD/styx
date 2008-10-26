@@ -39,7 +39,13 @@ Core::store(array(
 	'elements.prefix' => 'el',
 	
 	'expiration' => 31536000, // A long time
-	'cookieexpiration' => 8640000, // A long time
+	'cookie' => array(
+		'expire' => 8640000,
+		'path' => '/',
+		/*'domain' => '',
+		'secure' => '',
+		'httponly' => '',*/
+	),
 	
 	'timezone' => 'Europe/Vienna',
 ));

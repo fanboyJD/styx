@@ -12,8 +12,8 @@ class Lang {
 	/**
 	 * @var Fileparser
 	 */
-	private static $Fileparser;
-	private static $lang = 'en';
+	private static $Fileparser,
+		$lang = 'en';
 	
 	public static function setLanguage($lang){
 		self::$lang = strtolower(pick($lang, 'en'));

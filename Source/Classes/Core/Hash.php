@@ -10,7 +10,7 @@
 class Hash {
 	
 	public static function length($array){
-		return is_array($array) ? pick(sizeof($array)) : null;
+		return is_array($array) ? pick(count($array)) : null;
 	}
 	
 	public static function remove(&$array, $value){
@@ -43,7 +43,7 @@ class Hash {
 	}
 	
 	public static function args($args){
-		return sizeof($args)==1 ? self::splat($args[0]) : $args;
+		return count($args)==1 ? self::splat($args[0]) : $args;
 	}
 	
 }

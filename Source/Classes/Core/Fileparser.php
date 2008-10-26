@@ -10,7 +10,7 @@
 class Fileparser extends DynamicStorage {
 	
 	/* Big thanks to sorccu from the MooTools-Channel =) */
-	private $regex = array(
+	private static $regex = array(
 			'/\s*([\w\.]+)\s*=\s*([\'\"])(.*?[^\\\]|)\2;/ism',
 			'/namespace\s+([\w\.]+)\s*\{((?:([\"\'])(?:.*?[^\\\\]|)\3|[^\}])*)\}/ism',
 		),
@@ -38,7 +38,7 @@ class Fileparser extends DynamicStorage {
 		$array = array();
 		$content = file_get_contents($file);
 		
-		preg_match_all($this->regex[1], $content, $m);
+		preg_match_all(self::$regex[1], $content, $m);
 		if(is_array($m[1]))
 			foreach($m[1] as $key => $val){
 				$content = str_replace($m[0][$key], '', $content);
@@ -50,12 +50,12 @@ class Fileparser extends DynamicStorage {
 	}
 	
 	private function parse($content, $prefix = null){
-		preg_match_all($this->regex[0], $content, $m);
+		preg_match_all(self::$regex[0], $content, $m);
 		
 		if(is_array($m[1]))
 			foreach($m[1] as $k => $v)
 				if($v && $m[3][$k])
-					$array[($prefix ? $prefix.'.' : '').$v] = str_replace($this->replaces[0], $this->replaces[1], $m[3][$k]);
+					$array[($prefix ? $prefix.'.' : '').$v] = str_replace(self::$replaces[0], self::$replaces[1], $m[3][$k]);
 		
 		return pick($array, array());
 	}

@@ -7,7 +7,7 @@
  *
  */
 
-class QuerySelect extends QueryHandler implements Iterator {
+class QuerySelect extends QueryHandler implements Iterator, Countable {
 	
 	protected $cache = array(),
 		$queried = false;
@@ -70,7 +70,7 @@ class QuerySelect extends QueryHandler implements Iterator {
 		return db::getInstance()->fetch($this->query(), $type);
 	}
 	
-	public function count($field = null){
+	public function quantity($field = null){
 		$count = $this->fields('COUNT('.($field ? $field : Core::retrieve('identifier.internal')).')')->limit(0)->fetch(MYSQL_NUM);
 		
 		return pick($count[0], 0);
@@ -111,10 +111,10 @@ class QuerySelect extends QueryHandler implements Iterator {
 		return reset($this->cache);
 	}
 	
-	public function length(){
+	public function count(){
 		if(!$this->queried) $this->rewind();
 		
-		return sizeof($this->cache);
+		return count($this->cache);
 	}
 	
 }

@@ -32,10 +32,10 @@ class Element extends Runner {
 			*/
 		);
 	
-	protected static $uid = 0,
-		$formElements = array('input', 'checkbox', 'radio', 'select', 'textarea', 'richtext', 'optionlist');
+	protected static $formElements = array('input', 'checkbox', 'radio', 'select', 'textarea', 'richtext', 'optionlist');
 	
 	public function __construct($options, $name = null, $type = null){
+		static $uid = 0;
 		$type = strtolower($type);
 		
 		if($options[':tag']){
@@ -48,11 +48,11 @@ class Element extends Runner {
 		Hash::splat($options[':validate']);
 		
 		if(!$options['id'] && $options['name'])
-			$options['id'] = preg_replace('/\W/', '_', $options['name'].'_'.(self::$uid++));
+			$options['id'] = preg_replace('/\W/', '_', $options['name'].'_'.($uid++));
 		elseif($options['id'] && !$options['name'])
 			$options['name'] = $options['id'];
 		elseif(!$options[':unknown'])
-			$options['name'] = $options['id'] = $this->type.'_'.(self::$uid++);
+			$options['name'] = $options['id'] = $this->type.'_'.($uid++);
 		
 		if($options['class']){
 			if(!is_array($options['class']))
@@ -161,7 +161,7 @@ class Element extends Runner {
 		if(!is_array($a))
 			return '';
 		
-		if(is_array($a['class']) && sizeof($a['class']))
+		if(is_array($a['class']) && count($a['class']))
 			$a['class'] = implode(' ', $a['class']);
 		else
 			unset($a['class']);
@@ -431,8 +431,7 @@ class OptionList extends Elements {
 		parent::__construct(func_get_args(), get_class(), 'optionlist');
 		
 		if(is_array($this->options[':elements']))
-			foreach($this->options[':elements'] as $el)
-				$this->createElement($el);
+			array_walk($this->options[':elements'], array($this, 'createElement'));
 		
 		unset($this->options[':elements']);
 	}

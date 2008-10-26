@@ -11,14 +11,17 @@ abstract class Layer extends Runner {
 	/**
 	 * @var Form
 	 */
-	protected $form;
+	protected $form,
+	/**
+	 * @var QuerySelect
+	 */
+		$data,
 	
 	/**
 	 * @var Handler
 	 */
-	protected $Handler = null;
-	
-	protected $name,
+		$Handler = null,
+		$name,
 		$layername,
 		$base,
 		$table,
@@ -56,13 +59,7 @@ abstract class Layer extends Runner {
 	public $get = array(),
 		$post = array();
 	
-	/**
-	 * @var QuerySelect
-	 */
-	protected $data;
-	
-	private static $Configuration,
-		$Layers = array(
+	private static $Layers = array(
 			'List' => array(),
 			'Instances' => array(),
 		);
@@ -178,8 +175,8 @@ abstract class Layer extends Runner {
 		$this->data = db::select($this->table, $this->options['cache']);
 		$this->Handler = Handler::map('layer.'.$this->layername)->base('Layers', ucfirst($this->name))->bind($this);
 		
-		$this->get = Hash::length($get) ? $get : Request::retrieve('get');
-		$this->post = Hash::length($post) ? $post : Request::retrieve('post');
+		$this->get = Hash::length($get) ? $get : Request::getInstance()->retrieve('get');
+		$this->post = Hash::length($post) ? $post : Request::getInstance()->retrieve('post');
 		$this->event = $event[0];
 		
 		try{
@@ -346,12 +343,10 @@ abstract class Layer extends Runner {
 	}
 	
 	public function link($title = null, $event = null, $options = null){
-		/* Yes, you heard me: Layer static, not self - just for speed purposes */
-		if(!Layer::$Configuration)
-			Layer::$Configuration = array(
-				'path.separator' => Core::retrieve('path.separator'),
-				'app.link' => Core::retrieve('app.link'),
-				'language' => Lang::getLanguage(),
+		static $Configuration;	
+		if(!$Configuration)
+			$Configuration = array(
+				'default' => $this->getDefaultEvent('view'),
 			);
 		
 		if(is_array($title)) $title = $title[$this->options['identifier']['external']];
@@ -359,12 +354,8 @@ abstract class Layer extends Runner {
 		if($options && !is_array($options))
 			$options = array('handler' => $options);
 		
-		if(!$options['lang'])
-			$options['lang'] = Layer::$Configuration['language'];
-		
-		$default = $this->getDefaultEvent('view');
 		if(!$event || !in_array($event, $this->methods))
-			$event = $default;
+			$event = $Configuration['default'];
 		
 		if($options['handler']){
 			if($this->hasCustomHandler($event)){
@@ -375,23 +366,17 @@ abstract class Layer extends Runner {
 			}
 		}
 		
-		$base = Layer::$Configuration['app.link'].($options['handler'] ? 'handler'.Layer::$Configuration['path.separator'].$options['handler'].'/' : '').$this->base;
+		$base = array($this->base);
+		if($title || ($event && $event!=$Configuration['default'])){
+			if(!$title)
+				$base[] = $event;
+			else if(in_array($title, $this->methods) || $event!=$Configuration['default'])
+				$base[] = array($event, $title);
+			else
+				$base[] = $title;
+		}
 		
-		unset($options['handler']);
-		if($options['lang'] && strtolower($options['lang'])==Layer::$Configuration['language'])
-			unset($options['lang']);
-		
-		$array = array();
-		if(Hash::length($options))
-			foreach($options as $k => $v)
-				$array[] = $k.($v ? Layer::$Configuration['path.separator'].$v : '');
-		
-		if(sizeof($array)) $array = '/'.implode('/', $array);
-		else $array = null;
-		
-		if(!$title && (!$event || $event==$default)) return $base.$array;
-		
-		return $base.'/'.(!$title ? $event : (in_array($title, $this->methods) || $event!=$default ? $event.Layer::$Configuration['path.separator'] : '').$title).$array;
+		return Handler::link($options, $base);
 	}
 	
 	public function hasRight(){
@@ -446,7 +431,7 @@ abstract class Layer extends Runner {
 	}
 	
 	public function hasCustomHandler($event){
-		return sizeof(Hash::splat($this->allowedHandlers[$event])) || sizeof(Hash::splat($this->disabledHandlers[$event]));
+		return count(Hash::splat($this->allowedHandlers[$event])) || count(Hash::splat($this->disabledHandlers[$event]));
 	}
 	
 	/**

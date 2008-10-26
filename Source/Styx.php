@@ -4,7 +4,7 @@
  * Author: christoph.pojer@gmail.com
  */
 
-$_CONFIGURATION = null;
+unset($CONFIGURATION);
 if(!is_array($Paths))
 	$Paths = array(
 		'app.path' => realpath('../').DIRECTORY_SEPARATOR,
@@ -19,21 +19,23 @@ require_once($Paths['app.path'].'/Config/Configuration.php');
 
 if(!$Paths['path']) $Paths['path'] = dirname(__FILE__).DIRECTORY_SEPARATOR;
 
-foreach(array('Storage', 'Hash', 'Core', 'String') as $v)
+foreach(array('Storage', 'Hash', 'Core', 'String', 'Data') as $v)
 	require_once($Paths['path'].'Classes/Core/'.$v.'.php');
 
 spl_autoload_register(array('Core', 'autoload'));
 
 Core::store($Paths);
 
-Core::loadClass('Core', 'Data');
 Core::loadClass('Cache', 'Cache');
+
+if(!String::ends($CONFIGURATION[$use]['app.link'], '/'))
+	$CONFIGURATION[$use]['app.link'] .= '/';
 
 require_once($Paths['path'].'/Config/Configuration.php');
 
-if(is_array($_CONFIGURATION)){
-	Core::store($_CONFIGURATION);
-	unset($_CONFIGURATION);
+if(is_array($CONFIGURATION[$use])){
+	Core::store($CONFIGURATION[$use]);
+	unset($CONFIGURATION); // We unset the whole array, so no data from it is available any longer
 }
 unset($Paths);
 
@@ -47,7 +49,7 @@ if(function_exists('initialize')) initialize();
 
 Request::initialize();
 
-$get = Request::retrieve('get');
+$get = Request::getInstance()->retrieve('get');
 
 Handler::setHandlers(Core::retrieve('handler'));
 
@@ -63,25 +65,14 @@ if($get['m']['package'] && PackageManager::setPackage($get['m']['package'])){
 	
 	die;
 }else{
-	$languages = Core::retrieve('languages');
-	
-	if(is_array($languages)){
-		/* We set the first language in the array as default language */
-		Lang::setLanguage(array_shift($languages));
-		
-		/* And overwrite with the selected language, in that way it keeps missing language strings */
-		if($get['m']['lang'] && sizeof($languages) && in_array($get['m']['lang'], $languages))
-			Lang::setLanguage($get['m']['lang']);
-	}
-	
-	unset($languages);
+	Lang::setLanguage(Request::getLanguage());
 	
 	Handler::setType($get['p']['handler']);
 	Handler::setHeader();
 	
 	PackageManager::assignToMaster();
 	
-	Route::initialize($get, Request::retrieve('post'));
+	Route::initialize($get, Request::getInstance()->retrieve('post'));
 }
 
 unset($get);

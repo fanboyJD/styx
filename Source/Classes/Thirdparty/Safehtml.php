@@ -240,7 +240,7 @@ class Safehtml {
 							if(in_array($class, $this->allowedClasses))
 								$new[] = $class;
 					
-					if(sizeof($new)) $value = implode(' ', $new);
+					if(count($new)) $value = implode(' ', $new);
 					else continue;
 				}
 				
@@ -288,7 +288,7 @@ class Safehtml {
 		
 		if($this->convert[$name]) $name = $this->convert[$name];
 		
-		if(sizeof($this->_dcStack)!=0 || !in_array($name, $this->tagWhiteList))
+		if(count($this->_dcStack)!=0 || !in_array($name, $this->tagWhiteList))
 			return true;
 		
 		if(!preg_match("/^[a-z0-9]+$/i", $name)){
@@ -314,7 +314,7 @@ class Safehtml {
 		if(in_array($name, $this->closeParagraph) && in_array('p', $this->_stack))
 			$this->_closeHandler($parser, 'p');
 		
-		if($name=='li' && sizeof($this->_liStack) && $this->_listScope==$this->_liStack[sizeof($this->_liStack)-1])
+		if($name=='li' && count($this->_liStack) && $this->_listScope==$this->_liStack[count($this->_liStack)-1])
 			$this->_closeHandler($parser, 'li');
 		
 		if(in_array($name, $this->listTags))
@@ -334,7 +334,7 @@ class Safehtml {
 		return true;
 	}
 	
-	public function _closeHandler(&$parser, $name){
+	public function _closeHandler($parser, $name){
 		$name = strtolower($name);
 		if(isset($this->_dcCounter[$name]) && ($this->_dcCounter[$name]>0) && (in_array($name, $this->deleteTagsContent))){
 			while($name!=($tag = array_pop($this->_dcStack)))
@@ -343,7 +343,7 @@ class Safehtml {
 			$this->_dcCounter[$name]--;
 		}
 		
-		if(sizeof($this->_dcStack)!=0)
+		if(count($this->_dcStack)!=0)
 			return true;
 		
 		if(isset($this->_counter[$name]) && $this->_counter[$name]>0){
@@ -368,13 +368,13 @@ class Safehtml {
 		return true;
 	}
 	
-	public function _dataHandler(&$parser, $data){
-		if(sizeof($this->_dcStack)==0) $this->_xhtml .= $data;
+	public function _dataHandler($parser, $data){
+		if(count($this->_dcStack)==0) $this->_xhtml .= $data;
 		
 		return true;
 	}
 	
-	public function _escapeHandler(&$parser, $data){
+	public function _escapeHandler($parser, $data){
 		return true;
 	}
 	
@@ -621,7 +621,7 @@ class XML_HTMLSax3_Tab {
   $this->orig_obj =& $orig_obj;
   $this->orig_method = $orig_method;
  }
- function breakData(&$parser, $data) {
+ function breakData($parser, $data) {
   $data = explode("\t",$data);
   foreach ( $data as $chunk ) {
    $this->orig_obj->{$this->orig_method}($this, $chunk);
@@ -635,7 +635,7 @@ class XML_HTMLSax3_Entities_Parsed {
   $this->orig_obj =& $orig_obj;
   $this->orig_method = $orig_method;
  }
- function breakData(&$parser, $data) {
+ function breakData($parser, $data) {
   $data = preg_split('/(&.+?;)/',$data,-1,PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
   foreach ( $data as $chunk ) {
    $chunk = html_entity_decode($chunk,ENT_NOQUOTES);
@@ -656,7 +656,7 @@ class XML_HTMLSax3_Entities_Unparsed {
   $this->orig_obj =& $orig_obj;
   $this->orig_method = $orig_method;
  }
- function breakData(&$parser, $data) {
+ function breakData($parser, $data) {
   $data = preg_split('/(&.+?;)/',$data,-1,PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
   foreach ( $data as $chunk ) {
    $this->orig_obj->{$this->orig_method}($this, $chunk);
@@ -671,7 +671,7 @@ class XML_HTMLSax3_Escape_Stripper {
   $this->orig_obj =& $orig_obj;
   $this->orig_method = $orig_method;
  }
- function strip(&$parser, $data) {
+ function strip($parser, $data) {
   if ( substr($data,0,2) == '--' ) {
    $patterns = array(
     '/^\-\-/',    // Opening comment: --

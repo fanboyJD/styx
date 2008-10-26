@@ -35,7 +35,7 @@ abstract class Runner {
 	
 }
 
-class Core extends StaticStorage {
+class Core {
 	
 	private function __construct(){}
 	private function __clone(){}
@@ -97,6 +97,39 @@ class Core extends StaticStorage {
 			
 			$c->store('Core', 'Classes', self::store('Classes', $List));
 		}
+	}
+	
+	/* Using this because of missing features (will be changed when a usable version of php5.3 is out) */
+	private static function map($fn, $args){
+		static $Storage;
+		if(!$Storage) $Storage = new DynamicStorage();
+		
+		return call_user_func_array(array($Storage, $fn), $args);
+	}
+	
+	public static function store(){
+		$args = func_get_args();
+		return self::map('store', $args);
+	}
+	
+	public static function retrieve(){
+		$args = func_get_args();
+		return self::map('retrieve', $args);
+	}
+	
+	public static function erase(){
+		$args = func_get_args();
+		return self::map('erase', $args);
+	}
+	
+	public static function eraseBy(){
+		$args = func_get_args();
+		return self::map('eraseBy', $args);
+	}
+	
+	public static function eraseAll(){
+		$args = func_get_args();
+		return self::map('eraseAll', $args);
 	}
 	
 }

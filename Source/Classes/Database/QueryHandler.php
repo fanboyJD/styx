@@ -40,7 +40,7 @@ class QueryHandler {
 			return $data;
 		
 		foreach($data as $k => $v)
-			$out[] = $k.'='.($v!==null ? "'".Data::add(is_array($v) ? (sizeof($v[1]) ? Data::call($v[0], $v[1]) : $v[0]) : $v)."'" : 'NULL');
+			$out[] = $k.'='.($v!==null ? "'".Data::add(is_array($v) ? (count($v[1]) ? Data::call($v[0], $v[1]) : $v[0]) : $v)."'" : 'NULL');
 		
 		return implode(', ', $out);
 	}
@@ -63,7 +63,7 @@ class QueryHandler {
 		
 		foreach($data as $k => $v){
 			if(!ctype_digit((string)$k))
-				$out[] = $k.'='.($v!==null ? "'".Data::add(is_array($v) ? (sizeof($v[1]) ? Data::call($v[0], $v[1]) : $v[0]) : $v)."'" : 'NULL');
+				$out[] = $k.'='.($v!==null ? "'".Data::add(is_array($v) ? (count($v[1]) ? Data::call($v[0], $v[1]) : $v[0]) : $v)."'" : 'NULL');
 			elseif(is_array($v))
 				$out[] = '('.$this->formatWhere($v).')';
 			else

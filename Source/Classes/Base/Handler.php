@@ -93,6 +93,26 @@ class Handler extends Template {
 				header($k.': '.$v);
 	}
 	
+	public static function setCookie($key, $value, $expire = null){
+		static $Configuration;
+		
+		if(!$Configuration){
+			$Configuration = Core::retrieve('cookie');
+			$Configuration['expire'] += time();
+		}
+		
+		setcookie($key, $value, pick($expire, $Configuration['expire']), $Configuration['path'], $Configuration['domain'], $Configuration['secure'], $Configuration['httponly']);
+		
+		$cookie = Request::getInstance()->retrieve('cookie');
+		if($value) $cookie[$key] = $value;
+		else unset($cookie[$key]);
+		Request::getInstance()->store('cookie', $cookie);
+	}
+	
+	public static function removeCookie($key){
+		self::setCookie($key, false, time()-3600);
+	}
+	
 	public static function setType($type = null){
 		if(self::$Type) return;
 		
@@ -135,6 +155,34 @@ class Handler extends Template {
 		unset(self::$Instances[$slave ? 'slaves' : 'master'][$name]);
 	}
 	
+	public static function link($options = null, $base = null){
+		static $Configuration;	
+		if(!$Configuration)
+			$Configuration = array(
+				'path.separator' => Core::retrieve('path.separator'),
+				'app.link' => Core::retrieve('app.link'),
+			);
+		
+		$array = array();
+		if($options['handler']){
+			$array[] = 'handler'.$Configuration['path.separator'].$options['handler'];
+			unset($options['handler']);
+		}
+		
+		if(Hash::length(Hash::splat($base)))
+			foreach($base as $v)
+				$array[] = is_array($v) ? implode($Configuration['path.separator'], $v) : $v;
+		
+		if(Hash::length($options))
+			foreach($options as $k => $v)
+				$array[] = $k.($v ? $Configuration['path.separator'].$v : '');
+		
+		if(count($array)) $array = implode('/', $array);
+		else $array = null;
+		
+		return $Configuration['app.link'].$array;
+	}
+	
 	public function getName(){
 		return $this->name;
 	}
@@ -160,7 +208,7 @@ class Handler extends Template {
 	/**
 	 * @return Handler
 	 */
-	public function base($base){
+	public function base(){
 		$this->base = Hash::args(func_get_args());
 		
 		return $this;
@@ -234,7 +282,7 @@ class Handler extends Template {
 		if($this->master) $this->callback();
 		else $this->parsed = $this->assigned;
 		
-		if(sizeof($this->file)){
+		if(count($this->file)){
 			if($this->master && is_array($this->parsed)) $this->assign($this->parsed);
 			
 			return parent::parse($return);

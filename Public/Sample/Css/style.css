@@ -47,6 +47,8 @@ div#content {
 }
 
 div#logo a {
+	position: relative;
+	z-index: 10;
 	width: 377px;
 	height: 195px;
 	
@@ -124,6 +126,19 @@ div#footer div {
 
 div#footer div a:hover {
 	text-decoration: underline;
+}
+
+div#languages {
+	float: right;
+}
+
+div#languages a img {
+	margin: 1px 5px 1px 1px;
+}
+
+div#languages a.selected img {
+	margin: 0 4px 0 0;
+	border: 1px solid #aaa;
 }
 
 .clear {

@@ -10,8 +10,6 @@ deleted = 'The entry has been deleted!';
 source = 'View Source';
 
 namespace news {
-	name = 'News';
-	
 	posted = 'Posted by <b>%s</b> on %s';
 	
 	add = 'Add news';
@@ -83,6 +81,7 @@ namespace validator {
 	default = 'The field "<b>%s</b>" contains an invalid value.';
 	
 	# Custom
+	rightsWrapped = '<div class="inner">You don\'t have the necessary rights to access this page.</div>';
 	login = 'You have entered an invalid username or password.';
 	onlyedit = 'You can only edit pages but not add new ones.';
 }

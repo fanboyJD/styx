@@ -1,5 +1,8 @@
 <?php
-	$get = Request::retrieve('get');
+	if(!User::retrieve())
+		return;
+	
+	$get = Request::getInstance()->retrieve('get');
 	if($get['p']['do']=='cache'){
 		Cache::getInstance()->eraseAll(true);
 		$msg = 'erased';

@@ -2036,7 +2036,7 @@ class Upload {
      */
     function translate($str, $tokens = array()) {
         if (array_key_exists($str, $this->translation)) $str = $this->translation[$str];
-        if (is_array($tokens) && sizeof($tokens) > 0)   $str = vsprintf($str, $tokens);
+        if (is_array($tokens) && count($tokens) > 0)   $str = vsprintf($str, $tokens);
         return $str;
     }
 
@@ -2800,9 +2800,9 @@ class Upload {
                         } else {
                             $vars = explode(' ', $this->image_crop);
                         }
-                        if (sizeof($vars) == 4) {
+                        if (count($vars) == 4) {
                             $ct = $vars[0]; $cr = $vars[1]; $cb = $vars[2]; $cl = $vars[3];
-                        } else if (sizeof($vars) == 2) {
+                        } else if (count($vars) == 2) {
                             $ct = $vars[0]; $cr = $vars[1]; $cb = $vars[0]; $cl = $vars[1];
                         } else {
                             $ct = $vars[0]; $cr = $vars[0]; $cb = $vars[0]; $cl = $vars[0];
@@ -2984,9 +2984,9 @@ class Upload {
                             $this->log .= '- add border : ' . $this->image_border . '<br />';
                             $vars = explode(' ', $this->image_border);
                         }
-                        if (sizeof($vars) == 4) {
+                        if (count($vars) == 4) {
                             $ct = $vars[0]; $cr = $vars[1]; $cb = $vars[2]; $cl = $vars[3];
-                        } else if (sizeof($vars) == 2) {
+                        } else if (count($vars) == 2) {
                             $ct = $vars[0]; $cr = $vars[1]; $cb = $vars[0]; $cl = $vars[1];
                         } else {
                             $ct = $vars[0]; $cr = $vars[0]; $cb = $vars[0]; $cl = $vars[0];
@@ -3025,7 +3025,7 @@ class Upload {
                             $this->log .= '- add frame : ' . $this->image_frame_colors . '<br />';
                             $vars = explode(' ', $this->image_frame_colors);
                         }
-                        $nb = sizeof($vars);
+                        $nb = count($vars);
                         $this->image_dst_x = $this->image_dst_x + ($nb * 2);
                         $this->image_dst_y = $this->image_dst_y + ($nb * 2);
                         $tmp = $this->imagecreatenew($this->image_dst_x, $this->image_dst_y);
@@ -3269,12 +3269,12 @@ class Upload {
                                 $h = ($char_width * strlen($v));
                                 if ($h > $text_height) $text_height = $h;
                                 $line_width = $char_height;
-                                $text_width += $line_width + ($k < (sizeof($text)-1) ? $this->image_text_line_spacing : 0);
+                                $text_width += $line_width + ($k < (count($text)-1) ? $this->image_text_line_spacing : 0);
                             } else {
                                 $w = ($char_width * strlen($v));
                                 if ($w > $text_width) $text_width = $w;
                                 $line_height = $char_height;
-                                $text_height += $line_height + ($k < (sizeof($text)-1) ? $this->image_text_line_spacing : 0);
+                                $text_height += $line_height + ($k < (count($text)-1) ? $this->image_text_line_spacing : 0);
                             }
                         }
                         $text_width  += (2 * $this->image_text_padding_x);
@@ -3344,7 +3344,7 @@ class Upload {
                                 if ($this->image_text_direction == 'v') {
                                     imagestringup($filter,
                                                   $this->image_text_font,
-                                                  $k * ($line_width  + ($k > 0 && $k < (sizeof($text)) ? $this->image_text_line_spacing : 0)),
+                                                  $k * ($line_width  + ($k > 0 && $k < (count($text)) ? $this->image_text_line_spacing : 0)),
                                                   $text_height - (2 * $this->image_text_padding_y) - ($this->image_text_alignment == 'l' ? 0 : (($t_height - strlen($v) * $char_width) / ($this->image_text_alignment == 'r' ? 1 : 2))) ,
                                                   $v,
                                                   $text_color);
@@ -3352,7 +3352,7 @@ class Upload {
                                     imagestring($filter,
                                                 $this->image_text_font,
                                                 ($this->image_text_alignment == 'l' ? 0 : (($t_width - strlen($v) * $char_width) / ($this->image_text_alignment == 'r' ? 1 : 2))),
-                                                $k * ($line_height  + ($k > 0 && $k < (sizeof($text)) ? $this->image_text_line_spacing : 0)),
+                                                $k * ($line_height  + ($k > 0 && $k < (count($text)) ? $this->image_text_line_spacing : 0)),
                                                 $v,
                                                 $text_color);
                                 }
@@ -3366,7 +3366,7 @@ class Upload {
                                 if ($this->image_text_direction == 'v') {
                                     imagestringup($image_dst,
                                                   $this->image_text_font,
-                                                  $text_x + $k * ($line_width  + ($k > 0 && $k < (sizeof($text)) ? $this->image_text_line_spacing : 0)),
+                                                  $text_x + $k * ($line_width  + ($k > 0 && $k < (count($text)) ? $this->image_text_line_spacing : 0)),
                                                   $text_y + $text_height - (2 * $this->image_text_padding_y) - ($this->image_text_alignment == 'l' ? 0 : (($t_height - strlen($v) * $char_width) / ($this->image_text_alignment == 'r' ? 1 : 2))),
                                                   $v,
                                                   $text_color);
@@ -3374,7 +3374,7 @@ class Upload {
                                     imagestring($image_dst,
                                                 $this->image_text_font,
                                                 $text_x + ($this->image_text_alignment == 'l' ? 0 : (($t_width - strlen($v) * $char_width) / ($this->image_text_alignment == 'r' ? 1 : 2))),
-                                                $text_y + $k * ($line_height  + ($k > 0 && $k < (sizeof($text)) ? $this->image_text_line_spacing : 0)),
+                                                $text_y + $k * ($line_height  + ($k > 0 && $k < (count($text)) ? $this->image_text_line_spacing : 0)),
                                                 $v,
                                                 $text_color);
                                 }

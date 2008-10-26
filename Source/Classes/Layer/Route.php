@@ -74,7 +74,7 @@ class Route {
 		
 		foreach($rules as $rule){
 			$pass = false;
-			for($i=0,$length=sizeof($rule['route']);$i<$length;$i++){
+			for($i=0,$length=count($rule['route']);$i<$length;$i++){
 				$route = Hash::splat($rule['route'][$i]);
 				if(!$route['match']) $route['match'] = $route[0];
 				if(!$route['type']) $route['type'] = $route[1];

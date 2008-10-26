@@ -10,7 +10,7 @@
 
 class Filecache {
 	
-	public $Configuration = array(
+	private $Configuration = array(
 			'prefix' => null,
 			'root' => null,
 		),

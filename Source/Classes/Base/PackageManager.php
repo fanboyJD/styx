@@ -173,7 +173,7 @@ class PackageManager {
 	}
 	
 	private static function checkRequired($require){
-		if(sizeof($require)){
+		if(count($require)){
 			$client = Request::getClient();
 			
 			if($require['login'] && !User::retrieve())

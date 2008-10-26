@@ -1,6 +1,17 @@
 var User = {};
 window.addEvent('domready', function(){
 	(function(){
+		$$('div#languages a').set('tween', {duration: 200}).addEvents({
+			mouseenter: function(){
+				this.fade(0.5);
+			},
+			
+			mouseleave: function(){
+				this.fade(1);
+			}
+		});
+	})();
+	(function(){
 		$$('ul#menu li a').set({
 			morph: {duration: 300},
 			events: {
@@ -25,7 +36,10 @@ window.addEvent('domready', function(){
 	
 	(function(){
 		$$('a.hicon').set('opacity', 0).each(function(el){
-			el.getParent('div').addEvents({
+			el.addEvents({
+				mouseenter: el.fade.bind(el, 0.5),
+				mouseleave: el.fade.bind(el, 0.8)
+			}).getParent('div').addEvents({
 				mouseenter: el.fade.bind(el, 0.8),
 				mouseleave: el.fade.bind(el, 0)
 			});
