@@ -1,0 +1,86 @@
+rss.title = 'News-Feed';
+title = 'Titel';
+text = 'Inhalt';
+save = 'Speichern';
+edit = 'Bearbeiten';
+delete = 'Löschen';
+confirmdelete = 'Bist du sicher, dass du diesen Inhalt löschen möchtest?';
+deleted = 'Der Inhalt wurde gelöscht!';
+
+source = 'Quelltext anzeigen';
+
+namespace news {
+	posted = 'Eingetragen von <b>%s</b> am %s';
+	
+	add = 'Neuigkeiten einfügen';
+	edit = 'Neuigkeiten bearbeiten';
+	
+	saved = '<div class="inner">
+			<b>Dein Eintrag wurde gespeichert.</b><br/><br/>
+			<a href="%s" class="go icon">Zum News-Eintrag</a>
+		</div>';
+}
+
+namespace page {
+	saved = '<div class="inner">
+			<b>Die Seite wurde gespeichert.</b><br/><br/>
+			<a href="%s" class="go icon">Zur Seite</a>
+		</div>';
+	
+	notavailable = '<div class="inner">
+			<span class="icon go">Diese Seite ist nicht verfügbar.</span>
+		</div>';
+}
+
+# The namespace for the framework :)
+namespace framework {
+	description = '<span class="blue">Styx</span> ist ein PHP-Framework in einem frühen Alpha-Stadium.<br/><br/>
+		Du kannst den code herunterladen indem du folgenden Code ausführst<br/>
+			<span class="blue icon">svn checkout http://framework.og5.net/svn/</span>
+		<br/><br/>
+		Wenn du helfen / daran arbeiten / Schreibrechte für svn oder Sonstiges möchtest, bitte kontaktiere
+		mich: <a href="mailto:christoph.pojer@gmail.com">E-Mail</a> |
+		<a href="http://og5.net/christoph" target="portfolio">Portfolio</a>';
+}
+
+namespace user {
+	name = 'Benutzername';
+	pwd = 'Passwort';
+	login = 'Login';
+	logout = 'Logout';
+	
+	admin = 'Administration';
+	
+	hello = 'Hallo %s';
+	
+	loggedin = '<div class="inner">
+			<h1>Administration</h1>
+			<span class="bold go">Willkommen %s</span>
+		</div>';
+}
+
+namespace admin {
+	cache = 'Cache löschen';
+	erased = 'Cache gelöscht';
+}
+
+namespace validator {
+	content = '<div class="inner">
+			<span class="icon go">%s</span>
+		</div>';
+	
+	# Default
+	rights = 'Dir fehlen die erforderlichen Rechte um diese Seite aufzurufen.';
+	session = 'Die Sitzung ist abgelaufen. Bitte versuche es noch einmal.';
+	handler = 'Die Seite weiß nicht, wie die angeforderte Adresse verarbeitet werden soll.';
+	notempty = 'Das Feld "<b>%s</b>" darf nicht leer sein';
+	
+	data = 'Es war nicht möglich die eingegeben Daten zu verarbeiten. Bitte versuche es noch einmal.';
+	pagetitle = 'Das Feld "<b>%s</b>" darf nur Buchstaben, Zahlen oder _ enthalten.';
+	default = 'Das Feld "<b>%s</b>" enthält einen ungültigen Wert.';
+	
+	# Custom
+	rightsWrapped = '<div class="inner">Dir fehlen die erforderlichen Rechte um diese Seite aufzurufen.</div>';
+	login = 'Du hast einen falschen Benutzernamen oder ein falsches Password eingegeben.';
+	onlyedit = 'Du kannst nur Seiten bearbeiten aber keine neuen hinzufügen.';
+}

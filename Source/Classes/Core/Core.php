@@ -54,7 +54,7 @@ class Core {
 		
 		if(!file_exists($file)) return false;
 		
-		if(!class_exists($class)) require_once($file);
+		if(!class_exists($class, false)) require_once($file);
 		
 		return true;
 	}
@@ -64,13 +64,13 @@ class Core {
 		
 		$List = self::retrieve('Classes');
 		
-		return $List[$class] || class_exists($class) ? $List[$class] : false;	
+		return $List[$class] || class_exists($class, false) ? $List[$class] : false;	
 	}
 	
 	public static function autoload($class){
 		$file = self::classExists($class);
 		
-		if($file && !class_exists($class)) require_once($file);
+		if($file && !class_exists($class, false)) require_once($file);
 		
 		return $file;
 	}
