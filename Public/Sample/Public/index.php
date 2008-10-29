@@ -81,14 +81,14 @@
 				<a href="'.Layer::retrieve('login')->link(null, $user ? 'logout' : null).'">'.Lang::retrieve('user.'.($user ? 'logout' : 'login')).'</a>',
 			
 			'styx' => Core::retrieve('styx.name').' '.Core::retrieve('styx.version'),
-		))->parse();
+		))->show();
 	elseif(Page::behaviour('json'))
-		Page::map()->substitute('layer')->parse();
+		Page::map()->substitute('layer')->show();
 	elseif(Page::behaviour('xml'))
 		Page::map()->assign(array(
 			'app.name' => Core::retrieve('app.name'),
 			'app.link' => Core::retrieve('app.link'),
 			'app.mail' => Core::retrieve('app.mail'),
-		))->template('rss.php')->parse();
+		))->template('rss.php')->show();
 	else
 		Page::map()->disable();

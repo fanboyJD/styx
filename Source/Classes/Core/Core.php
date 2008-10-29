@@ -50,7 +50,7 @@ class Core {
 	 * @return bool
 	 */
 	public static function loadClass($dir, $class){
-		$file = self::retrieve('path').'Classes/'.$dir.'/'.ucfirst(strtolower($class)).'.php';
+		$file = self::retrieve('path').'Classes/'.ucfirst($dir).'/'.ucfirst(strtolower($class)).'.php';
 		
 		if(!file_exists($file)) return false;
 		

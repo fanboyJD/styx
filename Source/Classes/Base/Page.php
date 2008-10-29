@@ -56,16 +56,14 @@ class Page extends Template {
 	
 	protected function __construct(){
 		$this->base = 'Page';
-		$this->name = $name;
 		
 		$this->bind($this);
 	}
 	
 	/**
-	 * @param string $name
 	 * @return Page
 	 */
-	public static function map($name = null){
+	public static function map(){
 		static $Instance;
 		
 		return $Instance ? $Instance : $Instance = new Page();
@@ -126,7 +124,7 @@ class Page extends Template {
 	public static function setDefaultHeaders(){
 		$time = time();
 		$headers = array(
-			'Expires' => date('r', $time-1000000),
+			'Expires' => date('r', $time-1000),
 			'Last-Modified' => date('r', $time),
 			'Cache-Control' => 'no-cache, no-store, must-revalidate'
 		);
@@ -215,7 +213,7 @@ class Page extends Template {
 			$this->parsed = call_user_func_array($class ? array($c[0], $c[1]) : $c, array($this->assigned, $class ? $c[2] : null));
 	}
 	
-	public function parse($return = false){
+	public function show($return = false){
 		if(!$this->enabled) return;
 		
 		foreach(self::$Templates as $k => $v)

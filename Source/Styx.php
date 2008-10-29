@@ -45,15 +45,15 @@ Core::initialize();
 
 Core::autoload('Element'); // We need to load Element as there are several Classes that are always needed
 
-if(function_exists('initialize')) initialize();
-
 Request::initialize();
 
-$get = Request::getInstance()->retrieve('get');
+if(function_exists('initialize')) initialize();
 
 Page::setHandlers(Core::retrieve('handler'));
 
 User::initialize();
+
+$get = Request::getInstance()->retrieve('get');
 
 if($get['m']['package'] && PackageManager::setPackage($get['m']['package'])){
 	Page::useExtendedTypes();
@@ -61,7 +61,7 @@ if($get['m']['package'] && PackageManager::setPackage($get['m']['package'])){
 	Page::setType(PackageManager::getType());
 	Page::setHeader();
 	
-	Page::map()->parse();
+	Page::map()->show();
 	
 	die;
 }else{
