@@ -73,7 +73,7 @@ namespace validator {
 	# Default
 	rights = 'You don\'t have the necessary rights to access this page.';
 	session = 'Your session has been expired. Please try again.';
-	handler = 'The Webserver does not know how to process your request.';
+	contenttype = 'The Webserver does not know how to process your request.';
 	notempty = 'The field "<b>%s</b>" must not be empty';
 	
 	data = 'It was not possible to process your input data. Please try again.';

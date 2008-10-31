@@ -19,6 +19,8 @@ class Hash {
 	}
 	
 	public static function flatten(&$array, $prefix = null){
+		if(!is_array($array)) return $array;
+		
 		$imploded = array();
 		if($prefix) $prefix .= '.';
 		

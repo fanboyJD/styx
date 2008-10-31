@@ -28,8 +28,6 @@ $CONFIGURATION['debug'] = array(
 		'en' => array('en-us', 'en-gb', 'en'),
 		'de' => array('de-de', 'de-at', 'de-ch', 'de'),
 	),
-	'languages.cookie' => 'language',
-	'languages.querystring' => 'language',
 	
 	'rights.layer' => array(
 		'index' => array( // You can specify different rights for the IndexLayer like only adding or adding/modifying but not deleting

@@ -49,30 +49,22 @@ Request::initialize();
 
 if(function_exists('initialize')) initialize();
 
-Page::setHandlers(Core::retrieve('handler'));
-
 User::initialize();
 
 $get = Request::getInstance()->retrieve('get');
-
 if($get['m']['package'] && PackageManager::setPackage($get['m']['package'])){
-	Page::useExtendedTypes();
-	
-	Page::setType(PackageManager::getType());
-	Page::setHeader();
-	
-	Page::map()->show();
+	Page::getInstance()->show();
 	
 	die;
-}else{
-	Lang::setLanguage(Request::getLanguage());
-	
-	Page::setType($get['p']['handler']);
-	Page::setHeader();
-	
-	PackageManager::assignToMaster();
-	
-	Route::initialize($get, Request::getInstance()->retrieve('post'));
 }
+
+if(!Page::getContentType())
+	Page::setDefaultContentType(Core::retrieve('contenttype.default'));
+
+Lang::setLanguage(Request::getLanguage());
+
+PackageManager::assignToPage();
+
+Route::initialize($get, Request::getInstance()->retrieve('post'));
 
 unset($get);

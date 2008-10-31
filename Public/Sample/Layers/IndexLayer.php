@@ -6,10 +6,6 @@ class IndexLayer extends Layer {
 	public $usernames; // For: View
 	
 	public function initialize(){
-		$this->allowHandler('view', array('html', 'xml'));
-		$this->allowHandler('delete', 'json');
-		$this->disallowHandler('delete', array('html', 'xml'));
-		
 		return array(
 			'table' => 'news',
 			'options' => array(
@@ -56,7 +52,7 @@ class IndexLayer extends Layer {
 		$this->setValue(array(
 			'uid' => $this->editing ? $this->content['uid'] : User::get('id'),
 			'time' => $this->editing ? $this->content['time'] : time(),
-			'pagetitle' => $this->getPagetitle($this->getValue('title'), $this->where),
+			'pagetitle' => $this->getPagetitle($this->getValue('title')),
 		));
 		
 		$this->save();
@@ -67,12 +63,23 @@ class IndexLayer extends Layer {
 	public function onEdit(){
 		$this->edit();
 		
-		$this->Template->template('edit')->assign(array(
+		$this->Template->apply('edit')->assign(array(
 			'headline' => Lang::retrieve('news.'.($this->editing ? 'edit' : 'add')),
 		))->assign($this->format());
 	}
 	
 	public function onDelete($title){
+		/*
+		 * This could be used to enforce json encoding on any Request without looking at the wanted header
+		 * 
+		 * Page::allow('json');
+		 * Page::setContentType('json');
+		 * */
+		
+		Page::setDefaultContentType('json');
+		if(Page::getContentType()!='json')
+			throw new ValidatorException('contenttype');
+		
 		if(!User::checkSession($this->post['session'])){
 			$this->Template->assign(array(
 				'out' => 'error',
@@ -93,6 +100,8 @@ class IndexLayer extends Layer {
 	}
 	
 	public function onView($title){
+		Page::setDefaultContentType('html', 'xml');
+		
 		$this->data->limit(0)->order('time DESC');
 		if($title)
 			$this->data->where(array(
@@ -107,14 +116,14 @@ class IndexLayer extends Layer {
 		foreach(db::select('users')->fields('id, name')->where(Data::in('id', $users))->limit(0) as $user)
 			$this->usernames[$user['id']] = $user['name'];
 		
-		// We check for the used Handler (xml or html) and assign the correct template for it
-		$this->Template->template((Page::behaviour('xml') ? 'xml' : '').'view.php');
+		// We check for the used ContentType (xml or html) and assign the correct template for it
+		$this->Template->apply((Page::getContentType()=='xml' ? 'xml' : '').'view.php');
 	}
 	
 	public function populate(){
 		/*
-			This method gets automatically called by the edit and save handler
-			to populate some stuff with data you may need :)
+		 * This method gets automatically called by the edit and save handler
+		 * to populate some stuff with data you may need :)
 		*/
 		
 		$this->requireSession(); // Adds an invisible element with the current session so everything is safe :)

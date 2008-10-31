@@ -11,6 +11,7 @@ class PackageManager {
 	
 	private static $Elements = array(
 			'js' => array(
+				'class' => 'JavaScript',
 				'directory' => 'JavaScript',
 				'attribute' => 'src',
 				'options' => array(
@@ -20,6 +21,7 @@ class PackageManager {
 				),
 			),
 			'css' => array(
+				'class' => 'CSS',
 				'directory' => 'Css',
 				'attribute' => 'href',
 				'options' => array(
@@ -55,6 +57,11 @@ class PackageManager {
 	
 	public static function setPackage($name){
 		if(self::has($name)){
+			$class = self::$Elements[self::$Packages[$name]['type']]['class'];
+			Page::allow($class);
+			$class = $class.'Content';
+			Page::setContentType(new $class);
+			
 			self::$Package = $name;
 			return true;
 		}
@@ -66,7 +73,7 @@ class PackageManager {
 		return self::$Packages[self::$Package]['type'];
 	}
 	
-	public static function assignToMaster(){
+	public static function assignToPage(){
 		$version = Core::retrieve('app.version');
 		
 		foreach(self::$Packages as $name => $package){
@@ -84,7 +91,7 @@ class PackageManager {
 		
 		$assigned['packages'] = implode($assigned);
 		
-		Page::map()->assign($assigned);
+		Page::getInstance()->assign($assigned);
 	}
 	
 	public static function compress(){

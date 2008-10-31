@@ -99,7 +99,7 @@ class Data {
 	}
 	
 	public static function implode($array){
-		return implode('', Hash::flatten($array));
+		return is_array($array) ? implode('', Hash::flatten($array)) : $array;
 	}
 	
 	public static function clean($array, $whitespaces = false){

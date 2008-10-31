@@ -9,53 +9,25 @@
 
 class Page extends Template {
 	
-	private static $Type = null,
-		$Types = array(
-			'html' => array(
-				'headers' => array(
-					'Content-Type' => 'text/html; charset=UTF-8',
-				),
-				'defaultCallback' => array('Data', 'implode'),
-			),
-			
-			'json' => array(
-				'headers' => array(
-					'Content-Type' => 'application/json; charset=UTF-8',
-				),
-				'callback' => array('Data', 'encode', array(
-					'whitespace' => 'clean',
-				)),
-			),
-			
-			'xml' => array(
-				'headers' => array(
-					'Content-Type' => 'application/xhtml+xml; charset=UTF-8',
-				),
-			),
-		),
-		$ExtendedTypes = array(
-			'js' => array(
-				'headers' => array(
-					'Content-Type' => 'text/javascript; charset=UTF-8',
-				),
-				'callback' => array('PackageManager', 'compress'),
-			),
-			
-			'css' => array(
-				'headers' => array(
-					'Content-Type' => 'text/css; charset=UTF-8',
-				),
-				'callback' => array('PackageManager', 'compress'),
-			),
-		),
+	private static /**
+		 * @var ContentType
+		 */
+		$ContentType = null,
+		$Headers = array(),
+		$Types = array(),
 		$Templates = array();
 	
-	private $parsed = null,
-		$enabled = true,
-		$substitution = null;
+	private $substitution = null;
 	
 	protected function __construct(){
 		$this->base = 'Page';
+		
+		$time = time();
+		self::setHeader(array(
+			'Expires' => date('r', $time-1000),
+			'Last-Modified' => date('r', $time),
+			'Cache-Control' => 'no-cache, no-store, must-revalidate',
+		));
 		
 		$this->bind($this);
 	}
@@ -64,21 +36,33 @@ class Page extends Template {
 	 * @return Page
 	 */
 	public static function map(){
+		return self::getInstance();
+	}
+	
+	/**
+	 * 
+	 * Using getInstance is more intuitive than map
+	 * 
+	 * @return Page
+	 */
+	public static function getInstance(){
 		static $Instance;
 		
 		return $Instance ? $Instance : $Instance = new Page();
 	}
 	
-	public static function useExtendedTypes(){
-		self::$Types = array_merge(self::$Types, self::$ExtendedTypes);	
-	}
-	
-	public static function setHeader($headers = null){
-		if(!$headers) $headers = self::$Types[self::$Type]['headers'];
+	public static function setHeader($key, $value = null){
+		if(is_array($key)){
+			foreach($key as $k => $val)
+				self::setHeader($k, $val);
+			
+			return $key;
+		}
 		
-		if(is_array($headers))
-			foreach($headers as $k => $v)
-				header($k.': '.$v);
+		if(!self::$Headers[$key] || self::$Headers[$key]!=$value){
+			self::$Headers[$key] = $value;
+			if(!$value) unset(self::$Headers[$key]);
+		}
 	}
 	
 	public static function setCookie($key, $value, $expire = null){
@@ -101,42 +85,51 @@ class Page extends Template {
 		self::setCookie($key, false, time()-3600);
 	}
 	
-	public static function setType($type = null){
-		if(self::$Type) return;
+	public static function setDefaultContentType(){
+		$args = Hash::args(func_get_args());
+		if(Hash::length($args)) self::allow($args);
 		
-		$type = strtolower($type);
-		if(!self::$Types[$type]){
-			reset(self::$Types);
-			$type = key(self::$Types);
+		$class = Request::getBehaviour().'content';
+		
+		if($exists = Core::classExists($class))
+			$class = new $class;
+		
+		if(!$exists || !in_array($class->getType(), self::$Types) || $class->isExtended()){
+			$class = Core::retrieve('contenttype.default').'content';
+			$class = new $class;
 		}
 		
-		self::$Type = $type;
+		self::setContentType(new $class);
 	}
 	
-	public static function setHandlers($handlers){
-		foreach(self::$Types as $k => $v)
-			if(!in_array($k, $handlers))
-				unset(self::$Types[$k]);
+	public static function setContentType($contentType){
+		if(is_string($contentType)){
+			$class = strtolower($contentType).'content';
+			if(Core::classExists($class)) $contentType = new $class;
+			else return;
+		}
 		
-		self::setDefaultHeaders();
+		if(!in_array($contentType->getType(), self::$Types)) return;
+		
+		self::$ContentType = $contentType;
 	}
 	
-	public static function setDefaultHeaders(){
-		$time = time();
-		$headers = array(
-			'Expires' => date('r', $time-1000),
-			'Last-Modified' => date('r', $time),
-			'Cache-Control' => 'no-cache, no-store, must-revalidate'
-		);
-		
-		foreach(self::$Types as $k => $type)
-			Hash::extend(self::$Types[$k]['headers'], $headers);
+	public static function getContentType(){
+		return self::$ContentType ? self::$ContentType->getType() : false;
 	}
 	
-	public static function behaviour(){
-		$types = Hash::args(func_get_args());
+	public static function allow(){
+		$args = Hash::args(func_get_args());
 		
-		return in_array(self::$Type, $types);
+		self::$Types = array_map('strtolower', $args);
+	}
+	
+	public static function register($name, $obj){
+		self::$Templates[$name] = $obj;
+	}
+	
+	public static function deregister($name){
+		unset(self::$Templates[$name]);
 	}
 	
 	public static function link($options = null, $base = null){
@@ -145,12 +138,13 @@ class Page extends Template {
 			$Configuration = array(
 				'path.separator' => Core::retrieve('path.separator'),
 				'app.link' => Core::retrieve('app.link'),
+				'handler' => Core::retrieve('contenttype.querystring'),
 			);
 		
 		$array = array();
-		if($options['handler']){
-			$array[] = 'handler'.$Configuration['path.separator'].$options['handler'];
-			unset($options['handler']);
+		if($options[$Configuration['handler']]){
+			$array[] = $Configuration['handler'].$Configuration['path.separator'].$options['handler'];
+			unset($options[$Configuration['handler']]);
 		}
 		
 		if(Hash::length(Hash::splat($base)))
@@ -167,34 +161,8 @@ class Page extends Template {
 		return $Configuration['app.link'].$array;
 	}
 	
-	public static function register($name, $obj){
-		self::$Templates[$name] = $obj;
-	}
-	
-	public static function deregister($name){
-		unset(self::$Templates[$name]);
-	}
-	
 	/**
-	 * @return Page
-	 */
-	public function disable(){
-		$this->enabled = false;
-		
-		return $this;
-	}
-	
-	/**
-	 * @return Page
-	 */
-	public function enable(){
-		$this->enabled = true;
-		
-		return $this;
-	}
-	
-	/**
-	 * Useful for JSON-Handler: This Method sets a key for later substitution. Only the
+	 * Useful for JSON: This Method sets a key for later substitution. Only the
 	 * assigned variable with the given key will be send to output and it will replace
 	 * the original assignment array. 
 	 * 
@@ -206,15 +174,9 @@ class Page extends Template {
 		return $this;
 	}
 	
-	public function callback($callback = 'callback'){
-		$c = self::$Types[self::$Type][$callback];
-		$class = is_array($c);
-		if($c && (($class && method_exists($c[0], $c[1])) || function_exists($c)))
-			$this->parsed = call_user_func_array($class ? array($c[0], $c[1]) : $c, array($this->assigned, $class ? $c[2] : null));
-	}
-	
 	public function show($return = false){
-		if(!$this->enabled) return;
+		if(!self::$Types || !self::$ContentType || (self::$ContentType && !in_array(self::getContentType(), self::$Types)))
+			self::setDefaultContentType();
 		
 		foreach(self::$Templates as $k => $v)
 			$assign[$k] = $v->parse(true);
@@ -223,21 +185,24 @@ class Page extends Template {
 		if($main && $assign['layer.'.$main]) $assign['layer'] = $assign['layer.'.$main];
 		
 		$this->assign($assign);
+		
 		if($this->substitution) $this->assigned = $this->assigned[$this->substitution];
 		
-		$this->callback();
+		$out = self::$ContentType->process($this->assigned);
+		
+		$headers = self::$ContentType->getHeaders();
+		foreach(Hash::extend($headers, self::$Headers) as $key => $value)
+			header($key.': '.$value);
 		
 		if(count($this->file)){
-			if(is_array($this->parsed)) $this->assign($this->parsed);
+			$this->assigned = $out;
 			
 			return parent::parse($return);
-		}else{
-			$this->callback('defaultCallback');
 		}
 		
-		if($return) return $this->parsed;
+		if($return) return $out;
 		
-		echo $this->parsed;
+		echo $out;
 		flush();
 	}
 	

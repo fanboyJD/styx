@@ -31,7 +31,12 @@ Core::store(array(
 		'rights' => 'rights',
 	),
 	
-	'handler' => array('html', 'json', 'xml'),
+	'languages.cookie' => 'language',
+	'languages.querystring' => 'language',
+	
+	'contenttype.default' => 'html',
+	
+	'contenttype.querystring' => 'handler',
 	
 	'identifier.internal' => 'id',
 	'identifier.external' => 'pagetitle',

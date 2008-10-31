@@ -52,7 +52,7 @@ class LoginLayer extends Layer {
 		}
 		
 		$this->add();
-		$this->Template->template('login')->assign($this->format());
+		$this->Template->apply('login')->assign($this->format());
 	}
 	
 	public function onLogout(){

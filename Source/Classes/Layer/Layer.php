@@ -40,18 +40,10 @@ abstract class Layer extends Runner {
 			'identifier' => null,
 		),
 		
-		$handlers = array('html'),
-		$allowedHandlers = array(),
-		$disallowedHandlers = array(),
-		
 		$methods = array(),
 		$rights = null,
 		
 		$event = null,
-		$error = array(
-			'message' => null,
-			'prefix' => null,
-		),
 		$where = null,
 		$content = null,
 		$editing = false;
@@ -136,7 +128,6 @@ abstract class Layer extends Runner {
 			);
 		
 		$prefix = Core::retrieve('elements.prefix');
-		$this->error['prefix'] = ($prefix ? $prefix.'.' : '').'form.message';
 		
 		$this->form = $initialize['form'];
 		
@@ -190,18 +181,7 @@ abstract class Layer extends Runner {
 				$ev = $this->getDefaultEvent('view');
 				$event = array($ev, 'on'.ucfirst($ev));
 				if(!method_exists($this, $event[1]))
-					throw new ValidatorException('handler');
-			}
-			
-			/* 
-			 * When the allowed/disabled Handler arrays are set it checks for their contents
-			 * otherwise it checks for the global array that is responsible for the whole layer
-			 */
-			if($this->hasCustomHandler($event[0])){
-				if(!Page::behaviour($this->allowedHandlers[$event[0]]) && Page::behaviour($this->disallowedHandlers[$event[0]]))
-					throw new ValidatorException('handler');
-			}elseif(!Page::behaviour($this->handlers)){
-				throw new ValidatorException('handler');
+					throw new ValidatorException('contenttype');
 			}
 			
 			if($this->hasRight($event[0]))
@@ -209,9 +189,7 @@ abstract class Layer extends Runner {
 			else
 				throw new ValidatorException('rights');
 		}catch(ValidatorException $e){
-			$this->Template->assign(array(
-				$this->error['prefix'] => $e->getMessage(),
-			));
+			$this->Template->assign($e->getMessage());
 		}catch(Exception $e){
 			
 		}
@@ -219,7 +197,7 @@ abstract class Layer extends Runner {
 		return $this;
 	}
 	
-	/* EditHandler Begin */
+	/* Edit Begin */
 	public function edit($options = array(
 		'edit' => null,
 		'preventDefault' => false,
@@ -242,11 +220,6 @@ abstract class Layer extends Runner {
 			}
 		}
 		
-		if($this->error['message'])
-			$this->Template->assign(array(
-				$this->error['prefix'] => $this->error['message'],
-			));
-		
 		$this->populate();
 		
 		$this->form->get('action', $this->link($data[$this->options['identifier']['external']], $this->getDefaultEvent('save')));
@@ -257,38 +230,28 @@ abstract class Layer extends Runner {
 		
 		return $this->edit($options ? Hash::extend($options, $array) : $array);
 	}
-	/* EditHandler End */
+	/* Edit End */
 	
-	/* SaveHandler Begin */
+	/* Save Begin */
 	public function validate(){
 		$validate = $this->form->validate();
 		
-		if($validate!==true){
-			try{
-				throw new ValidatorException($validate);
-			}catch(Exception $e){
-				$this->error['message'] = $e->getMessage();
-				
-				$this->handle($this->getDefaultEvent($this->editing ? 'edit' : 'add'));
-			}
-			
-			throw new ValidatorException($validate); // I trick you :)
-		}
+		if($validate!==true) throw new ValidatorException($validate);
 	}
 	
 	public function prepareData($data){
 		if($this->event && $this->get['p'][$this->event] && $this->hasRight(pick($this->baseRights, $this->event), 'modify')){
-			$where = array(
+			$this->content = db::select($this->table, $this->options['cache'])->where(array(
 				$this->options['identifier']['external'] => array($this->get['p'][$this->event], $this->options['identifier']['external']),
-			);
+			))->fetch();
 			
-			$this->content = db::select($this->table, $this->options['cache'])->where($this->where)->fetch();
-			
-			$this->where = array(
-				$this->options['identifier']['internal'] => array($this->content[$this->options['identifier']['internal']], $this->options['identifier']['internal']),
-			);
-			
-			$this->editing = true;
+			if($this->content){
+				$this->where = array(
+					$this->options['identifier']['internal'] => array($this->content[$this->options['identifier']['internal']], $this->options['identifier']['internal']),
+				);
+				
+				$this->editing = true;
+			}
 		}
 		
 		$this->populate();
@@ -320,7 +283,7 @@ abstract class Layer extends Runner {
 		
 		$query->set($data)->query();
 	}
-	/* SaveHandler End */
+	/* Save End */
 	
 	public function getDefaultEvent($event){
 		return pick($this->events[$event]);
@@ -330,7 +293,9 @@ abstract class Layer extends Runner {
 		return $this->events[$event] = strtolower($name);
 	}
 	
-	public function getPagetitle($title, $where, $options = array()){
+	public function getPagetitle($title, $where = null, $options = array()){
+		if(!$where) $where = $this->where;
+		
 		if($this->table)
 			$options['contents'] = Hash::extend(Hash::splat($options['contents']), db::select($this->table, $this->options['cache'])->fields(array_unique($this->options['identifier']))->retrieve());
 		
@@ -347,24 +312,16 @@ abstract class Layer extends Runner {
 		if(!$Configuration)
 			$Configuration = array(
 				'default' => $this->getDefaultEvent('view'),
+				'handler' => Core::retrieve('contenttype.querystring')
 			);
 		
 		if(is_array($title)) $title = $title[$this->options['identifier']['external']];
 		
 		if($options && !is_array($options))
-			$options = array('handler' => $options);
+			$options = array($Configuration['handler'] => $options);
 		
 		if(!$event || !in_array($event, $this->methods))
 			$event = $Configuration['default'];
-		
-		if($options['handler']){
-			if($this->hasCustomHandler($event)){
-				if(!in_array($options['handler'], $this->allowedHandlers[$event]))
-					unset($options['handler']);
-			}elseif(!in_array($options['handler'], $this->handlers)){
-				unset($options['handler']);
-			}
-		}
 		
 		$base = array($this->base);
 		if($title || ($event && $event!=$Configuration['default'])){
@@ -412,26 +369,6 @@ abstract class Layer extends Runner {
 	
 	protected function populate(){
 		/* doSomething(); */
-	}
-	
-	public function allowHandler($methods, $handler){
-		foreach(Hash::splat($methods) as $method){
-			if(!in_array($method, $this->methods)) continue;
-			
-			$this->allowedHandlers[$method] = array_unique(array_merge(Hash::splat($this->allowedHandlers[$method]), Hash::splat($handler)));
-		}
-	}
-	
-	public function disallowHandler($methods, $handler){
-		foreach(Hash::splat($methods) as $method){
-			if(!in_array($method, $this->methods)) continue;
-			
-			$this->disallowedHandlers[$method] = array_unique(array_merge(Hash::splat($this->disallowedHandlers[$method]), Hash::splat($handler)));
-		}
-	}
-	
-	public function hasCustomHandler($event){
-		return count(Hash::splat($this->allowedHandlers[$event])) || count(Hash::splat($this->disabledHandlers[$event]));
 	}
 	
 	/**

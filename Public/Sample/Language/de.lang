@@ -72,7 +72,7 @@ namespace validator {
 	# Default
 	rights = 'Dir fehlen die erforderlichen Rechte um diese Seite aufzurufen.';
 	session = 'Die Sitzung ist abgelaufen. Bitte versuche es noch einmal.';
-	handler = 'Die Seite weiß nicht, wie die angeforderte Adresse verarbeitet werden soll.';
+	contenttype = 'Die Seite weiß nicht, wie die angeforderte Adresse verarbeitet werden soll.';
 	notempty = 'Das Feld "<b>%s</b>" darf nicht leer sein';
 	
 	data = 'Es war nicht möglich die eingegeben Daten zu verarbeiten. Bitte versuche es noch einmal.';

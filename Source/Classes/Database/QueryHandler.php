@@ -23,10 +23,10 @@ class QueryHandler {
 		$this->type = $type;
 		
 		/*
-		 * We cannot extend from DynamicStorage due to the
+		 * We cannot extend from Storage due to the
 		 * use of store/retrieve in QuerySelect
 		 */
-		$this->Storage = new DynamicStorage();
+		$this->Storage = new Storage();
 	}
 	
 	/*
@@ -76,7 +76,7 @@ class QueryHandler {
 	protected function formatLimit(){
 		$type = in_array($this->type, array('update', 'delete'));
 		
-		// This is awesome: through DynamicStorage it sets the limit value only if it has not been set yet
+		// This is awesome: through Storage it sets the limit value only if it has not been set yet
 		$limit = $this->Storage->retrieve('limit', $type ? array(0, 1) : null);
 		if(!$limit || (!$limit[0] && !$limit[1]))
 			return '';

@@ -42,7 +42,7 @@ class PageLayer extends Layer {
 			throw new ValidatorException('onlyedit');
 		
 		$this->setValue(array(
-			'pagetitle' => $this->getPagetitle($this->getValue('title'), $this->where),
+			'pagetitle' => $this->getPagetitle($this->getValue('title')),
 		));
 		
 		$this->save();
@@ -81,13 +81,13 @@ class PageLayer extends Layer {
 				'rights' => '<a class="hicon" href="'.$this->link($data['pagetitle'], 'edit').'"><img src="Images/pencil.png" alt="'.Lang::retrieve('edit').'"></a>',
 			));
 		
-		$this->Template->template('view')->assign($data);
+		$this->Template->apply('view')->assign($data);
 	}
 	
 	public function onMenu(){
 		$this->data->limit(0)->order('id ASC');
 		
-		$this->Template->template('menu.php');
+		$this->Template->apply('menu.php');
 	}
 	
 	public function populate(){

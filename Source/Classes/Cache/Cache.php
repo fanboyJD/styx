@@ -8,7 +8,7 @@
  */
 
 
-class Cache extends DynamicStorage {
+class Cache extends Storage {
 	private $Configuration = array(
 			'prefix' => null,
 			'root' => './Cache/',

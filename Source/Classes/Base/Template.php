@@ -10,11 +10,9 @@
 
 class Template extends Runner {
 	
-	protected $assigned = array(),
+	protected $assigned = null,
 		$file = array(),
 		$bind = null;
-	
-	protected static $Configuration = null;
 	
 	/**
 	 * @return Template
@@ -28,7 +26,7 @@ class Template extends Runner {
 	protected function __construct(){
 		$args = Hash::args(func_get_args());
 		
-		if($args) $this->template($args);
+		if($args) $this->apply($args);
 	}
 	
 	protected static function getFileName($file){
@@ -70,8 +68,10 @@ class Template extends Runner {
 				$this->bind->execute($filename);
 				return ob_get_clean();
 			}else{
-				// We stop here if the extension is not a template for 
-				// security reasons (code may gets exposed)
+				/* 
+				 * We stop here if the extension is not a template for 
+				 * security reasons (code may gets exposed)
+				 */
 				return;
 			}
 		}
@@ -91,8 +91,10 @@ class Template extends Runner {
 	 * @return Template
 	 */
 	public function assign(){
-		$args = func_get_args();
-		$this->assigned = Hash::extend($this->assigned, Hash::args($args));
+		$args = Hash::args(func_get_args());
+		
+		if(Hash::length($args)==1 && is_string($args[0])) $this->assigned = $args[0];
+		else $this->assigned = Hash::extend($this->assigned, $args);
 		
 		return $this;
 	}
@@ -109,30 +111,13 @@ class Template extends Runner {
 	/**
 	 * @return Template
 	 */
-	public function template(){
+	public function apply(){
 		$args = Hash::args(func_get_args());
 		
 		foreach(array_reverse(Hash::splat($this->base)) as $v)
 			array_unshift($args, $v);
 		
 		$this->file = $args;
-		
-		return $this;
-	}
-	
-	/**
-	 * @return Template
-	 */
-	public function filter($string){
-		if(is_array($string)){
-			array_walk($string, array($this, 'filter'));
-			
-			return $this;
-		}
-		
-		foreach($this->assigned as $k => $val)
-			if(!String::starts($k, $string))
-				unset($this->assigned[$k]);
 		
 		return $this;
 	}
@@ -153,15 +138,13 @@ class Template extends Runner {
 	 * @return mixed
 	 */
 	public function parse($return = false){
-		if(!Hash::length($this->file)){
-			if($return) return implode($this->assigned);
-			else echo implode($this->assigned);
-		}
+		if(!Hash::length($this->file))
+			return $this->assigned;
 		
 		$out = $this->getFile();
-		if(!$out && $return) return Hash::splat($this->assigned);
+		if(!$out && $return) return $this->assigned;
 		
-		Hash::flatten($this->assigned);
+		$this->assigned = Hash::flatten(Hash::splat($this->assigned));
 		
 		preg_match_all('/\\$\{([A-z0-9\.:\s|]+)\}/i', $out, $vars);
 		

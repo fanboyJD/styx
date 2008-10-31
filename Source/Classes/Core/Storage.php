@@ -7,7 +7,7 @@
  *
  */
 
-class DynamicStorage {
+class Storage {
 	
 	protected $Storage = array();
 	

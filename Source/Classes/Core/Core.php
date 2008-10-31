@@ -102,9 +102,8 @@ class Core {
 	/* Using this because of missing features (will be changed when a usable version of php5.3 is out) */
 	private static function map($fn, $args){
 		static $Storage;
-		if(!$Storage) $Storage = new DynamicStorage();
 		
-		return call_user_func_array(array($Storage, $fn), $args);
+		return call_user_func_array(array($Storage ? $Storage : $Storage = new Storage(), $fn), $args);
 	}
 	
 	public static function store(){

@@ -1,6 +1,13 @@
 <?php
+/*
+ * Styx::Request - MIT-style License
+ * Author: christoph.pojer@gmail.com
+ *
+ * Usage: Parses HTTP-Headers, provides data send by the user and holds URL-Information
+ *
+ */
 
-class Request extends DynamicStorage {
+class Request extends Storage {
 	
 	private static $method;
 	
@@ -33,32 +40,39 @@ class Request extends DynamicStorage {
 	}
 	
 	public static function processRequest($path = null){
+		static $Configuration;
+		
+		if(!$Configuration)
+			$Configuration = array(
+				'version' => Core::retrieve('app.version'),
+				'separator' => Core::retrieve('path.separator'),
+				'language' => Core::retrieve('languages.querystring'),
+				'handler' => Core::retrieve('contenttype.querystring'),
+				'default' => Core::retrieve('contenttype.default'),
+			);
+		
 		$polluted = array();
 		
 		$vars = explode('/', pick($path, $_SERVER['PATH_INFO']));
 		array_shift($vars);
 		
-		$version = Core::retrieve('app.version');
-		$separator = Core::retrieve('path.separator');
-		$language = Core::retrieve('languages.querystring');
-		
 		foreach($vars as $k => $v){
 			$v = Data::clean($v);
 			if(!$v) continue;
 			
-			$v = explode($separator, $v, 2);
+			$v = explode($Configuration['separator'], $v, 2);
 			if($polluted['p'][$v[0]]) continue;
 			
-			if(!$k && $version==$v[0] && strpos($vars[$k+1], '.')){
+			if($Configuration['version'] && !$k && $Configuration['version']==$v[0] && strpos($vars[$k+1], '.')){
 				$polluted['m']['package'] = $vars[$k+1];
 				continue;
-			}elseif($language && $v[0]==$language && $v[1]){
+			}elseif($Configuration['language'] && $v[0]==$Configuration['language'] && $v[1]){
 				$polluted['m']['language'] = $v[1];
 				continue;
 			}
 			
 			$polluted['p'][$v[0]] = pick($v[1]);
-			if($v[0]!='handler') $polluted['n'][] = $v[0];
+			if($v[0]!=$Configuration['handler']) $polluted['n'][] = $v[0];
 		}
 		
 		$polluted['o'] = $polluted['p']; // "Original"
@@ -68,7 +82,8 @@ class Request extends DynamicStorage {
 				$polluted['p'][$v] = null;
 			}
 		
-		if(!$polluted['p']['handler']) $polluted['p']['handler'] = 'html';
+		if($Configuration['handler'] && !$polluted['p'][$Configuration['handler']])
+			$polluted['p'][$Configuration['handler']] = $Configuration['default'];
 		
 		return $polluted;
 	}
@@ -200,6 +215,26 @@ class Request extends DynamicStorage {
 		}
 		
 		return $langs;
+	}
+	
+	public static function behaviour(){
+		$types = Hash::args(func_get_args());
+		
+		return in_array(self::getBehaviour(), $types);
+	}
+	
+	public static function getBehaviour(){
+		static $Configuration;
+		
+		if(!$Configuration)
+			$Configuration = array(
+				'handler' => Core::retrieve('contenttype.querystring'),
+			);
+		
+		if(!$Configuration) return false;
+		
+		$get = Request::getInstance()->retrieve('get');
+		return $get['p'][$Configuration['handler']];
 	}
 	
 }

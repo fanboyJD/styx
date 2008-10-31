@@ -7,7 +7,7 @@
  *
  */
 
-class Fileparser extends DynamicStorage {
+class Fileparser extends Storage {
 	
 	/* Big thanks to sorccu from the MooTools-Channel =) */
 	private static $regex = array(
