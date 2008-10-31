@@ -76,6 +76,8 @@ class PackageManager {
 	public static function assignToPage(){
 		$version = Core::retrieve('app.version');
 		
+		if(!count(self::$Packages)) return;
+		
 		foreach(self::$Packages as $name => $package){
 			if(!self::checkRequired($package['require']))
 				continue;

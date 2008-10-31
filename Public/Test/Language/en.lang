@@ -1,0 +1,32 @@
+rss.title = 'News-Feed';
+title = 'Title';
+text = 'Content';
+save = 'Save';
+edit = 'Edit';
+delete = 'Delete';
+
+namespace user {
+	name = 'Username';
+	pwd = 'Password';
+	login = 'Login';
+	logout = 'Logout';
+	
+	hello = 'Hello %s';
+}
+
+namespace validator {
+	content = '<span class="error">%s</span>';
+	
+	# Default
+	rights = 'You don\'t have the necessary rights to access this page.';
+	session = 'Your session has been expired. Please try again.';
+	contenttype = 'The Webserver does not know how to process your request.';
+	notempty = 'The field "<b>%s</b>" must not be empty';
+	
+	data = 'It was not possible to process your input data. Please try again.';
+	pagetitle = 'The field "<b>%s</b>" can only contain letters, numbers or an underscore (_).';
+	default = 'The field "<b>%s</b>" contains an invalid value.';
+	
+	# Custom
+	login = 'You have entered an invalid username or password.';
+}
