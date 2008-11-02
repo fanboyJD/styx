@@ -14,8 +14,7 @@ class Hash {
 	}
 	
 	public static function remove(&$array, $value){
-		$i = array_search($value, $array);
-		if($i!==false) unset($array[$i]);
+		return $array = array_diff_key($array, array_flip(array_keys($array, $value, true)));
 	}
 	
 	public static function flatten(&$array, $prefix = null){
@@ -41,10 +40,12 @@ class Hash {
 	}
 	
 	public static function splat(&$array){
-		return $array = !is_array($array) ? (is_null($array) ? array() : array($array)) : $array;
+		return $array = (!is_array($array) ? (is_null($array) ? array() : array($array)) : $array);
 	}
 	
 	public static function args($args){
+		$args = self::splat($args);
+		
 		return count($args)==1 ? self::splat($args[0]) : $args;
 	}
 	
