@@ -76,7 +76,6 @@ class User {
 	public static function login($user){
 		if($user[self::$Configuration['session']]) Cache::getInstance()->erase('User', 'userdata_'.$user[self::$Configuration['session']]);
 		
-		mt_srand((double)microtime()*1000000);
 		$rand = Core::retrieve('secure').mt_rand(0, 100000);
 		$user[self::$Configuration['session']] = sha1($rand.uniqid($rand, true));
 		

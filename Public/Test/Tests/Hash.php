@@ -73,6 +73,37 @@ class HashTest extends UnitTestCase {
 			'key' => 'differentvalue',
 			'new' => 'value',
 		));
+		
+		$multi = array(
+			'test' => 1,
+			'key' => array(
+				'multi' => array(
+					'something' => 7,
+					'test' => false,
+				),
+			),
+		);
+		
+		Hash::extend($multi, array(
+			'test' => 2,
+			'key' => array(
+				'multi' => array(
+					'test' => true,
+				),
+				'one' => 'ten',
+			),
+		));
+		
+		$this->assertEqual($multi, array(
+			'test' => 2,
+			'key' => array(
+				'multi' => array(
+					'something' => 7,
+					'test' => true,
+				),
+				'one' => 'ten',
+			),
+		));
 	}
 	
 	public function testSplat(){

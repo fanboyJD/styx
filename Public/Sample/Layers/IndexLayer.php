@@ -74,7 +74,7 @@ class IndexLayer extends Layer {
 		 * 
 		 * Page::allow('json');
 		 * Page::setContentType('json');
-		 * */
+		 */
 		
 		Page::setDefaultContentType('json');
 		if(Page::getContentType()!='json')

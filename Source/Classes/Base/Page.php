@@ -190,15 +190,15 @@ class Page extends Template {
 		
 		$out = self::$ContentType->process($this->assigned);
 		
-		$headers = self::$ContentType->getHeaders();
-		foreach(Hash::extend($headers, self::$Headers) as $key => $value)
-			header($key.': '.$value);
-		
 		if(count($this->file)){
 			$this->assigned = $out;
 			
-			return parent::parse($return);
+			$out = parent::parse(true);
 		}
+		
+		$headers = self::$ContentType->getHeaders();
+		foreach(Hash::extend($headers, self::$Headers) as $key => $value)
+			header($key.': '.$value);
 		
 		if($return) return $out;
 		

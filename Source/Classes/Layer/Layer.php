@@ -197,7 +197,6 @@ abstract class Layer extends Runner {
 		return $this;
 	}
 	
-	/* Edit Begin */
 	public function edit($options = array(
 		'edit' => null,
 		'preventDefault' => false,
@@ -230,9 +229,7 @@ abstract class Layer extends Runner {
 		
 		return $this->edit($options ? Hash::extend($options, $array) : $array);
 	}
-	/* Edit End */
 	
-	/* Save Begin */
 	public function validate(){
 		$validate = $this->form->validate();
 		
@@ -268,9 +265,8 @@ abstract class Layer extends Runner {
 		if(!$this->checkSession())
 			throw new ValidatorException('session');
 		
-		if(!$where) $where = $this->where;
-		
-		if($options['preventDefault']) unset($where);
+		if(!$where && !$options['preventDefault'])
+			$where = $this->where;
 		
 		$this->validate();
 		
@@ -283,7 +279,6 @@ abstract class Layer extends Runner {
 		
 		$query->set($data)->query();
 	}
-	/* Save End */
 	
 	public function getDefaultEvent($event){
 		return pick($this->events[$event]);
