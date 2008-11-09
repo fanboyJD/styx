@@ -32,6 +32,7 @@ class Route {
 						'n' => $get['n'],
 						'p' => $get['p'],
 						'm' => $get['m'],
+						'o' => $get['o'],
 					);
 					
 					foreach(array(

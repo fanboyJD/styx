@@ -141,6 +141,11 @@ class Page extends Template {
 				'handler' => Core::retrieve('contenttype.querystring'),
 			);
 		
+		if(!is_array($options)){
+			$wrapper[$options] = null;
+			$options = $wrapper;
+		}
+		
 		$array = array();
 		if($options[$Configuration['handler']]){
 			$array[] = $Configuration['handler'].$Configuration['path.separator'].$options['handler'];
