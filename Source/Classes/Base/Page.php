@@ -141,7 +141,7 @@ class Page extends Template {
 				'handler' => Core::retrieve('contenttype.querystring'),
 			);
 		
-		if(!is_array($options)){
+		if(!is_array($options) && $options){
 			$wrapper[$options] = null;
 			$options = $wrapper;
 		}
