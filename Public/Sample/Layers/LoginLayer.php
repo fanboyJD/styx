@@ -63,7 +63,7 @@ class LoginLayer extends Layer {
 	}
 	
 	public function link($title = null, $event = null, $options = null){
-		if($event=='logout') return 'logout';
+		if($event=='logout') return Page::link('logout');
 		
 		return parent::link($title, $event, $options);
 	}
