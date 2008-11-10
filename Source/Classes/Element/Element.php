@@ -38,6 +38,14 @@ class Element extends Runner {
 		static $uid = 0;
 		$type = strtolower($type);
 		
+		foreach(array(
+			'name', 'class', 'value', 'type', 'id',
+			':caption', ':alias', ':readOnly', ':default', ':validate', ':length', ':empty',
+			':elements', ':unknown', ':tag', ':standalone', ':realName', ':add', ':template',
+		) as $v)
+			if(empty($options[$v]))
+				$options[$v] = null;
+		
 		if($options[':tag']){
 			$this->name = $this->type = $options[':tag'];
 		}else{
@@ -97,7 +105,7 @@ class Element extends Runner {
 	public function prepareData(){
 		$val = $this->getValue();
 		
-		if($this->options[':validate'][0])
+		if(!empty($this->options[':validate'][0]))
 			$val = Data::call($val, $this->options[':validate']);
 		
 		return $val;
@@ -135,7 +143,8 @@ class Element extends Runner {
 			
 			return;
 		}
-		if(!$this->options[$key] || $this->options[$key]!=$value){
+		
+		if(empty($this->options[$key]) || $this->options[$key]!=$value){
 			$this->options[$key] = $value;
 			if(!$value) unset($this->options[$key]);
 		}
@@ -144,7 +153,7 @@ class Element extends Runner {
 	}
 	
 	public function get($key, $value = null){
-		if($value && !$this->options[$key])
+		if($value && empty($this->options[$key]))
 			$this->set($key, $value);
 		
 		return $this->options[$key];
@@ -182,10 +191,13 @@ class Elements extends Element {
 	public function __construct(){
 		$elements = func_get_args();
 		if(is_subclass_of($this, 'Elements')){
-			$name = $elements[1];
-			$type = $elements[2];
+			$name = isset($elements[1]) ? $elements[1] : null;
+			$type = isset($elements[2]) ? $elements[2] : null;
 			$elements = $elements[0];
 		}
+		
+		$options = array();
+		
 		if(is_array($elements[0])) $options = array_shift($elements);
 		
 		foreach($elements as $el)
@@ -203,7 +215,7 @@ class Elements extends Element {
 					else $els[$n] = $format;
 				}
 		
-		if(is_array($els['form.hidden']))
+		if(isset($els['form.hidden']) && is_array($els['form.hidden']))
 			$els['form.hidden'] = implode($els['form.hidden']);
 		
 		return $els;
@@ -231,7 +243,7 @@ class Elements extends Element {
 	}
 	
 	public function hasElement($el){
-		return !!$this->elements[$el->options['name']];
+		return !empty($this->elements[$el->options['name']]);
 	}
 	
 	public function getElements(){
@@ -244,7 +256,7 @@ class Elements extends Element {
 class Input extends Element {
 	
 	public function __construct($options, $name = null){
-		if(!$options['type'])
+		if(empty($options['type']))
 			$options['type'] = 'text';
 		
 		parent::__construct($options, $name ? $name : get_class(), 'input');
@@ -301,7 +313,7 @@ class Radio extends Element {
 		parent::__construct($options, $name, $type);
 		
 		// This class returns the preset value if wrong value is set
-		if(!key_exists(':empty', $this->options))
+		if(isset($this->options[':empty']) && !$this->options[':empty'])
 			$this->options[':empty'] = true;
 		
 		if($type=='radio') $this->addClass('radio');
@@ -399,7 +411,7 @@ class Textarea extends Element {
 	
 	public function __construct($options, $type = null){
 		foreach(array('cols', 'rows') as $v)
-			if(!$options[$v]) $options[$v] = 0;
+			if(empty($options[$v])) $options[$v] = 0;
 		
 		parent::__construct($options, get_class(), $type ? $type : 'textarea');
 	}

@@ -77,8 +77,8 @@ class Route {
 			$pass = false;
 			for($i=0,$length=count($rule['route']);$i<$length;$i++){
 				$route = Hash::splat($rule['route'][$i]);
-				if(!$route['match']) $route['match'] = $route[0];
-				if(!$route['type']) $route['type'] = $route[1];
+				if(empty($route['match'])) $route['match'] = $route[0];
+				if(empty($route['type'])) $route['type'] = $route[1];
 				
 				$urlpart = $get['n'][$i].($get['p'][$get['n'][$i]] ? $sep.$get['p'][$get['n'][$i]] : '');
 				

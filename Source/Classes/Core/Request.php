@@ -15,7 +15,9 @@ class Request extends Storage {
 	private function __clone(){}
 	
 	public static function initialize(){
-		self::$method = strtolower($_SERVER['REQUEST_METHOD']);
+		self::$method = isset($_SERVER['REQUEST_METHOD']) ? strtolower($_SERVER['REQUEST_METHOD']) : null;
+		
+		if(!in_array(self::$method, array('get', 'post', 'put', 'delete'))) self::$method = 'get';
 		
 		self::getInstance()->parse();
 	}
@@ -32,7 +34,7 @@ class Request extends Storage {
 		foreach(array('post', 'cookie') as $v)
 			$this->store($v, self::sanitize($GLOBALS['_'.strtoupper($v)]));
 		
-		if($polluted['m']['language'])
+		if(!empty($polluted['m']['language']))
 			Page::setCookie(Core::retrieve('languages.cookie'), $polluted['m']['language']);
 		
 		$get = array_merge(self::sanitize($_GET), $polluted);
@@ -52,8 +54,10 @@ class Request extends Storage {
 			);
 		
 		$polluted = array();
+		foreach(array('n', 'p', 'm', 'o') as $v)
+			$polluted[$v] = array();
 		
-		$vars = explode('/', pick($path, $_SERVER['PATH_INFO']));
+		$vars = explode('/', pick($path, isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : ''));
 		array_shift($vars);
 		
 		foreach($vars as $k => $v){
@@ -61,7 +65,7 @@ class Request extends Storage {
 			if(!$v) continue;
 			
 			$v = explode($Configuration['separator'], $v, 2);
-			if($polluted['p'][$v[0]]) continue;
+			if(!empty($polluted['p'][$v[0]])) continue;
 			
 			if($Configuration['version'] && !$k && $Configuration['version']==$v[0] && strpos($vars[$k+1], '.')){
 				$polluted['m']['package'] = $vars[$k+1];
@@ -71,18 +75,18 @@ class Request extends Storage {
 				continue;
 			}
 			
-			$polluted['p'][$v[0]] = pick($v[1]);
+			$polluted['p'][$v[0]] = isset($v[1]) ? pick($v[1]) : null;
 			if($v[0]!=$Configuration['handler']) $polluted['n'][] = $v[0];
 		}
 		
 		$polluted['o'] = $polluted['p']; // "Original"
 		foreach(array('index', 'view') as $k => $v)
-			if(!$polluted['n'][$k]){
+			if(empty($polluted['n'][$k])){
 				$polluted['n'][$k] = $v;
 				$polluted['p'][$v] = null;
 			}
 		
-		if($Configuration['handler'] && !$polluted['p'][$Configuration['handler']])
+		if($Configuration['handler'] && empty($polluted['p'][$Configuration['handler']]))
 			$polluted['p'][$Configuration['handler']] = $Configuration['default'];
 		
 		return $polluted;
@@ -109,7 +113,7 @@ class Request extends Storage {
 		static $client;
 		
 		if(!$client){
-			$uagent = $_SERVER['HTTP_USER_AGENT'];
+			$uagent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
 			
 			if(preg_match('/msie ([0-9]).*[0-9]*b*;/i', $uagent, $m)){
 				$client = array(
@@ -198,7 +202,7 @@ class Request extends Storage {
 					$langs[$cookie[$languagescookie]] = 2;
 			}
 			
-			if(!$_SERVER['HTTP_ACCEPT_LANGUAGE'])
+			if(empty($_SERVER['HTTP_ACCEPT_LANGUAGE']))
 				return $langs = array();
 			
 			preg_match_all('/([a-z]{1,8}(-[a-z]{1,8})?)\s*(;\s*q\s*=\s*(1|0\.[0-9]+))?/i', $_SERVER['HTTP_ACCEPT_LANGUAGE'], $m);

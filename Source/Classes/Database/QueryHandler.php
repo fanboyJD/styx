@@ -128,7 +128,7 @@ class QueryHandler {
 	}
 	
 	public function format($part = false){
-		if($this->formatted) return $this->formatted;
+		if(!empty($this->formatted)) return $this->formatted;
 		
 		$out = $this->formatWhere();
 		

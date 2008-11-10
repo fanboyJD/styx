@@ -93,7 +93,7 @@ class Template extends Runner {
 	public function assign(){
 		$args = Hash::args(func_get_args());
 		
-		if(Hash::length($args)==1 && is_string($args[0])) $this->assigned = $args[0];
+		if(Hash::length($args)==1 && isset($args[0]) && is_string($args[0])) $this->assigned = $args[0];
 		else $this->assigned = Hash::extend($this->assigned, $args);
 		
 		return $this;
@@ -144,7 +144,8 @@ class Template extends Runner {
 		$out = $this->getFile();
 		if(!$out && $return) return $this->assigned;
 		
-		$this->assigned = Hash::flatten(Hash::splat($this->assigned));
+		Hash::splat($this->assigned);
+		Hash::flatten($this->assigned);
 		
 		preg_match_all('/\\$\{([A-z0-9\.:\s|]+)\}/i', $out, $vars);
 		
@@ -153,7 +154,7 @@ class Template extends Runner {
 		foreach($vars[1] as $v){
 			$v = Data::clean(explode('|', $v));
 			foreach(Hash::splat($v) as $val){
-				if($this->assigned[$val]){
+				if(!empty($this->assigned[$val])){
 					$rep[1][$i] = $this->assigned[$val];
 					break;
 				}elseif(String::starts($val, 'lang.') && $lang = Lang::retrieve(substr($val, 5))){
@@ -162,7 +163,7 @@ class Template extends Runner {
 				}
 			}
 			
-			if(!$rep[1][$i]) $rep[1][$i] = '';
+			if(empty($rep[1][$i])) $rep[1][$i] = '';
 			
 			$i++;
 		}

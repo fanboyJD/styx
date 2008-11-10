@@ -57,7 +57,7 @@ class QuerySelect extends QueryHandler implements Iterator, Countable {
 	}
 	
 	public function format(){
-		if($this->formatted) return $this->formatted;
+		if(!empty($this->formatted)) return $this->formatted;
 		
 		$out = parent::format(true);
 		

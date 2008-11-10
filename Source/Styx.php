@@ -5,7 +5,7 @@
  */
 
 unset($CONFIGURATION);
-if(!is_array($Paths))
+if(!isset($Paths) || !is_array($Paths))
 	$Paths = array(
 		'app.path' => realpath('../').DIRECTORY_SEPARATOR,
 		'app.public' => realpath('./').DIRECTORY_SEPARATOR,
@@ -17,7 +17,7 @@ else
 
 require_once($Paths['app.path'].'/Config/Configuration.php');
 
-if(!$Paths['path']) $Paths['path'] = dirname(__FILE__).DIRECTORY_SEPARATOR;
+if(empty($Paths['path'])) $Paths['path'] = dirname(__FILE__).DIRECTORY_SEPARATOR;
 
 foreach(array('Storage', 'Hash', 'Core', 'String', 'Data') as $v)
 	require_once($Paths['path'].'Classes/Core/'.$v.'.php');
@@ -52,7 +52,7 @@ if(function_exists('initialize')) initialize();
 User::initialize();
 
 $get = Request::getInstance()->retrieve('get');
-if($get['m']['package'] && PackageManager::setPackage($get['m']['package'])){
+if(!empty($get['m']['package']) && PackageManager::setPackage($get['m']['package'])){
 	Page::getInstance()->show();
 	
 	die;

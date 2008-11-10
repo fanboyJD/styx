@@ -114,6 +114,8 @@ class PackageManager {
 		$c = Cache::getInstance();
 		
 		if($debug){
+			$time = 0;
+			
 			/* We check here if the files have been modified */
 			foreach($package['files'] as $file)
 				$time = max($time, filemtime(realpath($path.'/'.self::$Elements[$package['type']]['directory'].'/'.$file.'.'.$package['type'])));
@@ -138,7 +140,7 @@ class PackageManager {
 		
 		$content = implode($source);
 		
-		if(!$package['keepReadable']){
+		if(empty($package['keepReadable'])){
 			if($package['type']=='js'){
 				$compressor = new JavaScriptPacker($content, 'None', false);
 				$content = $compressor->pack();
@@ -185,10 +187,10 @@ class PackageManager {
 		if(count($require)){
 			$client = Request::getClient();
 			
-			if($require['login'] && !User::retrieve())
+			if(!empty($require['login']) && !User::retrieve())
 				return false;
 			
-			if($require['browser'] && ($require['browser']!=$client['browser'] || (!$require['version'] || !in_array($client['version'], Hash::splat($require['version'])))))
+			if(!empty($require['browser']) && ($require['browser']!=$client['browser'] || (!$require['version'] || !in_array($client['version'], Hash::splat($require['version'])))))
 				return false;
 		}
 		

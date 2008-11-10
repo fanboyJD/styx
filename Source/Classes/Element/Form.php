@@ -12,7 +12,7 @@ class Form extends Elements {
 	public function __construct(){
 		parent::__construct(func_get_args(), get_class());
 		
-		if(!$this->options['method'])
+		if(empty($this->options['method']))
 			$this->options['method'] = 'post';
 	}
 	
@@ -39,7 +39,7 @@ class Form extends Elements {
 	 */
 	public function setValue($data, $raw = false){
 		foreach($data as $k => $v)
-			if($this->elements[$k]){
+			if(!empty($this->elements[$k])){
 				$el = $this->elements[$k];
 				if($raw && (!in_array($el->type, self::$formElements)))
 					continue;
@@ -80,7 +80,7 @@ class Form extends Elements {
 			}elseif($this->options[':length'] && (strlen((string)$val)<$this->options[':length'][0] || strlen((string)$val)>$this->options[':length'][1]))
 				return array('length', $k, $el->options[':caption']);
 			
-			if(!$el->options[':validate'][0])
+			if(empty($el->options[':validate'][0]))
 				continue;
 			
 			$v = Validator::call($val, $el->options[':validate']);

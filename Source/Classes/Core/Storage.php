@@ -19,7 +19,7 @@ class Storage {
 			return $key;
 		}
 		
-		if(!$this->Storage[$key] || $this->Storage[$key]!=$value){
+		if(empty($this->Storage[$key]) || $this->Storage[$key]!=$value){
 			$this->Storage[$key] = $value;
 			if(!$value) unset($this->Storage[$key]);
 		}
@@ -28,10 +28,10 @@ class Storage {
 	}
 	
 	public function retrieve($key, $value = null){
-		if($value && !$this->Storage[$key])
+		if($value && empty($this->Storage[$key]))
 			$this->store($key, $value);
 		
-		return pick($this->Storage[$key]);
+		return isset($this->Storage[$key]) ? pick($this->Storage[$key]) : null;
 	}
 	
 	public function erase($key){

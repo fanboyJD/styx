@@ -59,7 +59,7 @@ class Page extends Template {
 			return $key;
 		}
 		
-		if(!self::$Headers[$key] || self::$Headers[$key]!=$value){
+		if(empty(self::$Headers[$key]) || self::$Headers[$key]!=$value){
 			self::$Headers[$key] = $value;
 			if(!$value) unset(self::$Headers[$key]);
 		}
@@ -71,6 +71,9 @@ class Page extends Template {
 		if(!$Configuration){
 			$Configuration = Core::retrieve('cookie');
 			$Configuration['expire'] += time();
+			foreach(array('path', 'domain', 'secure', 'httponly') as $v)
+				if(empty($Configuration[$v]))
+					$Configuration[$v] = null;
 		}
 		
 		setcookie($key, $value, pick($expire, $Configuration['expire']), $Configuration['path'], $Configuration['domain'], $Configuration['secure'], $Configuration['httponly']);
@@ -147,7 +150,7 @@ class Page extends Template {
 		}
 		
 		$array = array();
-		if($options[$Configuration['handler']]){
+		if(!empty($options[$Configuration['handler']])){
 			$array[] = $Configuration['handler'].$Configuration['path.separator'].$options['handler'];
 			unset($options[$Configuration['handler']]);
 		}
@@ -182,6 +185,8 @@ class Page extends Template {
 	public function show($return = false){
 		if(!self::$Types || !self::$ContentType || (self::$ContentType && !in_array(self::getContentType(), self::$Types)))
 			self::setDefaultContentType();
+		
+		$assign = array();
 		
 		foreach(self::$Templates as $k => $v)
 			$assign[$k] = $v->parse(true);

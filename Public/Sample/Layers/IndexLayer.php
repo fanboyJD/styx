@@ -110,6 +110,7 @@ class IndexLayer extends Layer {
 		else
 			$this->isIndex = true;
 		
+		$users = array();
 		foreach($this->data as $n)
 			$users[] = $n['uid'];
 		

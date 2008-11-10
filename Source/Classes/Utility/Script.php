@@ -8,7 +8,7 @@
  */
 
 class Script {
-	private static $script = array(),
+	private static $script = array('add' => '', 'ready' => ''),
 		$API = array('log', 'debug', 'info', 'warn', 'error', 'assert', 'dir', 'dirxml', 'trace', 'group', 'groupEnd', 'time', 'timeEnd', 'profile', 'profileEnd', 'count');
 	
 	private function __construct(){}

@@ -22,7 +22,7 @@ class PHPExtensionFilter extends FilterIterator {
 	}
 	
 	public function accept(){
-		return $this->it->isDir || strtolower(pathinfo($this->current(), PATHINFO_EXTENSION))=='php';
+		return !empty($this->it->isDir) || strtolower(pathinfo($this->current(), PATHINFO_EXTENSION))=='php';
 	}
 	
 }
@@ -64,7 +64,7 @@ class Core {
 		
 		$List = self::retrieve('Classes');
 		
-		return $List[$class] || class_exists($class, false) ? $List[$class] : false;	
+		return !empty($List[$class]) || class_exists($class, false) ? $List[$class] : false;	
 	}
 	
 	public static function autoload($class){

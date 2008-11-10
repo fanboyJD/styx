@@ -152,22 +152,22 @@ class Safehtml {
 		'classes' => false,
 		'whitelist' => null,
 	)){
-		if(is_array($options['whitelist']))
+		if(!empty($options['whitelist']) && is_array($options['whitelist']))
 			$this->tagWhiteList = $options['whitelist'];
 		
-		if($options['video']){
+		if(!empty($options['video'])){
 			$this->tagWhiteList[] = 'object';
 			$this->tagWhiteList[] = 'embed';
 			$this->tagWhiteList[] = 'param';
 		}
 		
-		if(is_array($options['classes']))
+		if(isset($options['classes']) && is_array($options['classes']))
 			$this->allowedClasses = $options['classes'];
 		else
 			$this->keepClasses = !!$options['classes'];
 		
 		foreach($this->blackProtocols as $proto){
-			unset($preg);
+			$preg = '';
 			
 			for($i=0,$length=strlen($proto);$i<$length;$i++)
 				$preg .= $proto[$i]."[\s\x01-\x1F]*";
@@ -202,11 +202,13 @@ class Safehtml {
 	}
 	
 	public function _writeAttrs($attrs, $tag){
+		$attributes = '';
+		
 		if(is_array($attrs)){
 			foreach($attrs as $name => $value){
 				$name = strtolower($name);
 				$allow = false;
-				if($this->cleanup[$tag]){
+				if(!empty($this->cleanup[$tag])){
 					if(!$this->cleanupAttributes[$name] || !in_array($name, $this->cleanup[$tag]))
 						continue;
 					
@@ -228,7 +230,7 @@ class Safehtml {
 					if(!$allow) continue;
 				}
 				
-				if(!$allow && (strpos($name, 'on')===0 || strpos($name, 'data')===0 || !in_array($name, $this->allowedAttributes) || (!preg_match("/^[a-z0-9]+$/i", $name)) || (is_array($this->removeAttribIfNotInElement[$name]) && !in_array($tag, $this->removeAttribIfNotInElement[$name]))))
+				if(!$allow && (strpos($name, 'on')===0 || strpos($name, 'data')===0 || !in_array($name, $this->allowedAttributes) || (!preg_match("/^[a-z0-9]+$/i", $name)) || (!empty($this->removeAttribIfNotInElement[$name]) && is_array($this->removeAttribIfNotInElement[$name]) && !in_array($tag, $this->removeAttribIfNotInElement[$name]))))
 					continue;
 				
 				if($name=='class' && !$this->keepClasses){
@@ -286,7 +288,7 @@ class Safehtml {
 			$this->_dcCounter[$name] = isset($this->_dcCounter[$name]) ? $this->_dcCounter[$name]+1 : 1;
 		}
 		
-		if($this->convert[$name]) $name = $this->convert[$name];
+		if(!empty($this->convert[$name])) $name = $this->convert[$name];
 		
 		if(count($this->_dcStack)!=0 || !in_array($name, $this->tagWhiteList))
 			return true;

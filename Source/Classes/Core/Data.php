@@ -15,7 +15,7 @@ class Data {
 	public static function call($data, $options){
 		Hash::splat($options);
 		if(method_exists('Data', $options[0]))
-			return call_user_func(array('Data', $options[0]), $data, $options[1]);
+			return call_user_func(array('Data', $options[0]), $data, isset($options[1]) ? $options[1] : null);
 		
 		return $data;
 	}
@@ -134,7 +134,7 @@ class Data {
 		
 		if(self::id($title)) $title = '_'.$title;
 		
-		if(!$options['identifier']){
+		if(empty($options['identifier'])){
 			static $identifier;
 			
 			if(!$identifier)
@@ -145,7 +145,8 @@ class Data {
 			
 			$options['identifier'] = $identifier;
 		}
-		if($options['contents']) return self::checkTitle($title, $options);
+		
+		if(!empty($options['contents'])) return self::checkTitle($title, $options);
 		
 		return $title;
 	}
@@ -160,7 +161,7 @@ class Data {
 		foreach($options['contents'] as $content){
 			if(!is_array($content)) $content = array($options['identifier']['external'] => $content);
 			
-			if((!$options[$options['identifier']['internal']] || $options[$options['identifier']['internal']]!=$content[$options['identifier']['internal']]) && strtolower($content[$options['identifier']['external']])==strtolower($title.(self::id($i) ? (String::ends($title, '_') ? '' : '_').$i : '')))
+			if((empty($options[$options['identifier']['internal']]) || $options[$options['identifier']['internal']]!=$content[$options['identifier']['internal']]) && strtolower($content[$options['identifier']['external']])==strtolower($title.(self::id($i) ? (String::ends($title, '_') ? '' : '_').$i : '')))
 				return self::checkTitle($title, $options, ++$i);
 		}
 		

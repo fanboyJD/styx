@@ -29,7 +29,7 @@ class Validator {
 		
 		Hash::splat($options);
 		if(method_exists($Instance, $options[0]))
-			return $Instance->{$options[0]}($data, $options[1]);
+			return $Instance->{$options[0]}($data, isset($options[1]) ? $options[1] : null);
 		
 		return true;
 	}

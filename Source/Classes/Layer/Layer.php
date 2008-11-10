@@ -88,7 +88,7 @@ abstract class Layer extends Runner {
 	 */
 	public static function retrieve($layer){
 		$layer = strtolower($layer);
-		if(!self::$Layers['Instances'][$layer])
+		if(empty(self::$Layers['Instances'][$layer]))
 			return Layer::run($layer);
 		
 		return self::$Layers['Instances'][$layer];
@@ -105,8 +105,10 @@ abstract class Layer extends Runner {
 		self::$Layers['Instances'][$this->layername] = $this;
 		
 		foreach(get_class_methods($this) as $m)
-			if(String::starts($m, 'on') && strlen($m)>=3)
-				$this->methods[] = strtolower(substr($m, 2));
+			if(String::starts($m, 'on') && strlen($m)>=3){
+				$method = $this->methods[] = strtolower(substr($m, 2));
+				$this->rights[$method] = 0;
+			}
 		
 		$initialize = $this->initialize();
 		Hash::splat($initialize);
@@ -114,7 +116,7 @@ abstract class Layer extends Runner {
 		if(key_exists('table', $initialize))
 			$this->table = pick($initialize['table']);
 		
-		if(is_array($initialize['options'])) Hash::extend($this->options, $initialize['options']);
+		if(isset($initialize['options']) && is_array($initialize['options'])) Hash::extend($this->options, $initialize['options']);
 		
 		if(!$this->options['identifier'])
 			$this->options['identifier'] = array(
@@ -132,11 +134,13 @@ abstract class Layer extends Runner {
 		$this->form = $initialize['form'];
 		
 		$rights = Core::retrieve('rights.layer');
-		if(is_array($rights[$this->name]))
-			foreach(Hash::flatten($rights[$this->name]) as $name => $right)
-				$this->rights[strtolower($name)] = true;
-		elseif($rights[$this->name])
-			$this->rights = 1;
+		if(isset($rights[$this->name])){
+			if(is_array($rights[$this->name]))
+				foreach(Hash::flatten($rights[$this->name]) as $name => $right)
+					$this->rights[strtolower($name)] = true;
+			elseif($rights[$this->name])
+				$this->rights = 1;
+		}
 	}
 	
 	public function initialize(){
@@ -185,7 +189,7 @@ abstract class Layer extends Runner {
 			}
 			
 			if($this->hasRight($event[0]))
-				$this->{$event[1]}($this->get['p'][$event[0]]);
+				$this->{$event[1]}(isset($this->get['p'][$event[0]]) ? pick($this->get['p'][$event[0]]) : null);
 			else
 				throw new ValidatorException('rights');
 		}catch(ValidatorException $e){
@@ -204,12 +208,12 @@ abstract class Layer extends Runner {
 		if(!$this->hasRight(pick($this->baseRights, $this->event), 'add'))
 			throw new ValidatorException('rights');
 		
-		if(!$options['edit'] && !$options['preventDefault'] && $this->event && $this->get['p'][$this->event] && $this->hasRight(pick($this->baseRights, $this->event), 'modify'))
+		if(empty($options['edit']) && !$options['preventDefault'] && $this->event && $this->get['p'][$this->event] && $this->hasRight(pick($this->baseRights, $this->event), 'modify'))
 			$options['edit'] = array(
 				$this->options['identifier']['external'] => array($this->get['p'][$this->event], $this->options['identifier']['external']),
 			);
 		
-		if($options['edit'] && Validator::check($options['edit']) && $this->table){
+		if(!empty($options['edit']) && Validator::check($options['edit']) && $this->table){
 			$data = db::select($this->table, $this->options['cache'])->where($options['edit'])->fetch();
 			if($data){
 				$this->setValue($data);
@@ -221,7 +225,7 @@ abstract class Layer extends Runner {
 		
 		$this->populate();
 		
-		$this->form->get('action', $this->link($data[$this->options['identifier']['external']], $this->getDefaultEvent('save')));
+		$this->form->get('action', $this->link(!empty($data[$this->options['identifier']['external']]) ? $data[$this->options['identifier']['external']] : null, $this->getDefaultEvent('save')));
 	}
 	
 	public function add($options = null){
@@ -237,7 +241,7 @@ abstract class Layer extends Runner {
 	}
 	
 	public function prepareData($data){
-		if($this->event && $this->get['p'][$this->event] && $this->hasRight(pick($this->baseRights, $this->event), 'modify')){
+		if($this->event && !empty($this->get['p'][$this->event]) && $this->hasRight(pick($this->baseRights, $this->event), 'modify')){
 			$this->content = db::select($this->table, $this->options['cache'])->where(array(
 				$this->options['identifier']['external'] => array($this->get['p'][$this->event], $this->options['identifier']['external']),
 			))->fetch();
@@ -334,7 +338,7 @@ abstract class Layer extends Runner {
 	public function hasRight(){
 		$args = Hash::args(func_get_args());
 		
-		if(!$this->rights || (is_array($this->rights) && !$this->rights[implode('.', $args)]))
+		if(!$this->rights || (is_array($this->rights) && empty($this->rights[implode('.', $args)])))
 			return true;
 		
 		array_unshift($args, 'layer', $this->name);
@@ -351,7 +355,7 @@ abstract class Layer extends Runner {
 		
 		return $this->form->addElement(new HiddenInput(array(
 			'name' => $name,
-			'value' => Request::getMethod()=='post' && $this->post[$name] ? $this->post[$name] : User::get($user['session']),
+			'value' => Request::getMethod()=='post' && !empty($this->post[$name]) ? $this->post[$name] : User::get($user['session']),
 			':alias' => true,
 		)));
 	}

@@ -26,7 +26,9 @@ class Rights {
 		
 		foreach($rights as $right){
 			$prefix[] = $right;
-			if($this->rights[implode('.', $prefix)]==1)
+			$check = implode('.', $prefix);
+			
+			if(!empty($this->rights[$check]) && $this->rights[$check]==1)
 				return true;
 		}
 		

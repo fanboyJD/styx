@@ -46,8 +46,10 @@ class User {
 	
 	private static function getLoginData(){
 		if(self::$Configuration['type']=='cookie'){
+			$prefix = Core::retrieve('prefix');
 			$cookie = Request::getInstance()->retrieve('cookie');
-			$data = json_decode((string)$cookie[Core::retrieve('prefix')], true);
+			
+			$data = json_decode(!empty($cookie[$prefix]) ? (string)$cookie[$prefix] : null, true);
 		}
 		
 		return Hash::length($data)==3 ? $data : false;
