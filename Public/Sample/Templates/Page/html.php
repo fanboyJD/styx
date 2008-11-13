@@ -14,6 +14,7 @@
 	<div id="languages"><?php
 		$separator = Core::retrieve('path.separator');
 		$request = Request::processRequest();
+		
 		foreach(Core::retrieve('languages') as $k => $lang)
 			echo '<a href="'.Page::link($request['o'], array(array('language', $k))).'"'.(Lang::getLanguage()==$k ? ' class="selected"' : '').'><img src="Images/'.$k.'.png" alt="" /></a>';
 	?></div>

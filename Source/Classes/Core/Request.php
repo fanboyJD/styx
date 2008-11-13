@@ -42,7 +42,7 @@ class Request extends Storage {
 	}
 	
 	public static function processRequest($path = null){
-		static $Configuration;
+		static $Configuration, $processed = array();
 		
 		if(!$Configuration)
 			$Configuration = array(
@@ -50,14 +50,21 @@ class Request extends Storage {
 				'separator' => Core::retrieve('path.separator'),
 				'language' => Core::retrieve('languages.querystring'),
 				'handler' => Core::retrieve('contenttype.querystring'),
-				'default' => Core::retrieve('contenttype.default'),
+				'contenttype.default' => Core::retrieve('contenttype.default'),
+				'layer.default' => Core::retrieve('layer.default'),
 			);
+		
+		$path = pick($path, isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '');
+		
+		if(!$path) return array();
+		
+		if(!empty($processed[$path])) return $processed[$path];
 		
 		$polluted = array();
 		foreach(array('n', 'p', 'm', 'o') as $v)
 			$polluted[$v] = array();
 		
-		$vars = explode('/', pick($path, isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : ''));
+		$vars = explode('/', $path);
 		array_shift($vars);
 		
 		foreach($vars as $k => $v){
@@ -76,20 +83,23 @@ class Request extends Storage {
 			}
 			
 			$polluted['p'][$v[0]] = isset($v[1]) ? pick($v[1]) : null;
+			
 			if($v[0]!=$Configuration['handler']) $polluted['n'][] = $v[0];
 		}
 		
-		$polluted['o'] = $polluted['p']; // "Original"
-		foreach(array('index', 'view') as $k => $v)
+		foreach($polluted['p'] as $k => $v)
+			$polluted['o'][Data::entities($k)] = $v ? Data::entities($v) : null; // "Original" (but safe)
+		
+		foreach($Configuration['layer.default'] as $k => $v)
 			if(empty($polluted['n'][$k])){
 				$polluted['n'][$k] = $v;
 				$polluted['p'][$v] = null;
 			}
 		
 		if($Configuration['handler'] && empty($polluted['p'][$Configuration['handler']]))
-			$polluted['p'][$Configuration['handler']] = $Configuration['default'];
+			$polluted['p'][$Configuration['handler']] = $Configuration['contenttype.default'];
 		
-		return $polluted;
+		return $processed[$path] = $polluted;
 	}
 	
 	public static function sanitize($data){
@@ -133,14 +143,6 @@ class Request extends Storage {
 		return $client;
 	}
 	
-	public static function isSecure(){
-		return $_SERVER['HTTPS'] && $_SERVER['HTTPS'] == 'on';
-	}
-	
-	public static function getReferer(){
-		return pick($_SERVER['HTTP_REFERER']);
-	}
-	
 	public function getUrl(){
 		static $url;
 		
@@ -151,6 +153,14 @@ class Request extends Storage {
 		}
 		
 		return $url;
+	}
+	
+	public static function isSecure(){
+		return $_SERVER['HTTPS'] && $_SERVER['HTTPS'] == 'on';
+	}
+	
+	public static function getReferer(){
+		return pick($_SERVER['HTTP_REFERER']);
 	}
 	
 	public function getHost(){
@@ -171,7 +181,22 @@ class Request extends Storage {
 	}
 	
 	public function getPath(){
-		return $_SERVER['REQUEST_URI'];
+		static $Configuration, $path;
+		
+		if(!$Configuration)
+			$Configuration = array(
+				'path.separator' => Core::retrieve('path.separator'),
+			);
+		
+		if($path) return $path;
+		
+		$request = self::processRequest();
+		
+		$path = array();
+		foreach($request['o'] as $k => $v)
+			$path[] = $k.($v ? $Configuration['path.separator'].$v : '');
+		
+		return $path = implode('/', $path);
 	}
 
 	public static function getLanguage(){

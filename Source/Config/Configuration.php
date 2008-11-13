@@ -31,6 +31,8 @@ Core::store(array(
 		'rights' => 'rights',
 	),
 	
+	'layer.default' => array('index', 'view'),
+	
 	'languages.cookie' => 'language',
 	'languages.querystring' => 'language',
 	
