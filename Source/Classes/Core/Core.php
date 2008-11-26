@@ -72,7 +72,7 @@ class Core {
 		
 		if($file && !class_exists($class, false)) require_once($file);
 		
-		return $file;
+		return !!$file;
 	}
 	
 	public static function initialize(){

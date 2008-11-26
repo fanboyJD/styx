@@ -28,12 +28,8 @@ class Route {
 			}else{
 				/* We overwrite the get and post values here if needed */
 				if(is_array($route['action'])){
-					$tmp = array(
-						'n' => $get['n'],
-						'p' => $get['p'],
-						'm' => $get['m'],
-						'o' => $get['o'],
-					);
+					foreach(array('m', 'n', 'o', 'p') as $v)
+						$tmp[$v] = $get[$v];
 					
 					foreach(array(
 						2 => 'get',

@@ -42,7 +42,7 @@ class Request extends Storage {
 	}
 	
 	public static function processRequest($path = null){
-		static $Configuration, $processed = array();
+		static $Configuration, $processed = array(), $empty;
 		
 		if(!$Configuration)
 			$Configuration = array(
@@ -54,15 +54,15 @@ class Request extends Storage {
 				'layer.default' => Core::retrieve('layer.default'),
 			);
 		
-		$path = pick($path, isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '');
+		if(!$empty)
+			foreach(array('m', 'n', 'o', 'p') as $v)
+				$empty[$v] = array();
 		
-		if(!$path) return array();
+		$path = pick($path, isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '');
 		
 		if(!empty($processed[$path])) return $processed[$path];
 		
-		$polluted = array();
-		foreach(array('n', 'p', 'm', 'o') as $v)
-			$polluted[$v] = array();
+		$polluted = $empty;
 		
 		$vars = explode('/', $path);
 		array_shift($vars);
@@ -156,21 +156,23 @@ class Request extends Storage {
 	}
 	
 	public static function isSecure(){
-		return $_SERVER['HTTPS'] && $_SERVER['HTTPS'] == 'on';
+		return !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on';
 	}
 	
 	public static function getReferer(){
-		return pick($_SERVER['HTTP_REFERER']);
+		return !empty($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null;
 	}
 	
 	public function getHost(){
-		return pick($_SERVER['HTTP_HOST']);
+		return !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : null;
 	}
 	
 	public function getPort(){
-		return pick(Data::id($_SERVER['SERVER_PORT']), 80);
+		return !empty($_SERVER['SERVER_PORT']) ? pick(Data::id($_SERVER['SERVER_PORT']), 80) : 80;
 	}
 	public function getServer(){
+		if(empty($_SERVER['SERVER_NAME'])) return;
+		
 		$port = self::getPort();
 		
 		return $_SERVER['SERVER_NAME'].($port!=80 && $port ? ':'.$port : '');
@@ -196,7 +198,7 @@ class Request extends Storage {
 		foreach($request['o'] as $k => $v)
 			$path[] = $k.($v ? $Configuration['path.separator'].$v : '');
 		
-		return $path = implode('/', $path);
+		return $path = (!empty($_SERVER['SCRIPT_NAME']) ? pathinfo($_SERVER['SCRIPT_NAME'], PATHINFO_DIRNAME).'/' : '').implode('/', $path);
 	}
 
 	public static function getLanguage(){
@@ -223,8 +225,8 @@ class Request extends Storage {
 		if(!$langs){
 			if($languagescookie = Core::retrieve('languages.cookie')){
 				$cookie = self::getInstance()->retrieve('cookie');
-				if($cookie[$languagescookie])
-					$langs[$cookie[$languagescookie]] = 2;
+				if(!empty($cookie[$languagescookie]))
+					$langs[Data::pagetitle($cookie[$languagescookie])] = 2; // We strip out bad content
 			}
 			
 			if(empty($_SERVER['HTTP_ACCEPT_LANGUAGE']))

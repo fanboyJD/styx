@@ -66,7 +66,7 @@ abstract class Layer extends Runner {
 		$layerName = strtolower($layerName);
 		$class = ucfirst($layerName).'Layer';
 		
-		if(!class_exists($class) || !is_subclass_of($class, 'Layer'))
+		if(!is_subclass_of($class, 'Layer'))
 			return false;
 		
 		if($isRouted && call_user_func(array($class, 'hide')))
