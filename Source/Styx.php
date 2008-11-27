@@ -15,12 +15,12 @@ else
 		if(strrpos($path, '/')!==strlen($path)-1)
 			$Paths[$k] = $path.'/'; // Custom Paths may not have a slash at the end
 
-require_once($Paths['app.path'].'/Config/Configuration.php');
+require($Paths['app.path'].'/Config/Configuration.php');
 
 if(empty($Paths['path'])) $Paths['path'] = dirname(__FILE__).DIRECTORY_SEPARATOR;
 
 foreach(array('Storage', 'Hash', 'Core', 'String', 'Data') as $v)
-	require_once($Paths['path'].'Classes/Core/'.$v.'.php');
+	require($Paths['path'].'Classes/Core/'.$v.'.php');
 
 spl_autoload_register(array('Core', 'autoload'));
 
@@ -31,7 +31,7 @@ Core::loadClass('Cache', 'Cache');
 if(!String::ends($CONFIGURATION[$use]['app.link'], '/'))
 	$CONFIGURATION[$use]['app.link'] .= '/';
 
-require_once($Paths['path'].'/Config/Configuration.php');
+require($Paths['path'].'/Config/Configuration.php');
 
 if(is_array($CONFIGURATION[$use])){
 	Core::store($CONFIGURATION[$use]);

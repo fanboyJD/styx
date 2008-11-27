@@ -54,7 +54,7 @@ class Core {
 		
 		if(!file_exists($file)) return false;
 		
-		if(!class_exists($class, false)) require_once($file);
+		if(!class_exists($class, false)) require $file;
 		
 		return true;
 	}
@@ -70,7 +70,7 @@ class Core {
 	public static function autoload($class){
 		$file = self::classExists($class);
 		
-		if($file && !class_exists($class, false)) require_once($file);
+		if($file && !class_exists($class, false)) require $file;
 		
 		return !!$file;
 	}

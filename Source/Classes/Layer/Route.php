@@ -24,7 +24,7 @@ class Route {
 		if($route){
 			if(!is_array($route['action']) && $route['action']){
 				$file = realpath(Core::retrieve('app.path').$route['action']);
-				if(file_exists($file)) require_once($file);
+				if(file_exists($file)) require($file);
 			}else{
 				/* We overwrite the get and post values here if needed */
 				if(is_array($route['action'])){
