@@ -19,6 +19,6 @@ class ValidatorException extends Exception {
 		$lang = Lang::retrieve('validator.'.$error[0]);
 		if(!$lang) $lang = Lang::retrieve('validator.default');
 		
-		parent::__construct(sprintf($content, sprintf($lang, $error[2])));
+		parent::__construct(sprintf($content, sprintf($lang, !empty($error[2]) ? $error[2] : '')));
 	}
 }

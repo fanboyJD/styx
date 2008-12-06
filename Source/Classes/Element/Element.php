@@ -176,7 +176,7 @@ class Element extends Runner {
 			unset($a['class']);
 		
 		foreach($a as $key => $val)
-			if($val!==false && !in_array('skip'.ucfirst($key), $options) && !self::skipable($key))
+			if(($val || $val===0) && !in_array('skip'.ucfirst($key), $options) && !self::skipable($key))
 				$s[] = $key.'="'.($key=='style' ? str_replace('"', "'", $val) : Data::entities($val)).'"';
 		
 		return is_array($s) ? ' '.implode(' ', $s) : '';
@@ -209,7 +209,7 @@ class Elements extends Element {
 	public function format(){
 		$els = array();
 		foreach($this->elements as $n => $el)
-			if(!in_array($el->options['type'], array('field')) && !$el->options[':readOnly'])
+			if(!in_array($el->type, array('field')) && !$el->options[':readOnly'])
 				if($format = $el->format()){
 					if($el->name=='HiddenInput') $els['form.hidden'][] = $format;
 					else $els[$n] = $format;
@@ -225,7 +225,7 @@ class Elements extends Element {
 	 * @return Element
 	 */
 	public function getElement($name){
-		return pick($this->elements[$name]);
+		return !empty($this->elements[$name]) ? $this->elements[$name] : null;
 	}
 	
 	/**
@@ -401,7 +401,7 @@ class Checkbox extends Element {
 	}
 	
 	public function getValue(){
-		return $this->options['checked'] ? 1 : 0;
+		return !empty($this->options['checked']) ? 1 : 0;
 	}
 	
 }

@@ -276,7 +276,8 @@ abstract class Layer extends Runner {
 		
 		$data = $this->form->prepareData();
 		if(!$data) throw new ValidatorException('data');
-		elseif(!$this->table) throw new ValidatorException();
+		
+		if(!$this->table) return;
 		
 		if($where) $query = db::update($this->table)->where($where);
 		else $query = db::insert($this->table);

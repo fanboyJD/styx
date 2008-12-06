@@ -73,7 +73,7 @@ class Form extends Elements {
 			
 			$val = $el->getValue();
 			if(!$val){
-				if($el->options[':empty'] || $el->options[':validate'][0]=='bool' || ($el->options[':validate'][0]=='numericrange' && $el->options[':validate'][1][0]==0))
+				if($el->options[':empty'] || (!empty($el->options[':validate'][0]) && $el->options[':validate'][0]=='bool') || (!empty($el->options[':validate'][0]) && $el->options[':validate'][0]=='numericrange' && isset($el->options[':validate'][1][0]) && $el->options[':validate'][1][0]==0))
 					continue;
 				elseif(!$el->options[':empty'])
 					return array('notempty', $k, $el->options[':caption']);
