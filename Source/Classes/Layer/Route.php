@@ -35,7 +35,7 @@ class Route {
 						2 => 'get',
 						3 => 'post',
 					) as $k => $v)
-						if(is_array($route['action'][$k])){
+						if(!empty($route['action'][$k]) && is_array($route['action'][$k])){
 							$$v = $route['action'][$k];
 							unset($route['action'][$k]);
 						}
@@ -45,7 +45,8 @@ class Route {
 				
 				/* We map the original values to the routed ones */
 				for($i=0;$i<=1;$i++){
-					$val = $route['map'][$i][1] ? $route['map'][$i][0] : $get['p'][$route['map'][$i][0] ? $route['map'][$i][0] : $get['n'][$i]];
+					if(empty($route['map'])) $val = $get['p'][$get['n'][$i]];
+					else $val = $route['map'][$i][1] ? $route['map'][$i][0] : ($get['p'][$route['map'][$i][0] ? $route['map'][$i][0] : $get['n'][$i]]);
 					
 					if($route['action'][$i]) $get['p'][$route['action'][$i]] = $val;
 					else $action[$i] = $val;

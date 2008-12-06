@@ -177,6 +177,7 @@ class Data {
 	public static function excerpt($data, $options = array(
 		'length' => 400,
 		'purify' => true,
+		'dots' => true,
 		'options' => false,
 	)){
 		if(strlen($data)<$options['length']) return $data;
@@ -190,7 +191,7 @@ class Data {
 			if($pos!==false) $data = substr($data, 0, $pos);
 		}
 		
-		return ($options['purify'] ? self::purify($data, $options['options']) : $data).'...';
+		return (!empty($options['purify']) ? self::purify($data, $options['options']) : $data).(!empty($options['dots']) ? '...' : '');
 	}
 	
 	public static function encode($data, $options = array(

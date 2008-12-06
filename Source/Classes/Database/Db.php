@@ -146,6 +146,8 @@ class db {
 		
 		if(!$query) return false;
 		
+		$rows = array();
+		
 		while($row = $this->fetch($query))
 			$rows[] = $row;
 		
