@@ -3,7 +3,7 @@
  *  base include file for SimpleTest
  *  @package    SimpleTest
  *  @subpackage UnitTester
- *  @version    $Id: exceptions.php 1672 2008-03-02 04:47:34Z edwardzyang $
+ *  @version    $Id: exceptions.php 1769 2008-04-19 14:39:00Z pp11 $
  */
 
 /**#@+
@@ -25,8 +25,8 @@ class SimpleExceptionTrappingInvoker extends SimpleInvokerDecorator {
      *    Stores the invoker to be wrapped.
      *    @param SimpleInvoker $invoker   Test method runner.
      */
-    function SimpleExceptionTrappingInvoker($invoker) {
-        $this->SimpleInvokerDecorator($invoker);
+    function __construct($invoker) {
+        parent::__construct($invoker);
     }
 
     /**

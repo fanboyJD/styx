@@ -3,7 +3,7 @@
  *  Autorunner which runs all tests cases found in a file
  *  that includes this module.
  *  @package    SimpleTest
- *  @version    $Id: autorun.php 1721 2008-04-07 19:27:10Z lastcraft $
+ *  @version    $Id: autorun.php 1809 2008-09-12 00:46:55Z lastcraft $
  */
 require_once dirname(__FILE__) . '/unit_tester.php';
 require_once dirname(__FILE__) . '/mock_objects.php';
@@ -19,17 +19,22 @@ register_shutdown_function('simpletest_autorun');
  *    it's output controlled with SimpleTest::prefer().
  */
 function simpletest_autorun() {
-    if (tests_have_run()) {
-        return;
+    try {
+        if (tests_have_run()) {
+            return;
+        }
+        $candidates = array_intersect(
+                capture_new_classes(),
+                classes_defined_in_initial_file());
+        $loader = new SimpleFileLoader();
+        $suite = $loader->createSuiteFromClasses(
+                basename(initial_file()),
+                $loader->selectRunnableTests($candidates));
+        $result = $suite->run(new DefaultReporter());
+    } catch (Exception $stack_frame_fix) {
+        print $stack_frame_fix->getMessage();
+        $result = false;
     }
-    $candidates = array_intersect(
-            capture_new_classes(),
-            classes_defined_in_initial_file());
-    $loader = new SimpleFileLoader();
-    $suite = $loader->createSuiteFromClasses(
-            basename(initial_file()),
-            $loader->selectRunnableTests($candidates));
-    $result = $suite->run(new DefaultReporter());
     if (SimpleReporter::inCli()) {
         exit($result ? 0 : 1);
     }
@@ -54,7 +59,12 @@ function tests_have_run() {
 function initial_file() {
     static $file = false;
     if (! $file) {
-        $file = reset(get_included_files());
+        if (isset($_SERVER, $_SERVER['SCRIPT_FILENAME'])) {
+            $file = $_SERVER['SCRIPT_FILENAME'];
+        } else {
+	        $included_files = get_included_files();
+	        $file = reset($included_files);
+        }
     }
     return $file;
 }
