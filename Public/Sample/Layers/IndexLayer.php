@@ -78,34 +78,24 @@ class IndexLayer extends Layer {
 		if(!User::hasRight('layer.index.delete'))
 			throw new ValidatorException('rights');
 		
-		/*
-		 * This could be used to enforce json encoding on any Request without looking at the wanted header
-		 * 
-		 * Response::allow('json');
-		 * Response::setContentType('json');
-		 */
-		
-		Response::setDefaultContentType('json');
-		if(Response::getContentType()!='json')
+		// This way it is required to use "handler;json" in the Querystring. If we leave the "if" out the contenttype "json" would be enforced
+		if(Request::getBehaviour()!='json')
 			throw new ValidatorException('contenttype');
 		
-		if(!User::checkSession($this->post['session'])){
+		Response::setContentType('json');
+		
+		try{
+			$this->delete();
+			$this->Template->assign(array(
+				'out' => 'success',
+				'msg' => Lang::retrieve('deleted'),
+			));
+		}catch(ValidatorException $e){
 			$this->Template->assign(array(
 				'out' => 'error',
-				'msg' => Lang::retrieve('validator.session'),
+				'msg' => $e->getMessage(),
 			));
-			
-			return;
 		}
-		
-		db::delete($this->table)->where(array(
-			'pagetitle' => array($title, 'pagetitle'),
-		))->query();
-		
-		$this->Template->assign(array(
-			'out' => 'success',
-			'msg' => Lang::retrieve('deleted'),
-		));
 	}
 	
 	public function onView($title){
@@ -132,7 +122,7 @@ class IndexLayer extends Layer {
 	
 	public function populate(){
 		/*
-		 * This method gets automatically called by the edit and save handler
+		 * This method gets automatically called by the edit and save event
 		 * to populate some stuff with data you may need :)
 		*/
 		

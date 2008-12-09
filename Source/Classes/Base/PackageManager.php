@@ -58,12 +58,10 @@ class PackageManager {
 	
 	public static function setPackage($name){
 		if(self::has($name)){
-			$class = self::$Elements[self::$Packages[$name]['type']]['class'];
-			Response::allow($class);
-			$class = $class.'Content';
-			Response::setContentType(new $class);
+			Response::setContentType(self::$Elements[self::$Packages[$name]['type']]['class']);
 			
 			self::$Package = $name;
+			
 			return true;
 		}
 		
@@ -78,6 +76,7 @@ class PackageManager {
 		if(!count(self::$Packages)) return;
 		
 		$version = Core::retrieve('app.version');
+		$assigned = array();
 		
 		foreach(self::$Packages as $name => $package){
 			if(!self::checkRequired($package['require']))

@@ -71,13 +71,13 @@ class PageLayer extends Layer {
 	}
 	
 	public function onView($title){
-		if($title){
+		$data = null;
+		if($title)
 			$data = $this->Data->where(array(
 				'pagetitle' => array($title, 'pagetitle'),
 			))->fetch();
-		}
 		
-		if(!$data['id']){
+		if(!$data){
 			$this->Template->assign(Lang::retrieve('page.notavailable'));
 			return;
 		}
@@ -98,7 +98,7 @@ class PageLayer extends Layer {
 	
 	public function populate(){
 		/*
-			This method gets automatically called by the edit and save handler
+			This method gets automatically called by the edit and save event
 			to populate some stuff with data you may need :)
 		*/
 		

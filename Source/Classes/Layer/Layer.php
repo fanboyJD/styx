@@ -133,15 +133,9 @@ abstract class Layer extends Runner {
 		$this->Form = $initialize['form'];
 	}
 	
-	public function initialize(){
-		/*return array(
-			'table' => '',
-			'options' => array(
-			
-			),
-			'form' => new Form()
-		);*/
-	}
+	public function initialize(){}
+	
+	protected function populate(){}
 	
 	/**
 	 * @return Layer
@@ -157,17 +151,16 @@ abstract class Layer extends Runner {
 		$event = array(strtolower($event));
 		$event[] = 'on'.ucfirst($event[0]);
 		
-		$this->Data = db::select($this->table, $this->options['cache']);
+		$this->Data = $this->table ? db::select($this->table, $this->options['cache']) : array();
 		$this->Template = Template::map()->base('Layers', ucfirst($this->name))->bind($this);
 		Page::getInstance()->register('layer.'.$this->layername, $this->Template);
 		
 		$this->get = Hash::length($get) ? $get : Request::getInstance()->retrieve('get');
 		$this->post = Hash::length($post) ? $post : Request::getInstance()->retrieve('post');
-		$this->event = $event[0];
 		
 		try{
 			if(Request::getMethod()=='post'){
-				if($this->post) $this->prepareData($this->post);
+				if($this->post) $this->prepare($this->post);
 				else throw new ValidatorException('data');
 			}
 			
@@ -178,11 +171,10 @@ abstract class Layer extends Runner {
 					throw new ValidatorException('contenttype');
 			}
 			
+			$this->event = $event[0];
 			$this->{$event[1]}(isset($this->get['p'][$event[0]]) ? pick($this->get['p'][$event[0]]) : null);
 		}catch(ValidatorException $e){
 			$this->Template->assign($e->getMessage());
-		}catch(Exception $e){
-			
 		}
 		
 		return $this;
@@ -224,8 +216,8 @@ abstract class Layer extends Runner {
 		if($validate!==true) throw new ValidatorException($validate);
 	}
 	
-	public function prepareData($data){
-		if($this->event && !empty($this->get['p'][$this->event])){
+	public function prepare($data){
+		if($this->event && !empty($this->get['p'][$this->event]) && $this->table){
 			$this->content = db::select($this->table, $this->options['cache'])->where(array(
 				$this->options['identifier']['external'] => array($this->get['p'][$this->event], $this->options['identifier']['external']),
 			))->fetch();
@@ -255,7 +247,7 @@ abstract class Layer extends Runner {
 		
 		$this->validate();
 		
-		$data = $this->Form->prepareData();
+		$data = $this->Form->prepare();
 		if(!$data) throw new ValidatorException('data');
 		
 		if(!$this->table) return;
@@ -264,6 +256,19 @@ abstract class Layer extends Runner {
 		else $query = db::insert($this->table);
 		
 		$query->set($data)->query();
+	}
+	
+	public function delete($where = null){
+		if(!$this->editing)
+			throw new ValidatorException('data');
+		
+		if(!$this->checkSession())
+			throw new ValidatorException('session');
+		
+		if(!$where)
+			$where = $this->where;
+		
+		db::delete($this->table)->where($this->where)->query();
 	}
 	
 	public function getDefaultEvent($event){
@@ -298,7 +303,7 @@ abstract class Layer extends Runner {
 		
 		if(is_array($title)) $title = $title[$this->options['identifier']['external']];
 		
-		if($options && !is_array($options))
+		if($options && !is_array($options) && $Configuration['handler'])
 			$options = array($Configuration['handler'] => $options);
 		
 		if(!$event || !in_array($event, $this->methods))
@@ -336,10 +341,6 @@ abstract class Layer extends Runner {
 		$el = $this->getElement($this->generateSessionName());
 		
 		return !$el || ($el && User::checkSession($el->getValue()));
-	}
-	
-	protected function populate(){
-		/* doSomething(); */
 	}
 	
 	/**

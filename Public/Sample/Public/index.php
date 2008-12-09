@@ -49,13 +49,14 @@
 			),
 		));
 		
-		Route::connect(array(
-			array('logout', 'equalsAll')
-		), array('login', 'logout'));
+		Route::connect('logout', array(
+			'layer' => 'login',
+			'event' => 'logout',
+		));
 		
-		Route::connect(array(
-			array('admin', 'equalsAll')
-		), 'admin.php');
+		Route::connect('admin', array(
+			'include' => 'admin.php'
+		));
 	}
 	
 	$user = User::retrieve();

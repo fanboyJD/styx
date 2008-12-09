@@ -59,8 +59,6 @@ class Response {
 		self::setCookie($key, false, time()-3600);
 	}
 	
-
-	
 	public static function link($options = null, $base = null){
 		static $Configuration;	
 		if(!$Configuration)
@@ -76,7 +74,7 @@ class Response {
 		}
 		
 		$array = array();
-		if(!empty($options[$Configuration['handler']])){
+		if($Configuration['handler'] && !empty($options[$Configuration['handler']])){
 			$array[] = $Configuration['handler'].$Configuration['path.separator'].$options['handler'];
 			unset($options[$Configuration['handler']]);
 		}
@@ -93,6 +91,12 @@ class Response {
 		else $array = null;
 		
 		return $Configuration['app.link'].$array;
+	}
+	
+	public static function allow(){
+		$args = Hash::args(func_get_args());
+		
+		self::$Types = array_map('strtolower', $args);
 	}
 	
 	public static function setDefaultContentType(){
@@ -119,8 +123,6 @@ class Response {
 			else return;
 		}
 		
-		if(!in_array($contentType->getType(), self::$Types)) return;
-		
 		self::$ContentType = $contentType;
 	}
 	
@@ -129,16 +131,10 @@ class Response {
 	}
 	
 	public static function retrieveContentType(){
-		if(!self::$Types || !self::$ContentType || (self::$ContentType && !in_array(self::getContentType(), self::$Types)))
+		if(!self::$ContentType)
 			self::setDefaultContentType();
 		
 		return self::$ContentType;
-	}
-	
-	public static function allow(){
-		$args = Hash::args(func_get_args());
-		
-		self::$Types = array_map('strtolower', $args);
 	}
 	
 }

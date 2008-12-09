@@ -100,7 +100,7 @@ class Element extends Runner {
 		return $this->options['value'];
 	}
 	
-	public function prepareData(){
+	public function prepare(){
 		$val = $this->getValue();
 		
 		if(!empty($this->options[':validate'][0]))

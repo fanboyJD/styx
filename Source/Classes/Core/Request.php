@@ -9,7 +9,7 @@
 
 class Request extends Storage {
 	
-	private static $method;
+	private static $method, $behaviour;
 	
 	private function __construct(){}
 	private function __clone(){}
@@ -82,9 +82,12 @@ class Request extends Storage {
 				continue;
 			}
 			
+			if($v[0]==$Configuration['handler']){
+				self::$behaviour = pick($v[1]);
+				continue;
+			}
 			$polluted['p'][$v[0]] = isset($v[1]) ? pick($v[1]) : null;
-			
-			if($v[0]!=$Configuration['handler']) $polluted['n'][] = $v[0];
+			$polluted['n'][] = $v[0];
 		}
 		
 		foreach($polluted['p'] as $k => $v)
@@ -96,8 +99,8 @@ class Request extends Storage {
 				$polluted['p'][$v] = null;
 			}
 		
-		if($Configuration['handler'] && empty($polluted['p'][$Configuration['handler']]))
-			$polluted['p'][$Configuration['handler']] = $Configuration['contenttype.default'];
+		if(!self::$behaviour)
+			self::$behaviour = $Configuration['contenttype.default'];
 		
 		return $processed[$path] = $polluted;
 	}
@@ -248,24 +251,12 @@ class Request extends Storage {
 		return $langs;
 	}
 	
-	public static function behaviour(){
-		$types = Hash::args(func_get_args());
-		
-		return in_array(self::getBehaviour(), $types);
+	public static function setBehaviour($behaviour){
+		self::$behaviour = $behaviour;
 	}
 	
 	public static function getBehaviour(){
-		static $Configuration;
-		
-		if(!$Configuration)
-			$Configuration = array(
-				'handler' => Core::retrieve('contenttype.querystring'),
-			);
-		
-		if(!$Configuration) return false;
-		
-		$get = Request::getInstance()->retrieve('get');
-		return $get['p'][$Configuration['handler']];
+		return self::$behaviour;
 	}
 	
 }

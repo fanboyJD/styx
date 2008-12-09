@@ -54,14 +54,14 @@ class Form extends Elements {
 		return !empty($this->elements[$name]) ? $this->elements[$name]->getValue() : false;
 	}
 	
-	public function prepareData($alias = false){
+	public function prepare($alias = false){
 		$els = array();
 		
 		foreach($this->elements as $k => $el){
 			if($el->type=='button' || $el->options[':readOnly'] || ($alias xor $el->options[':alias']))
 				continue;
 			
-			$els[$k] = $el->prepareData();
+			$els[$k] = $el->prepare();
 		}
 		
 		return count($els) ? $els : false;

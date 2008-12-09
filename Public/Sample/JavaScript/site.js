@@ -47,12 +47,13 @@ window.addEvent('domready', function(){
 			if(el.hasClass('delete'))
 				el.addEvent('click', function(e){
 					e.stop();
-					if(confirm(el.getElement('img').get('title')))
+					if(confirm(el.getElement('img').get('title'))){
+						var data = {};
+						data[el.get('rel')] = User.session;
+						
 						new Request.JSON({
 							url: el,
-							data: {
-								session: User.session
-							},
+							data: data,
 							onSuccess: function(j){
 								if(j && j.out){
 									alert(j.msg);
@@ -63,6 +64,7 @@ window.addEvent('domready', function(){
 								}
 							}
 						}).post();
+					}
 				});
 		});
 	})();
