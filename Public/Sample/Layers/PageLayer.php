@@ -66,7 +66,7 @@ class PageLayer extends Layer {
 	
 	public function onView($title){
 		if($title){
-			$data = $this->data->where(array(
+			$data = $this->Data->where(array(
 				'pagetitle' => array($title, 'pagetitle'),
 			))->fetch();
 		}
@@ -76,7 +76,7 @@ class PageLayer extends Layer {
 			return;
 		}
 		
-		if($this->hasRight('edit'))
+		if(User::hasRight('layer.page.edit'))
 			$this->Template->assign(array(
 				'rights' => '<a class="hicon" href="'.$this->link($data['pagetitle'], 'edit').'"><img src="Images/pencil.png" alt="'.Lang::retrieve('edit').'"></a>',
 			));
@@ -85,7 +85,7 @@ class PageLayer extends Layer {
 	}
 	
 	public function onMenu(){
-		$this->data->limit(0)->order('id ASC');
+		$this->Data->limit(0)->order('id ASC');
 		
 		$this->Template->apply('menu.php');
 	}

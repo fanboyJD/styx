@@ -4,7 +4,6 @@
 		'app.path' => realpath('../'),
 		'app.public' => realpath('./'),
 	);*/
-	
 	include('../../../Source/Styx.php');
 	
 	function initialize(){
@@ -62,7 +61,7 @@
 			'session' => $user['session'],
 		)).';');
 	
-	if(Page::getContentType()=='html')
+	if(Response::getContentType()=='html')
 		Page::getInstance()->apply('html.php')->assign(array(
 			'app.name' => Core::retrieve('app.name'),
 			'app.link' => Core::retrieve('app.link'),
@@ -82,9 +81,9 @@
 			
 			'styx' => Core::retrieve('styx.name').' '.Core::retrieve('styx.version'),
 		))->show();
-	elseif(Page::getContentType()=='json')
+	elseif(Response::getContentType()=='json')
 		Page::getInstance()->substitute('layer')->show();
-	elseif(Page::getContentType()=='xml')
+	elseif(Response::getContentType()=='xml')
 		Page::getInstance()->assign(array(
 			'app.name' => Core::retrieve('app.name'),
 			'app.link' => Core::retrieve('app.link'),

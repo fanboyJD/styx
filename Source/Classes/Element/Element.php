@@ -32,8 +32,6 @@ class Element extends Runner {
 			*/
 		);
 	
-	protected static $formElements = array('input', 'checkbox', 'radio', 'select', 'textarea', 'richtext', 'optionlist');
-	
 	public function __construct($options, $name = null, $type = null){
 		static $uid = 0;
 		$type = strtolower($type);
@@ -189,7 +187,9 @@ class Elements extends Element {
 	protected $elements = array();
 	
 	public function __construct(){
+		$name = $type = null;
 		$elements = func_get_args();
+		
 		if(is_subclass_of($this, 'Elements')){
 			$name = isset($elements[1]) ? $elements[1] : null;
 			$type = isset($elements[2]) ? $elements[2] : null;
@@ -203,7 +203,7 @@ class Elements extends Element {
 		foreach($elements as $el)
 			$this->elements[$el->options['name']] = $el;
 		
-		parent::__construct($options, $name ? $name : get_class(), $type);
+		parent::__construct($options, pick($name, get_class()), $type);
 	}
 	
 	public function format(){
@@ -215,7 +215,7 @@ class Elements extends Element {
 					else $els[$n] = $format;
 				}
 		
-		if(isset($els['form.hidden']) && is_array($els['form.hidden']))
+		if(!empty($els['form.hidden']) && is_array($els['form.hidden']))
 			$els['form.hidden'] = implode($els['form.hidden']);
 		
 		return $els;

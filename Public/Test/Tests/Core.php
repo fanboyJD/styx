@@ -4,6 +4,26 @@ include('./Initialize.php');
 
 class CoreTest extends UnitTestCase {
 	
+	public $layer = '';
+	
+	public function setUp(){
+		$appath = Core::retrieve('app.path');
+		
+		$this->layer = $appath.'Layers';
+		
+		touch($this->layer.'/temp.tmp');
+		if(!file_exists($this->layer.'/test')) mkdir($this->layer.'/test');
+		touch($this->layer.'/test/temp.html');
+		touch($this->layer.'/test/test.php');
+	}
+	
+	public function tearDown(){
+		unlink($this->layer.'/temp.tmp');
+		unlink($this->layer.'/test/temp.html');
+		unlink($this->layer.'/test/test.php');
+		rmdir($this->layer.'/test');
+	}
+	
 	public function testPick(){
 		$this->assertNull(pick(null));
 		
@@ -29,24 +49,13 @@ class CoreTest extends UnitTestCase {
 	}
 	
 	public function testExtensionFilter(){
-		$layer = Core::retrieve('app.path').'Layers';
-		touch($layer.'/temp.tmp');
-		mkdir($layer.'/test');
-		touch($layer.'/test/temp.html');
-		touch($layer.'/test/test.php');
-		
-		foreach(new PHPExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($layer))) as $file)
+		foreach(new PHPExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->layer))) as $file)
 			$files[] = $file->getFileName();
 		
-		$this->assertEqual(count($files), 3);
+		$this->assertEqual(count($files), 4);
 		
 		foreach($files as $file)
 			$this->assertEqual(pathinfo($file, PATHINFO_EXTENSION), 'php');
-		
-		unlink($layer.'/temp.tmp');
-		unlink($layer.'/test/temp.html');
-		unlink($layer.'/test/test.php');
-		rmdir($layer.'/test');
 	}
 	
 	public function testConfigurationUnchanged(){
@@ -67,17 +76,17 @@ class CoreTest extends UnitTestCase {
 		
 		$this->assertTrue(Core::classExists('Core'));
 		
-		$this->assertTrue(Core::classExists('TestClass'));
+		$this->assertTrue(Core::classExists('JavaScriptPacker'));
 		
 		$this->assertFalse(Core::classExists('RandomClassDoesNotExist'));
 	}
 	
 	public function testAutoload(){
-		$this->assertFalse(class_exists('TestClass', false));
+		$this->assertFalse(class_exists('JavaScriptPacker', false));
 		
-		new TestClass();
+		new JavaScriptPacker(' some_random_script(); '); // We know that this class won't be around at that time
 		
-		$this->assertTrue(class_exists('TestClass', false));
+		$this->assertTrue(class_exists('JavaScriptPacker', false));
 	}
 	
 }

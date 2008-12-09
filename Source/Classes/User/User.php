@@ -92,7 +92,7 @@ class User {
 			foreach(self::$Configuration['fields'] as $v)
 				$json[$v] = $user[$v];
 			
-			Page::setCookie(Core::retrieve('prefix'), json_encode($json));
+			Response::setCookie(Core::retrieve('prefix'), json_encode($json));
 		}
 		
 		return self::handlelogin(false);
@@ -102,7 +102,7 @@ class User {
 		Cache::getInstance()->erase('User', 'userdata_'.User::get(self::$Configuration['session']));
 		
 		if(self::$Configuration['type']=='cookie')
-			Page::removeCookie(Core::retrieve('prefix'));
+			Response::removeCookie(Core::retrieve('prefix'));
 		
 		self::store(false);
 	}

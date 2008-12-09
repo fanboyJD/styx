@@ -63,7 +63,7 @@ class Filecache {
 	}
 	
 	public function eraseBy($key, $force = false){
-		$this->eraseBy($key.'*', $force);
+		$this->erase($key.'*', $force);
 	}
 	
 	public function eraseAll($force = false){

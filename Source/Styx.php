@@ -13,7 +13,7 @@ if(!isset($Paths) || !is_array($Paths))
 else
 	foreach($Paths as $k => $path)
 		if(strrpos($path, '/')!==strlen($path)-1)
-			$Paths[$k] = $path.'/'; // Custom Paths may not have a slash at the end
+			$Paths[$k] = $path.'/'; // Custom Paths might not have a slash at the end
 
 require($Paths['app.path'].'/Config/Configuration.php');
 
@@ -26,18 +26,17 @@ spl_autoload_register(array('Core', 'autoload'));
 
 Core::store($Paths);
 
-Core::loadClass('Cache', 'Cache');
+if(!isset($use) || empty($CONFIGURATION[$use]))
+	$use = array_shift(array_keys($CONFIGURATION));
 
 if(!String::ends($CONFIGURATION[$use]['app.link'], '/'))
 	$CONFIGURATION[$use]['app.link'] .= '/';
 
 require($Paths['path'].'/Config/Configuration.php');
 
-if(is_array($CONFIGURATION[$use])){
-	Core::store($CONFIGURATION[$use]);
-	unset($CONFIGURATION); // We unset the whole array, so no data from it is available any longer
-}
-unset($Paths);
+Core::store($CONFIGURATION[$use]);
+
+unset($Paths, $CONFIGURATION); // Unset the whole array, so no data from it is available any longer
 
 ini_set('date.timezone', Core::retrieve('timezone'));
 
@@ -54,16 +53,15 @@ User::initialize();
 $get = Request::getInstance()->retrieve('get');
 if(!empty($get['m']['package']) && PackageManager::setPackage($get['m']['package'])){
 	Page::getInstance()->show();
-	
 	die;
 }
 
-if(!Page::getContentType())
-	Page::setDefaultContentType(Core::retrieve('contenttype.default'));
+if(!Response::getContentType())
+	Response::setDefaultContentType(Core::retrieve('contenttype.default'));
 
 Lang::setLanguage(Request::getLanguage());
 
-PackageManager::assignToPage();
+PackageManager::assignPackages();
 
 Route::initialize($get, Request::getInstance()->retrieve('post'));
 

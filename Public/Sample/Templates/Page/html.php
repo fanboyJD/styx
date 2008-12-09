@@ -16,7 +16,7 @@
 		$request = Request::processRequest();
 		
 		foreach(Core::retrieve('languages') as $k => $lang)
-			echo '<a href="'.Page::link($request['o'], array(array('language', $k))).'"'.(Lang::getLanguage()==$k ? ' class="selected"' : '').'><img src="Images/'.$k.'.png" alt="" /></a>';
+			echo '<a href="'.Response::link($request['o'], array(array('language', $k))).'"'.(Lang::getLanguage()==$k ? ' class="selected"' : '').'><img src="Images/'.$k.'.png" alt="" /></a>';
 	?></div>
 	<div id="logo"><a href="${app.link}"></a></div>
 	${menu}

@@ -38,7 +38,10 @@ class Rights {
 	public function hasRight(){
 		$args = Hash::args(func_get_args());
 		
-		return $this->checkRight($args);
+		foreach($args as $k => $arg)
+			$args[$k] = explode('.', $arg);
+		
+		return $this->checkRight(array_values(Hash::flatten($args)));
 	}
 	
 }

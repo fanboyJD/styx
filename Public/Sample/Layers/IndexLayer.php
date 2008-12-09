@@ -49,6 +49,9 @@ class IndexLayer extends Layer {
 	}
 	
 	public function onSave(){
+		if(!User::hasRight('layer.index.edit'))
+			throw new ValidatorException('rights');
+		
 		$this->setValue(array(
 			'uid' => $this->editing ? $this->content['uid'] : User::get('id'),
 			'time' => $this->editing ? $this->content['time'] : time(),
@@ -63,8 +66,11 @@ class IndexLayer extends Layer {
 	public function onEdit(){
 		$this->edit();
 		
+		if(!User::hasRight('layer.index.edit', ($this->editing ? 'modify' : 'add')))
+			throw new ValidatorException('rights');
+		
 		$this->Template->apply('edit')->assign(array(
-			'headline' => Lang::retrieve('news.'.($this->editing ? 'edit' : 'add')),
+			'headline' => Lang::retrieve('news.'.($this->editing ? 'modify' : 'add')),
 		))->assign($this->format());
 	}
 	
@@ -72,12 +78,12 @@ class IndexLayer extends Layer {
 		/*
 		 * This could be used to enforce json encoding on any Request without looking at the wanted header
 		 * 
-		 * Page::allow('json');
-		 * Page::setContentType('json');
+		 * Response::allow('json');
+		 * Response::setContentType('json');
 		 */
 		
-		Page::setDefaultContentType('json');
-		if(Page::getContentType()!='json')
+		Response::setDefaultContentType('json');
+		if(Response::getContentType()!='json')
 			throw new ValidatorException('contenttype');
 		
 		if(!User::checkSession($this->post['session'])){
@@ -100,25 +106,25 @@ class IndexLayer extends Layer {
 	}
 	
 	public function onView($title){
-		Page::setDefaultContentType('html', 'xml');
+		Response::setDefaultContentType('html', 'xml');
 		
-		$this->data->limit(0)->order('time DESC');
+		$this->Data->limit(0)->order('time DESC');
 		if($title)
-			$this->data->where(array(
+			$this->Data->where(array(
 				'pagetitle' => array($title, 'pagetitle'),
 			))->limit(1);
 		else
 			$this->isIndex = true;
 		
 		$users = array();
-		foreach($this->data as $n)
+		foreach($this->Data as $n)
 			$users[] = $n['uid'];
 		
 		foreach(db::select('users')->fields('id, name')->where(Data::in('id', $users))->limit(0) as $user)
 			$this->usernames[$user['id']] = $user['name'];
 		
 		// We check for the used ContentType (xml or html) and assign the correct template for it
-		$this->Template->apply((Page::getContentType()=='xml' ? 'xml' : '').'view.php');
+		$this->Template->apply((Response::getContentType()=='xml' ? 'xml' : '').'view.php');
 	}
 	
 	public function populate(){

@@ -30,7 +30,7 @@ class LoginLayer extends Layer {
 	public function onHandle(){
 		$this->validate();
 		
-		$user = $this->data->where(array(
+		$user = $this->Data->where(array(
 			'name' => $this->getValue('name'),
 			'AND',
 			'pwd' => sha1(Core::retrieve('secure').$this->getValue('pwd')),
@@ -63,7 +63,7 @@ class LoginLayer extends Layer {
 	}
 	
 	public function link($title = null, $event = null, $options = null){
-		if($event=='logout') return Page::link('logout');
+		if($event=='logout') return Response::link('logout');
 		
 		return parent::link($title, $event, $options);
 	}

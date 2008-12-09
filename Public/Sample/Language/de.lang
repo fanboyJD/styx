@@ -13,7 +13,7 @@ namespace news {
 	posted = 'Eingetragen von <b>%s</b> am %s';
 	
 	add = 'Neuigkeiten einfügen';
-	edit = 'Neuigkeiten bearbeiten';
+	modify = 'Neuigkeiten bearbeiten';
 	
 	saved = '<div class="inner">
 			<b>Dein Eintrag wurde gespeichert.</b><br/><br/>
@@ -35,7 +35,7 @@ namespace page {
 # The namespace for the framework :)
 namespace framework {
 	description = '<span class="blue">Styx</span> ist ein PHP-Framework in einem frühen Alpha-Stadium.<br/><br/>
-		Du kannst den code herunterladen indem du folgenden Code ausführst<br/>
+		Du kannst das SVN-Repository laden indem du folgenden Code ausführst<br/>
 			<span class="blue icon">svn checkout http://framework.og5.net/svn/</span>
 		<br/><br/>
 		Wenn du helfen / daran arbeiten / Schreibrechte für svn oder Sonstiges möchtest, bitte kontaktiere

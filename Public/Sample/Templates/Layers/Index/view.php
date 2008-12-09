@@ -1,11 +1,11 @@
 <?php
-	foreach($this->data as $n){
+	foreach($this->Data as $n){
 		echo '<div class="inner">';
 		
-		if($this->hasRight('edit', 'modify'))
+		if(User::hasRight('layer.index.edit.modify'))
 			echo '<a class="hicon" href="'.$this->link($n['pagetitle'], 'edit').'"><img src="Images/pencil.png" alt="${lang.edit}"></a>';
 		
-		if($this->hasRight('delete'))
+		if(User::hasRight('layer.index.delete'))
 			echo '<a class="hicon delete" href="'.$this->link($n['pagetitle'], 'delete', 'json').'"><img src="Images/cross.png" alt="${lang.delete}" title="${lang.confirmdelete}"></a>';
 		
 		echo '<h1>'.$n['title'].'</h1>

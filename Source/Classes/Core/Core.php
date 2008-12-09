@@ -76,6 +76,8 @@ class Core {
 	}
 	
 	public static function initialize(){
+		self::loadClass('Cache', 'Cache');
+		
 		$c = Cache::getInstance();
 		
 		$List = self::store('Classes', $c->retrieve('Core', 'Classes'));

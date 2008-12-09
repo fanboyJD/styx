@@ -13,7 +13,7 @@ namespace news {
 	posted = 'Posted by <b>%s</b> on %s';
 	
 	add = 'Add news';
-	edit = 'Edit news';
+	modify = 'Edit news';
 	
 	saved = '<div class="inner">
 			<b>Your entry has been saved.</b><br/><br/>

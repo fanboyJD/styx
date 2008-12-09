@@ -94,12 +94,12 @@ class Data {
 		return $data;
 	}
 	
-	public static function in($key, $array){
-		return !Hash::length($array) ? $key."=''" : $key.' IN ('.implode(',', array_unique(Hash::splat($array))).')';
+	public static function implode(&$array){
+		return $array = (is_array($array) ? implode('', Hash::flatten($array)) : $array);
 	}
 	
-	public static function implode($array){
-		return is_array($array) ? implode('', Hash::flatten($array)) : $array;
+	public static function in($key, $array){
+		return !Hash::length($array) ? $key."=''" : $key.' IN ('.implode(',', array_unique(Hash::splat($array))).')';
 	}
 	
 	public static function clean($array, $whitespaces = false){

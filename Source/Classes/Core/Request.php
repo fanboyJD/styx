@@ -35,7 +35,7 @@ class Request extends Storage {
 			$this->store($v, self::sanitize($GLOBALS['_'.strtoupper($v)]));
 		
 		if(!empty($polluted['m']['language']))
-			Page::setCookie(Core::retrieve('languages.cookie'), $polluted['m']['language']);
+			Response::setCookie(Core::retrieve('languages.cookie'), $polluted['m']['language']);
 		
 		$get = array_merge(self::sanitize($_GET), $polluted);
 		if(Hash::length($get)) $this->store('get', $get);

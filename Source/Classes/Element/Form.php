@@ -9,6 +9,8 @@
 
 class Form extends Elements {
 	
+	protected static $formElements = array('input', 'checkbox', 'radio', 'select', 'textarea', 'richtext', 'optionlist');
+	
 	public function __construct(){
 		parent::__construct(func_get_args(), get_class());
 		
@@ -49,7 +51,7 @@ class Form extends Elements {
 	}
 	
 	public function getValue($name){
-		return $this->elements[$name] ? $this->elements[$name]->getValue() : false;
+		return !empty($this->elements[$name]) ? $this->elements[$name]->getValue() : false;
 	}
 	
 	public function prepareData($alias = false){

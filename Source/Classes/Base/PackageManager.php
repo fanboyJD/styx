@@ -41,6 +41,7 @@ class PackageManager {
 	
 	public static function add($name, $options = array(
 		'type' => '',
+		'readable' => false,
 		'files' => array(),
 		'options' => array(),
 		'require' => array(),
@@ -58,9 +59,9 @@ class PackageManager {
 	public static function setPackage($name){
 		if(self::has($name)){
 			$class = self::$Elements[self::$Packages[$name]['type']]['class'];
-			Page::allow($class);
+			Response::allow($class);
 			$class = $class.'Content';
-			Page::setContentType(new $class);
+			Response::setContentType(new $class);
 			
 			self::$Package = $name;
 			return true;
@@ -73,7 +74,7 @@ class PackageManager {
 		return self::$Packages[self::$Package]['type'];
 	}
 	
-	public static function assignToPage(){
+	public static function assignPackages(){
 		if(!count(self::$Packages)) return;
 		
 		$version = Core::retrieve('app.version');
@@ -91,8 +92,6 @@ class PackageManager {
 			$assigned['package.'.$name] = $el->format();
 		}
 		
-		$assigned['packages'] = implode($assigned);
-		
 		Page::getInstance()->assign($assigned);
 	}
 	
@@ -106,7 +105,7 @@ class PackageManager {
 		$path = Core::retrieve('app.path');
 		
 		if($compress)
-			Page::setHeader(array(
+			Response::setHeader(array(
 				'Vary' => 'Accept-Encoding',
 				'Content-Encoding' => self::$encoding,
 			));
@@ -124,7 +123,7 @@ class PackageManager {
 				$debug = false;
 		}else{
 			$expiration = Core::retrieve('expiration');
-			Page::setHeader(array(
+			Response::setHeader(array(
 				'Expires' => date('r', time()+$expiration),
 				'Cache-Control' => 'public, max-age='.$expiration,
 			));
@@ -140,7 +139,7 @@ class PackageManager {
 		
 		$content = implode($source);
 		
-		if(empty($package['keepReadable'])){
+		if(empty($package['readable'])){
 			if($package['type']=='js'){
 				$compressor = new JavaScriptPacker($content, 'None', false);
 				$content = $compressor->pack();

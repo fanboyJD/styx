@@ -29,19 +29,6 @@ $CONFIGURATION['debug'] = array(
 		'de' => array('de-de', 'de-at', 'de-ch', 'de'),
 	),
 	
-	'rights.layer' => array(
-		'index' => array( // You can specify different rights for the IndexLayer like only adding or adding/modifying but not deleting
-			'edit' => array(
-				'add' => 1,
-				'modify' => 1,
-			),
-			'delete' => 1,
-		),
-		
-		'page' => array(
-			'edit' => 1 // You need rights to edit entries in the PageLayer
-		),
-	),
 );
 
 $CONFIGURATION['production'] = array_merge($CONFIGURATION['debug'], array(

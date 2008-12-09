@@ -1,5 +1,5 @@
 <?php
-	foreach($this->data as $n)
+	foreach($this->Data as $n)
 		echo '<item>
 			<title>'.$n['title'].'</title>
 			<link>'.$this->link($n['pagetitle']).'</link>
