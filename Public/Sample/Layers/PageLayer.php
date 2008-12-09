@@ -38,6 +38,9 @@ class PageLayer extends Layer {
 	}
 	
 	public function onSave(){
+		if(!User::hasRight('layer.page.edit'))
+			throw new ValidatorException('rights');
+		
 		if(!$this->editing)
 			throw new ValidatorException('onlyedit');
 		
@@ -51,6 +54,9 @@ class PageLayer extends Layer {
 	}
 	
 	public function onEdit(){
+		if(!User::hasRight('layer.page.edit'))
+			throw new ValidatorException('rights');
+		
 		$this->edit();
 		
 		if(!$this->editing)

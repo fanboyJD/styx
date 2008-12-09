@@ -9,31 +9,18 @@
 
 class User {
 	
-	/**
-	 * @var Rights
-	 */
-	private static $Rights;
-	
 	private static $Configuration = array(),
 		$rights = array(),
 		$user = null;
 	
 	public static function initialize(){
 		self::$Configuration = Core::retrieve('user');
-		
-		self::$Rights = new Rights();
-		
-		self::handlelogin();
 	}
 	
 	public static function store($user){
-		self::$user = false;
+		self::setRights($user && !empty(self::$Configuration['rights']) && !empty($user[self::$Configuration['rights']]) ? $user[self::$Configuration['rights']] : null);
 		
-		self::$Rights->setRights($user && self::$Configuration['rights'] ? $user[self::$Configuration['rights']] : null);
-		
-		if(is_array($user)) self::$user = $user;
-		
-		return self::$user;
+		return self::$user = (is_array($user) ? $user : false);
 	}
 	
 	public static function retrieve(){
@@ -45,6 +32,8 @@ class User {
 	}
 	
 	private static function getLoginData(){
+		$data = array();
+		
 		if(self::$Configuration['type']=='cookie'){
 			$prefix = Core::retrieve('prefix');
 			$cookie = Request::getInstance()->retrieve('cookie');
@@ -55,7 +44,7 @@ class User {
 		return Hash::length($data)==3 ? $data : false;
 	}
 	
-	public static function handlelogin($cache = true){
+	public static function handle($cache = true){
 		$data = self::getLoginData();
 		
 		if(!$data) return;
@@ -76,7 +65,7 @@ class User {
 	}
 	
 	public static function login($user){
-		if($user[self::$Configuration['session']]) Cache::getInstance()->erase('User', 'userdata_'.$user[self::$Configuration['session']]);
+		if(!empty($user[self::$Configuration['session']])) Cache::getInstance()->erase('User', 'userdata_'.$user[self::$Configuration['session']]);
 		
 		$rand = Core::retrieve('secure').mt_rand(0, 100000);
 		$user[self::$Configuration['session']] = sha1($rand.uniqid($rand, true));
@@ -95,7 +84,7 @@ class User {
 			Response::setCookie(Core::retrieve('prefix'), json_encode($json));
 		}
 		
-		return self::handlelogin(false);
+		return self::handle(false);
 	}
 	
 	public static function logout(){
@@ -121,10 +110,51 @@ class User {
 		return true;
 	}
 	
-	public static function hasRight(){
+	public static function setRights(){
 		$args = Hash::args(func_get_args());
 		
-		return self::retrieve() && self::$Rights->hasRight($args);
+		if(Hash::length($args)==1 && !is_array($args[0])) $args = json_decode($args[0], true);
+		
+		self::$rights = Hash::flatten(Hash::splat($args));
+	}
+	
+	public static function removeRight(){
+		$args = Hash::args(func_get_args());
+		
+		foreach($args as $arg)
+			foreach(self::$rights as $k => $right)
+				if($arg==$right || String::starts($right, $arg.'.'))
+					unset(self::$rights[$k]);
+	}
+	
+	public static function addRight($right){
+		self::$rights[] = $right;
+	}
+	
+	public static function hasRight(){
+		if(!is_array(self::$user))
+			return false;
+		
+		$args = Hash::args(func_get_args());
+		
+		foreach($args as $k => $arg)
+			$args[$k] = explode('.', $arg);
+		
+		return !!self::checkRight(array_values(Hash::flatten($args)));
+	}
+	
+	private static function checkRight($rights){
+		if(!is_array($rights)) return false;
+		
+		foreach($rights as $right){
+			$prefix[] = $right;
+			$check = implode('.', $prefix);
+			
+			if(in_array($check, self::$rights))
+				return $check;
+		}
+		
+		return false;
 	}
 	
 }

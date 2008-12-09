@@ -46,9 +46,9 @@ Core::autoload('Element'); // We need to load Element as there are several Class
 
 Request::initialize();
 
-if(function_exists('initialize')) initialize();
-
 User::initialize();
+
+if(function_exists('initialize')) initialize();
 
 $get = Request::getInstance()->retrieve('get');
 if(!empty($get['m']['package']) && PackageManager::setPackage($get['m']['package'])){

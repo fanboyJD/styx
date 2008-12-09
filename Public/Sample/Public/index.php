@@ -7,6 +7,8 @@
 	include('../../../Source/Styx.php');
 	
 	function initialize(){
+		User::handle(); // Automatically sign-on the user if login data is provided
+		
 		Script::set('
 			if(!window.console) window.console = console = {log: $empty};
 			

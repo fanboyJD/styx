@@ -66,7 +66,7 @@ class IndexLayer extends Layer {
 	public function onEdit(){
 		$this->edit();
 		
-		if(!User::hasRight('layer.index.edit', ($this->editing ? 'modify' : 'add')))
+		if(!User::hasRight('layer.index.edit', $this->editing ? 'modify' : 'add'))
 			throw new ValidatorException('rights');
 		
 		$this->Template->apply('edit')->assign(array(
@@ -75,6 +75,9 @@ class IndexLayer extends Layer {
 	}
 	
 	public function onDelete($title){
+		if(!User::hasRight('layer.index.delete'))
+			throw new ValidatorException('rights');
+		
 		/*
 		 * This could be used to enforce json encoding on any Request without looking at the wanted header
 		 * 
