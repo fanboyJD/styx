@@ -60,7 +60,7 @@ abstract class Layer extends Runner {
 	/**
 	 * @return Layer
 	 */
-	public static function run($layerName, $event = null, $get = null, $post = null, $isRouted = false){
+	public static function run($layerName, $event = null, $get = null, $post = null){
 		if(!$layerName || !Core::autoload($layerName.'layer'))
 			return false;
 		
@@ -70,18 +70,11 @@ abstract class Layer extends Runner {
 		if(!is_subclass_of($class, 'Layer'))
 			return false;
 		
-		if($isRouted && call_user_func(array($class, 'hide')))
-			return false;
-		
 		$layer = new $class($layerName);
 		
 		if($event) $layer->handle($event, $get, $post);
 		
 		return $layer;
-	}
-	
-	public static function hide(){
-		return false;
 	}
 	
 	/**
@@ -155,8 +148,8 @@ abstract class Layer extends Runner {
 		$this->Template = Template::map()->base('Layers', ucfirst($this->name))->bind($this);
 		Page::getInstance()->register('layer.'.$this->layername, $this->Template);
 		
-		$this->get = Hash::length($get) ? $get : Request::getInstance()->retrieve('get');
-		$this->post = Hash::length($post) ? $post : Request::getInstance()->retrieve('post');
+		$this->get = Hash::length($get) ? $get : Request::retrieve('get');
+		$this->post = Hash::length($post) ? $post : Request::retrieve('post');
 		
 		try{
 			if(Request::getMethod()=='post'){

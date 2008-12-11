@@ -50,11 +50,12 @@ User::initialize();
 
 if(function_exists('initialize')) initialize();
 
-$get = Request::getInstance()->retrieve('get');
+$get = Request::retrieve('get');
 if(!empty($get['m']['package']) && PackageManager::setPackage($get['m']['package'])){
 	Page::getInstance()->show();
 	die;
 }
+unset($get);
 
 if(!Response::getContentType())
 	Response::setDefaultContentType(Core::retrieve('contenttype.default'));
@@ -63,6 +64,4 @@ Lang::setLanguage(Request::getLanguage());
 
 PackageManager::assignPackages();
 
-Route::initialize($get, Request::getInstance()->retrieve('post'));
-
-unset($get);
+Route::initialize();

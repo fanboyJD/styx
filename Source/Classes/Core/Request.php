@@ -7,7 +7,7 @@
  *
  */
 
-class Request extends Storage {
+class Request {
 	
 	private static $method, $behaviour;
 	
@@ -19,26 +19,20 @@ class Request extends Storage {
 		
 		if(!in_array(self::$method, array('get', 'post', 'put', 'delete'))) self::$method = 'get';
 		
-		self::getInstance()->parse();
+		self::parse();
 	}
 	
-	public static function getInstance(){
-		static $Instance;
-		
-		return $Instance ? $Instance : $Instance = new Request();
-	}
-	
-	public function parse(){
+	public static function parse(){
 		$polluted = self::processRequest();
 			
 		foreach(array('post', 'cookie') as $v)
-			$this->store($v, self::sanitize($GLOBALS['_'.strtoupper($v)]));
+			self::store($v, self::sanitize($GLOBALS['_'.strtoupper($v)]));
 		
 		if(!empty($polluted['m']['language']))
 			Response::setCookie(Core::retrieve('languages.cookie'), $polluted['m']['language']);
 		
 		$get = array_merge(self::sanitize($_GET), $polluted);
-		if(Hash::length($get)) $this->store('get', $get);
+		if(Hash::length($get)) self::store('get', $get);
 	}
 	
 	public static function processRequest($path = null){
@@ -227,7 +221,7 @@ class Request extends Storage {
 		
 		if(!$langs){
 			if($languagescookie = Core::retrieve('languages.cookie')){
-				$cookie = self::getInstance()->retrieve('cookie');
+				$cookie = self::retrieve('cookie');
 				if(!empty($cookie[$languagescookie]))
 					$langs[Data::pagetitle($cookie[$languagescookie])] = 2; // We strip out bad content
 			}
@@ -257,6 +251,32 @@ class Request extends Storage {
 	
 	public static function getBehaviour(){
 		return self::$behaviour;
+	}
+	
+	/* Storage Methods (Will be moved to a StaticStorage-Class in PHP5.3) */
+	private static $Storage = array();
+	
+	public function store($key, $value = null){
+		if(is_array($key)){
+			foreach($key as $k => $val)
+				self::store($k, $val);
+			
+			return $key;
+		}
+		
+		if(empty(self::$Storage[$key]) || self::$Storage[$key]!=$value){
+			if($value) self::$Storage[$key] = $value;
+			else unset(self::$Storage[$key]);
+		}
+		
+		return $value;
+	}
+	
+	public function retrieve($key, $value = null){
+		if($value && empty(self::$Storage[$key]))
+			return self::store($key, $value);
+		
+		return !empty(self::$Storage[$key]) ? self::$Storage[$key] : null;
 	}
 	
 }

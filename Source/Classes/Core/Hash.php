@@ -40,7 +40,9 @@ class Hash {
 	}
 	
 	public static function splat(&$array){
-		return $array = (!is_array($array) ? (is_null($array) ? array() : array($array)) : $array);
+		if(is_array($array)) return $array;
+		
+		return $array = (empty($array) ? array() : array($array));
 	}
 	
 	public static function args($args){

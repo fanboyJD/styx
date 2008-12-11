@@ -91,7 +91,7 @@ class Data {
 				elseif(is_array($val)) $val = self::nullify($val);
 			}
 		
-		return $data;
+		return Hash::splat($data);
 	}
 	
 	public static function implode(&$array){

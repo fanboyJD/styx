@@ -101,36 +101,30 @@ class Core {
 		}
 	}
 	
-	/* Using this because of missing features (will be changed when a usable version of php5.3 is out) */
-	private static function map($fn, $args){
-		static $Storage;
+	/* Storage Methods (Will be moved to a StaticStorage-Class in PHP5.3) */
+	private static $Storage = array();
+	
+	public function store($key, $value = null){
+		if(is_array($key)){
+			foreach($key as $k => $val)
+				self::store($k, $val);
+			
+			return $key;
+		}
 		
-		return call_user_func_array(array($Storage ? $Storage : $Storage = new Storage(), $fn), $args);
+		if(empty(self::$Storage[$key]) || self::$Storage[$key]!=$value){
+			if($value) self::$Storage[$key] = $value;
+			else unset(self::$Storage[$key]);
+		}
+		
+		return $value;
 	}
 	
-	public static function store(){
-		$args = func_get_args();
-		return self::map('store', $args);
-	}
-	
-	public static function retrieve(){
-		$args = func_get_args();
-		return self::map('retrieve', $args);
-	}
-	
-	public static function erase(){
-		$args = func_get_args();
-		return self::map('erase', $args);
-	}
-	
-	public static function eraseBy(){
-		$args = func_get_args();
-		return self::map('eraseBy', $args);
-	}
-	
-	public static function eraseAll(){
-		$args = func_get_args();
-		return self::map('eraseAll', $args);
+	public function retrieve($key, $value = null){
+		if($value && empty(self::$Storage[$key]))
+			return self::store($key, $value);
+		
+		return !empty(self::$Storage[$key]) ? self::$Storage[$key] : null;
 	}
 	
 }

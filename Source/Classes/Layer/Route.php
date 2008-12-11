@@ -10,13 +10,16 @@
 class Route {
 	
 	private static $mainLayer = null,
-		$routes = array();
+		$routes = array(),
+		$hidden = array();
 	
 	private function __construct(){}
 	private function __clone(){}
 	
-	public static function initialize($get, $post){
+	public static function initialize(){
 		if(self::$mainLayer) return;
+		
+		$get = Request::retrieve('get');
 		
 		$action = $get['n'];
 		$route = self::getRoute($get);
@@ -34,9 +37,16 @@ class Route {
 				Response::setContentType($route['options']['contenttype']);
 			
 			$get = $route['get'];
-		}
+		}elseif(in_array(array( // If there is no route and the layer/event is hidden we do not execute it :)
+			'layer' => $action[0],
+			'event' => $action[1],
+		), self::$hidden) || in_array(array(
+			'layer' => $action[0],
+			'event' => '*',
+		), self::$hidden))
+			return;
 		
-		if(Layer::run($action[0], $action[1], $get, $post, true))
+		if(Layer::run($action[0], $action[1], $get, Request::retrieve('post')))
 			self::$mainLayer = $action[0];
 	}
 	
@@ -86,14 +96,21 @@ class Route {
 		return false;
 	}
 	
-	public static function connect($route, $options = null, $priority = 50){
+	public static function connect($route, $options = array(), $priority = 50){
 		Hash::splat($options['match']);
 		
 		self::$routes[Data::pagetitle($priority, array(
 			'contents' => array_keys(self::$routes),
 		))] = array(
-			'route' => explode('/', $route),
+			'route' => Data::nullify(explode('/', $route)),
 			'options' => $options
+		);
+	}
+	
+	public static function hide($layer, $event = null){
+		self::$hidden[]  = array(
+			'layer' => strtolower($layer),
+			'event' => pick(strtolower($event), '*'),
 		);
 	}
 	

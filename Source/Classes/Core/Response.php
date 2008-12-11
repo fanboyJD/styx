@@ -49,10 +49,10 @@ class Response {
 		
 		setcookie($key, $value, pick($expire, $Configuration['expire']), $Configuration['path'], $Configuration['domain'], $Configuration['secure'], $Configuration['httponly']);
 		
-		$cookie = Request::getInstance()->retrieve('cookie');
+		$cookie = Request::retrieve('cookie');
 		if($value) $cookie[$key] = $value;
 		else unset($cookie[$key]);
-		Request::getInstance()->store('cookie', $cookie);
+		Request::store('cookie', $cookie);
 	}
 	
 	public static function removeCookie($key){

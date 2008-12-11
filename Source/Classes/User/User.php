@@ -36,7 +36,7 @@ class User {
 		
 		if(self::$Configuration['type']=='cookie'){
 			$prefix = Core::retrieve('prefix');
-			$cookie = Request::getInstance()->retrieve('cookie');
+			$cookie = Request::retrieve('cookie');
 			
 			$data = json_decode(!empty($cookie[$prefix]) ? (string)$cookie[$prefix] : null, true);
 		}

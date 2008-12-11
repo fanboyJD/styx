@@ -2,7 +2,7 @@
 	if(!User::retrieve())
 		return;
 	
-	$get = Request::getInstance()->retrieve('get');
+	$get = Request::retrieve('get');
 	
 	if(!empty($get['p']['do']) && $get['p']['do']=='cache'){
 		Cache::getInstance()->eraseAll(true);
