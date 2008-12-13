@@ -1,6 +1,6 @@
 <?php
 
-include('./Initialize.php');
+require_once('./Initialize.php');
 
 class HashTest extends UnitTestCase {
 	

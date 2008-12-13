@@ -27,8 +27,6 @@ class db {
 		
 		if(is_array($options))
 			$this->Configuration = $options;
-		
-		$this->Configuration['debug'] = Core::retrieve('debug');
 	}
 	
 	private function __clone(){}
@@ -108,6 +106,10 @@ class db {
 	}
 	
 	public function query($sql){
+		static $debug = null;
+		
+		if($debug===null) $debug = Core::retrieve('debug');
+		
 		if(!$this->isConnected){
 			$this->connect();
 			
@@ -118,7 +120,7 @@ class db {
 		
 		$query = mysql_query($sql);
 		
-		if($this->Configuration['debug']){
+		if($debug){
 			$this->queries++;
 			Script::log($sql);
 			if(!$query) Script::log(mysql_error(), 'error');

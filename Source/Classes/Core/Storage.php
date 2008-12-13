@@ -11,20 +11,17 @@ class Storage {
 	
 	protected $Storage = array();
 	
-	public function store($key, $value = null){
-		if(is_array($key)){
-			foreach($key as $k => $val)
-				$this->store($k, $val);
-			
-			return $key;
-		}
+	public function store($array, $value = null){
+		if(!is_array($array))
+			$array = array($array => $value);
 		
-		if(empty($this->Storage[$key]) || $this->Storage[$key]!=$value){
-			if($value) $this->Storage[$key] = $value;
-			else unset($this->Storage[$key]);
-		}
+		foreach($array as $key => $value)
+			if(empty($this->Storage[$key]) || $this->Storage[$key]!=$value){
+				if($value) $this->Storage[$key] = $value;
+				else unset($this->Storage[$key]);
+			}
 		
-		return $value;
+		return Hash::length($array)==1 ? $value : $array;
 	}
 	
 	public function retrieve($key, $value = null){

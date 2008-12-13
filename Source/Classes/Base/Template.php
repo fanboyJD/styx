@@ -29,43 +29,21 @@ class Template extends Runner {
 		if($args) $this->apply($args);
 	}
 	
-	protected static function getFileName($file){
-		static $Paths;
-		if(!$Paths) $Paths = array(
-				'app.root' => realpath(Core::retrieve('app.path').'Templates/'),
-				'root' => realpath(Core::retrieve('path').'Templates/'),
-			);
-		
-		foreach(array(
-			$Paths['app.root'].'/'.$file,
-			$Paths['root'].'/'.$file
-		) as $f)
-			if(file_exists($f))
-				return $f;
-		
-		return false;
-	}
-	
 	protected function getFile(){
 		static $Configuration;
-		if(!$Configuration) $Configuration = array(
-				'template.default' => Core::retrieve('template.default'),
-				'template.execute' => Core::retrieve('template.execute'),
-			);
-		
-		$c = Cache::getInstance();
+		if(!$Configuration)
+			$Configuration = Core::fetch('Templates', 'template.default', 'template.execute');
 		
 		$ext = pathinfo(end($this->file), PATHINFO_EXTENSION);
-		$file = implode('/', $this->file).(!$ext ? $ext = '.'.$Configuration['template.default'] : '');
+		$file = implode('/', $this->file).(!$ext ? '.'.$Configuration['template.default'] : '');
 		
-		if(in_array($ext, $Configuration['template.execute'])){
+		if(in_array(strtolower($ext ? $ext : $Configuration['template.default']), $Configuration['template.execute'])){
 			if($this->bind && method_exists($this->bind, 'execute')){
 				ob_start();
 				
-				$filename = self::getFileName($file);
-				if(!$filename) return;
+				if(empty($Configuration['Templates'][$file])) return;
 				
-				$this->bind->execute($filename);
+				$this->bind->execute($Configuration['Templates'][$file]);
 				return ob_get_clean();
 			}else{
 				/* 
@@ -76,15 +54,7 @@ class Template extends Runner {
 			}
 		}
 		
-		if(!Core::retrieve('debug')){
-			$tpl = $c->retrieve('Templates', $file);
-			if($tpl) return $tpl;
-		}
-		
-		$filename = self::getFileName($file);
-		if(!$filename) return;
-		
-		return $c->store('Templates', $file, file_get_contents($filename), ONE_WEEK);
+		return !empty($Configuration['Templates'][$file]) ? file_get_contents($Configuration['Templates'][$file]) : false;
 	}
 	
 	/**

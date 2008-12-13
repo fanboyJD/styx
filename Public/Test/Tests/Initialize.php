@@ -6,10 +6,12 @@
 		'app.path' => realpath('../../Sample/'),
 		'app.public' => realpath('./'),
 	);
+	
 	include('../../../Source/Styx.php');
 	
 	function initialize(){
-		Route::connect(array(
-			array('logout', 'equalsAll')
-		), array('login', 'logout'));
+		Route::connect('logout', array(
+			'layer' => 'login',
+			'event' => 'logout',
+		));
 	}

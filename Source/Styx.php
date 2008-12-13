@@ -4,7 +4,6 @@
  * Author: christoph.pojer@gmail.com
  */
 
-unset($CONFIGURATION);
 if(!isset($Paths) || !is_array($Paths))
 	$Paths = array(
 		'app.path' => realpath('../').DIRECTORY_SEPARATOR,

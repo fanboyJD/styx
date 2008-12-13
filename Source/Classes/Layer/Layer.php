@@ -291,13 +291,13 @@ abstract class Layer extends Runner {
 		if(!$Configuration)
 			$Configuration = array(
 				'default' => $this->getDefaultEvent('view'),
-				'handler' => Core::retrieve('contenttype.querystring')
+				'contenttype.querystring' => Core::retrieve('contenttype.querystring')
 			);
 		
 		if(is_array($title)) $title = $title[$this->options['identifier']['external']];
 		
-		if($options && !is_array($options) && $Configuration['handler'])
-			$options = array($Configuration['handler'] => $options);
+		if($options && !is_array($options) && $Configuration['contenttype.querystring'])
+			$options = array($Configuration['contenttype.querystring'] => $options);
 		
 		if(!$event || !in_array($event, $this->methods))
 			$event = $Configuration['default'];
@@ -321,11 +321,14 @@ abstract class Layer extends Runner {
 	
 	public function requireSession(){
 		$name = $this->generateSessionName();
-		$user = Core::retrieve('user');
+		if($this->getElement($name))
+			return;
+		
+		$uconfig = Core::retrieve('user');
 		
 		return $this->Form->addElement(new HiddenInput(array(
 			'name' => $name,
-			'value' => Request::getMethod()=='post' && !empty($this->post[$name]) ? $this->post[$name] : User::get($user['session']),
+			'value' => Request::getMethod()=='post' && !empty($this->post[$name]) ? $this->post[$name] : User::get($uconfig['session']),
 			':alias' => true,
 		)));
 	}

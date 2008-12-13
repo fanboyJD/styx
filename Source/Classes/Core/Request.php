@@ -39,13 +39,9 @@ class Request {
 		static $Configuration, $processed = array(), $empty;
 		
 		if(!$Configuration)
-			$Configuration = array(
-				'version' => Core::retrieve('app.version'),
-				'separator' => Core::retrieve('path.separator'),
-				'language' => Core::retrieve('languages.querystring'),
-				'handler' => Core::retrieve('contenttype.querystring'),
-				'contenttype.default' => Core::retrieve('contenttype.default'),
-				'layer.default' => Core::retrieve('layer.default'),
+			$Configuration = Core::fetch(
+				'app.version', 'path.separator', 'languages.querystring',
+				'contenttype.querystring', 'contenttype.default', 'layer.default'
 			);
 		
 		if(!$empty)
@@ -65,18 +61,18 @@ class Request {
 			$v = Data::clean($v);
 			if(!$v) continue;
 			
-			$v = explode($Configuration['separator'], $v, 2);
+			$v = explode($Configuration['path.separator'], $v, 2);
 			if(!empty($polluted['p'][$v[0]])) continue;
 			
-			if($Configuration['version'] && !$k && $Configuration['version']==$v[0] && strpos($vars[$k+1], '.')){
+			if($Configuration['app.version'] && !$k && $Configuration['app.version']==$v[0] && strpos($vars[$k+1], '.')){
 				$polluted['m']['package'] = $vars[$k+1];
 				continue;
-			}elseif($Configuration['language'] && $v[0]==$Configuration['language'] && $v[1]){
+			}elseif($Configuration['languages.querystring'] && $v[0]==$Configuration['languages.querystring'] && $v[1]){
 				$polluted['m']['language'] = $v[1];
 				continue;
 			}
 			
-			if($v[0]==$Configuration['handler']){
+			if($v[0]==$Configuration['contenttype.querystring']){
 				self::$behaviour = pick($v[1]);
 				continue;
 			}
@@ -256,23 +252,20 @@ class Request {
 	/* Storage Methods (Will be moved to a StaticStorage-Class in PHP5.3) */
 	private static $Storage = array();
 	
-	public function store($key, $value = null){
-		if(is_array($key)){
-			foreach($key as $k => $val)
-				self::store($k, $val);
-			
-			return $key;
-		}
+	public static function store($array, $value = null){
+		if(!is_array($array))
+			$array = array($array => $value);
 		
-		if(empty(self::$Storage[$key]) || self::$Storage[$key]!=$value){
-			if($value) self::$Storage[$key] = $value;
-			else unset(self::$Storage[$key]);
-		}
+		foreach($array as $key => $value)
+			if(empty(self::$Storage[$key]) || self::$Storage[$key]!=$value){
+				if($value) self::$Storage[$key] = $value;
+				else unset(self::$Storage[$key]);
+			}
 		
-		return $value;
+		return Hash::length($array)==1 ? $value : $array;
 	}
 	
-	public function retrieve($key, $value = null){
+	public static function retrieve($key, $value = null){
 		if($value && empty(self::$Storage[$key]))
 			return self::store($key, $value);
 		

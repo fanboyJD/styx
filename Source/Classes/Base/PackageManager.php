@@ -100,8 +100,7 @@ class PackageManager {
 			return '';
 		
 		$compress = self::checkGzipCompress();
-		$debug = Core::retrieve('debug');
-		$path = Core::retrieve('app.path');
+		$Configuration = Core::fetch('debug', 'app.path', 'expiration');
 		
 		if($compress)
 			Response::setHeader(array(
@@ -111,30 +110,29 @@ class PackageManager {
 		
 		$c = Cache::getInstance();
 		
-		if($debug){
+		if(!empty($Configuration['debug'])){
 			$time = 0;
 			
 			/* We check here if the files have been modified */
 			foreach($package['files'] as $file)
-				$time = max($time, filemtime(realpath($path.'/'.self::$Elements[$package['type']]['directory'].'/'.$file.'.'.$package['type'])));
+				$time = max($time, filemtime(realpath($Configuration['app.path'].'/'.self::$Elements[$package['type']]['directory'].'/'.$file.'.'.$package['type'])));
 			
 			if($time<$c->retrieve('CompressedTime', self::$Package, 'file'))
-				$debug = false;
+				$Configuration['debug'] = false;
 		}else{
-			$expiration = Core::retrieve('expiration');
 			Response::setHeader(array(
-				'Expires' => date('r', time()+$expiration),
-				'Cache-Control' => 'public, max-age='.$expiration,
+				'Expires' => date('r', time()+$Configuration['expiration']),
+				'Cache-Control' => 'public, max-age='.$Configuration['expiration'],
 			));
 		}
 		
-		if(!$debug){
+		if(empty($Configuration['debug'])){
 			$output = $c->retrieve('Compressed', self::$Package.($compress ? '1' : ''), 'file', false);
 			if($output) return $output;
 		}
 		
 		foreach($package['files'] as $file)
-			$source[] = file_get_contents(realpath($path.'/'.self::$Elements[$package['type']]['directory'].'/'.$file.'.'.$package['type']));
+			$source[] = file_get_contents(realpath($Configuration['app.path'].'/'.self::$Elements[$package['type']]['directory'].'/'.$file.'.'.$package['type']));
 		
 		$content = implode($source);
 		

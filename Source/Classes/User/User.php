@@ -14,7 +14,7 @@ class User {
 		$user = null;
 	
 	public static function initialize(){
-		self::$Configuration = Core::retrieve('user');
+		self::$Configuration = array_merge(Core::retrieve('user'), Core::fetch('prefix', 'identifier.internal', 'secure'));
 	}
 	
 	public static function store($user){
@@ -35,10 +35,9 @@ class User {
 		$data = array();
 		
 		if(self::$Configuration['type']=='cookie'){
-			$prefix = Core::retrieve('prefix');
 			$cookie = Request::retrieve('cookie');
 			
-			$data = json_decode(!empty($cookie[$prefix]) ? (string)$cookie[$prefix] : null, true);
+			$data = json_decode(!empty($cookie[self::$Configuration['prefix']]) ? (string)$cookie[self::$Configuration['prefix']] : null, true);
 		}
 		
 		return Hash::length($data)==3 ? $data : false;
@@ -49,8 +48,6 @@ class User {
 		
 		if(!$data) return;
 		
-		$id = Core::retrieve('identifier.internal');
-		
 		foreach(self::$Configuration['fields'] as $v){
 			$fields[$v] = $data[$v];
 			$fields[] = 'AND';
@@ -59,7 +56,7 @@ class User {
 		
 		$user = db::select(self::$Configuration['table'], $cache)->where($fields)->fetch();
 		
-		if($user[$id]) return self::store(Cache::getInstance()->store('User', 'userdata_'.$user[self::$Configuration['session']], $user, ONE_DAY));
+		if($user[self::$Configuration['identifier.internal']]) return self::store(Cache::getInstance()->store('User', 'userdata_'.$user[self::$Configuration['session']], $user, ONE_DAY));
 		
 		self::logout();
 	}
@@ -67,21 +64,20 @@ class User {
 	public static function login($user){
 		if(!empty($user[self::$Configuration['session']])) Cache::getInstance()->erase('User', 'userdata_'.$user[self::$Configuration['session']]);
 		
-		$rand = Core::retrieve('secure').mt_rand(0, 100000);
+		$rand = self::$Configuration['secure'].mt_rand(0, 100000);
 		$user[self::$Configuration['session']] = sha1($rand.uniqid($rand, true));
 		
-		$id = Core::retrieve('identifier.internal');
 		db::update(self::$Configuration['table'])->set(array(
 			self::$Configuration['session'] => $user[self::$Configuration['session']],
 		))->where(array(
-			$id => $user[$id],
+			self::$Configuration['identifier.internal'] => $user[self::$Configuration['identifier.internal']],
 		))->query();
 		
 		if(self::$Configuration['type']=='cookie'){
 			foreach(self::$Configuration['fields'] as $v)
 				$json[$v] = $user[$v];
 			
-			Response::setCookie(Core::retrieve('prefix'), json_encode($json));
+			Response::setCookie(self::$Configuration['prefix'], json_encode($json));
 		}
 		
 		return self::handle(false);
@@ -91,7 +87,7 @@ class User {
 		Cache::getInstance()->erase('User', 'userdata_'.User::get(self::$Configuration['session']));
 		
 		if(self::$Configuration['type']=='cookie')
-			Response::removeCookie(Core::retrieve('prefix'));
+			Response::removeCookie(self::$Configuration['prefix']);
 		
 		self::store(false);
 	}

@@ -9,9 +9,8 @@
 
 class Page extends Template {
 	
-	private $Templates = array();
-	
-	private $substitution = null;
+	private $Templates = array(),
+		$substitution = null;
 	
 	protected function __construct(){
 		$this->base = 'Page';

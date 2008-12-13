@@ -1,6 +1,6 @@
 <?php
 
-include('./Initialize.php');
+require_once('./Initialize.php');
 
 class CoreTest extends UnitTestCase {
 	
@@ -11,14 +11,16 @@ class CoreTest extends UnitTestCase {
 		
 		$this->layer = $appath.'Layers';
 		
-		touch($this->layer.'/temp.tmp');
+		touch($this->layer.'/temp.php.tmp');
+		touch($this->layer.'/temp.tpl');
 		if(!file_exists($this->layer.'/test')) mkdir($this->layer.'/test');
 		touch($this->layer.'/test/temp.html');
 		touch($this->layer.'/test/test.php');
 	}
 	
 	public function tearDown(){
-		unlink($this->layer.'/temp.tmp');
+		unlink($this->layer.'/temp.php.tmp');
+		unlink($this->layer.'/temp.tpl');
 		unlink($this->layer.'/test/temp.html');
 		unlink($this->layer.'/test/test.php');
 		rmdir($this->layer.'/test');
@@ -49,13 +51,15 @@ class CoreTest extends UnitTestCase {
 	}
 	
 	public function testExtensionFilter(){
-		foreach(new PHPExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->layer))) as $file)
+		foreach(new ExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->layer))) as $file){
+			$this->assertEqual(pathinfo($file->getFileName(), PATHINFO_EXTENSION), 'php');
 			$files[] = $file->getFileName();
+		}
 		
 		$this->assertEqual(count($files), 4);
-		
-		foreach($files as $file)
-			$this->assertEqual(pathinfo($file, PATHINFO_EXTENSION), 'php');
+			
+		foreach(new ExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->layer)), array('html', 'tpl')) as $file)
+			$this->assertTrue(in_array(pathinfo($file->getFileName(), PATHINFO_EXTENSION), array('html', 'tpl')));
 	}
 	
 	public function testConfigurationUnchanged(){

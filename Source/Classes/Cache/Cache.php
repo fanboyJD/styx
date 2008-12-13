@@ -25,7 +25,7 @@ class Cache extends Storage {
 				'type' => 'eaccelerator',
 			);
 		
-		$this->Configuration['prefix'] = pick($options['prefix'], Core::retrieve('prefix'));
+		$this->Configuration['prefix'] = !empty($options['prefix']) ? $options['prefix'] : Core::retrieve('prefix');
 		
 		if($options['root']) $this->Configuration['root'] = realpath($options['root']);
 		else $this->Configuration['root'] = Core::retrieve('path').$this->Configuration['root'];

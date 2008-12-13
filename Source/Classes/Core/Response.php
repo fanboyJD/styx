@@ -62,11 +62,7 @@ class Response {
 	public static function link($options = null, $base = null){
 		static $Configuration;	
 		if(!$Configuration)
-			$Configuration = array(
-				'path.separator' => Core::retrieve('path.separator'),
-				'app.link' => Core::retrieve('app.link'),
-				'handler' => Core::retrieve('contenttype.querystring'),
-			);
+			$Configuration = Core::fetch('path.separator', 'app.link', 'contenttype.querystring');
 		
 		if(!is_array($options) && $options){
 			$wrapper[$options] = null;
@@ -74,9 +70,9 @@ class Response {
 		}
 		
 		$array = array();
-		if($Configuration['handler'] && !empty($options[$Configuration['handler']])){
-			$array[] = $Configuration['handler'].$Configuration['path.separator'].$options['handler'];
-			unset($options[$Configuration['handler']]);
+		if($Configuration['contenttype.querystring'] && !empty($options[$Configuration['contenttype.querystring']])){
+			$array[] = $Configuration['contenttype.querystring'].$Configuration['path.separator'].$options[$Configuration['contenttype.querystring']];
+			unset($options[$Configuration['contenttype.querystring']]);
 		}
 		
 		if(Hash::length(Hash::splat($base)))
