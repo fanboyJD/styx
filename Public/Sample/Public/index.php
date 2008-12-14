@@ -65,9 +65,7 @@
 		)).';');
 	
 	if(Response::getContentType()=='html')
-		Page::getInstance()->apply('html.php')->assign(array(
-			'app.name' => Core::retrieve('app.name'),
-			'app.link' => Core::retrieve('app.link'),
+		Page::getInstance()->apply('html.php')->assign(Core::fetch('app.name', 'app.link'))->assign(array(
 			'scripts' => Script::get(),
 			
 			'source' => 'http://framework.og5.net/dev/browser/trunk/Public/Sample',
@@ -82,13 +80,9 @@
 			'user' => ($user ? Lang::get('user.hello', $user['name']).' | <a href="admin">'.Lang::retrieve('user.admin').'</a> | ' : '').'
 				<a href="'.Layer::retrieve('login')->link(null, $user ? 'logout' : null).'">'.Lang::retrieve('user.'.($user ? 'logout' : 'login')).'</a>',
 			
-			'styx' => Core::retrieve('styx.name').' '.Core::retrieve('styx.version'),
+			'styx' => implode(' ', Core::fetch('styx.name', 'styx.version')),
 		))->show();
 	elseif(Response::getContentType()=='json')
 		Page::getInstance()->substitute('layer')->show();
 	elseif(Response::getContentType()=='xml')
-		Page::getInstance()->assign(array(
-			'app.name' => Core::retrieve('app.name'),
-			'app.link' => Core::retrieve('app.link'),
-			'app.mail' => Core::retrieve('app.mail'),
-		))->apply('rss.php')->show();
+		Page::getInstance()->assign(Core::fetch('app.name', 'app.link', 'app.mail'))->apply('rss.php')->show();

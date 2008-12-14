@@ -152,11 +152,6 @@ abstract class Layer extends Runner {
 		$this->post = Hash::length($post) ? $post : Request::retrieve('post');
 		
 		try{
-			if(Request::getMethod()=='post'){
-				if($this->post) $this->prepare($this->post);
-				else throw new ValidatorException('data');
-			}
-			
 			if(!method_exists($this, $event[1])){
 				$ev = $this->getDefaultEvent('view');
 				$event = array($ev, 'on'.ucfirst($ev));
@@ -165,6 +160,12 @@ abstract class Layer extends Runner {
 			}
 			
 			$this->event = $event[0];
+			
+			if(Request::getMethod()=='post'){
+				if($this->post) $this->prepare($this->post);
+				else throw new ValidatorException('data');
+			}
+			
 			$this->{$event[1]}(isset($this->get['p'][$event[0]]) ? pick($this->get['p'][$event[0]]) : null);
 		}catch(ValidatorException $e){
 			$this->Template->assign($e->getMessage());

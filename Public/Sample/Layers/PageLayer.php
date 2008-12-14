@@ -15,6 +15,7 @@ class PageLayer extends Layer {
 				new Input(array(
 					'name' => 'title',
 					':caption' => Lang::retrieve('title'),
+					':validate' => 'specialchars',
 				)),
 				
 				new Textarea(array(

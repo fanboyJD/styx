@@ -11,6 +11,7 @@ class LoginLayer extends Layer {
 				new Input(array(
 					'name' => 'name',
 					':caption' => Lang::retrieve('user.name'),
+					':validate' => 'pagetitle',
 				)),
 				
 				new Input(array(

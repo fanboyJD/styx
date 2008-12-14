@@ -108,6 +108,10 @@ class Template extends Runner {
 	 * @return mixed
 	 */
 	public function parse($return = false){
+		static $regex;
+		
+		if(!$regex) $regex = Core::retrieve('template.regex');
+		
 		if(!Hash::length($this->file))
 			return $this->assigned;
 		
@@ -117,7 +121,7 @@ class Template extends Runner {
 		Hash::splat($this->assigned);
 		Hash::flatten($this->assigned);
 		
-		preg_match_all('/\\$\{([A-z0-9\.:\s|]+)\}/i', $out, $vars);
+		preg_match_all($regex, $out, $vars);
 		
 		$rep = array(array_values($vars[0]));
 		$i = 0;

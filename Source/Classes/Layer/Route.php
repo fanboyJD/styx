@@ -57,35 +57,42 @@ class Route {
 	public static function getRoute($get){
 		$sep = Core::retrieve('path.separator');
 		
+		$path = Request::getPath();
+		
 		$routes = self::$routes;
 		krsort($routes);
 		
 		foreach($routes as $route){
 			$i = -1;
 			
-			foreach($route['route'] as $r){
-				$i++;
-				$urlpart = !empty($get['n'][$i]) ? $get['n'][$i].($get['p'][$get['n'][$i]] ? $sep.$get['p'][$get['n'][$i]] : '') : null;
-				
-				if(!empty($route['options']['match'][$r])){
-					$m = $route['options']['match'][$r];
+			if(!empty($route['options']['regex'])){
+				if(!preg_match($route['route'], $path))
+					continue;
+			}else{
+				foreach($route['route'] as $r){
+					$i++;
+					$urlpart = !empty($get['n'][$i]) ? $get['n'][$i].($get['p'][$get['n'][$i]] ? $sep.$get['p'][$get['n'][$i]] : '') : null;
 					
-					if(!empty($m['regex']) && !preg_match($m['regex'], $urlpart))
-						continue 2;
-					if(!empty($m['starts']) && !String::starts($urlpart, $m['starts']))
-						continue 2;
-					if(!empty($m['ends']) && !String::ends($urlpart, $m['ends']))
-						continue 2;
-					if(!empty($m['equals']) && $urlpart!=$m['equals'])
-						continue 2;
-					
-					if(!empty($m['as'])){
-						$get['p'][$m['as']] = pick($get['p'][$get['n'][$i]], $get['n'][$i]);
+					if(!empty($route['options']['match'][$r])){
+						$m = $route['options']['match'][$r];
 						
-						unset($get['p'][$get['n'][$i]]);
+						if(!empty($m['regex']) && !preg_match($m['regex'], $urlpart))
+							continue 2;
+						if(!empty($m['starts']) && !String::starts($urlpart, $m['starts']))
+							continue 2;
+						if(!empty($m['ends']) && !String::ends($urlpart, $m['ends']))
+							continue 2;
+						if(!empty($m['equals']) && $urlpart!=$m['equals'])
+							continue 2;
+						
+						if(!empty($m['as'])){
+							$get['p'][$m['as']] = pick($get['p'][$get['n'][$i]], $get['n'][$i]);
+							
+							unset($get['p'][$get['n'][$i]]);
+						}
+					}elseif($urlpart!=$r){
+						continue 2;
 					}
-				}elseif($urlpart!=$r){
-					continue 2;
 				}
 			}
 			
@@ -102,7 +109,7 @@ class Route {
 		self::$routes[Data::pagetitle($priority, array(
 			'contents' => array_keys(self::$routes),
 		))] = array(
-			'route' => Data::nullify(explode('/', $route)),
+			'route' => !empty($options['regex']) ? $route : Data::nullify(explode('/', $route)),
 			'options' => $options
 		);
 	}

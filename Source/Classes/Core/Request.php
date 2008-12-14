@@ -81,7 +81,7 @@ class Request {
 		}
 		
 		foreach($polluted['p'] as $k => $v)
-			$polluted['o'][Data::entities($k)] = $v ? Data::entities($v) : null; // "Original" (but safe)
+			$polluted['o'][Data::specialchars($k)] = $v ? Data::specialchars($v) : null; // "Original" (but safe)
 		
 		foreach($Configuration['layer.default'] as $k => $v)
 			if(empty($polluted['n'][$k])){
@@ -179,9 +179,7 @@ class Request {
 		static $Configuration, $path;
 		
 		if(!$Configuration)
-			$Configuration = array(
-				'path.separator' => Core::retrieve('path.separator'),
-			);
+			$Configuration = Core::fetch('path.separator');
 		
 		if($path) return $path;
 		

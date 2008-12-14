@@ -33,12 +33,25 @@ class Data {
 		return stripslashes($string);
 	}
 	
-	public static function entities($string){
-		return htmlspecialchars($string, ENT_COMPAT, 'UTF-8', false);
+	public static function escape($string){
+		static $replaces;
+		
+		if($replaces===null){
+			$encode = Core::retrieve('template.encode');
+			
+			$replaces = is_array($encode) ? array(
+				array_keys($encode),
+				array_values($encode),
+			) : false;
+		}
+		
+		if(!$replaces) return $string;
+		
+		return str_replace($replaces[0], $replaces[1], $string);
 	}
 	
 	public static function specialchars($string){
-		return trim(htmlspecialchars($string));
+		return self::escape(trim(htmlspecialchars($string, ENT_COMPAT, 'UTF-8', false)));
 	}
 	
 	public static function id($int, $divider = 0){
@@ -171,7 +184,7 @@ class Data {
 	public static function purify($data, $options = array()){
 		$purify = new Safehtml($options);
 		
-		return $purify->parse($data);
+		return self::escape($purify->parse($data));
 	}
 	
 	public static function excerpt($data, $options = array(
