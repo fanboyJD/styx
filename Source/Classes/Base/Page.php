@@ -74,7 +74,7 @@ class Page extends Template {
 			$assign[$k] = $v->parse(true);
 		
 		$main = Route::getMainLayer();
-		if($main && $assign['layer.'.$main]) $assign['layer'] = $assign['layer.'.$main];
+		if($main && !empty($assign['layer.'.$main])) $assign['layer'] = $assign['layer.'.$main];
 		
 		$this->assign($assign);
 		

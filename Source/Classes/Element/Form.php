@@ -40,10 +40,12 @@ class Form extends Elements {
 	 * @param bool $raw
 	 */
 	public function setValue($data, $raw = false){
+		if(!is_array($data)) return;
+		
 		foreach($data as $k => $v)
 			if(!empty($this->elements[$k])){
 				$el = $this->elements[$k];
-				if($raw && (!in_array($el->type, self::$formElements)))
+				if($raw && !in_array($el->type, self::$formElements))
 					continue;
 				
 				$el->setValue(Data::clean($v));

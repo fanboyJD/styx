@@ -65,7 +65,7 @@ abstract class Layer extends Runner {
 			return false;
 		
 		$layerName = strtolower($layerName);
-		$class = ucfirst($layerName).'Layer';
+		$class = $layerName.'Layer';
 		
 		if(!is_subclass_of($class, 'Layer'))
 			return false;
@@ -89,7 +89,9 @@ abstract class Layer extends Runner {
 	}
 	
 	public function __construct($name){
-		$this->base = $this->layername = $this->name = $this->table = $name;
+		$this->base = $this->name = ucfirst($name);
+		$this->table = $this->layername = strtolower($name);
+		
 		if(in_array($this->layername, self::$Layers['List']))
 			$this->layername = Data::pagetitle($this->layername, array(
 				'contents' => self::$Layers['List'],
@@ -98,14 +100,14 @@ abstract class Layer extends Runner {
 		self::$Layers['List'][] = $this->layername;
 		self::$Layers['Instances'][$this->layername] = $this;
 		
-		foreach(get_class_methods($this) as $m)
-			if(String::starts($m, 'on') && strlen($m)>=3)
-				$method = $this->methods[] = strtolower(substr($m, 2));
+		foreach(get_class_methods($this) as $method)
+			if(String::starts($method, 'on') && strlen($method)>=3)
+				array_push($this->methods, strtolower(substr($method, 2)));
 		
 		$initialize = $this->initialize();
 		Hash::splat($initialize);
 		
-		if(key_exists('table', $initialize))
+		if(isset($initialize['table']))
 			$this->table = pick($initialize['table']);
 		
 		if(isset($initialize['options']) && is_array($initialize['options'])) Hash::extend($this->options, $initialize['options']);
@@ -122,8 +124,6 @@ abstract class Layer extends Runner {
 			);
 		
 		$prefix = Core::retrieve('elements.prefix');
-		
-		$this->Form = $initialize['form'];
 	}
 	
 	public function initialize(){}
@@ -134,6 +134,7 @@ abstract class Layer extends Runner {
 	 * @return Layer
 	 */
 	public function handle($event, $get = null, $post = null){
+		$event = strtolower($event);
 		if(!in_array($event, $this->methods)){
 			$default = $this->getDefaultEvent('view');
 			
@@ -141,32 +142,24 @@ abstract class Layer extends Runner {
 			$event = $default;
 		}
 		
-		$event = array(strtolower($event));
-		$event[] = 'on'.ucfirst($event[0]);
-		
 		$this->Data = $this->table ? db::select($this->table, $this->options['cache']) : array();
-		$this->Template = Template::map()->base('Layers', ucfirst($this->name))->bind($this);
+		$this->Template = Template::map()->base('Layers', $this->name)->bind($this);
 		Page::getInstance()->register('layer.'.$this->layername, $this->Template);
 		
-		$this->get = Hash::length($get) ? $get : Request::retrieve('get');
-		$this->post = Hash::length($post) ? $post : Request::retrieve('post');
+		foreach(array('get', 'post') as $v)
+			$this->{$v} = Hash::length($$v) ? $$v : Request::retrieve($v);
 		
 		try{
-			if(!method_exists($this, $event[1])){
-				$ev = $this->getDefaultEvent('view');
-				$event = array($ev, 'on'.ucfirst($ev));
-				if(!method_exists($this, $event[1]))
-					throw new ValidatorException('contenttype');
-			}
-			
-			$this->event = $event[0];
+			$this->event = $event;
 			
 			if(Request::getMethod()=='post'){
 				if($this->post) $this->prepare($this->post);
 				else throw new ValidatorException('data');
 			}
 			
-			$this->{$event[1]}(isset($this->get['p'][$event[0]]) ? pick($this->get['p'][$event[0]]) : null);
+			$event = array($event, 'on'.ucfirst($event));
+			
+			$this->{$event[1]}(isset($this->get['p'][$event[0]]) ? $this->get['p'][$event[0]] : null);
 		}catch(ValidatorException $e){
 			$this->Template->assign($e->getMessage());
 		}
@@ -175,27 +168,13 @@ abstract class Layer extends Runner {
 	}
 	
 	public function edit($options = array(
-		'edit' => null,
 		'preventDefault' => false,
 	)){
-		if(empty($options['edit']) && !$options['preventDefault'] && $this->event && $this->get['p'][$this->event])
-			$options['edit'] = array(
-				$this->options['identifier']['external'] => array($this->get['p'][$this->event], $this->options['identifier']['external']),
-			);
+		if(empty($options['preventDefault']) && Request::getMethod()!='post') $this->prepare();
 		
-		if(!empty($options['edit']) && Validator::check($options['edit']) && $this->table){
-			$data = db::select($this->table, $this->options['cache'])->where($options['edit'])->fetch();
-			if($data){
-				$this->setValue($data);
-				$this->content = $data;
-				$this->where = $options['edit'];
-				$this->editing = true;
-			}
-		}
+		if($this->editing) $this->setValue($this->content, true);
 		
-		$this->populate();
-		
-		$this->Form->get('action', $this->link(!empty($data[$this->options['identifier']['external']]) ? $data[$this->options['identifier']['external']] : null, $this->getDefaultEvent('save')));
+		$this->Form->get('action', $this->link(!empty($this->content[$this->options['identifier']['external']]) ? $this->content[$this->options['identifier']['external']] : null, $this->getDefaultEvent('save')));
 	}
 	
 	public function add($options = null){
@@ -210,7 +189,7 @@ abstract class Layer extends Runner {
 		if($validate!==true) throw new ValidatorException($validate);
 	}
 	
-	public function prepare($data){
+	public function prepare($data = null){
 		if($this->event && !empty($this->get['p'][$this->event]) && $this->table){
 			$this->content = db::select($this->table, $this->options['cache'])->where(array(
 				$this->options['identifier']['external'] => array($this->get['p'][$this->event], $this->options['identifier']['external']),
@@ -230,14 +209,11 @@ abstract class Layer extends Runner {
 		$this->setValue($data, true);
 	}
 	
-	public function save($where = null, $options = array(
-		'preventDefault' => false,
-	)){
+	public function save($where = null){
 		if(!$this->checkSession())
 			throw new ValidatorException('session');
 		
-		if(!$where && !$options['preventDefault'])
-			$where = $this->where;
+		if(!$where) $where = $this->where;
 		
 		$this->validate();
 		
@@ -259,14 +235,13 @@ abstract class Layer extends Runner {
 		if(!$this->checkSession())
 			throw new ValidatorException('session');
 		
-		if(!$where)
-			$where = $this->where;
+		if(!$where) $where = $this->where;
 		
 		db::delete($this->table)->where($this->where)->query();
 	}
 	
 	public function getDefaultEvent($event){
-		return pick($this->events[$event]);
+		return !empty($this->events[$event]) ? $this->events[$event] : null;
 	}
 	
 	public function setDefaultEvent($event, $name){
@@ -305,12 +280,9 @@ abstract class Layer extends Runner {
 		
 		$base = array($this->base);
 		if($title || ($event && $event!=$Configuration['default'])){
-			if(!$title)
-				$base[] = $event;
-			else if(in_array($title, $this->methods) || $event!=$Configuration['default'])
-				$base[] = array($event, $title);
-			else
-				$base[] = $title;
+			if(!$title) $base[] = $event;
+			else if(in_array($title, $this->methods) || $event!=$Configuration['default']) $base[] = array($event, $title);
+			else $base[] = $title;
 		}
 		
 		return Response::link($options, $base);
@@ -322,8 +294,7 @@ abstract class Layer extends Runner {
 	
 	public function requireSession(){
 		$name = $this->generateSessionName();
-		if($this->getElement($name))
-			return;
+		if($this->getElement($name)) return;
 		
 		$uconfig = Core::retrieve('user');
 		
@@ -338,18 +309,6 @@ abstract class Layer extends Runner {
 		$el = $this->getElement($this->generateSessionName());
 		
 		return !$el || ($el && User::checkSession($el->getValue()));
-	}
-	
-	/**
-	 * This Method parses the Template and
-	 * deregisters its reference inside the Page-Class
-	 */
-	public function parse($return = true, $remove = true){
-		$out = $this->Template->parse($return);
-		
-		if($remove) Page::getInstance()->deregister('layer.'.$this->layername);
-		
-		return $out;
 	}
 	
 	/* Form methods mapping */
@@ -372,6 +331,18 @@ abstract class Layer extends Runner {
 	 */
 	public function getElement($name){
 		return $this->Form->getElement($name);
+	}
+	
+	/**
+	 * This Method parses the Template and
+	 * deregisters its reference inside the Page-Class
+	 */
+	public function parse($return = true, $remove = true){
+		$out = $this->Template->parse($return);
+		
+		if($remove) Page::getInstance()->deregister('layer.'.$this->layername);
+		
+		return $out;
 	}
 	
 }

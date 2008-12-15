@@ -5,26 +5,27 @@ class LoginLayer extends Layer {
 		$this->setDefaultEvent('save', 'handle');
 		$this->setDefaultEvent('view', 'login');
 		
+		$this->Form = new Form(
+			new Input(array(
+				'name' => 'name',
+				':caption' => Lang::retrieve('user.name'),
+				':validate' => 'pagetitle',
+			)),
+			
+			new Input(array(
+				'name' => 'pwd',
+				'type' => 'password',
+				':caption' => Lang::retrieve('user.pwd'),
+			)),
+			
+			new Button(array(
+				'name' => 'bsave',
+				':caption' => Lang::retrieve('user.login'),
+			))
+		);
+		
 		return array(
 			'table' => 'users',
-			'form' => new Form(
-				new Input(array(
-					'name' => 'name',
-					':caption' => Lang::retrieve('user.name'),
-					':validate' => 'pagetitle',
-				)),
-				
-				new Input(array(
-					'name' => 'pwd',
-					'type' => 'password',
-					':caption' => Lang::retrieve('user.pwd'),
-				)),
-				
-				new Button(array(
-					'name' => 'bsave',
-					':caption' => Lang::retrieve('user.login'),
-				))
-			)
 		);
 	}
 	

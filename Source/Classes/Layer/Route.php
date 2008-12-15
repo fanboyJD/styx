@@ -47,7 +47,7 @@ class Route {
 			return;
 		
 		if(Layer::run($action[0], $action[1], $get, Request::retrieve('post')))
-			self::$mainLayer = $action[0];
+			self::$mainLayer = strtolower($action[0]);
 	}
 	
 	public static function getMainLayer(){

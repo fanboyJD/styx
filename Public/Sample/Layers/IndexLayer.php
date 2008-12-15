@@ -14,39 +14,44 @@ class IndexLayer extends Layer {
 					'external' => 'pagetitle',
 				),
 			),
-			'form' => new Form(
-				new Input(array(
-					'name' => 'title',
-					':caption' => Lang::retrieve('title'),
-					':validate' => 'specialchars',
-				)),
-				
-				new Textarea(array(
-					'name' => 'content',
-					':caption' => Lang::retrieve('text'),
-					':validate' => array('purify', array( // These are the options for the Data-Class method "purify". In this case the classes in the HTML to be kept
-						'classes' => array('green', 'blue', 'b', 'icon', 'bold', 'italic'),
-					)),
-				)),
-				
-				new Button(array(
-					'name' => 'bsave',
-					':caption' => Lang::retrieve('save'),
-				)),
-				
-				new Field(array(
-					'name' => 'uid',
-				)),
-				
-				new Field(array(
-					'name' => 'pagetitle',
-				)),
-				
-				new Field(array(
-					'name' => 'time',
-				))
-			)
 		);
+	}
+	
+	public function populate(){
+		$this->Form = new Form(
+			new Input(array(
+				'name' => 'title',
+				':caption' => Lang::retrieve('title'),
+				':validate' => 'specialchars',
+			)),
+			
+			new Textarea(array(
+				'name' => 'content',
+				':caption' => Lang::retrieve('text'),
+				':validate' => array('purify', array( // These are the options for the Data-Class method "purify". In this case the classes in the HTML to be kept
+					'classes' => array('green', 'blue', 'b', 'icon', 'bold', 'italic'),
+				)),
+			)),
+			
+			new Button(array(
+				'name' => 'bsave',
+				':caption' => Lang::retrieve('save'),
+			)),
+			
+			new Field(array(
+				'name' => 'uid',
+			)),
+			
+			new Field(array(
+				'name' => 'pagetitle',
+			)),
+			
+			new Field(array(
+				'name' => 'time',
+			))
+		);
+		
+		$this->requireSession(); // Adds an invisible element with the current session so everything is safe :)
 	}
 	
 	public function onSave(){
@@ -121,12 +126,4 @@ class IndexLayer extends Layer {
 		$this->Template->apply((Response::getContentType()=='xml' ? 'xml' : '').'view.php');
 	}
 	
-	public function populate(){
-		/*
-		 * This method gets automatically called by the edit and save event
-		 * to populate some stuff with data you may need :)
-		*/
-		
-		$this->requireSession(); // Adds an invisible element with the current session so everything is safe :)
-	}
 }
