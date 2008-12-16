@@ -1,6 +1,6 @@
 <?php
 /*
- * Styx::QueryHandler - MIT-style License
+ * Styx::Query - MIT-style License
  * Author: christoph.pojer@gmail.com
  *
  * Usage: Handles and processes UPDATE/INSERT/DELETE SQL-Statements
@@ -86,7 +86,7 @@ class Query {
 	
 	/**
 	 * @param array $data
-	 * @return QueryHandler
+	 * @return Query
 	 */
 	public function set($data){
 		unset($this->formatted);
@@ -98,7 +98,7 @@ class Query {
 	
 	/**
 	 * @param array $data
-	 * @return QueryHandler
+	 * @return Query
 	 */
 	public function where(){
 		unset($this->formatted);
@@ -112,7 +112,7 @@ class Query {
 	/**
 	 * @param mixed $limit
 	 * @param mixed $val
-	 * @return QueryHandler
+	 * @return Query
 	 */
 	public function limit($limit, $val = null){
 		unset($this->formatted);

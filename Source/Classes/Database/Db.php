@@ -79,7 +79,7 @@ class db {
 	
 	/**
 	 * @param string $table
-	 * @return QueryHandler
+	 * @return Query
 	 */
 	public static function update($table){
 		return new Query($table, 'update');
@@ -87,7 +87,7 @@ class db {
 	
 	/**
 	 * @param string $table
-	 * @return QueryHandler
+	 * @return Query
 	 */
 	public static function insert($table){
 		return new Query($table, 'insert');
@@ -95,7 +95,7 @@ class db {
 	
 	/**
 	 * @param string $table
-	 * @return QueryHandler
+	 * @return Query
 	 */
 	public static function delete($table){
 		return new Query($table, 'delete');
