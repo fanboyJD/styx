@@ -7,7 +7,7 @@
  *
  */
 
-class QueryHandler {
+class Query {
 	
 	protected $Types = array('update', 'insert', 'delete'),
 		$Storage,
@@ -49,7 +49,7 @@ class QueryHandler {
 	 *	WHERE allows the following input methods:
 	 *		(int) 15 => "id='15'"
 	 *		(string) "id='15'"
-	 *		array(id=>15, 'AND', Data::in('uid', array(1, 2, 3)))
+	 *		array(id=>15, 'AND', Query::in('uid', array(1, 2, 3)))
 	 *		array(array('id' => 5), 'OR', array('id' => 6))
 	 */
 	protected function formatWhere($deep = null){
@@ -154,6 +154,17 @@ class QueryHandler {
 	
 	public function __toString(){
 		return $this->format();
+	}
+	
+	public static function in($key, $array){
+		$array = array_unique(Hash::splat($array));
+		$length = Hash::length($array);
+		
+		if($length>=2)
+			foreach($array as $k => $v)
+				$array[$k] = "'".Data::add($v)."'";
+		
+		return $length<2 ? $key."='".($length==1 ? reset($array) : '')."'" : $key.' IN ('.implode(',', $array).')';
 	}
 	
 }

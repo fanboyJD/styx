@@ -16,18 +16,15 @@ class Response {
 		$Headers = array(),
 		$Types = array();
 	
-	public static function setHeader($key, $value = null){
-		if(is_array($key)){
-			foreach($key as $k => $val)
-				self::setHeader($k, $val);
-			
-			return $key;
-		}
+	public static function setHeader($array, $value = null){
+		if(!is_array($array))
+			$array = array($array => $value);
 		
-		if(empty(self::$Headers[$key]) || self::$Headers[$key]!=$value){
-			self::$Headers[$key] = $value;
-			if(!$value) unset(self::$Headers[$key]);
-		}
+		foreach($array as $key => $value)
+			if(empty(self::$Headers[$key]) || self::$Headers[$key]!=$value){
+				if($value) self::$Headers[$key] = $value;
+				else unset(self::$Headers[$key]);
+			}
 	}
 	
 	public static function sendHeaders(){

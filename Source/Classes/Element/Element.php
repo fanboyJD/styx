@@ -198,10 +198,11 @@ class Elements extends Element {
 		
 		$options = array();
 		
-		if(is_array($elements[0])) $options = array_shift($elements);
+		if(isset($elements[0]) && is_array($elements[0])) $options = array_shift($elements);
 		
-		foreach($elements as $el)
-			$this->elements[$el->options['name']] = $el;
+		if(count($elements))
+			foreach($elements as $el)
+				$this->elements[$el->options['name']] = $el;
 		
 		parent::__construct($options, pick($name, get_class()), $type);
 	}
@@ -227,7 +228,7 @@ class Elements extends Element {
 	public function getElement($name){
 		return !empty($this->elements[$name]) ? $this->elements[$name] : null;
 	}
-	
+
 	/**
 	 * @return Element
 	 */
@@ -236,6 +237,12 @@ class Elements extends Element {
 			$this->elements[$el->options['name']] = $el;
 		
 		return $el;
+	}
+	
+	public function addElements(){
+		foreach(Hash::args(func_get_args()) as $el)
+			if(!$this->hasElement($el))
+				$this->elements[$el->options['name']] = $el;
 	}
 	
 	public function removeElement($el){

@@ -9,7 +9,7 @@
 
 class Route {
 	
-	private static $mainLayer = null,
+	private static $mainlayer = null,
 		$routes = array(),
 		$hidden = array();
 	
@@ -17,7 +17,7 @@ class Route {
 	private function __clone(){}
 	
 	public static function initialize(){
-		if(self::$mainLayer) return;
+		if(self::$mainlayer) return;
 		
 		$get = Request::retrieve('get');
 		
@@ -46,12 +46,15 @@ class Route {
 		), self::$hidden))
 			return;
 		
-		if(Layer::run($action[0], $action[1], $get, Request::retrieve('post')))
-			self::$mainLayer = strtolower($action[0]);
+		$layer = Layer::retrieve($action[0]);
+		if(!$layer) return;
+		
+		$layer->fire($action[1], $get)->register();
+		self::$mainlayer = strtolower($action[0]);
 	}
 	
-	public static function getMainLayer(){
-		return self::$mainLayer;
+	public static function getMainlayer(){
+		return self::$mainlayer;
 	}
 	
 	public static function getRoute($get){

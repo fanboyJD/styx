@@ -57,6 +57,10 @@ class Template extends Runner {
 		return !empty($Configuration['Templates'][$file]) ? file_get_contents($Configuration['Templates'][$file]) : false;
 	}
 	
+	public function hasFile(){
+		return !!Hash::length($this->file);
+	}
+	
 	/**
 	 * @return Template
 	 */
@@ -112,7 +116,7 @@ class Template extends Runner {
 		
 		if(!$regex) $regex = Core::retrieve('template.regex');
 		
-		if(!Hash::length($this->file))
+		if(!$this->hasFile())
 			return $this->assigned;
 		
 		$out = $this->getFile();

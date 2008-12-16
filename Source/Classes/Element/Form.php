@@ -21,9 +21,9 @@ class Form extends Elements {
 	public function format(){
 		static $prefix = false;
 		
-		$out = array('form.top' => '<form'.$this->implode('skipName').'>');
+		$out = array('form.top' => '<form'.$this->implode('skipName').'><div>');
 		Hash::extend($out, parent::format());
-		$out['form.bottom'] = '</form>';
+		$out['form.bottom'] = '</div></form>';
 		
 		if($prefix===false)
 			$prefix = pick(Core::retrieve('elements.prefix'));
@@ -66,7 +66,7 @@ class Form extends Elements {
 			$els[$k] = $el->prepare();
 		}
 		
-		return count($els) ? $els : false;
+		return count($els) ? $els : array();
 	}
 	
 	public function validate(){

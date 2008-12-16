@@ -70,7 +70,7 @@
 			
 			'source' => 'http://framework.og5.net/dev/browser/trunk/Public/Sample',
 			
-			'menu' => Layer::run('page', 'menu')->parse(),
+			'menu' => Layer::create('Page')->fire('menu')->parse(),
 			
 			'rss' => array(
 				'link' => Layer::retrieve('index')->link(null, null, 'xml'),

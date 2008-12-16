@@ -5,7 +5,7 @@ class LoginLayer extends Layer {
 		$this->setDefaultEvent('save', 'handle');
 		$this->setDefaultEvent('view', 'login');
 		
-		$this->Form = new Form(
+		$this->Form->addElements(
 			new Input(array(
 				'name' => 'name',
 				':caption' => Lang::retrieve('user.name'),

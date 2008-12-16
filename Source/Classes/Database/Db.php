@@ -82,7 +82,7 @@ class db {
 	 * @return QueryHandler
 	 */
 	public static function update($table){
-		return new QueryHandler($table, 'update');
+		return new Query($table, 'update');
 	}
 	
 	/**
@@ -90,7 +90,7 @@ class db {
 	 * @return QueryHandler
 	 */
 	public static function insert($table){
-		return new QueryHandler($table, 'insert');
+		return new Query($table, 'insert');
 	}
 	
 	/**
@@ -98,7 +98,7 @@ class db {
 	 * @return QueryHandler
 	 */
 	public static function delete($table){
-		return new QueryHandler($table, 'delete');
+		return new Query($table, 'delete');
 	}
 	
 	public function getQueries(){

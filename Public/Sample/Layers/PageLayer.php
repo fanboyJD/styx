@@ -15,7 +15,7 @@ class PageLayer extends Layer {
 	}
 	
 	public function populate(){
-		$this->Form = new Form(
+		$this->Form->addElements(
 			new Input(array(
 				'name' => 'title',
 				':caption' => Lang::retrieve('title'),

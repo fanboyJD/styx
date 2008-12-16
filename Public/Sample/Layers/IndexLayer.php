@@ -18,7 +18,7 @@ class IndexLayer extends Layer {
 	}
 	
 	public function populate(){
-		$this->Form = new Form(
+		$this->Form->addElements(
 			new Input(array(
 				'name' => 'title',
 				':caption' => Lang::retrieve('title'),
@@ -119,7 +119,7 @@ class IndexLayer extends Layer {
 		foreach($this->Data as $n)
 			$users[] = $n['uid'];
 		
-		foreach(db::select('users')->fields('id, name')->where(Data::in('id', $users))->limit(0) as $user)
+		foreach(db::select('users')->fields('id, name')->where(Query::in('id', $users))->limit(0) as $user)
 			$this->usernames[$user['id']] = $user['name'];
 		
 		// We check for the used ContentType (xml or html) and assign the correct template for it

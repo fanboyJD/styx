@@ -14,6 +14,8 @@ class Hash {
 	}
 	
 	public static function remove(&$array, $value){
+		if(!in_array($value, $array)) return $array;
+		
 		return $array = array_diff_key($array, array_flip(array_keys($array, $value, true)));
 	}
 	

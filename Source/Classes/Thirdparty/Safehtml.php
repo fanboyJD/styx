@@ -134,8 +134,6 @@ class Safehtml {
 			)
 		),
 		
-		$noClose = array(),
-		
 		$closeParagraph = array(
 			'address', 'blockquote', 'center', 'dd', 'dir', 'div', 
 			'dl', 'dt', 'h1', 'h2', 'h3', 'h4', 
@@ -345,7 +343,7 @@ class Safehtml {
 			$this->_dcCounter[$name]--;
 		}
 		
-		if(count($this->_dcStack)!=0)
+		if(count($this->_dcStack)!=0 || !in_array($name, $this->tagWhiteList))
 			return true;
 		
 		if(isset($this->_counter[$name]) && $this->_counter[$name]>0){
@@ -359,8 +357,7 @@ class Safehtml {
 	}
 	
 	public function _closeTag($tag){
-		if(!in_array($tag, $this->noClose))
-			$this->_xhtml .= '</'.$tag.'>';
+		$this->_xhtml .= '</'.$tag.'>';
 		
 		$this->_counter[$tag]--;
 		if(in_array($tag, $this->listTags)) $this->_listScope--;

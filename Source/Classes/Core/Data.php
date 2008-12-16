@@ -111,10 +111,6 @@ class Data {
 		return $array = (is_array($array) ? implode('', Hash::flatten($array)) : $array);
 	}
 	
-	public static function in($key, $array){
-		return !Hash::length($array) ? $key."=''" : $key.' IN ('.implode(',', array_unique(Hash::splat($array))).')';
-	}
-	
 	public static function clean($array, $whitespaces = false){
 		if(is_array($array)){
 			foreach($array as $k => &$val){

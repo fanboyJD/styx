@@ -1,3 +1,4 @@
+${el.form.message}
 <div class="inner">
 <h1>${headline}</h1>
 	${el.form.top}

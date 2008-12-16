@@ -45,11 +45,14 @@ class Page extends Template {
 	}
 	
 	public function register($name, $obj){
+		if(in_array($obj, $this->Templates))
+			$this->deregister($obj);
+		
 		$this->Templates[$name] = $obj;
 	}
 	
-	public function deregister($name){
-		unset($this->Templates[$name]);
+	public function deregister($obj){
+		Hash::remove($this->Templates, $obj);
 	}
 	
 	/**
@@ -73,7 +76,7 @@ class Page extends Template {
 		foreach($this->Templates as $k => $v)
 			$assign[$k] = $v->parse(true);
 		
-		$main = Route::getMainLayer();
+		$main = Route::getMainlayer();
 		if($main && !empty($assign['layer.'.$main])) $assign['layer'] = $assign['layer.'.$main];
 		
 		$this->assign($assign);

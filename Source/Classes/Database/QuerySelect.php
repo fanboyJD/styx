@@ -7,7 +7,7 @@
  *
  */
 
-class QuerySelect extends QueryHandler implements Iterator, Countable {
+class QuerySelect extends Query implements Iterator, Countable {
 	
 	protected $cache = array(),
 		$queried = false;
