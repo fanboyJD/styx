@@ -1,3 +1,4 @@
+${el.form.message}
 <div class="inner">
 	<h1>${lang.user.login}</h1>
 	${el.form.top}

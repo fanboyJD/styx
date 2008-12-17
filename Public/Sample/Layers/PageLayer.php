@@ -3,14 +3,7 @@ class PageLayer extends Layer {
 	
 	public function initialize(){
 		return array(
-			'table' => 'page',
-			'options' => array(
-				'cache' => false, // Just for testing purposes. Caching should only be deactivated if the data frequently changes or gets modified externally
-				'identifier' => array(
-					'internal' => 'id',
-					'external' => 'pagetitle',
-				),
-			),
+			'cache' => false, // Just for testing purposes. Caching should only be deactivated if the data frequently changes or gets modified externally
 		);
 	}
 	
@@ -56,7 +49,7 @@ class PageLayer extends Layer {
 		
 		$this->save();
 		
-		$this->Template->assign(Lang::get('page.saved', $this->link($this->getValue('pagetitle'))));
+		$this->Template->append(Lang::get('page.saved', $this->link($this->getValue('pagetitle'))));
 	}
 	
 	public function onEdit(){
@@ -69,7 +62,7 @@ class PageLayer extends Layer {
 			throw new ValidatorException('onlyedit');
 		
 		/* We put some styling here as we don't want to add a new Template for that :) */
-		$this->Template->assign('<div class="inner">
+		$this->Template->append('<div class="inner">
 			'.Data::implode($this->format()).'
 			<div class="clear"></div>
 			</div>'

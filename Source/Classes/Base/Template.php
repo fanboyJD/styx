@@ -11,6 +11,7 @@
 class Template extends Runner {
 	
 	protected $assigned = null,
+		$appended = array(),
 		$file = array(),
 		$bind = null;
 	
@@ -39,10 +40,9 @@ class Template extends Runner {
 		
 		if(in_array(strtolower($ext ? $ext : $Configuration['template.default']), $Configuration['template.execute'])){
 			if($this->bind && method_exists($this->bind, 'execute')){
-				ob_start();
-				
 				if(empty($Configuration['Templates'][$file])) return;
 				
+				ob_start();
 				$this->bind->execute($Configuration['Templates'][$file]);
 				return ob_get_clean();
 			}else{
@@ -67,8 +67,17 @@ class Template extends Runner {
 	public function assign(){
 		$args = Hash::args(func_get_args());
 		
-		if(Hash::length($args)==1 && isset($args[0]) && is_string($args[0])) $this->assigned = $args[0];
-		else $this->assigned = Hash::extend($this->assigned, $args);
+		$this->assigned = Hash::extend($this->assigned, $args);
+		
+		return $this;
+	}
+	
+	/**
+	 * @return Template
+	 */
+	public function append($value, $unshift = false){
+		$fn = 'array_'.($unshift ? 'unshift' : 'push');
+		$fn($this->appended, $value);
 		
 		return $this;
 	}
@@ -116,11 +125,10 @@ class Template extends Runner {
 		
 		if(!$regex) $regex = Core::retrieve('template.regex');
 		
-		if(!$this->hasFile())
-			return $this->assigned;
+		if(!$this->hasFile()) return Hash::length($this->appended) ? implode($this->appended) : $this->assigned;
 		
 		$out = $this->getFile();
-		if(!$out && $return) return $this->assigned;
+		if(!$out && $return) return Hash::length($this->appended) ? implode($this->appended) : $this->assigned;
 		
 		Hash::splat($this->assigned);
 		Hash::flatten($this->assigned);

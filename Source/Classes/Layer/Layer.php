@@ -36,8 +36,13 @@ abstract class Layer extends Runner {
 			'save' => 'save',
 		),
 		
+		$rebounds = array(
+			
+		),
+		
 		$options = array(
 			/*'table' => null,*/
+			'rebound' => true,
 			'cache' => true,
 			'identifier' => null,
 		),
@@ -96,11 +101,13 @@ abstract class Layer extends Runner {
 		$initialize = $this->initialize();
 		Hash::splat($initialize);
 		
-		if(isset($initialize['table']))
+		if(isset($initialize['table'])){
 			$this->table = pick($initialize['table']);
+			unset($initialize['table']);
+		}
 		
-		if(isset($initialize['options']) && is_array($initialize['options']))
-			Hash::extend($this->options, $initialize['options']);
+		if(Hash::length($initialize) && is_array($initialize))
+			Hash::extend($this->options, $initialize);
 		
 		if(empty($this->options['identifier']))
 			$this->options['identifier'] = array(
@@ -139,21 +146,36 @@ abstract class Layer extends Runner {
 		try{
 			$this->event = $event;
 			
-			if(Request::getMethod()=='post'){
-				if($this->post) $this->prepare($this->post);
-				else throw new ValidatorException('data');
-			}
+			if(Request::getMethod()=='post' && $this->post)
+				$this->prepare($this->post);
 			
 			$this->{'on'.ucfirst($event)}(isset($this->get['p'][$event]) ? $this->get['p'][$event] : null);
 		}catch(ValidatorException $e){
+			static $rebound;
+			
+			if(!$rebound && $this->options['rebound']){
+				$rebound = true;
+				foreach($this->Form->prepare() as $name => $value)
+					$this->post[$name] = $value;
+				
+				$event = $this->getReboundEvent($this->event);
+				if(!$event) $event = $this->getDefaultEvent('edit');
+				
+				if($event){
+					$this->get['p'][$event] = isset($this->get['p'][$this->event]) ? $this->get['p'][$this->event] : null;
+					
+					$this->fire($event, $this->get, $this->post);
+				}
+			}
+			
 			$assign = $e->getMessage();
 			
 			if($this->Template->hasFile()){
 				$prefix = Core::retrieve('elements.prefix');
-				$assign = array(($prefix ? $prefix.'.' : '').'form.message' => $assign);
+				$this->Template->assign(array(($prefix ? $prefix.'.' : '').'form.message' => $assign));
+			}else{
+				$this->Template->append($assign, true);
 			}
-			
-			$this->Template->assign($assign);
 		}
 		
 		return $this;
@@ -177,14 +199,6 @@ abstract class Layer extends Runner {
 		$validate = $this->Form->validate();
 		
 		if($validate===true) return;
-		
-		foreach($this->Form->prepare() as $name => $value)
-			$this->post[$name] = $value;
-		
-		$event = $this->getDefaultEvent('edit');
-		$this->get['p'][$event] = isset($this->get['p'][$this->event]) ? $this->get['p'][$this->event] : null;
-		
-		$this->fire($event, $this->get, $this->post);
 		
 		throw new ValidatorException($validate);
 	}
@@ -246,6 +260,14 @@ abstract class Layer extends Runner {
 	
 	public function setDefaultEvent($event, $name){
 		return $this->events[$event] = strtolower($name);
+	}
+	
+	public function getReboundEvent($from){
+		return !empty($this->rebounds[$from]) ? $this->rebounds[$from] : null;
+	}
+	
+	public function setReboundEvent($event, $to){
+		return $this->rebounds[$event] = strtolower($to);
 	}
 	
 	public function getPagetitle($title, $where = null, $options = array()){

@@ -80,9 +80,9 @@ class Data {
 		'order' => null,
 		'future' => false,
 	)){
-		$data = explode(pick($options['separator'], '.'), $data);
+		$data = explode(!empty($options['separator']) ? $options['separator'] : '.', $data);
 		
-		foreach(str_split(pick($options['order'], 'dmy')) as $k => $v){
+		foreach(str_split(!empty($options['order']) ? $options['order'] : 'dmy') as $k => $v){
 			if(!self::id($data[$k])) return null;
 			
 			$input[$v] = $data[$k];

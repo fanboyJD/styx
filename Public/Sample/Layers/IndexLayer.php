@@ -8,12 +8,6 @@ class IndexLayer extends Layer {
 	public function initialize(){
 		return array(
 			'table' => 'news',
-			'options' => array(
-				'identifier' => array(
-					'internal' => 'id',
-					'external' => 'pagetitle',
-				),
-			),
 		);
 	}
 	
@@ -66,7 +60,7 @@ class IndexLayer extends Layer {
 		
 		$this->save();
 		
-		$this->Template->assign(Lang::get('news.saved', $this->link($this->getValue('pagetitle'))));
+		$this->Template->append(Lang::get('news.saved', $this->link($this->getValue('pagetitle'))));
 	}
 	
 	public function onEdit(){
