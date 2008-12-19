@@ -33,7 +33,10 @@ Core::store(array(
 		'rights' => 'rights',
 	),
 	
-	'layer.default' => array('index', 'view'),
+	'layer.default' => array(
+		'layer' => 'index',
+		'event' => 'view'
+	),
 	
 	'languages.cookie' => 'language',
 	'languages.querystring' => 'language',

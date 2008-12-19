@@ -35,7 +35,6 @@ class PackageManager {
 			),
 		),
 		$Packages = array(),
-		$Package = null,
 		$compress = null,
 		$encoding = null;
 	
@@ -46,30 +45,21 @@ class PackageManager {
 		'options' => array(),
 		'require' => array(),
 	)){
+		static $version;
+		
+		if(!$version) $version = Core::retrieve('app.version');
+		
 		Hash::splat($options['files']);
 		Hash::splat($options['require']);
 		
-		self::$Packages[$name] = $options;
-	}
-	
-	private static function has($name){
-		return is_array(self::$Packages[$name]);
-	}
-	
-	public static function setPackage($name){
-		if(self::has($name)){
-			Response::setContentType(self::$Elements[self::$Packages[$name]['type']]['class']);
-			
-			self::$Package = $name;
-			
-			return true;
-		}
+		Route::connect($version.'/'.$name, array(
+			'package' => $name,
+			'equals' => true,
+			'contenttype' => self::$Elements[$options['type']]['class'],
+			'preventDefault' => true, /* This is not necessary but a prevention :) */
+		));
 		
-		return false;
-	}
-	
-	public static function getType(){
-		return self::$Packages[self::$Package]['type'];
+		self::$Packages[$name] = $options;
 	}
 	
 	public static function assignPackages(){
@@ -94,11 +84,23 @@ class PackageManager {
 		Page::getInstance()->assign($assigned);
 	}
 	
-	public static function compress(){
-		$package = self::$Packages[self::$Package];
+	public static function showPackage($name){
+		if(empty(self::$Packages[$name])) die;
+		
+		Page::getInstance()->assign(array('package' => $name))->show();
+		die;
+	}
+	
+	public static function compress($content){
+		if(empty($content['package']) || empty(self::$Packages[$content['package']]))
+			return '';
+		
+		$name = $content['package'];
+		$package = self::$Packages[$content['package']];
 		if(!self::checkRequired($package['require']))
 			return '';
 		
+		unset($content);
 		$compress = self::checkGzipCompress();
 		$Configuration = Core::fetch('debug', 'app.path', 'expiration');
 		
@@ -117,7 +119,7 @@ class PackageManager {
 			foreach($package['files'] as $file)
 				$time = max($time, filemtime(realpath($Configuration['app.path'].'/'.self::$Elements[$package['type']]['directory'].'/'.$file.'.'.$package['type'])));
 			
-			if($time<$c->retrieve('CompressedTime', self::$Package, 'file'))
+			if($time<$c->retrieve('CompressedTime', $name, 'file'))
 				$Configuration['debug'] = false;
 		}else{
 			Response::setHeader(array(
@@ -127,7 +129,7 @@ class PackageManager {
 		}
 		
 		if(empty($Configuration['debug'])){
-			$output = $c->retrieve('Compressed', self::$Package.($compress ? '1' : ''), 'file', false);
+			$output = $c->retrieve('Compressed', $name.($compress ? '1' : ''), 'file', false);
 			if($output) return $output;
 		}
 		
@@ -151,10 +153,10 @@ class PackageManager {
 		
 		$gzipcontent = gzencode($content, 9, FORCE_GZIP);
 		
-		$c->store('Compressed', self::$Package, $content, 'file', false);
-		$c->store('Compressed', self::$Package.'1', $gzipcontent, 'file', false);
+		$c->store('Compressed', $name, $content, 'file', false);
+		$c->store('Compressed', $name.'1', $gzipcontent, 'file', false);
 		
-		$c->store('CompressedTime', self::$Package, time(), 'file');
+		$c->store('CompressedTime', $name, time(), 'file');
 		
 		return $compress ? $gzipcontent : $content;
 	}

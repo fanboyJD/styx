@@ -19,47 +19,52 @@ class Route {
 	public static function initialize(){
 		if(self::$mainlayer) return;
 		
-		$get = Request::retrieve('get');
+		$action = Request::fetch('get', 'layer', 'event', 'parts', 'keys');
 		
-		$action = $get['n'];
-		$route = self::getRoute($get);
+		$route = self::getRoute($action);
 		
 		if($route){
+			if(!empty($route['options']['contenttype']))
+				Response::setContentType($route['options']['contenttype']);
+
+			if(!empty($route['options']['package']))
+				PackageManager::showPackage($route['options']['package']); // We won't get past this line if it matches
+			
 			if(!empty($route['options']['include'])){
 				$file = realpath(Core::retrieve('app.path').$route['options']['include']);
 				if(file_exists($file)) require($file);
 			}
 				
-			if(!empty($route['options']['layer']))
-				$action = array($route['options']['layer'], $route['options']['event']);
+			if(!empty($route['options']['layer'])){
+				$action['layer'] = $route['options']['layer'];
+				$action['event'] = !empty($route['options']['event']) ? $route['options']['event'] : null;
+			}
 			
-			if(!empty($route['options']['contenttype']))
-				Response::setContentType($route['options']['contenttype']);
-			
-			$get = $route['get'];
+			$action['get'] = $route['get'];
 		}elseif(in_array(array( // If there is no route and the layer/event is hidden we do not execute it :)
-			'layer' => $action[0],
-			'event' => $action[1],
+			'layer' => $action['layer'],
+			'event' => $action['event'],
 		), self::$hidden) || in_array(array(
-			'layer' => $action[0],
+			'layer' => $action['layer'],
 			'event' => '*',
 		), self::$hidden))
 			return;
 		
-		$layer = Layer::retrieve($action[0]);
+		if(!empty($route['options']['preventDefault']))
+			return;
+		
+		$layer = Layer::retrieve($action['layer']);
 		if(!$layer) return;
 		
-		$layer->fire($action[1], $get)->register();
-		self::$mainlayer = strtolower($action[0]);
+		$layer->fire($action['event'], !empty($action['get']) ? $action['get'] : null)->register();
+		self::$mainlayer = strtolower($action['layer']);
 	}
 	
 	public static function getMainlayer(){
 		return self::$mainlayer;
 	}
 	
-	public static function getRoute($get){
-		$sep = Core::retrieve('path.separator');
-		
+	public static function getRoute($action){
 		$path = Request::getPath();
 		
 		$routes = self::$routes;
@@ -67,39 +72,41 @@ class Route {
 		
 		foreach($routes as $route){
 			$i = -1;
-			
-			if(!empty($route['options']['regex'])){
+			if(!empty($route['options']['equals'])){
+				if($route['route']!=$path)
+					continue;
+			}elseif(!empty($route['options']['regex'])){
 				if(!preg_match($route['route'], $path))
 					continue;
 			}else{
 				foreach($route['route'] as $r){
 					$i++;
-					$urlpart = !empty($get['n'][$i]) ? $get['n'][$i].($get['p'][$get['n'][$i]] ? $sep.$get['p'][$get['n'][$i]] : '') : null;
 					
-					if(!empty($route['options']['match'][$r])){
+					if(!empty($route['options']['match'][$r]) && !empty($action['parts'][$i])){
 						$m = $route['options']['match'][$r];
 						
-						if(!empty($m['regex']) && !preg_match($m['regex'], $urlpart))
+						if(!empty($m['regex']) && !preg_match($m['regex'], $action['parts'][$i]))
 							continue 2;
-						if(!empty($m['starts']) && !String::starts($urlpart, $m['starts']))
+						if(!empty($m['starts']) && !String::starts($action['parts'][$i], $m['starts']))
 							continue 2;
-						if(!empty($m['ends']) && !String::ends($urlpart, $m['ends']))
+						if(!empty($m['ends']) && !String::ends($action['parts'][$i], $m['ends']))
 							continue 2;
-						if(!empty($m['equals']) && $urlpart!=$m['equals'])
+						if(!empty($m['equals']) && $action['parts'][$i]!=$m['equals'])
 							continue 2;
 						
 						if(!empty($m['as'])){
-							$get['p'][$m['as']] = pick($get['p'][$get['n'][$i]], $get['n'][$i]);
+							$action['get'][$m['as']] = pick($action['get'][$action['keys'][$i]]);
 							
-							unset($get['p'][$get['n'][$i]]);
+							unset($action['get'][$action['keys'][$i]]);
 						}
-					}elseif($urlpart!=$r){
+					}elseif(empty($action['parts'][$i]) || $action['parts'][$i]!=$r){
 						continue 2;
 					}
 				}
 			}
 			
-			$route['get'] = $get;
+			$route['get'] = $action['get'];
+			
 			return $route;
 		}
 				
@@ -112,7 +119,7 @@ class Route {
 		self::$routes[Data::pagetitle($priority, array(
 			'contents' => array_keys(self::$routes),
 		))] = array(
-			'route' => !empty($options['regex']) ? $route : Data::nullify(explode('/', $route)),
+			'route' => !empty($options['regex']) || !empty($options['equals']) ? $route : Data::nullify(explode('/', $route)),
 			'options' => $options
 		);
 	}

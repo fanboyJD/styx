@@ -79,7 +79,7 @@ class IndexLayer extends Layer {
 			throw new ValidatorException('rights');
 		
 		// This way it is required to use "handler;json" in the Querystring. If we leave the "if" out the contenttype "json" would be enforced
-		if(Request::getBehaviour()!='json')
+		if(Request::retrieve('behaviour')!='json')
 			throw new ValidatorException('contenttype');
 		
 		Response::setContentType('json');

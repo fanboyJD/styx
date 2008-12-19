@@ -20,7 +20,7 @@ class CSSContent extends ContentType {
 	}
 	
 	public function process($content){
-		return PackageManager::compress();
+		return PackageManager::compress($content);
 	}
 	
 }

@@ -61,7 +61,10 @@ namespace user {
 
 namespace admin {
 	cache = 'Cache löschen';
-	erased = 'Cache gelöscht';
+	cacheerased = 'Cache gelöscht';
+	
+	allcache = 'Filecache und Cache löschen';
+	allcacheerased = 'Filecache und Cache gelöscht';
 }
 
 namespace validator {

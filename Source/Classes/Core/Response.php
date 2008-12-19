@@ -96,7 +96,7 @@ class Response {
 		$args = Hash::args(func_get_args());
 		if(Hash::length($args)) self::allow($args);
 		
-		$class = Request::getBehaviour().'content';
+		$class = Request::retrieve('behaviour').'content';
 		
 		if($exists = Core::classExists($class))
 			$class = new $class;

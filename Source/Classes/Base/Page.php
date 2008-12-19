@@ -73,13 +73,17 @@ class Page extends Template {
 		
 		$assign = array();
 		
-		foreach($this->Templates as $k => $v)
-			$assign[$k] = $v->parse(true);
+		if(Hash::length($this->Templates))
+			foreach($this->Templates as $k => $v)
+				$assign[$k] = $v->parse(true);
 		
 		$main = Route::getMainlayer();
 		if($main && !empty($assign['layer.'.$main])) $assign['layer'] = $assign['layer.'.$main];
 		
 		$this->assign($assign);
+		
+		if($ContentType->getType()=='html')
+			PackageManager::assignPackages();
 		
 		if($this->substitution) $this->assigned = $this->assigned[$this->substitution];
 		

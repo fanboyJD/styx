@@ -13,10 +13,10 @@
 <div class="wrapper">
 	<div id="languages"><?php
 		$separator = Core::retrieve('path.separator');
-		$request = Request::processRequest();
+		$request = Request::retrieve('request');
 		
 		foreach(Core::retrieve('languages') as $k => $lang)
-			echo '<a href="'.Response::link($request['o'], array(array('language', $k))).'"'.(Lang::getLanguage()==$k ? ' class="selected"' : '').'><img src="Images/'.$k.'.png" alt="" /></a>';
+			echo '<a href="'.Response::link($request, array(array('language', $k))).'"'.(Lang::getLanguage()==$k ? ' class="selected"' : '').'><img src="Images/'.$k.'.png" alt="" /></a>';
 	?></div>
 	<div id="logo"><a href="${app.link}"></a></div>
 	${menu}

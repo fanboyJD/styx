@@ -15,84 +15,85 @@ class Request {
 	private function __clone(){}
 	
 	public static function initialize(){
-		self::$method = isset($_SERVER['REQUEST_METHOD']) ? strtolower($_SERVER['REQUEST_METHOD']) : null;
+		$method = isset($_SERVER['REQUEST_METHOD']) ? strtolower($_SERVER['REQUEST_METHOD']) : null;
 		
-		if(!in_array(self::$method, array('get', 'post', 'put', 'delete'))) self::$method = 'get';
+		self::store('method', in_array($method, array('get', 'post', 'put', 'delete')) ? $method : 'get');
 		
 		self::parse();
 	}
 	
 	public static function parse(){
-		$polluted = self::processRequest();
-			
 		foreach(array('post', 'cookie') as $v)
 			self::store($v, self::sanitize($GLOBALS['_'.strtoupper($v)]));
 		
-		if(!empty($polluted['m']['language']))
-			Response::setCookie(Core::retrieve('languages.cookie'), $polluted['m']['language']);
+		$request = self::processRequest();
 		
-		$get = array_merge(self::sanitize($_GET), $polluted);
-		if(Hash::length($get)) self::store('get', $get);
+		if(!empty($request['language']))
+			Response::setCookie(Core::retrieve('languages.cookie'), $request['language']);
+		
+		self::store($request);
 	}
 	
 	public static function processRequest($path = null){
-		static $Configuration, $processed = array(), $empty;
+		static $Configuration, $processed = array();
 		
-		if(!$Configuration)
+		if(!$Configuration){
 			$Configuration = Core::fetch(
-				'app.version', 'path.separator', 'languages.querystring',
-				'contenttype.querystring', 'contenttype.default', 'layer.default'
+				'path.separator', 'languages.querystring', 'layer.default',
+				'contenttype.querystring', 'contenttype.default'
 			);
-		
-		if(!$empty)
-			foreach(array('m', 'n', 'o', 'p') as $v)
-				$empty[$v] = array();
+			
+			$Configuration['checks'] = array();
+			foreach(array(
+				'language' => 'languages.querystring',
+				'behaviour' => 'contenttype.querystring',
+			) as $k => $v)
+				if(!empty($Configuration[$v]))
+					$Configuration['checks'][$k] = $Configuration[$v];
+		}
 		
 		$path = pick($path, isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '');
 		
 		if(!empty($processed[$path])) return $processed[$path];
 		
-		$polluted = $empty;
+		foreach(array('get', 'request', 'parts', 'keys') as $v)
+			$request[$v] = array();
 		
 		$vars = explode('/', $path);
 		array_shift($vars);
 		
-		foreach($vars as $k => $v){
-			$v = Data::clean($v);
+		$i = 0;
+		foreach($vars as $k => $part){
+			$v = Data::clean($part);
 			if(!$v) continue;
 			
 			$v = explode($Configuration['path.separator'], $v, 2);
-			if(!empty($polluted['p'][$v[0]])) continue;
+			if(empty($v[0]) || !empty($request['get'][$v[0]])) continue;
 			
-			if($Configuration['app.version'] && !$k && $Configuration['app.version']==$v[0] && strpos($vars[$k+1], '.')){
-				$polluted['m']['package'] = $vars[$k+1];
-				continue;
-			}elseif($Configuration['languages.querystring'] && $v[0]==$Configuration['languages.querystring'] && $v[1]){
-				$polluted['m']['language'] = $v[1];
-				continue;
+			if($e = !empty($v[1])){
+				foreach($Configuration['checks'] as $key => $value){
+					if($v[0]==$value){
+						$request[$key] = $v[1];
+						continue 2;
+					}
+				}
 			}
 			
-			if($v[0]==$Configuration['contenttype.querystring']){
-				self::$behaviour = pick($v[1]);
-				continue;
-			}
-			$polluted['p'][$v[0]] = isset($v[1]) ? pick($v[1]) : null;
-			$polluted['n'][] = $v[0];
+			$request['parts'][] = $part;
+			$request['keys'][] = $v[0];
+			$request['get'][$v[0]] = $e ? pick($v[1]) : null;
+			$request['request'][Data::specialchars($v[0])] = $e ? Data::specialchars($v[1]) : null;
+			
+			if($i<2) $request[$i++ ? 'event' : 'layer'] = $v[0];
 		}
 		
-		foreach($polluted['p'] as $k => $v)
-			$polluted['o'][Data::specialchars($k)] = $v ? Data::specialchars($v) : null; // "Original" (but safe)
+		foreach(array('layer', 'event') as $v)
+			if(empty($request[$v]))
+				$request[$v] = $Configuration['layer.default'][$v];
 		
-		foreach($Configuration['layer.default'] as $k => $v)
-			if(empty($polluted['n'][$k])){
-				$polluted['n'][$k] = $v;
-				$polluted['p'][$v] = null;
-			}
+		if(empty($request['behaviour'])) $request['behaviour'] = $Configuration['contenttype.default'];
 		
-		if(!self::$behaviour)
-			self::$behaviour = $Configuration['contenttype.default'];
-		
-		return $processed[$path] = $polluted;
+		return $processed[$path] = $request;
 	}
 	
 	public static function sanitize($data){
@@ -106,10 +107,6 @@ class Request {
 		}
 		
 		return array();
-	}
-	
-	public static function getMethod(){
-		return self::$method;
 	}
 	
 	public static function getClient(){
@@ -140,7 +137,7 @@ class Request {
 		static $url;
 		
 		if(!$url){
-			$url = self::getProtocol().'://'.self::getServer().self::getPath();
+			$url = self::getProtocol().'://'.self::getServer().self::getScript().self::getPath();
 			
 			if(!String::ends($url, '/')) $url .= '/';
 		}
@@ -183,13 +180,15 @@ class Request {
 		
 		if($path) return $path;
 		
-		$request = self::processRequest();
-		
 		$path = array();
-		foreach($request['o'] as $k => $v)
+		foreach(Hash::splat(self::retrieve('request')) as $k => $v)
 			$path[] = $k.($v ? $Configuration['path.separator'].$v : '');
 		
-		return $path = (!empty($_SERVER['SCRIPT_NAME']) ? pathinfo($_SERVER['SCRIPT_NAME'], PATHINFO_DIRNAME).'/' : '').implode('/', $path);
+		return $path = implode('/', $path);
+	}
+	
+	public function getScript(){
+		return !empty($_SERVER['SCRIPT_NAME']) ? pathinfo($_SERVER['SCRIPT_NAME'], PATHINFO_DIRNAME).'/' : '';
 	}
 
 	public static function getLanguage(){
@@ -239,14 +238,6 @@ class Request {
 		return $langs;
 	}
 	
-	public static function setBehaviour($behaviour){
-		self::$behaviour = $behaviour;
-	}
-	
-	public static function getBehaviour(){
-		return self::$behaviour;
-	}
-	
 	/* Storage Methods (Will be moved to a StaticStorage-Class in PHP5.3) */
 	private static $Storage = array();
 	
@@ -268,6 +259,18 @@ class Request {
 			return self::store($key, $value);
 		
 		return !empty(self::$Storage[$key]) ? self::$Storage[$key] : null;
+	}
+	
+	public static function fetch(){
+		$args = Hash::args(func_get_args());
+		
+		$array = array();
+		
+		foreach($args as $arg)
+			if(!empty(self::$Storage[$arg]))
+				$array[$arg] = self::$Storage[$arg];
+		
+		return $array;
 	}
 	
 }

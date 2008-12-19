@@ -49,6 +49,7 @@ abstract class Layer extends Runner {
 		
 		$methods = array(),
 		
+		$request = null,
 		$event = null,
 		$where = null,
 		$content = null,
@@ -96,6 +97,7 @@ abstract class Layer extends Runner {
 			if(String::starts($method, 'on') && strlen($method)>=3)
 				array_push($this->methods, strtolower(substr($method, 2)));
 		
+		$this->request = Request::retrieve('method');
 		$this->Form = new Form();
 		
 		$initialize = $this->initialize();
@@ -129,31 +131,31 @@ abstract class Layer extends Runner {
 	 * @return Layer
 	 */
 	public function fire($event, $get = null, $post = null){
+		foreach(array('get', 'post') as $v)
+			$this->{$v} = Hash::length($$v) ? $$v : Request::retrieve($v);
+		
 		$event = strtolower($event);
 		if(!in_array($event, $this->methods)){
 			$default = $this->getDefaultEvent('view');
 			
-			$get['p'][$default] = $event;
+			$this->get[$default] = $event;
 			$event = $default;
 		}
 		
 		$this->Data = $this->table ? db::select($this->table, $this->options['cache']) : array();
 		$this->Template = Template::map()->base('Layers', $this->name)->bind($this);
 		
-		foreach(array('get', 'post') as $v)
-			$this->{$v} = Hash::length($$v) ? $$v : Request::retrieve($v);
-		
 		try{
 			$this->event = $event;
 			
-			if(Request::getMethod()=='post' && $this->post)
+			if($this->request=='post' && Hash::length($this->post))
 				$this->prepare($this->post);
 			
-			$this->{'on'.ucfirst($event)}(isset($this->get['p'][$event]) ? $this->get['p'][$event] : null);
+			$this->{'on'.ucfirst($event)}(isset($this->get[$event]) ? $this->get[$event] : null);
 		}catch(ValidatorException $e){
 			static $rebound;
 			
-			if(!$rebound && $this->options['rebound']){
+			if(!$rebound && $this->options['rebound'] && $this->request=='post' && Hash::length($this->post)){
 				$rebound = true;
 				foreach($this->Form->prepare() as $name => $value)
 					$this->post[$name] = $value;
@@ -162,7 +164,7 @@ abstract class Layer extends Runner {
 				if(!$event) $event = $this->getDefaultEvent('edit');
 				
 				if($event){
-					$this->get['p'][$event] = isset($this->get['p'][$this->event]) ? $this->get['p'][$this->event] : null;
+					$this->get[$event] = isset($this->get[$this->event]) ? $this->get[$this->event] : null;
 					
 					$this->fire($event, $this->get, $this->post);
 				}
@@ -184,7 +186,7 @@ abstract class Layer extends Runner {
 	public function edit($options = array(
 		'preventDefault' => false,
 	)){
-		if(empty($options['preventDefault']) && Request::getMethod()!='post') $this->prepare(null, true);
+		if(empty($options['preventDefault']) && $this->request!='post') $this->prepare(null, true);
 		
 		$this->Form->get('action', $this->link(!empty($this->content[$this->options['identifier']['external']]) ? $this->content[$this->options['identifier']['external']] : null, $this->getDefaultEvent('save')));
 	}
@@ -204,9 +206,9 @@ abstract class Layer extends Runner {
 	}
 	
 	public function prepare($data = null, $fill = false){
-		if($this->event && !empty($this->get['p'][$this->event]) && $this->table){
+		if($this->event && !empty($this->get[$this->event]) && $this->table){
 			$this->content = db::select($this->table, $this->options['cache'])->where(array(
-				$this->options['identifier']['external'] => array($this->get['p'][$this->event], $this->options['identifier']['external']),
+				$this->options['identifier']['external'] => array($this->get[$this->event], $this->options['identifier']['external']),
 			))->fetch();
 			
 			if($this->content){
@@ -322,7 +324,7 @@ abstract class Layer extends Runner {
 		
 		return $this->Form->addElement(new HiddenInput(array(
 			'name' => $name,
-			'value' => Request::getMethod()=='post' && !empty($this->post[$name]) ? $this->post[$name] : User::get($uconfig['session']),
+			'value' => $this->request=='post' && !empty($this->post[$name]) ? $this->post[$name] : User::get($uconfig['session']),
 			':alias' => true,
 		)));
 	}
