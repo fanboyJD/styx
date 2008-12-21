@@ -12,24 +12,25 @@ class Validator {
 	private function __construct(){}
 	private function __clone(){}
 	
-	public static function check($data){
-		if(!$data || !is_array($data))
-			return false;
+	public static function call($data, $validators){
+		static $Instance, $Methods = array();
 		
-		foreach($data as $k => $v)
-			if(!ctype_digit((string)$k) && is_array($v) && !self::call($v[0], $v[1]))
-				return false;
-		
-		return true;
-	}
-	
-	public static function call($data, $options){
-		static $Instance;
 		if(!$Instance) $Instance = new Validator();
 		
-		Hash::splat($options);
-		if(method_exists($Instance, $options[0]))
-			return $Instance->{$options[0]}($data, isset($options[1]) ? $options[1] : null);
+		if(!Hash::length($Methods))
+			foreach(get_class_methods($Instance) as $method)
+				array_push($Methods, strtolower($method));
+		
+		if(is_string($validators))
+			$validators = array($validators => true);
+		
+		foreach($validators as $validator => $options){
+			if(empty($options) || !in_array(strtolower($validator), $Methods))
+				continue;
+			
+			if(!$Instance->{$validator}($data, is_array($options) ? $options : null))
+				return $validator;
+		}
 		
 		return true;
 	}
@@ -41,17 +42,7 @@ class Validator {
 	public function mail($data){
 		if(!$data) return false;
 		
-		foreach(array('@', '.') as $v){
-			$pos = strpos($data, $v);
-			if(!$pos || $pos+1==strlen($data))
-				return false;
-		}
-		
-		foreach(array('"', "'", '\\', '/') as $v)
-			if(strpos($data, $v))
-				return false;
-		
-		return true;
+		return !!filter_var($data, FILTER_VALIDATE_EMAIL);
 	}
 	
 	public function id($data){
@@ -76,6 +67,18 @@ class Validator {
 			return false;
 		
 		return true;
+	}
+	
+	public function notempty($data){
+		return !!trim($data);
+	}
+	
+	public function length($data, $options){
+		$data = trim($data);
+		
+		if(empty($options[1])) return strlen((string)$data)<=$options[0];
+		
+		return strlen((string)$data)>=$options[0] && strlen((string)$data)<=$options[1];
 	}
 	
 }

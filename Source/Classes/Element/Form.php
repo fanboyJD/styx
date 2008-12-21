@@ -60,7 +60,7 @@ class Form extends Elements {
 		$els = array();
 		
 		foreach($this->elements as $k => $el){
-			if($el->type=='button' || $el->options[':readOnly'] || ($alias xor $el->options[':alias']))
+			if($el->type=='button' || ($alias xor !empty($el->options[':alias'])))
 				continue;
 			
 			$els[$k] = $el->prepare();
@@ -71,25 +71,12 @@ class Form extends Elements {
 	
 	public function validate(){
 		foreach($this->elements as $k => $el){
-			unset($v);
-			if(!in_array($el->type, self::$formElements))
+			if(!in_array($el->type, self::$formElements) || empty($el->options[':validate']))
 				continue;
 			
-			$val = $el->getValue();
-			if(!$val){
-				if($el->options[':empty'] || (!empty($el->options[':validate'][0]) && $el->options[':validate'][0]=='bool') || (!empty($el->options[':validate'][0]) && $el->options[':validate'][0]=='numericrange' && isset($el->options[':validate'][1][0]) && $el->options[':validate'][1][0]==0))
-					continue;
-				elseif(!$el->options[':empty'])
-					return array('notempty', $k, $el->options[':caption']);
-			}elseif($this->options[':length'] && (strlen((string)$val)<$this->options[':length'][0] || strlen((string)$val)>$this->options[':length'][1]))
-				return array('length', $k, $el->options[':caption']);
+			$v = Validator::call($el->getValue(), $el->options[':validate']);
 			
-			if(empty($el->options[':validate'][0]))
-				continue;
-			
-			$v = Validator::call($val, $el->options[':validate']);
-			
-			if($v!==true) return array($el->options[':validate'][0], $k, $el->options[':caption']);
+			if($v!==true) return array($v, $k, !empty($el->options[':caption']) ? $el->options[':caption'] : null);
 		}
 		
 		return true;

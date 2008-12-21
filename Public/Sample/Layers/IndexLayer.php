@@ -14,15 +14,21 @@ class IndexLayer extends Layer {
 			new Input(array(
 				'name' => 'title',
 				':caption' => Lang::retrieve('title'),
-				':validate' => 'specialchars',
+				':validate' => array(
+					'specialchars' => true,
+					'notempty' => true,
+				),
 			)),
 			
 			new Textarea(array(
 				'name' => 'content',
 				':caption' => Lang::retrieve('text'),
-				':validate' => array('purify', array( // These are the options for the Data-Class method "purify". In this case the classes in the HTML to be kept
-					'classes' => array('green', 'blue', 'b', 'icon', 'bold', 'italic'),
-				)),
+				':validate' => array(
+					'purify' => array( // These are the options for the Data-Class method "purify". In this case the classes in the HTML to be kept
+						'classes' => array('green', 'blue', 'b', 'icon', 'bold', 'italic'),
+					),
+					'notempty' => true,
+				),
 			)),
 			
 			new Button(array(
@@ -30,17 +36,9 @@ class IndexLayer extends Layer {
 				':caption' => Lang::retrieve('save'),
 			)),
 			
-			new Field(array(
-				'name' => 'uid',
-			)),
-			
-			new Field(array(
-				'name' => 'pagetitle',
-			)),
-			
-			new Field(array(
-				'name' => 'time',
-			))
+			new Field('uid'),
+			new Field('pagetitle'),
+			new Field('time')
 		);
 		
 		$this->requireSession(); // Adds an invisible element with the current session so everything is safe :)

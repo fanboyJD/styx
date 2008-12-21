@@ -11,14 +11,12 @@
 class ValidatorException extends Exception {
 	
 	public function __construct(){
-		static $content = null;
+		static $content = null, $default;
 		if(!$content) $content = pick(Lang::retrieve('validator.content'), '%s');
+		if(!$default) $default = Lang::retrieve('validator.default');
 		
 		$error = Hash::args(func_get_args());
 		
-		$lang = Lang::retrieve('validator.'.$error[0]);
-		if(!$lang) $lang = Lang::retrieve('validator.default');
-		
-		parent::__construct(sprintf($content, sprintf($lang, !empty($error[2]) ? $error[2] : '')));
+		parent::__construct(sprintf($content, sprintf(pick(Lang::retrieve('validator.'.$error[0]), $default), !empty($error[2]) ? $error[2] : '')));
 	}
 }

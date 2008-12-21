@@ -12,10 +12,24 @@ class Data {
 	private function __construct(){}
 	private function __clone(){}
 	
-	public static function call($data, $options){
-		Hash::splat($options);
-		if(method_exists('Data', $options[0]))
-			return call_user_func(array('Data', $options[0]), $data, isset($options[1]) ? $options[1] : null);
+	public static function call($data, $validators){
+		static $Instance, $Methods = array();
+		
+		if(!$Instance) $Instance = new Data();
+		
+		if(!Hash::length($Methods))
+			foreach(get_class_methods('Data') as $method)
+				array_push($Methods, strtolower($method));
+		
+		if(is_string($validators))
+			$validators = array($validators => true);
+		
+		foreach($validators as $validator => $options){
+			if(empty($options) || !in_array(strtolower($validator), $Methods))
+				continue;
+			
+			$data = $Instance->{$validator}($data, is_array($options) ? $options : null);
+		}
 		
 		return $data;
 	}
@@ -105,10 +119,6 @@ class Data {
 			}
 		
 		return Hash::splat($data);
-	}
-	
-	public static function implode(&$array){
-		return $array = (is_array($array) ? implode('', Hash::flatten($array)) : $array);
 	}
 	
 	public static function clean($array, $whitespaces = false){

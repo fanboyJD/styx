@@ -12,15 +12,20 @@ class PageLayer extends Layer {
 			new Input(array(
 				'name' => 'title',
 				':caption' => Lang::retrieve('title'),
-				':validate' => 'specialchars',
+				':validate' => array(
+					'specialchars' => true,
+					'notempty' => true,
+				),
 			)),
 			
 			new Textarea(array(
 				'name' => 'content',
 				':caption' => Lang::retrieve('text'),
-				':validate' => array('purify', array( // These are the options for the Data-Class method "purify". In this case the classes in the HTML to be kept
-					'classes' => array('green', 'blue', 'b', 'icon', 'bold', 'italic'),
-				)),
+				':validate' => array(
+					'purify' => array( // These are the options for the Data-Class method "purify". In this case the classes in the HTML to be kept
+						'classes' => array('green', 'blue', 'b', 'icon', 'bold', 'italic'),
+					),
+				),
 			)),
 			
 			new Button(array(
@@ -28,9 +33,7 @@ class PageLayer extends Layer {
 				':caption' => Lang::retrieve('save'),
 			)),
 			
-			new Field(array(
-				'name' => 'pagetitle',
-			))
+			new Field('pagetitle')
 		);
 		
 		$this->requireSession(); // Adds an invisible element with the current session so everything is safe :)
@@ -63,7 +66,7 @@ class PageLayer extends Layer {
 		
 		/* We put some styling here as we don't want to add a new Template for that :) */
 		$this->Template->append('<div class="inner">
-			'.Data::implode($this->format()).'
+			'.implode(array_map('implode', $this->format())).'
 			<div class="clear"></div>
 			</div>'
 		);

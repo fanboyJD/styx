@@ -15,11 +15,8 @@ class Element extends Runner {
 			/*Keys:
 				:caption
 				:alias - no db field (for username etc.)
-				:readOnly - it is not possible to change this element's value in the db
 				:default - for checkbox, defaultvalue
 				:validate
-				:length
-				:empty - input value can be empty
 				:elements
 				:unknown - name/id won't be set automatically when empty
 				:tag - type/name given by options
@@ -36,38 +33,31 @@ class Element extends Runner {
 		static $uid = 0;
 		$type = strtolower($type);
 		
-		foreach(array(
-			'name', 'class', 'value', 'type', 'id',
-			':caption', ':alias', ':readOnly', ':default', ':validate', ':length', ':empty',
-			':elements', ':unknown', ':tag', ':standalone', ':realName', ':add', ':template',
-		) as $v)
-			if(empty($options[$v]))
-				$options[$v] = null;
-		
-		if($options[':tag']){
+		if(!empty($options[':tag'])){
 			$this->name = $this->type = $options[':tag'];
 		}else{
 			$this->name = $name;
 			$this->type = $type ? $type : 'element';
 		}
 		
-		Hash::splat($options[':validate']);
+		$hasId = !empty($options['id']);
+		$hasName = !empty($options['name']);
 		
-		if(!$options['id'] && $options['name'])
+		if(!$hasId && $hasName)
 			$options['id'] = preg_replace('/\W/', '_', $options['name'].'_'.($uid++));
-		elseif($options['id'] && !$options['name'])
+		elseif($hasId && !$hasName)
 			$options['name'] = $options['id'];
-		elseif(!$options[':unknown'])
+		elseif(empty($options[':unknown']))
 			$options['name'] = $options['id'] = $this->type.'_'.($uid++);
 		
-		if($options['class']){
+		if(!empty($options['class'])){
 			if(!is_array($options['class']))
 				$options['class'] = explode(' ', $options['class']);
 		}else{
 			$options['class'] = array();
 		}
 		
-		$options[':preset'] = $options['value'];
+		$options[':preset'] = !empty($options['value']) ? $options['value'] : null;
 		
 		$this->options = $options;
 	}
@@ -75,11 +65,11 @@ class Element extends Runner {
 	public function format($pass = null){
 		if(!$pass) $pass = array('attributes' => $this->implode());
 		
-		$out = Template::map('Element', pick($this->options[':template'], $this->name))->bind($this)->assign($this->options)->assign($pass)->parse(true);
+		$out = Template::map('Element', !empty($this->options[':template']) ? $this->options[':template'] : $this->name)->bind($this)->assign($this->options)->assign($pass)->parse(true);
 		
 		if(!is_array($out)) return $out;
 		
-		return '<'.$this->type.$pass['attributes'].($this->options[':standalone'] ? ' />' : '>'.$this->options[':caption'].'</'.$this->type.'>');
+		return '<'.$this->type.$pass['attributes'].(!empty($this->options[':standalone']) ? ' />' : '>'.$this->get(':caption').'</'.$this->type.'>');
 	}
 	
 	public static function skipable($key){
@@ -87,23 +77,17 @@ class Element extends Runner {
 	}
 	
 	public function setValue($v){
-		if($this->options[':readOnly'])
-			return;
-		
 		$this->options['value'] = $v;
 	}
 	
 	public function getValue(){
-		if($this->options[':length'][1])
-			$this->options['value'] = substr($this->options['value'], 0, $this->options[':length'][1]);
-		
-		return $this->options['value'];
+		return !empty($this->options['value']) ? $this->options['value'] : null;
 	}
 	
 	public function prepare(){
 		$val = $this->getValue();
 		
-		if(!empty($this->options[':validate'][0]))
+		if(!empty($this->options[':validate']))
 			$val = Data::call($val, $this->options[':validate']);
 		
 		return $val;
@@ -134,27 +118,24 @@ class Element extends Runner {
 	/**
 	 * @return Element
 	 */
-	public function set($key, $value = null){
-		if(is_array($key)){
-			foreach($key as $k => $val)
-				$this->set($k, $val);
-			
-			return;
-		}
+	public function set($array, $value = null){
+		if(!is_array($array))
+			$array = array($array => $value);
 		
-		if(empty($this->options[$key]) || $this->options[$key]!=$value){
-			$this->options[$key] = $value;
-			if(!$value) unset($this->options[$key]);
-		}
+		foreach($array as $key => $value)
+			if(empty($this->options[$key]) || $this->options[$key]!=$value){
+				if($value) $this->options[$key] = $value;
+				else unset($this->options[$key]);
+			}
 		
-		return $this;
+		return Hash::length($array)==1 ? $value : $array;
 	}
 	
 	public function get($key, $value = null){
 		if($value && empty($this->options[$key]))
 			$this->set($key, $value);
 		
-		return $this->options[$key];
+		return !empty($this->options[$key]) ? $this->options[$key] : null;
 	}
 	
 	public function implode($options = array(
@@ -210,7 +191,7 @@ class Elements extends Element {
 	public function format(){
 		$els = array();
 		foreach($this->elements as $n => $el)
-			if(!in_array($el->type, array('field')) && !$el->options[':readOnly'])
+			if(!in_array($el->type, array('field')))
 				if($format = $el->format()){
 					if($el->name=='HiddenInput') $els['form.hidden'][] = $format;
 					else $els[$n] = $format;
@@ -298,6 +279,8 @@ class Button extends Element {
 class Field extends Element {
 	
 	public function __construct($options){
+		if(is_string($options)) $options = array('name' => $options);
+		
 		parent::__construct($options, get_class(), 'field');
 	}
 	
@@ -398,9 +381,6 @@ class Checkbox extends Element {
 	}
 	
 	public function setValue($v){
-		if($this->options[':readOnly'])
-			return;
-		
 		if($this->options['value']==$v)
 			$this->options['checked'] = 1;
 		
@@ -449,7 +429,7 @@ class OptionList extends Elements {
 	public function __construct(){
 		parent::__construct(func_get_args(), get_class(), 'optionlist');
 		
-		if(is_array($this->options[':elements']))
+		if(!empty($this->options[':elements']) && is_array($this->options[':elements']))
 			array_walk($this->options[':elements'], array($this, 'createElement'));
 		
 		unset($this->options[':elements']);
