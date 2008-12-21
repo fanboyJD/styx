@@ -11,11 +11,11 @@
 			'session' => $user['session'],
 		)).';');
 	
+	Layer::create('Page')->fireEvent('menu')->register('pagemenu');
+	
 	if(Response::getContentType()=='html')
 		Page::getInstance()->apply('html.php')->assign(Core::fetch('app.name', 'app.link'))->assign(array(
 			'source' => 'http://framework.og5.net/dev/browser/trunk/Public/Sample',
-			
-			'menu' => Layer::create('Page')->fireEvent('menu')->parse(),
 			
 			'rss' => array(
 				'link' => Layer::retrieve('index')->link(null, null, 'xml'),
