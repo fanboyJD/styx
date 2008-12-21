@@ -41,7 +41,7 @@ namespace framework {
 		<br/><br/>
 		If you want to help / work on it / write access to svn or whatever, please contact
 		me: <a href="mailto:christoph.pojer@gmail.com">E-Mail</a> |
-		<a href="http://og5.net/christoph" target="portfolio">Portfolio</a>';
+		<a href="http://og5.net/christoph">Portfolio</a>';
 }
 
 namespace user {

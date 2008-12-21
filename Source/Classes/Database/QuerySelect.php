@@ -30,8 +30,29 @@ class QuerySelect extends Query implements Iterator, Countable {
 		return $data ? ' ORDER BY '.implode(',', Hash::splat($data)) : '';
 	}
 	
+	protected function formatGroup(){
+		$data = $this->Storage->retrieve('group');
+		
+		return $data ? ' GROUP BY '.$data : '';
+	}
+	
+	protected function formatHaving(){
+		$data = $this->Storage->retrieve('having');
+		
+		return $data ? ' HAVING '.$data : '';
+	}
+	
+	protected function formatJoin(){
+		$data = $this->Storage->retrieve('join');
+		
+		if(empty($data['on']) || empty($data['table']))
+			return;
+		
+		return $data ? (!empty($data['type']) && in_array($data['type'], array('LEFT', 'RIGHT', 'INNER', 'OUTER')) ? ' '.strtoupper($data['type']) : '').
+			' JOIN '.$data['table'].' ON ('.$data['on'].')' : '';
+	}
+	
 	/**
-	 * @param array $data
 	 * @return QuerySelect
 	 */
 	public function fields(){
@@ -44,7 +65,6 @@ class QuerySelect extends Query implements Iterator, Countable {
 	}
 	
 	/**
-	 * @param mixed $data
 	 * @return QuerySelect
 	 */
 	public function order(){
@@ -56,12 +76,53 @@ class QuerySelect extends Query implements Iterator, Countable {
 		return $this;
 	}
 	
+	/**
+	 * @param mixed $data
+	 * @return QuerySelect
+	 */
+	public function group($data){
+		unset($this->formatted);
+		
+		$this->Storage->store('group', $data);
+		
+		return $this;
+	}
+	
+	/**
+	 * @param mixed $data
+	 * @return QuerySelect
+	 */
+	public function having($data){
+		unset($this->formatted);
+		
+		$this->Storage->store('having', $data);
+		
+		return $this;
+	}
+
+	/**
+	 * @param mixed $data
+	 * @return QuerySelect
+	 */
+	public function join($on, $table, $type = null){
+		unset($this->formatted);
+		
+		$this->Storage->store('join', array(
+			'on' => $on,
+			'table' => $table,
+			'type' => $type,
+		));
+		
+		return $this;
+	}
+	
 	public function format(){
 		if(!empty($this->formatted)) return $this->formatted;
 		
 		$out = parent::format(true);
 		
-		return $this->formatted = 'SELECT '.$this->formatFields().' FROM '.$this->table.$out[0].$this->formatOrder().$out[1];
+		return $this->formatted = 'SELECT '.$this->formatFields().' FROM '.$this->table.
+			$this->formatJoin().$out[0].$this->formatOrder().$this->formatGroup().$this->formatHaving().$out[1];
 	}
 	
 	public function fetch($type = null){
@@ -71,7 +132,9 @@ class QuerySelect extends Query implements Iterator, Countable {
 	}
 	
 	public function quantity($field = null){
-		$count = $this->fields('COUNT('.($field ? $field : Core::retrieve('identifier.internal')).')')->limit(0)->fetch(MYSQL_NUM);
+		$query = clone $this;
+		
+		$count = $query->fields("COUNT('".($field ? $field : Core::retrieve('identifier.internal'))."')")->fetch(MYSQL_NUM);
 		
 		return pick($count[0], 0);
 	}

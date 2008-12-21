@@ -16,6 +16,8 @@ class Eacceleratorcache {
 		);
 	
 	public function __construct($Configuration){
+		$Configuration['prefix'] .= '/';
+		
 		$this->Configuration = $Configuration;
 	}
 	

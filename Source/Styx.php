@@ -47,7 +47,7 @@ Request::initialize();
 
 User::initialize();
 
-if(function_exists('initialize')) initialize();
+Core::fireEvent('initialize');
 
 if(!Response::getContentType())
 	Response::setDefaultContentType(Core::retrieve('contenttype.default'));

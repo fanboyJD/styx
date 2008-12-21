@@ -14,12 +14,14 @@ class Script {
 	private function __construct(){}
 	private function __clone(){}
 	
-	public static function set($script, $add = false){
-		self::$script[$add ? 'add' : 'ready'] .= $script;
+	public static function set($data, $add = false){
+		self::$script[$add ? 'add' : 'ready'] .= $data;
 	}
 	
-	public static function log($script, $type = 'log'){
-		self::set('console.'.(in_array($type, self::$API) ? $type : self::$API[0]).'('.json_encode($script).');');
+	public static function log($data, $type = null){
+		$type = strtolower($type);
+		
+		self::set('console.'.(in_array($type, self::$API) ? $type : self::$API[0]).'('.json_encode($data).');');
 	}
 	
 	public static function get(){

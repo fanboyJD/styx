@@ -12,18 +12,17 @@ class Filecache {
 	
 	private $Configuration = array(
 			'prefix' => null,
-			'root' => null,
 		),
 		$time = null;
 	
 	public function __construct($Configuration){
-		$this->Configuration = $Configuration;
+		$this->Configuration['prefix'] = $Configuration['root'].$Configuration['prefix'].'/';
 		
 		$this->time = time();
 	}
 	
 	public function retrieve($key){
-		$file = $this->Configuration['root'].$this->Configuration['prefix'].'/'.$key.'.txt';
+		$file = $this->Configuration['prefix'].$key.'.txt';
 		if(!file_exists($file)) return null;
 		
 		$content = explode('|', file_get_contents($file), 2);
@@ -32,7 +31,7 @@ class Filecache {
 	}
 	
 	public function store($key, $content, $ttl){
-		$file = $this->Configuration['root'].$this->Configuration['prefix'].'/'.$key.'.txt';
+		$file = $this->Configuration['prefix'].$key.'.txt';
 		
 		if(!file_exists($file)){
 			Folder::mkdir(dirname($file));
@@ -47,7 +46,7 @@ class Filecache {
 	}
 	
 	public function erase($key, $force = false){
-		$files = glob($this->Configuration['root'].$this->Configuration['prefix'].'/'.$key.'.txt');
+		$files = glob($this->Configuration['prefix'].$key.'.txt');
 		if(!Hash::length($files))
 			return;
 		

@@ -6,59 +6,6 @@
 	);*/
 	include('../../../Source/Styx.php');
 	
-	function initialize(){
-		User::handle(); // Automatically sign-on the user if login data is provided
-		
-		Script::set('
-			if(!window.console) window.console = console = {log: $empty};
-			
-			var Config = '.json_encode(array(
-				'separator' => Core::retrieve('path.separator'),
-			)).';
-		', true);
-		
-		PackageManager::add('package1.js', array(
-			'type' => 'js',
-			'files' => array('mootools', 'site'),
-		));
-		
-		PackageManager::add('style.css', array(
-			'type' => 'css',
-			'files' => array('style', 'forms'),
-		));
-		
-		/*
-			The following js/css packages are only served for Internet Explorer version 6
-			It is also possible to require 'login' => true so the package will only
-			be sent to logged in users.
-		*/
-		PackageManager::add('ie.js', array(
-			'type' => 'js',
-			'files' => 'iepngfix_tilebg',
-			'require' => array(
-				'browser' => 'ie',
-				'version' => 6
-			),
-		));
-		PackageManager::add('ie.css', array(
-			'type' => 'css',
-			'files' => 'ie',
-			'require' => array(
-				'browser' => 'ie',
-				'version' => 6
-			),
-		));
-		
-		Route::connect('logout', array(
-			'layer' => 'login',
-			'event' => 'logout',
-		));
-		
-		Route::connect('admin', array(
-			'include' => 'admin.php'
-		));
-	}
-	
 	$user = User::retrieve();
 	if($user) Script::set('User = '.json_encode(array(
 			'session' => $user['session'],
@@ -66,11 +13,9 @@
 	
 	if(Response::getContentType()=='html')
 		Page::getInstance()->apply('html.php')->assign(Core::fetch('app.name', 'app.link'))->assign(array(
-			'scripts' => Script::get(),
-			
 			'source' => 'http://framework.og5.net/dev/browser/trunk/Public/Sample',
 			
-			'menu' => Layer::create('Page')->fire('menu')->parse(),
+			'menu' => Layer::create('Page')->fireEvent('menu')->parse(),
 			
 			'rss' => array(
 				'link' => Layer::retrieve('index')->link(null, null, 'xml'),

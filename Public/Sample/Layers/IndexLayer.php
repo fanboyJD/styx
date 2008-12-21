@@ -3,8 +3,6 @@ class IndexLayer extends Layer {
 	
 	public $isIndex = false;
 	
-	public $usernames; // For: View
-	
 	public function initialize(){
 		return array(
 			'table' => 'news',
@@ -101,20 +99,13 @@ class IndexLayer extends Layer {
 	public function onView($title){
 		Response::setDefaultContentType('html', 'xml');
 		
-		$this->Data->limit(0)->order('time DESC');
+		$this->Data->fields('news.*, users.name')->join('news.uid=users.id', 'users', 'left')->limit(0)->order('time DESC');
 		if($title)
 			$this->Data->where(array(
 				'pagetitle' => array($title, 'pagetitle'),
 			))->limit(1);
 		else
 			$this->isIndex = true;
-		
-		$users = array();
-		foreach($this->Data as $n)
-			$users[] = $n['uid'];
-		
-		foreach(db::select('users')->fields('id, name')->where(Query::in('id', $users))->limit(0) as $user)
-			$this->usernames[$user['id']] = $user['name'];
 		
 		// We check for the used ContentType (xml or html) and assign the correct template for it
 		$this->Template->apply((Response::getContentType()=='xml' ? 'xml' : '').'view.php');

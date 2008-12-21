@@ -130,7 +130,7 @@ abstract class Layer extends Runner {
 	/**
 	 * @return Layer
 	 */
-	public function fire($event, $get = null, $post = null){
+	public function fireEvent($event, $get = null, $post = null){
 		foreach(array('get', 'post') as $v)
 			$this->{$v} = Hash::length($$v) ? $$v : Request::retrieve($v);
 		
@@ -166,7 +166,7 @@ abstract class Layer extends Runner {
 				if($event){
 					$this->get[$event] = isset($this->get[$this->event]) ? $this->get[$this->event] : null;
 					
-					$this->fire($event, $this->get, $this->post);
+					$this->fireEvent($event, $this->get, $this->post);
 				}
 			}
 			

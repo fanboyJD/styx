@@ -121,6 +121,30 @@ class Core {
 		}
 	}
 	
+	public static function fireEvent($event){
+		static $Instance, $Methods = array();
+		
+		if($Instance===null)
+			$Instance = self::classExists('Application') ? new Application : false;
+		
+		if($Instance===false)
+			return false;
+		
+		if(!Hash::length($Methods))
+			foreach(get_class_methods($Instance) as $method)
+				if(String::starts($method, 'on') && strlen($method)>=3)
+					array_push($Methods, strtolower(substr($method, 2)));
+		
+		$event = strtolower($event);
+		
+		if(!in_array($event, $Methods))
+			return false;
+		
+		$Instance->{'on'.ucfirst($event)}();
+		
+		return true;
+	}
+	
 	/* Storage Methods (Will be moved to a StaticStorage-Class in PHP5.3) */
 	private static $Storage = array();
 	

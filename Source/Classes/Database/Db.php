@@ -108,7 +108,7 @@ class db {
 	public function query($sql){
 		static $debug = null;
 		
-		if($debug===null) $debug = Core::retrieve('debug');
+		if($debug===null) $debug = pick(Core::retrieve('debug'), false);
 		
 		if(!$this->isConnected){
 			$this->connect();

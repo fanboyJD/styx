@@ -97,7 +97,6 @@ class Query {
 	}
 	
 	/**
-	 * @param array $data
 	 * @return Query
 	 */
 	public function where(){

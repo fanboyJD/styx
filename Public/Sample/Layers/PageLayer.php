@@ -83,14 +83,15 @@ class PageLayer extends Layer {
 		
 		if(User::hasRight('layer.page.edit'))
 			$this->Template->assign(array(
-				'rights' => '<a class="hicon" href="'.$this->link($data['pagetitle'], 'edit').'"><img src="Images/pencil.png" alt="'.Lang::retrieve('edit').'"></a>',
+				'rights' => '<a class="hicon" href="'.$this->link($data['pagetitle'], 'edit').'"><img src="Images/pencil.png" alt="'.Lang::retrieve('edit').'" /></a>',
 			));
 		
 		$this->Template->apply('view')->assign($data);
 	}
 	
 	public function onMenu(){
-		$this->Data->limit(0)->order('id ASC');
+		/* We want to cache the menu-entries! */
+		$this->Data = db::select($this->table)->fields('title, pagetitle')->limit(0)->order('id ASC');
 		
 		$this->Template->apply('menu.php');
 	}

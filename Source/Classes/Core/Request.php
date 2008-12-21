@@ -9,8 +9,6 @@
 
 class Request {
 	
-	private static $method, $behaviour;
-	
 	private function __construct(){}
 	private function __clone(){}
 	
@@ -39,15 +37,17 @@ class Request {
 		
 		if(!$Configuration){
 			$Configuration = Core::fetch(
-				'path.separator', 'languages.querystring', 'layer.default',
-				'contenttype.querystring', 'contenttype.default'
+				'path.separator', 'languages.querystring', 'languages',
+				'contenttype.querystring', 'contenttype.default', 'layer.default'
 			);
 			
 			$Configuration['checks'] = array();
-			foreach(array(
-				'language' => 'languages.querystring',
-				'behaviour' => 'contenttype.querystring',
-			) as $k => $v)
+			
+			$check = array('behaviour' => 'contenttype.querystring');
+			if(!empty($Configuration['languages']) && Hash::length($Configuration['languages']))
+				$check['language'] = 'languages.querystring';
+			
+			foreach($check as $k => $v)
 				if(!empty($Configuration[$v]))
 					$Configuration['checks'][$k] = $Configuration[$v];
 		}

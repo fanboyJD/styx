@@ -82,13 +82,15 @@ class CoreTest extends UnitTestCase {
 		
 		$this->assertTrue(Core::classExists('JavaScriptPacker'));
 		
+		$this->assertTrue(Core::classExists('Application')); // Custom User Class
+		
 		$this->assertFalse(Core::classExists('RandomClassDoesNotExist'));
 	}
 	
 	public function testAutoload(){
-		$this->assertFalse(class_exists('JavaScriptPacker', false));
+		$this->assertFalse(class_exists('JavaScriptPacker', false)); // We know that this class won't be around at that time
 		
-		new JavaScriptPacker(' some_random_script(); '); // We know that this class won't be around at that time
+		new JavaScriptPacker('some_random_script();');
 		
 		$this->assertTrue(class_exists('JavaScriptPacker', false));
 	}
