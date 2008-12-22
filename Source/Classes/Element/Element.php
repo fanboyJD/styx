@@ -156,7 +156,7 @@ class Element extends Runner {
 		
 		foreach($a as $key => $val)
 			if(($val || $val===0) && !in_array('skip'.ucfirst($key), $options) && !self::skipable($key))
-				$s[] = $key.'="'.($key=='style' ? str_replace('"', "'", $val) : Data::specialchars($val)).'"';
+				$s[] = $key.'="'.($key=='style' ? str_replace('"', "'", $val) : Data::sanitize($val)).'"';
 		
 		return is_array($s) ? ' '.implode(' ', $s) : '';
 	}

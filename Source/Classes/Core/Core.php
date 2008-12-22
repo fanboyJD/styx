@@ -76,6 +76,11 @@ class Core {
 	}
 	
 	public static function initialize(){
+		self::$Storage['identifier'] = array(
+			'internal' => self::$Storage['identifier.internal'],
+			'external' => self::$Storage['identifier.external'],
+		);
+		
 		self::loadClass('Cache', 'Cache');
 		
 		$c = Cache::getInstance();

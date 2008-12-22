@@ -70,7 +70,7 @@ class Response {
 		}
 		
 		$array = array();
-		if($Configuration['contenttype.querystring'] && !empty($options[$Configuration['contenttype.querystring']])){
+		if(!empty($Configuration['contenttype.querystring']) && !empty($options[$Configuration['contenttype.querystring']])){
 			$array[] = $Configuration['contenttype.querystring'].$Configuration['path.separator'].$options[$Configuration['contenttype.querystring']];
 			unset($options[$Configuration['contenttype.querystring']]);
 		}

@@ -13,7 +13,7 @@ class PageLayer extends Layer {
 				'name' => 'title',
 				':caption' => Lang::retrieve('title'),
 				':validate' => array(
-					'specialchars' => true,
+					'sanitize' => true,
 					'notempty' => true,
 				),
 			)),

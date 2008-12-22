@@ -82,7 +82,7 @@ class Request {
 			$request['parts'][] = $part;
 			$request['keys'][] = $v[0];
 			$request['get'][$v[0]] = $e ? pick($v[1]) : null;
-			$request['request'][Data::specialchars($v[0])] = $e ? Data::specialchars($v[1]) : null;
+			$request['request'][Data::sanitize($v[0])] = $e ? Data::sanitize($v[1]) : null;
 			
 			if($i<2) $request[$i++ ? 'event' : 'layer'] = $v[0];
 		}

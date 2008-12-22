@@ -1,4 +1,8 @@
 <?php
+	$paginate = $this->paginate()->parse();
+	
+	if($paginate) echo $paginate.'<div class="clear"></div>';
+	
 	foreach($this->Data as $n){
 		echo '<div class="inner">';
 		
@@ -16,4 +20,6 @@
 				<div class="clear"></div>
 			</div>';
 	}
+	
+	if($paginate) echo $paginate.'<div class="clear"></div>';
 ?>

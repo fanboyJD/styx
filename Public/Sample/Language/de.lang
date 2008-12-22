@@ -67,6 +67,11 @@ namespace admin {
 	allcacheerased = 'Filecache und Cache gelöscht';
 }
 
+namespace paginate {
+	next = 'Weiter';
+	previous = 'Zurück';
+}
+
 namespace validator {
 	content = '<div class="inner">
 			<span class="icon go">%s</span>

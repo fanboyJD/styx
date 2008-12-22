@@ -64,7 +64,7 @@ class Data {
 		return str_replace($replaces[0], $replaces[1], $string);
 	}
 	
-	public static function specialchars($string){
+	public static function sanitize($string){
 		return self::escape(trim(htmlspecialchars($string, ENT_COMPAT, 'UTF-8', false)));
 	}
 	
@@ -143,31 +143,27 @@ class Data {
 	)){
 		static $regex;
 		
-		if(!$regex)
+		if(!$regex){
 			$regex = array(
 				explode(' ', 'Æ æ Œ œ ß Ü ü Ö ö Ä ä À Á Â Ã Ä Å &#260; &#258; Ç &#262; &#268; &#270; &#272; Ð È É Ê Ë &#280; &#282; &#286; Ì Í Î Ï &#304; &#321; &#317; &#313; Ñ &#323; &#327; Ò Ó Ô Õ Ö Ø &#336; &#340; &#344; Š &#346; &#350; &#356; &#354; Ù Ú Û Ü &#366; &#368; Ý Ž &#377; &#379; à á â ã ä å &#261; &#259; ç &#263; &#269; &#271; &#273; è é ê ë &#281; &#283; &#287; ì í î ï &#305; &#322; &#318; &#314; ñ &#324; &#328; ð ò ó ô õ ö ø &#337; &#341; &#345; &#347; š &#351; &#357; &#355; ù ú û ü &#367; &#369; ý ÿ ž &#378; &#380;'),
 				explode(' ', 'Ae ae Oe oe ss Ue ue Oe oe Ae ae A A A A A A A A C C C D D D E E E E E E G I I I I I L L L N N N O O O O O O O R R S S S T T U U U U U U Y Z Z Z a a a a a a a a c c c d d e e e e e e g i i i i i l l l n n n o o o o o o o o r r s s s t t u u u u u u y y z z z'),
 			);
+			
+			$regex[0][] = '"';
+			$regex[0][] = "'";
+		}
 		
-		$title = trim(substr(preg_replace('/\_{2,}/', '_', preg_replace('/[^A-z0-9_]/i', '_', str_replace($regex[0], $regex[1], $title))), 0, 64));
-		
-		if(self::id($title)) $title = '_'.$title;
+		$title = trim(substr(preg_replace('/_{2,}/', '_', preg_replace('/[^A-z0-9_]/i', '_', str_replace($regex[0], $regex[1], $title))), 0, 64), '_');
 		
 		if(empty($options['identifier'])){
 			static $identifier;
 			
-			if(!$identifier)
-				$identifier = array(
-					'internal' => Core::retrieve('identifier.internal'),
-					'external' => Core::retrieve('identifier.external'),
-				);
+			if(!$identifier) $identifier = Core::retrieve('identifier');
 			
 			$options['identifier'] = $identifier;
 		}
 		
-		if(!empty($options['contents'])) return self::checkTitle($title, $options);
-		
-		return $title;
+		return !empty($options['contents']) ? self::checkTitle($title, $options) : $title;
 	}
 	
 	private static function checkTitle($title, $options = array(
@@ -184,7 +180,7 @@ class Data {
 				return self::checkTitle($title, $options, ++$i);
 		}
 		
-		return $title.(self::id($i) ? (String::ends($title, '_') ? '' : '_').$i : '');
+		return $title.($i ? '_'.$i : '');
 	}
 	
 	public static function purify($data, $options = array()){

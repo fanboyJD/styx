@@ -15,7 +15,7 @@ class IndexLayer extends Layer {
 				'name' => 'title',
 				':caption' => Lang::retrieve('title'),
 				':validate' => array(
-					'specialchars' => true,
+					'sanitize' => true,
 					'notempty' => true,
 				),
 			)),
@@ -74,7 +74,7 @@ class IndexLayer extends Layer {
 		if(!User::hasRight('layer.index.delete'))
 			throw new ValidatorException('rights');
 		
-		// This way it is required to use "handler;json" in the Querystring. If we leave the "if" out the contenttype "json" would be enforced
+		// This way it is required to use "handler;json" in the Querystring. If we left the "if" out the contenttype "json" would be enforced
 		if(Request::retrieve('behaviour')!='json')
 			throw new ValidatorException('contenttype');
 		
@@ -97,16 +97,25 @@ class IndexLayer extends Layer {
 	public function onView($title){
 		Response::setDefaultContentType('html', 'xml');
 		
+		// We check for the used ContentType (xml or html) and assign the correct template for it
+		$contenttype = Response::getContentType();
+		
 		$this->Data->fields('news.*, users.name')->join('news.uid=users.id', 'users', 'left')->limit(0)->order('time DESC');
-		if($title)
+		if($title){
 			$this->Data->where(array(
 				'pagetitle' => array($title, 'pagetitle'),
 			))->limit(1);
-		else
+		}else{
+			if($contenttype=='html')
+				$this->paginate()->initialize($this->Data, array(
+					'start' => !empty($this->get['start']) ? $this->get['start'] : 0,
+					'per' => 2,
+				));
+			
 			$this->isIndex = true;
+		}
 		
-		// We check for the used ContentType (xml or html) and assign the correct template for it
-		$this->Template->apply((Response::getContentType()=='xml' ? 'xml' : '').'view.php');
+		$this->Template->apply(($contenttype=='xml' ? 'xml' : '').'view.php');
 	}
 	
 }

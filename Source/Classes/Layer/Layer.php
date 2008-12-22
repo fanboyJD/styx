@@ -24,6 +24,11 @@ abstract class Layer extends Runner {
 		 */
 		$Template = null,
 		
+		/**
+		 * @var Paginate
+		 */
+		$Paginate = null,
+		
 		$name,
 		$base,
 		$table,
@@ -112,10 +117,7 @@ abstract class Layer extends Runner {
 			Hash::extend($this->options, $initialize);
 		
 		if(empty($this->options['identifier']))
-			$this->options['identifier'] = array(
-				'internal' => Core::retrieve('identifier.internal'),
-				'external' => Core::retrieve('identifier.external'),
-			);
+			$this->options['identifier'] = Core::retrieve('identifier');
 		elseif(!is_array($this->options['identifier']))
 			$this->options['identifier'] = array(
 				'internal' => $this->options['identifier'],
@@ -278,7 +280,7 @@ abstract class Layer extends Runner {
 		if($this->table)
 			$options['contents'] = Hash::extend(Hash::splat($options['contents']), db::select($this->table, $this->options['cache'])->fields(array_unique($this->options['identifier']))->retrieve());
 		
-		if($where[$this->options['identifier']['internal']])
+		if(!empty($where[$this->options['identifier']['internal']]))
 			$options[$this->options['identifier']['internal']] = Data::call($where[$this->options['identifier']['internal']][0], $where[$this->options['identifier']['internal']][1]);
 		
 		$options['identifier'] = $this->options['identifier'];
@@ -286,7 +288,18 @@ abstract class Layer extends Runner {
 		return Data::pagetitle($title, $options);
 	}
 	
-	public function link($title = null, $event = null, $options = null){
+	public function getIdentifier($identifier = null){
+		return $identifier && !empty($this->options['identifier'][$identifier]) ? $this->options['identifier'][$identifier] : $this->options['identifier'];
+	}
+	
+	public function paginate($class = null){
+		if($this->Paginate && strtolower(get_class($this->Paginate))==strtolower(pick($class, 'Paginate')))
+			return $this->Paginate;
+		
+		return $this->Paginate = Paginate::retrieve($class)->bind($this);
+	}
+	
+	public function link($title = null, $event = null, $options = null, $showEvent = false){
 		static $Configuration;	
 		if(!$Configuration)
 			$Configuration = array(
@@ -296,14 +309,14 @@ abstract class Layer extends Runner {
 		
 		if(is_array($title)) $title = $title[$this->options['identifier']['external']];
 		
-		if($options && !is_array($options) && $Configuration['contenttype.querystring'])
+		if($options && !is_array($options) && !empty($Configuration['contenttype.querystring']))
 			$options = array($Configuration['contenttype.querystring'] => $options);
 		
 		if(!$event || !in_array($event, $this->methods))
 			$event = $Configuration['default'];
 		
-		$base = array(strtolower($this->name));
-		if($title || ($event && $event!=$Configuration['default'])){
+		$base = array(strtolower($this->base));
+		if($title || ($event && ($event!=$Configuration['default'] || $showEvent))){
 			if(!$title) $base[] = $event;
 			else if(in_array($title, $this->methods) || $event!=$Configuration['default']) $base[] = array($event, $title);
 			else $base[] = $title;

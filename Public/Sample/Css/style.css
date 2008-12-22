@@ -197,6 +197,10 @@ img, a img {
 	border: 0;
 }
 
+a.next {
+	float: right;
+}
+
 div#content a {
 	color: #f7f7f7;
 }

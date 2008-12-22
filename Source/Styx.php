@@ -11,8 +11,7 @@ if(!isset($Paths) || !is_array($Paths))
 	);
 else
 	foreach($Paths as $k => $path)
-		if(strrpos($path, '/')!==strlen($path)-1)
-			$Paths[$k] = $path.'/'; // Custom Paths might not have a slash at the end
+		$Paths[$k] = rtrim($path, '/').'/'; // Custom Paths might not have a slash at the end
 
 require($Paths['app.path'].'/Config/Configuration.php');
 
@@ -26,7 +25,7 @@ spl_autoload_register(array('Core', 'autoload'));
 Core::store($Paths);
 
 if(!isset($use) || empty($CONFIGURATION[$use]))
-	$use = array_shift(array_keys($CONFIGURATION));
+	$use = reset(array_keys($CONFIGURATION));
 
 if(!String::ends($CONFIGURATION[$use]['app.link'], '/'))
 	$CONFIGURATION[$use]['app.link'] .= '/';

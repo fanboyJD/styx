@@ -13,7 +13,7 @@ class Template extends Runner {
 	protected $assigned = null,
 		$appended = array(),
 		$file = array(),
-		$bind = null;
+		$bound = null;
 	
 	/**
 	 * @return Template
@@ -39,11 +39,11 @@ class Template extends Runner {
 		$file = implode('/', $this->file).(!$ext ? '.'.$Configuration['template.default'] : '');
 		
 		if(in_array(strtolower($ext ? $ext : $Configuration['template.default']), $Configuration['template.execute'])){
-			if($this->bind && method_exists($this->bind, 'execute')){
+			if($this->bound && method_exists($this->bound, 'execute')){
 				if(empty($Configuration['Templates'][$file])) return;
 				
 				ob_start();
-				$this->bind->execute($Configuration['Templates'][$file]);
+				$this->bound->execute($Configuration['Templates'][$file]);
 				return ob_get_clean();
 			}else{
 				/* 
@@ -109,7 +109,7 @@ class Template extends Runner {
 	 * @return Template
 	 */
 	public function bind($bind){
-		if(is_object($bind)) $this->bind = $bind;
+		if(is_object($bind)) $this->bound = $bind;
 		
 		return $this;
 	}

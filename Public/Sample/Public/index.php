@@ -13,7 +13,8 @@
 	
 	Layer::create('Page')->fireEvent('menu')->register('pagemenu');
 	
-	if(Response::getContentType()=='html')
+	$contenttype = Response::getContentType();
+	if($contenttype=='html')
 		Page::getInstance()->apply('html.php')->assign(Core::fetch('app.name', 'app.link'))->assign(array(
 			'source' => 'http://framework.og5.net/dev/browser/trunk/Public/Sample',
 			
@@ -27,7 +28,7 @@
 			
 			'styx' => implode(' ', Core::fetch('styx.name', 'styx.version')),
 		))->show();
-	elseif(Response::getContentType()=='json')
+	elseif($contenttype=='json')
 		Page::getInstance()->substitute('layer')->show();
-	elseif(Response::getContentType()=='xml')
+	elseif($contenttype=='xml')
 		Page::getInstance()->assign(Core::fetch('app.name', 'app.link', 'app.mail'))->apply('rss.php')->show();
