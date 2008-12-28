@@ -35,14 +35,15 @@ window.addEvent('domready', function(){
 	})();
 	
 	(function(){
-		$$('a.hicon').set('opacity', 0).each(function(el){
-			el.addEvents({
-				mouseenter: el.fade.bind(el, 0.5),
-				mouseleave: el.fade.bind(el, 0.8)
-			}).getParent('div').addEvents({
-				mouseenter: el.fade.bind(el, 0.8),
-				mouseleave: el.fade.bind(el, 0)
-			});
+		$$('a.hicon, a.modifier').each(function(el){
+			if(el.hasClass('hicon'))
+				el.set('opacity', 0).addEvents({
+					mouseenter: el.fade.bind(el, 0.5),
+					mouseleave: el.fade.bind(el, 0.8)
+				}).getParent('div').addEvents({
+					mouseenter: el.fade.bind(el, 0.8),
+					mouseleave: el.fade.bind(el, 0)
+				});
 			
 			if(el.hasClass('delete'))
 				el.addEvent('click', function(e){

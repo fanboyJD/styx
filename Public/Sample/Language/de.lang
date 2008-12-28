@@ -22,6 +22,8 @@ namespace news {
 }
 
 namespace page {
+	modify = 'Seite bearbeiten';
+	
 	saved = '<div class="inner">
 			<b>Die Seite wurde gespeichert.</b><br/><br/>
 			<a href="%s" class="go icon">Zur Seite</a>
@@ -57,9 +59,22 @@ namespace user {
 			<h1>Administration</h1>
 			<span class="bold go">Willkommen %s</span>
 		</div>';
+	
+	add = 'Benutzer einfügen';
+	modify = 'Benutzer bearbeiten';
+	
+	confirmdelete = 'Bist du sicher, dass du diesen Benutzer löschen möchtest?';
+	deleted = 'Der Benutzer wurde gelöscht!';
+	pwdempty = ' <small>(Freilassen um Passwort beizubehalten)</small>';
+	saved = '<div class="inner">
+			<b>Der Benutzer wurde gespeichert.</b><br/><br/>
+			<a href="%s" class="go icon">Zurück</a>
+		</div>';
 }
 
 namespace admin {
+	user = 'Benutzerverwaltung';
+	
 	cache = 'Cache löschen';
 	cacheerased = 'Cache gelöscht';
 	

@@ -14,6 +14,7 @@
 				<h1>'.Lang::retrieve('user.admin').'</h1>
 				'.(!empty($msg) ? '<span class="go icon">'.Lang::retrieve('admin.'.$msg).'</span><br/><br/>' : '').'
 				<a class="go icon" href="'.Layer::retrieve('index')->link(null, 'edit').'">'.Lang::retrieve('news.add').'</a><br/>
+				<a class="go icon" href="admin/user">'.Lang::retrieve('admin.user').'</a><br/>
 				<a class="go icon" href="'.Core::retrieve('app.link').'admin/do'.Core::retrieve('path.separator').'cache">'.Lang::retrieve('admin.cache').'</a><br/>
 				<a class="go icon" href="'.Core::retrieve('app.link').'admin/do'.Core::retrieve('path.separator').'allcache">'.Lang::retrieve('admin.allcache').'</a>
 			</div>',

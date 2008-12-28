@@ -35,14 +35,4 @@ class Storage {
 		unset($this->Storage[$key]);
 	}
 	
-	public function eraseBy($key){
-		foreach($this->Storage as $k => $v)
-			if(String::starts($k, $key))
-				unset($this->Storage[$k]);
-	}
-	
-	public function eraseAll(){
-		$this->Storage = array();
-	}
-	
 }

@@ -144,9 +144,10 @@ class Query {
 	}
 	
 	public function query(){
-		$query = db::getInstance()->query($this->format());
+		$query = Database::getInstance()->query($this->format());
 		
-		if($this->type!='select') Cache::getInstance()->eraseBy('QueryCache', $this->table.'_');
+		if($this->type!='select')
+			Cache::getInstance()->eraseBy('QueryCache/'.$this->table.'/')->eraseByTag('Database/'.$this->table);
 		
 		return $query;
 	}

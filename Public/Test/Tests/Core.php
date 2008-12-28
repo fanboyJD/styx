@@ -56,7 +56,7 @@ class CoreTest extends UnitTestCase {
 			$files[] = $file->getFileName();
 		}
 		
-		$this->assertEqual(count($files), 4);
+		$this->assertEqual(count($files), 5);
 			
 		foreach(new ExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->layer)), array('html', 'tpl')) as $file)
 			$this->assertTrue(in_array(pathinfo($file->getFileName(), PATHINFO_EXTENSION), array('html', 'tpl')));

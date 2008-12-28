@@ -66,6 +66,7 @@ class PageLayer extends Layer {
 		
 		/* We put some styling here as we don't want to add a new Template for that :) */
 		$this->Template->append('<div class="inner">
+			<h1>'.Lang::retrieve('page.modify').'</h1>
 			'.implode(array_map('implode', $this->format())).'
 			<div class="clear"></div>
 			</div>'
@@ -94,7 +95,7 @@ class PageLayer extends Layer {
 	
 	public function onMenu(){
 		/* We want to cache the menu-entries! */
-		$this->Data = db::select($this->table)->fields('title, pagetitle')->limit(0)->order('id ASC');
+		$this->Data = Database::select($this->table)->fields('title, pagetitle')->limit(0)->order('id ASC');
 		
 		$this->Template->apply('menu.php');
 	}

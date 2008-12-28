@@ -119,7 +119,7 @@ class PackageManager {
 			foreach($package['files'] as $file)
 				$time = max($time, filemtime(realpath($Configuration['app.path'].'/'.self::$Elements[$package['type']]['directory'].'/'.$file.'.'.$package['type'])));
 			
-			if($time<$c->retrieve('CompressedTime', $name, 'file'))
+			if($time<$c->retrieve('CompressedTime/'.$name))
 				$Configuration['debug'] = false;
 		}else{
 			Response::setHeader(array(
@@ -129,7 +129,7 @@ class PackageManager {
 		}
 		
 		if(empty($Configuration['debug'])){
-			$output = $c->retrieve('Compressed', $name.($compress ? '1' : ''), 'file', false);
+			$output = $c->retrieve('Compressed/'.$name.($compress ? '1' : ''));
 			if($output) return $output;
 		}
 		
@@ -153,10 +153,15 @@ class PackageManager {
 		
 		$gzipcontent = gzencode($content, 9, FORCE_GZIP);
 		
-		$c->store('Compressed', $name, $content, 'file', false);
-		$c->store('Compressed', $name.'1', $gzipcontent, 'file', false);
+		$options = array(
+			'encode' => false,
+			'ttl' => 0,
+		);
 		
-		$c->store('CompressedTime', $name, time(), 'file');
+		$c->store('Compressed/'.$name, $content, $options);
+		$c->store('Compressed/'.$name.'1', $gzipcontent, $options);
+		
+		$c->store('CompressedTime/'.$name, time(), $options);
 		
 		return $compress ? $gzipcontent : $content;
 	}

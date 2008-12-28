@@ -153,7 +153,7 @@ class Data {
 			$regex[0][] = "'";
 		}
 		
-		$title = trim(substr(preg_replace('/_{2,}/', '_', preg_replace('/[^A-z0-9_]/i', '_', str_replace($regex[0], $regex[1], $title))), 0, 64), '_');
+		$title = trim(substr(preg_replace('/([^A-z0-9]|_|\^)+/i', '_', str_replace($regex[0], $regex[1], $title)), 0, 64), '_');
 		
 		if(empty($options['identifier'])){
 			static $identifier;

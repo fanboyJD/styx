@@ -128,7 +128,7 @@ class QuerySelect extends Query implements Iterator, Countable {
 	public function fetch($type = null){
 		$this->Storage->retrieve('limit', array(0, 1)); // To overcome big queries
 		
-		return db::getInstance()->fetch($this->query(), $type);
+		return Database::getInstance()->fetch($this->query(), $type);
 	}
 	
 	public function quantity($field = null){
@@ -143,7 +143,7 @@ class QuerySelect extends Query implements Iterator, Countable {
 	public function retrieve(){
 		$this->queried = false;
 		
-		return $this->cache = pick(db::getInstance()->retrieve($this->format()), array());
+		return $this->cache = pick(Database::getInstance()->retrieve($this->format()), array());
 	}
 	
 	public function rewind(){

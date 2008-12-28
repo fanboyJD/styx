@@ -85,7 +85,7 @@ class Core {
 		
 		$c = Cache::getInstance();
 		
-		$List = self::$Storage['Classes'] = $c->retrieve('Core', 'Classes');
+		$List = self::$Storage['Classes'] = $c->retrieve('Core/Classes');
 		
 		if(!$List || !empty(self::$Storage['debug'])){
 			$List = array();
@@ -101,10 +101,10 @@ class Core {
 			foreach(new ExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator(self::$Storage['app.path'].'/Classes/'))) as $file)
 				$List[strtolower(basename($file->getFileName(), '.php'))] = $file->getRealPath();
 			
-			self::$Storage['Classes'] = $c->store('Core', 'Classes', $List, ONE_WEEK);
+			self::$Storage['Classes'] = $c->store('Core/Classes', $List, ONE_WEEK);
 		}
 		
-		$Templates = self::$Storage['Templates'] = $c->retrieve('Core', 'Templates');
+		$Templates = self::$Storage['Templates'] = $c->retrieve('Core/Templates');
 		
 		if(!$Templates || !empty(self::$Storage['debug'])){
 			$Templates = array();
@@ -122,7 +122,7 @@ class Core {
 				}
 			}
 			
-			self::$Storage['Templates'] = $c->store('Core', 'Templates', $Templates, ONE_WEEK);
+			self::$Storage['Templates'] = $c->store('Core/Templates', $Templates, ONE_WEEK);
 		}
 	}
 	

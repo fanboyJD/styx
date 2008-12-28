@@ -40,6 +40,9 @@ class Route {
 				$action['event'] = !empty($route['options']['event']) ? $route['options']['event'] : null;
 			}
 			
+			if(!empty($route['layer'])) $action['layer'] = $route['layer'];
+			if(!empty($route['event'])) $action['event'] = $route['event'];
+			
 			$action['get'] = $route['get'];
 		}elseif(in_array(array( // If there is no route and the layer/event is hidden we do not execute it :)
 			'layer' => $action['layer'],
@@ -94,12 +97,17 @@ class Route {
 						if(!empty($m['equals']) && $action['parts'][$i]!=$m['equals'])
 							continue 2;
 						
-						if(!empty($m['as'])){
-							$action['get'][$m['as']] = pick($action['get'][$action['keys'][$i]]);
+						if(!empty($action['keys'][$i])){
+							if(!empty($m['as'])){
+								$action['get'][$m['as']] = pick($action['get'][$action['keys'][$i]], $action['keys'][$i]);
+								
+								unset($action['get'][$action['keys'][$i]]);
+							}
 							
-							unset($action['get'][$action['keys'][$i]]);
+							if(!empty($m['layer'])) $route['layer'] = $action['keys'][$i];
+							if(!empty($m['event'])) $route['event'] = $action['keys'][$i];
 						}
-					}elseif(empty($action['parts'][$i]) || $action['parts'][$i]!=$r){
+					}elseif(empty($route['options']['match'][$r]['omit']) && (empty($action['parts'][$i]) || $action['parts'][$i]!=$r)){
 						continue 2;
 					}
 				}

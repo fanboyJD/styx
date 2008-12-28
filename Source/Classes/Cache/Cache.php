@@ -14,31 +14,45 @@ class Cache extends Storage {
 			'root' => './Cache/',
 			'engine' => false,
 		),
-		$engineInstance = null,
-		$filecacheInstance = null;
+		$Meta = array(),
+		$time = null,
+		$cacheInstance = null,
+		$persistentInstance = null;
 	
 	private function __construct(){
 		$options = Core::retrieve('cache');
 		
-		if((!$options['engine'] || $options['engine']=='eaccelerator') && function_exists('eaccelerator_get'))
-			$this->Configuration['engine'] = array(
-				'type' => 'eaccelerator',
-			);
+		if(empty($options['engine']) || $options['engine']=='eaccelerator')
+			$this->Configuration['engine'] = 'eaccelerator';
 		
 		$this->Configuration['prefix'] = !empty($options['prefix']) ? $options['prefix'] : Core::retrieve('prefix');
 		
-		if($options['root']) $this->Configuration['root'] = realpath($options['root']);
+		if(!empty($options['root'])) $this->Configuration['root'] = realpath($options['root']);
 		else $this->Configuration['root'] = Core::retrieve('path').$this->Configuration['root'];
 		
-		$class = $this->Configuration['engine']['type'].'cache';
-		if($this->Configuration['engine']['type'] && Core::loadClass('Cache', $class))
-			$this->engineInstance = new $class($this->Configuration);
+		$class = ucfirst($this->Configuration['engine']).'cache';
+		if($this->Configuration['engine'] && Core::loadClass('Cache', $class))
+			$this->cacheInstance = new $class($this->Configuration);
 		
 		Core::loadClass('Cache', 'Filecache');
-		$this->filecacheInstance = new filecache($this->Configuration);
+		$this->persistentInstance = new Filecache($this->Configuration);
+		
+		$this->time = time();
+		
+		$this->Meta = json_decode($this->persistentInstance->retrieve('Cache/List'), true);
+		
+		if(!$this->Meta) $this->Meta = array();
+		
+		foreach($this->Meta as $k => $v)
+			if($v[0] && $v[0]<$this->time)
+				unset($this->Meta[$k]);
 	}
 	
 	private function __clone(){}
+	
+	public function __destruct(){
+		$this->persistentInstance->store('Cache/List', json_encode($this->Meta));
+	}
 	
 	/**
 	 * @param array $options
@@ -51,62 +65,108 @@ class Cache extends Storage {
 	}
 	
 	public function getEngine(){
-		return $this->engine;
+		return $this->Configuration['engine'];
 	}
 	
-	public function retrieve($key, $id, $ttl = null, $decode = true){
-		$content = parent::retrieve($key.'/'.$id);
-		if(!$content){
-			$content = $this->{$this->engineInstance && $ttl!='file' ? 'engineInstance' : 'filecacheInstance'}->retrieve($key.'/'.$id);
+	public function retrieve($id){
+		if(empty($this->Meta[$id])) return null;
+		
+		if(empty($this->Storage[$id])){
+			$content = $this->{$this->cacheInstance && $this->Meta[$id][1] ? 'cacheInstance' : 'persistentInstance'}->retrieve($id);
 			
 			if(!$content) return null;
 			
-			if($decode) $content = json_decode($content, true);
-			parent::store($key.'/'.$id, $content);
+			if($this->Meta[$id][2]) $content = json_decode($content, true);
+			
+			$this->Storage[$id] = $content;
 		}
 		
-		return $content;
+		return $this->Storage[$id];
 	}
 	
-	public function store($key, $id, $input, $ttl = 3600, $encode = true){
-		if(!$input) return;
+	public function store($id, $input, $options = null){
+		$default = array(
+			'type' => 'cache',
+			'ttl' => 3600,
+			'encode' => true,
+		);
 		
-		$content = $encode ? json_encode(Data::clean($input)) : $input;
+		if(Data::id($options)) Hash::extend($default, array('ttl' => $options));
+		elseif(is_array($options)) Hash::extend($default, $options);
 		
-		$this->{$this->engineInstance && $ttl!='file' ? 'engineInstance' : 'filecacheInstance'}->store($key.'/'.$id, $content, $ttl);
+		if(!$default['ttl']) $default['type'] = 'file';
 		
-		return parent::store($key.'/'.$id, $input);;
+		$this->Meta[$id] = array(
+			$default['ttl'] ? $this->time+$default['ttl'] : 0,
+			$default['type']=='cache' ? 1 : 0,
+			$default['encode'] ? 1 : 0,
+		);
+		
+		if(!empty($options['tags'])) $this->Meta[$id][] = array_values(Hash::splat($options['tags']));
+		
+		$content = $this->Meta[$id][2] ? json_encode(Data::clean($input)) : $input;
+		
+		$this->{$this->cacheInstance && $this->Meta[$id][1] ? 'cacheInstance' : 'persistentInstance'}->store($id, $content, $default['ttl']);
+		
+		return $this->Storage[$id] = $input;
 	}
 	
-	public function erase($key, $id, $force = false){
-		$name = $key.'/'.$id;
-		parent::erase($name);
+	public function erase($array, $force = false){
+		if(!is_array($array))
+			$array = array($array);
 		
-		if($this->engineInstance)
-			$this->engineInstance->erase($name);
+		$list = array(
+			'cacheInstance' => array(),
+			'persistentInstance' => array(),
+		);
 		
-		if($force || !$this->engineInstance)
-			$this->filecacheInstance->erase($name, $force);
+		foreach($array as $id){
+			if(empty($this->Meta[$id]))
+				continue;
+			
+			if(!$this->Meta[$id][0] && !$force)
+				continue;
+			
+			$list[$this->cacheInstance && $this->Meta[$id][1] ? 'cacheInstance' : 'persistentInstance'][] = $id;
+			
+			unset($this->Storage[$id], $this->Meta[$id]);
+		}
+		
+		foreach($list as $k => $v)
+			if(Hash::length($v))
+				$this->{$k}->erase($v);
+		
+		return $this;
 	}
 	
-	public function eraseBy($key, $id, $force = false){
-		$name = $key.'/'.$id;
-		parent::eraseBy($name);
+	public function eraseBy($id, $force = false){
+		$list = array();
+		foreach($this->Meta as $k => $v)
+			if(String::starts($k, $id))
+				$list[] = $k;
+			
+		if(Hash::length($list))
+			$this->erase($list, $force);
 		
-		if($this->engineInstance)
-			$this->engineInstance->eraseBy($name);
-
-		if($force || !$this->engineInstance)
-			$this->filecacheInstance->eraseBy($name, $force);
+		return $this;
+	}
+	
+	public function eraseByTag($tag, $force = false){
+		$list = array();
+		foreach($this->Meta as $k => $v)
+			if(!empty($v[3]) && in_array($tag, $v[3]))
+				$list[] = $k;
+		
+		if(Hash::length($list))
+			$this->erase($list, $force);
+		
+		return $this;
 	}
 	
 	public function eraseAll($force = false){
-		parent::eraseAll();
+		$this->erase(array_keys($this->Meta), $force);
 		
-		if($this->engineInstance)
-			$this->engineInstance->eraseAll();
-		
-		if($force || !$this->engineInstance)
-			$this->filecacheInstance->eraseAll($force);
+		return $this;
 	}
+	
 }

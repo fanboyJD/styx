@@ -144,7 +144,7 @@ abstract class Layer extends Runner {
 			$event = $default;
 		}
 		
-		$this->Data = $this->table ? db::select($this->table, $this->options['cache']) : array();
+		$this->Data = $this->table ? Database::select($this->table, $this->options['cache']) : array();
 		$this->Template = Template::map()->base('Layers', $this->name)->bind($this);
 		
 		try{
@@ -209,7 +209,7 @@ abstract class Layer extends Runner {
 	
 	public function prepare($data = null, $fill = false){
 		if($this->event && !empty($this->get[$this->event]) && $this->table){
-			$this->content = db::select($this->table, $this->options['cache'])->where(array(
+			$this->content = Database::select($this->table, $this->options['cache'])->where(array(
 				$this->options['identifier']['external'] => array($this->get[$this->event], $this->options['identifier']['external']),
 			))->fetch();
 			
@@ -240,8 +240,8 @@ abstract class Layer extends Runner {
 		
 		if(!$this->table) return;
 		
-		if($where) $query = db::update($this->table)->where($where);
-		else $query = db::insert($this->table);
+		if($where) $query = Database::update($this->table)->where($where);
+		else $query = Database::insert($this->table);
 		
 		$query->set($data)->query();
 	}
@@ -255,7 +255,7 @@ abstract class Layer extends Runner {
 		
 		if(!$where) $where = $this->where;
 		
-		db::delete($this->table)->where($this->where)->query();
+		Database::delete($this->table)->where($this->where)->query();
 	}
 	
 	public function getDefaultEvent($event){
@@ -278,7 +278,7 @@ abstract class Layer extends Runner {
 		if(!$where) $where = $this->where;
 		
 		if($this->table)
-			$options['contents'] = Hash::extend(Hash::splat($options['contents']), db::select($this->table, $this->options['cache'])->fields(array_unique($this->options['identifier']))->retrieve());
+			$options['contents'] = Hash::extend(Hash::splat($options['contents']), Database::select($this->table, $this->options['cache'])->fields(array_unique($this->options['identifier']))->retrieve());
 		
 		if(!empty($where[$this->options['identifier']['internal']]))
 			$options[$this->options['identifier']['internal']] = Data::call($where[$this->options['identifier']['internal']][0], $where[$this->options['identifier']['internal']][1]);

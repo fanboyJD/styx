@@ -40,7 +40,7 @@ class LoginLayer extends Layer {
 		$user = $this->Data->where(array(
 			'name' => $this->getValue('name'),
 			'AND',
-			'pwd' => sha1(Core::retrieve('secure').$this->getValue('pwd')),
+			'pwd' => User::getPassword($this->getValue('pwd')),
 		))->fetch();
 		
 		if(!is_array($user)) throw new ValidatorException('login');

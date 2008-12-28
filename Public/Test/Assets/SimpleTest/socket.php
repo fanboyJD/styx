@@ -153,7 +153,7 @@ class SimpleFileSocket extends SimpleStickyError {
      *    @param integer $timeout      Maximum time to wait for connection.
      *    @access protected
      */
-    protected function openFile($file, $error) {
+    protected function openFile($file, &$error) {
         return @fopen($file->asString(), 'r');
     }
 }

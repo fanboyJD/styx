@@ -54,20 +54,20 @@ class User {
 		}
 		array_pop($fields);
 		
-		$user = db::select(self::$Configuration['table'], $cache)->where($fields)->fetch();
+		$user = Database::select(self::$Configuration['table'], $cache)->where($fields)->fetch();
 		
-		if($user[self::$Configuration['identifier.internal']]) return self::store(Cache::getInstance()->store('User', 'userdata_'.$user[self::$Configuration['session']], $user, ONE_DAY));
+		if($user[self::$Configuration['identifier.internal']]) return self::store(Cache::getInstance()->store('User/userdata_'.$user[self::$Configuration['session']], $user, ONE_DAY));
 		
 		self::logout();
 	}
 	
 	public static function login($user){
-		if(!empty($user[self::$Configuration['session']])) Cache::getInstance()->erase('User', 'userdata_'.$user[self::$Configuration['session']]);
+		if(!empty($user[self::$Configuration['session']])) Cache::getInstance()->erase('User/userdata_'.$user[self::$Configuration['session']]);
 		
 		$rand = self::$Configuration['secure'].mt_rand(0, 100000);
 		$user[self::$Configuration['session']] = sha1($rand.uniqid($rand, true));
 		
-		db::update(self::$Configuration['table'])->set(array(
+		Database::update(self::$Configuration['table'])->set(array(
 			self::$Configuration['session'] => $user[self::$Configuration['session']],
 		))->where(array(
 			self::$Configuration['identifier.internal'] => $user[self::$Configuration['identifier.internal']],
@@ -84,7 +84,7 @@ class User {
 	}
 	
 	public static function logout(){
-		Cache::getInstance()->erase('User', 'userdata_'.User::get(self::$Configuration['session']));
+		Cache::getInstance()->erase('User/userdata_'.User::get(self::$Configuration['session']));
 		
 		if(self::$Configuration['type']=='cookie')
 			Response::removeCookie(self::$Configuration['prefix']);
@@ -104,6 +104,10 @@ class User {
 				return false;
 		
 		return true;
+	}
+	
+	public static function getPassword($password){
+		return sha1(Core::retrieve('secure').$password);
 	}
 	
 	public static function setRights(){

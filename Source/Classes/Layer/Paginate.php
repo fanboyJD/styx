@@ -22,6 +22,7 @@ class Paginate {
 		$options = array(
 			'start' => 0,
 			'per' => 10,
+			'key' => 'start',
 			'template' => null,
 		),
 		
@@ -36,8 +37,12 @@ class Paginate {
 		
 		Hash::extend($this->options, $options);
 		
-		$this->options['start'] = Data::id($this->options['start']);
 		$this->options['per'] = Data::id($this->options['per']);
+		
+		if($this->Layer && !$this->options['start'] && !empty($this->Layer->get[$this->options['key']]))
+			$this->options['start'] = $this->Layer->get[$this->options['key']];
+		
+		$this->options['start'] = Data::id($this->options['start'], $this->options['per']);
 	}
 	
 	public static function retrieve($class){
@@ -52,6 +57,9 @@ class Paginate {
 		if(!$this->initialized) return;
 		
 		$this->count = $this->Data->quantity($this->Layer->getIdentifier('internal'));
+		
+		if($this->options['start']>=$this->count)
+			$this->options['start'] = 0;
 		
 		$this->Data->limit($this->options['start'], $this->options['per']);
 		
@@ -82,6 +90,10 @@ class Paginate {
 	
 	public function getPer(){
 		return $this->options['per'];
+	}
+	
+	public function getKey(){
+		return $this->options['key'];
 	}
 	
 	/**

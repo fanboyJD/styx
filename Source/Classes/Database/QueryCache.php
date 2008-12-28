@@ -9,12 +9,23 @@
 
 class QueryCache extends QuerySelect {
 	
+	private function getIdentifier($type = null){
+		return $this->table.'_'.md5($this->format().$type);
+	}
+	
 	private function getCache($type = null){
-		return Cache::getInstance()->retrieve('QueryCache', $this->table.'_'.md5($this->format().$type));
+		return Cache::getInstance()->retrieve('QueryCache/'.$this->table.'/'.md5($this->format().$type));
 	}
 	
 	private function setCache($content, $type = null){
-		return Cache::getInstance()->store('QueryCache', $this->table.'_'.md5($this->format().$type), $content);
+		$options = array(
+			'ttl' => ONE_DAY/2,
+		);
+		$data = $this->Storage->retrieve('join');
+		if(is_array($data) && !empty($data['table']))
+			$options['tags'] = array('Database/'.$data['table']);
+		
+		return Cache::getInstance()->store('QueryCache/'.$this->table.'/'.md5($this->format().$type), $content, $options);
 	}
 	
 	public function fetch($type = null){

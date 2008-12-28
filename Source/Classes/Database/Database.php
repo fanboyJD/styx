@@ -1,13 +1,13 @@
 <?php
 /*
- * Styx::Db - MIT-style License
+ * Styx::Database - MIT-style License
  * Author: christoph.pojer@gmail.com
  *
  * Usage: Handles MySQL-Database connection
  *
  */
 
-class db {
+class Database {
 	
 	private $queries = 0,
 		$Configuration = array(
@@ -25,14 +25,13 @@ class db {
 	private function __construct(){
 		$options = Core::retrieve('database');
 		
-		if(is_array($options))
-			$this->Configuration = $options;
+		if(is_array($options)) $this->Configuration = $options;
 	}
 	
 	private function __clone(){}
 	
 	public function __destruct(){
-		$this->closeConnection();
+		$this->disconnect();
 	}
 	
 	/**
@@ -42,7 +41,7 @@ class db {
 	public static function getInstance(){
 		static $Instance;
 		
-		return $Instance ? $Instance : $Instance = new db();
+		return $Instance ? $Instance : $Instance = new Database();
 	}
 	
 	public function connect(){
@@ -60,11 +59,12 @@ class db {
 		return $this->Connection['db'] = mysql_select_db($this->Configuration['db']);
 	}
 	
-	public function closeConnection(){
-		if($this->isConnected){
-			$this->isConnected = false;
-			mysql_close($this->Connection['c']);
-		}
+	public function disconnect(){
+		if(!$this->isConnected)
+			return;
+		
+		$this->isConnected = false;
+		mysql_close($this->Connection['c']);
 	}
 	
 	/**
@@ -130,17 +130,11 @@ class db {
 	}
 	
 	public function fetch($query, $type = null){
-		if(!$query) return false;
-		
-		return pick(mysql_fetch_array($query, ($type ? $type : MYSQL_ASSOC)), false);
+		return $query ? pick(mysql_fetch_array($query, ($type ? $type : MYSQL_ASSOC)), false) : false;
 	}
 	
 	public function getId(){
 		return mysql_insert_id();
-	}
-	
-	public function numRows($query){
-		return mysql_num_rows($query);
 	}
 	
 	public function retrieve($sql){

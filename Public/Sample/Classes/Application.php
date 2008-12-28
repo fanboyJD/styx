@@ -53,6 +53,18 @@ class Application {
 		Route::connect('admin', array(
 			'include' => 'admin.php'
 		));
+		
+		Route::connect('admin/user/event', array(
+			'layer' => 'User',
+			'match' => array(
+				'event' => array(
+					'omit' => true,
+					'event' => true
+				),
+			),
+		), 51);
+		
+		Route::hide('User');
 	}
 	
 	public function onPageShow(){

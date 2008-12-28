@@ -12,60 +12,38 @@ class Filecache {
 	
 	private $Configuration = array(
 			'prefix' => null,
-		),
-		$time = null;
+		);
 	
 	public function __construct($Configuration){
 		$this->Configuration['prefix'] = $Configuration['root'].$Configuration['prefix'].'/';
-		
-		$this->time = time();
 	}
 	
-	public function retrieve($key){
-		$file = $this->Configuration['prefix'].$key.'.txt';
+	public function retrieve($id){
+		$file = $this->Configuration['prefix'].$id.'.txt';
 		if(!file_exists($file)) return null;
 		
-		$content = explode('|', file_get_contents($file), 2);
-		
-		return $content[0]<$this->time && $content[0]!='file' ? null : $content[1];
+		return file_get_contents($file);
 	}
 	
-	public function store($key, $content, $ttl){
-		$file = $this->Configuration['prefix'].$key.'.txt';
+	public function store($id, $content, $ttl = null){
+		$file = $this->Configuration['prefix'].$id.'.txt';
 		
 		if(!file_exists($file)){
 			Folder::mkdir(dirname($file));
 			
-			try{
-				touch($file); 
-				chmod($file, 0777);
-			}catch(Exception $e){}
+			touch($file); 
+			chmod($file, 0777);
 		}
 		
-		file_put_contents($file, ($ttl=='file' ? 'file' : $this->time+$ttl).'|'.$content);
+		file_put_contents($file, $content);
 	}
 	
-	public function erase($key, $force = false){
-		$files = glob($this->Configuration['prefix'].$key.'.txt');
-		if(!Hash::length($files))
-			return;
-		
-		try{
-			foreach($files as $file){
-				$content = explode('|', file_get_contents($file), 2);
-				if($content[0]=='file' && !$force)
-					continue;
-				
-				unlink($file);
-			}
-		}catch(Exception $e){}
+	public function erase($array){
+		foreach($array as $id){
+			$file = $this->Configuration['prefix'].$id.'.txt';
+			
+			if(file_exists($file)) unlink($file);
+		}
 	}
 	
-	public function eraseBy($key, $force = false){
-		$this->erase($key.'*', $force);
-	}
-	
-	public function eraseAll($force = false){
-		$this->erase('*/*', $force);
-	}
 }

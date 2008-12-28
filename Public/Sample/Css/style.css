@@ -201,6 +201,18 @@ a.next {
 	float: right;
 }
 
+a.modifier {
+	text-decoration: none;
+}
+
+a.modifier:hover {
+	text-decoration: underline;
+}
+
+a.modifier img {
+	vertical-align: bottom;
+}
+
 div#content a {
 	color: #f7f7f7;
 }

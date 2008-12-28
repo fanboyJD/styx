@@ -22,6 +22,8 @@ namespace news {
 }
 
 namespace page {
+	modify = 'Edit page';
+	
 	saved = '<div class="inner">
 			<b>Your page has been saved.</b><br/><br/>
 			<a href="%s" class="go icon">Go to the Page</a>
@@ -58,9 +60,22 @@ namespace user {
 			<h1>Administration</h1>
 			<span class="bold go">Welcome %s</span>
 		</div>';
+	
+	add = 'Add user';
+	modify = 'Edit user';
+	
+	confirmdelete = 'Are you sure to delete this user?';
+	deleted = 'The user has been deleted!';
+	pwdempty = ' <small>(leave empty to keep current)</small>';
+	saved = '<div class="inner">
+			<b>The user has been saved.</b><br/><br/>
+			<a href="%s" class="go icon">Back</a>
+		</div>';
 }
 
 namespace admin {
+	user = 'User management';
+	
 	cache = 'Clear Cache';
 	allcache = 'Clear Filecache and Cache';
 	

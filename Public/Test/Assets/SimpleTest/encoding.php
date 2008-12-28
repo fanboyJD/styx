@@ -353,7 +353,7 @@ class SimpleGetEncoding extends SimpleEncoding {
      *    @param SimpleSocket $socket        Socket to write to.
      *    @access public
      */
-    function writeHeadersTo($socket) {
+    function writeHeadersTo(&$socket) {
     }
     
     /**
@@ -362,7 +362,7 @@ class SimpleGetEncoding extends SimpleEncoding {
      *    @param SimpleSocket $socket        Socket to write to.
      *    @access public
      */
-    function writeTo($socket) {
+    function writeTo(&$socket) {
     }
     
     /**

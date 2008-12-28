@@ -108,7 +108,6 @@ class IndexLayer extends Layer {
 		}else{
 			if($contenttype=='html')
 				$this->paginate()->initialize($this->Data, array(
-					'start' => !empty($this->get['start']) ? $this->get['start'] : 0,
 					'per' => 2,
 				));
 			

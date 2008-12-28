@@ -3,12 +3,17 @@
  *  Autorunner which runs all tests cases found in a file
  *  that includes this module.
  *  @package    SimpleTest
- *  @version    $Id: autorun.php 1809 2008-09-12 00:46:55Z lastcraft $
+ *  @version    $Id: autorun.php 1846 2008-12-26 00:12:00Z jsweat $
+ */
+
+/**#@+
+ * include simpletest files
  */
 require_once dirname(__FILE__) . '/unit_tester.php';
 require_once dirname(__FILE__) . '/mock_objects.php';
 require_once dirname(__FILE__) . '/collector.php';
 require_once dirname(__FILE__) . '/default_reporter.php';
+/**#@-*/
 
 $GLOBALS['SIMPLETEST_AUTORUNNER_INITIAL_CLASSES'] = get_declared_classes();
 register_shutdown_function('simpletest_autorun');
@@ -23,9 +28,7 @@ function simpletest_autorun() {
         if (tests_have_run()) {
             return;
         }
-        $candidates = array_intersect(
-                capture_new_classes(),
-                classes_defined_in_initial_file());
+        $candidates = capture_new_classes();
         $loader = new SimpleFileLoader();
         $suite = $loader->createSuiteFromClasses(
                 basename(initial_file()),
@@ -70,22 +73,8 @@ function initial_file() {
 }
 
 /**
- *    Just the classes from the first autorun script. May
- *    get a few false positives, as it just does a regex based
- *    on following the word "class".
- *    @return array        List of all possible classes in first
- *                         autorun script.
- */
-function classes_defined_in_initial_file() {
-    if (preg_match_all('/\bclass\s+(\w+)/i', file_get_contents(initial_file()), $matches)) {
-        return array_map('strtolower', $matches[1]);
-    }
-    return array();
-}
-
-/**
  *    Every class since the first autorun include. This
- *    is safe enough if require_once() is alwyas used.
+ *    is safe enough if require_once() is always used.
  *    @return array        Class names.
  */
 function capture_new_classes() {
