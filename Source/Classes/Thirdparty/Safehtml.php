@@ -47,7 +47,7 @@ class Safehtml {
 			'help', 'javascript', 'livescript', 'lynxcgi', 'lynxexec', 
 			'ms-help', 'ms-its', 'mhtml', 'mocha', 'opera',   
 			'res', 'resource', 'shell', 'vbscript', 'view-source', 
-			'vnd.ms.radio', 'wysiwyg', 
+			'vnd.ms.radio', 'wysiwyg',
 		),
 		$whiteProtocols = array(
 			'ed2k', 'file', 'ftp', 'gopher', 'http', 'https', 
@@ -61,7 +61,7 @@ class Safehtml {
 		$cssKeywords = array(
 			'z\-index', 'cursor', 'display', 'position ', 'absolute',
 			'relative', 'behavior', 'behaviour', 'content', 'expression',
-			'fixed', 'include-source', 'moz-binding', 'scrollbar',
+			'fixed', 'include-source', 'moz-binding', 'binding', 'scrollbar',
 			'visibility', 'filter', 'opacity', 'accelerator', '-moz-',
 			'azimuth', 'clip', 'counter', 'cue', 'elevation', 'ime-mode',
 			'page', 'pause', 'pitch', 'link-source', 'ruby', 'richness',
@@ -96,7 +96,9 @@ class Safehtml {
 			'colspan' => array('tr', 'th'),
 		),
 		
-		$removeIfNoAttribs = array('object', 'param', 'embed'),
+		$removeIfNoAttribs = array('object', 'param', 'embed', 'img', 'a'),
+		
+		$removeIfEmpty = array('src', 'href'),
 		
 		$cleanup = array(
 			'object' => array('width', 'height', 'type', 'classid', 'codebase'),
@@ -162,7 +164,7 @@ class Safehtml {
 		if(isset($options['classes']) && is_array($options['classes']))
 			$this->allowedClasses = $options['classes'];
 		else
-			$this->keepClasses = !!$options['classes'];
+			$this->keepClasses = isset($options['classes']);
 		
 		foreach($this->blackProtocols as $proto){
 			$preg = '';
@@ -207,7 +209,7 @@ class Safehtml {
 				$name = strtolower($name);
 				$allow = false;
 				if(!empty($this->cleanup[$tag])){
-					if(!$this->cleanupAttributes[$name] || !in_array($name, $this->cleanup[$tag]))
+					if(empty($this->cleanupAttributes[$name]) || !in_array($name, $this->cleanup[$tag]))
 						continue;
 					
 					if(is_array($this->cleanupAttributes[$name])){
@@ -269,6 +271,9 @@ class Safehtml {
 					if(!in_array($proto, $this->whiteProtocols))
 						continue;
 				}
+				
+				if(!$value && in_array($name, $this->removeIfEmpty))
+					continue;
 				
 				$attributes .= ' '.$name.'="'.str_replace('"', "&quot;", $value).'"';
 			}

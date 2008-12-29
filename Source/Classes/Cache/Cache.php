@@ -30,7 +30,7 @@ class Cache extends Storage {
 		if(!empty($options['root'])) $this->Configuration['root'] = realpath($options['root']);
 		else $this->Configuration['root'] = Core::retrieve('path').$this->Configuration['root'];
 		
-		$class = ucfirst($this->Configuration['engine']).'cache';
+		$class = String::ucfirst($this->Configuration['engine']).'cache';
 		if($this->Configuration['engine'] && Core::loadClass('Cache', $class))
 			$this->cacheInstance = new $class($this->Configuration);
 		

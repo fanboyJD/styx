@@ -19,13 +19,18 @@ class ValidatorPrototype {
 		
 		if(!Hash::length($Methods))
 			foreach(get_class_methods($Instance) as $method)
-				array_push($Methods, strtolower($method));
+				array_push($Methods, String::toLower($method));
 		
 		if(is_string($validators))
 			$validators = array($validators => true);
 		
+		if(!empty($validators['notempty']) && !empty($validators['purify']))
+			$validators['notempty'] = array(
+				'purify' => $validators['purify'],
+			);
+		
 		foreach($validators as $validator => $options){
-			if(empty($options) || !in_array(strtolower($validator), $Methods))
+			if(empty($options) || !in_array(String::toLower($validator), $Methods))
 				continue;
 			
 			if(!$Instance->{$validator}($data, is_array($options) ? $options : null))
@@ -69,16 +74,18 @@ class ValidatorPrototype {
 		return true;
 	}
 	
-	public function notempty($data){
+	public function notempty($data, $options = null){
+		if(!empty($options['purify'])) $data = Data::purify($data, $options['purify']);
+		
 		return !!trim($data);
 	}
 	
 	public function length($data, $options){
 		$data = trim($data);
 		
-		if(empty($options[1])) return strlen((string)$data)<=$options[0];
+		if(empty($options[1])) return String::length($data)<=$options[0];
 		
-		return strlen((string)$data)>=$options[0] && strlen((string)$data)<=$options[1];
+		return String::length($data)>=$options[0] && String::length($data)<=$options[1];
 	}
 	
 }

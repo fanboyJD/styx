@@ -60,7 +60,7 @@ class Route {
 		if(!$layer) return;
 		
 		$layer->fireEvent($action['event'], !empty($action['get']) ? $action['get'] : null)->register();
-		self::$mainlayer = strtolower($action['layer']);
+		self::$mainlayer = String::toLower($action['layer']);
 	}
 	
 	public static function getMainlayer(){
@@ -134,8 +134,8 @@ class Route {
 	
 	public static function hide($layer, $event = null){
 		self::$hidden[]  = array(
-			'layer' => strtolower($layer),
-			'event' => pick(strtolower($event), '*'),
+			'layer' => String::toLower($layer),
+			'event' => pick(String::toLower($event), '*'),
 		);
 	}
 	

@@ -31,7 +31,7 @@ class Element extends Runner {
 	
 	public function __construct($options, $name = null, $type = null){
 		static $uid = 0;
-		$type = strtolower($type);
+		$type = String::toLower($type);
 		
 		if(!empty($options[':tag'])){
 			$this->name = $this->type = $options[':tag'];
@@ -155,7 +155,7 @@ class Element extends Runner {
 			unset($a['class']);
 		
 		foreach($a as $key => $val)
-			if(($val || $val===0) && !in_array('skip'.ucfirst($key), $options) && !self::skipable($key))
+			if(($val || $val===0) && !in_array('skip'.String::ucfirst($key), $options) && !self::skipable($key))
 				$s[] = $key.'="'.($key=='style' ? str_replace('"', "'", $val) : Data::sanitize($val)).'"';
 		
 		return is_array($s) ? ' '.implode(' ', $s) : '';

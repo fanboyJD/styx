@@ -19,13 +19,13 @@ class DataPrototype {
 		
 		if(!Hash::length($Methods))
 			foreach(get_class_methods('Data') as $method)
-				array_push($Methods, strtolower($method));
+				array_push($Methods, String::toLower($method));
 		
 		if(is_string($validators))
 			$validators = array($validators => true);
 		
 		foreach($validators as $validator => $options){
-			if(empty($options) || !in_array(strtolower($validator), $Methods))
+			if(empty($options) || !in_array(String::toLower($validator), $Methods))
 				continue;
 			
 			$data = $Instance->{$validator}($data, is_array($options) ? $options : null);
@@ -61,7 +61,7 @@ class DataPrototype {
 		
 		if(!$replaces) return $string;
 		
-		return str_replace($replaces[0], $replaces[1], $string);
+		return String::replace($replaces[0], $replaces[1], $string);
 	}
 	
 	public static function sanitize($string){
@@ -130,7 +130,7 @@ class DataPrototype {
 			}
 		}else{
 			$array = trim($array);
-			if($whitespaces) $array = str_replace(array("\r\n", "\t", "\n", "\r"), array($whitespaces=='clean' ? "\n" : " ", "", $whitespaces=='clean' ? "\n" : " ", ""), $array);
+			if($whitespaces) $array = String::replace(array("\r\n", "\t", "\n", "\r"), array($whitespaces=='clean' ? "\n" : " ", "", $whitespaces=='clean' ? "\n" : " ", ""), $array);
 		}
 		
 		return $array;
@@ -153,7 +153,7 @@ class DataPrototype {
 			$regex[0][] = "'";
 		}
 		
-		$title = trim(substr(preg_replace('/([^A-z0-9]|_|\^)+/i', '_', str_replace($regex[0], $regex[1], $title)), 0, 64), '_');
+		$title = trim(String::sub(preg_replace('/([^A-z0-9]|_|\^)+/i', '_', String::replace($regex[0], $regex[1], $title)), 0, 64), '_');
 		
 		if(empty($options['identifier'])){
 			static $identifier;
@@ -176,7 +176,7 @@ class DataPrototype {
 		foreach($options['contents'] as $content){
 			if(!is_array($content)) $content = array($options['identifier']['external'] => $content);
 			
-			if((empty($options[$options['identifier']['internal']]) || $options[$options['identifier']['internal']]!=$content[$options['identifier']['internal']]) && strtolower($content[$options['identifier']['external']])==strtolower($title.(self::id($i) ? (String::ends($title, '_') ? '' : '_').$i : '')))
+			if((empty($options[$options['identifier']['internal']]) || $options[$options['identifier']['internal']]!=$content[$options['identifier']['internal']]) && String::toLower($content[$options['identifier']['external']])==String::toLower($title.($i ? '_'.$i : '')))
 				return self::checkTitle($title, $options, ++$i);
 		}
 		
@@ -195,15 +195,15 @@ class DataPrototype {
 		'dots' => true,
 		'options' => false,
 	)){
-		if(strlen($data)<$options['length']) return $data;
+		if(String::length($data)<$options['length']) return $data;
 		
-		$data = substr($data, 0, $options['length']);
+		$data = String::sub($data, 0, $options['length']);
 		
 		preg_match('/(\s+(?!([^<]+)?>)(?!.*\s+).*)/is', $data, $m);
 		
 		if($m[1]){
 			$pos = strrpos($data, $m[1]);
-			if($pos!==false) $data = substr($data, 0, $pos);
+			if($pos!==false) $data = String::sub($data, 0, $pos);
 		}
 		
 		return (!empty($options['purify']) ? self::purify($data, $options['options']) : $data).(!empty($options['dots']) ? '...' : '');

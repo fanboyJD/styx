@@ -16,7 +16,7 @@ class Lang {
 		$lang = 'en';
 	
 	public static function setLanguage($lang){
-		self::$lang = strtolower(pick($lang, 'en'));
+		self::$lang = String::toLower(pick($lang, 'en'));
 		
 		self::$Fileparser = new Fileparser('Language/'.self::$lang.'.lang');
 	}

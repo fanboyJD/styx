@@ -19,7 +19,7 @@ class Script {
 	}
 	
 	public static function log($data, $type = null){
-		$type = strtolower($type);
+		$type = String::toLower($type);
 		
 		self::set('console.'.(in_array($type, self::$API) ? $type : self::$API[0]).'('.json_encode($data).');');
 	}

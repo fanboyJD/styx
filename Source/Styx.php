@@ -4,6 +4,9 @@
  * Author: christoph.pojer@gmail.com
  */
 
+if(function_exists('mb_internal_encoding'))
+	mb_internal_encoding('UTF-8');
+
 if(!isset($Paths) || !is_array($Paths))
 	$Paths = array(
 		'app.path' => realpath('../').DIRECTORY_SEPARATOR,

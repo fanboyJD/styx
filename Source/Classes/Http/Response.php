@@ -92,7 +92,7 @@ class Response {
 	public static function allow(){
 		$args = Hash::args(func_get_args());
 		
-		self::$Types = array_map('strtolower', $args);
+		self::$Types = array_map('String::toLower', $args);
 	}
 	
 	public static function setDefaultContentType(){
@@ -114,7 +114,7 @@ class Response {
 	
 	public static function setContentType($contentType){
 		if(is_string($contentType)){
-			$class = strtolower($contentType).'content';
+			$class = String::toLower($contentType).'content';
 			if(Core::classExists($class)) $contentType = new $class;
 			else return;
 		}

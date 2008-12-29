@@ -46,8 +46,8 @@ class Paginate {
 	}
 	
 	public static function retrieve($class){
-		$self = strtolower(__CLASS__);
-		if(!$class || !Core::classExists($class) || (strtolower($class)!=$self && !is_subclass_of($class, $self)))
+		$self = String::toLower(__CLASS__);
+		if(!$class || !Core::classExists($class) || (String::toLower($class)!=$self && !is_subclass_of($class, $self)))
 			$class = $self;
 		
 		return new $class;

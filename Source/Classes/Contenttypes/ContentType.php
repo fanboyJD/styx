@@ -12,7 +12,7 @@ class ContentType {
 	protected $type = null;
 	
 	public function __construct(){
-		$this->type = substr(strtolower(get_class($this)), 0, -7);
+		$this->type = String::sub(String::toLower(get_class($this)), 0, -7);
 	}
 	
 	public function getType(){

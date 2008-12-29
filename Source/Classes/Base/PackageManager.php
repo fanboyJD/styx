@@ -143,7 +143,7 @@ class PackageManager {
 				$compressor = new JavaScriptPacker($content, 'None', false);
 				$content = $compressor->pack();
 			}else{
-				$content = str_replace(
+				$content = String::replace(
 					array('{ ',' }', '; ', ';}', ': ', ', '),
 					array('{', '}', ';', '}', ':', ','),
 					Data::clean(preg_replace('/\s{2,}/', '', preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $content)), true)
@@ -174,7 +174,7 @@ class PackageManager {
 			
 			$encodings = array();
 			if($_SERVER['HTTP_ACCEPT_ENCODING'])
-				$encodings = explode(',', strtolower(preg_replace('/\s+/', '', $_SERVER['HTTP_ACCEPT_ENCODING'])));
+				$encodings = explode(',', String::toLower(preg_replace('/\s+/', '', $_SERVER['HTTP_ACCEPT_ENCODING'])));
 		
 			if((in_array('gzip', $encodings) || in_array('x-gzip', $encodings)) && !ini_get('zlib.output_compression'))
 				self::$encoding = (in_array('x-gzip', $encodings) ? 'x-' : '').'gzip';

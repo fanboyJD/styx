@@ -38,7 +38,7 @@ class Template extends Runner {
 		$ext = pathinfo(end($this->file), PATHINFO_EXTENSION);
 		$file = implode('/', $this->file).(!$ext ? '.'.$Configuration['template.default'] : '');
 		
-		if(in_array(strtolower($ext ? $ext : $Configuration['template.default']), $Configuration['template.execute'])){
+		if(in_array(String::toLower($ext ? $ext : $Configuration['template.default']), $Configuration['template.execute'])){
 			if($this->bound && method_exists($this->bound, 'execute')){
 				if(empty($Configuration['Templates'][$file])) return;
 				
@@ -143,7 +143,7 @@ class Template extends Runner {
 				if(!empty($this->assigned[$val])){
 					$rep[1][$i] = $this->assigned[$val];
 					break;
-				}elseif(String::starts($val, 'lang.') && $lang = Lang::retrieve(substr($val, 5))){
+				}elseif(String::starts($val, 'lang.') && $lang = Lang::retrieve(String::sub($val, 5))){
 					$rep[1][$i] = $lang;
 					break;
 				}
@@ -157,7 +157,7 @@ class Template extends Runner {
 		$rep[0][] = "\t";
 		$rep[1][] = '';
 		
-		$out = str_replace($rep[0], $rep[1], $out);
+		$out = String::replace($rep[0], $rep[1], $out);
 		
 		if($return) return $out;
 		

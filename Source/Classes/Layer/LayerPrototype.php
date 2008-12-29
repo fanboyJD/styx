@@ -70,7 +70,7 @@ abstract class LayerPrototype extends Runner {
 		if(!$layername || !Core::autoload($layername.'layer'))
 			return false;
 		
-		$layername = strtolower($layername);
+		$layername = String::toLower($layername);
 		$class = $layername.'layer';
 		
 		if(!is_subclass_of($class, 'layer'))
@@ -87,7 +87,7 @@ abstract class LayerPrototype extends Runner {
 	public static function retrieve($layer){
 		static $Instances;
 		
-		$layer = strtolower($layer);
+		$layer = String::toLower($layer);
 		if(empty($Instances[$layer]))
 			return $Instances[$layer] = Layer::create($layer);
 		
@@ -95,12 +95,12 @@ abstract class LayerPrototype extends Runner {
 	}
 	
 	protected function __construct($name){
-		$this->base = $this->name = ucfirst($name);
-		$this->table = $this->layername = strtolower($name);
+		$this->base = $this->name = String::ucfirst($name);
+		$this->table = $this->layername = String::toLower($name);
 		
 		foreach(get_class_methods($this) as $method)
-			if(String::starts($method, 'on') && strlen($method)>=3)
-				array_push($this->methods, strtolower(substr($method, 2)));
+			if(String::starts($method, 'on') && String::length($method)>=3)
+				array_push($this->methods, String::toLower(String::sub($method, 2)));
 		
 		$this->request = Request::retrieve('method');
 		$this->Form = new Form();
@@ -136,7 +136,7 @@ abstract class LayerPrototype extends Runner {
 		foreach(array('get', 'post') as $v)
 			$this->{$v} = Hash::length($$v) ? $$v : Request::retrieve($v);
 		
-		$event = strtolower($event);
+		$event = String::toLower($event);
 		if(!in_array($event, $this->methods)){
 			$default = $this->getDefaultEvent('view');
 			
@@ -153,7 +153,7 @@ abstract class LayerPrototype extends Runner {
 			if($this->request=='post' && Hash::length($this->post))
 				$this->prepare($this->post);
 			
-			$this->{'on'.ucfirst($event)}(isset($this->get[$event]) ? $this->get[$event] : null);
+			$this->{'on'.String::ucfirst($event)}(isset($this->get[$event]) ? $this->get[$event] : null);
 		}catch(ValidatorException $e){
 			static $rebound;
 			
@@ -263,7 +263,7 @@ abstract class LayerPrototype extends Runner {
 	}
 	
 	public function setDefaultEvent($event, $name){
-		return $this->events[$event] = strtolower($name);
+		return $this->events[$event] = String::toLower($name);
 	}
 	
 	public function getReboundEvent($from){
@@ -271,7 +271,7 @@ abstract class LayerPrototype extends Runner {
 	}
 	
 	public function setReboundEvent($event, $to){
-		return $this->rebounds[$event] = strtolower($to);
+		return $this->rebounds[$event] = String::toLower($to);
 	}
 	
 	public function getPagetitle($title, $where = null, $options = array()){
@@ -293,7 +293,7 @@ abstract class LayerPrototype extends Runner {
 	}
 	
 	public function paginate($class = null){
-		if($this->Paginate && strtolower(get_class($this->Paginate))==strtolower(pick($class, 'Paginate')))
+		if($this->Paginate && String::toLower(get_class($this->Paginate))==String::toLower(pick($class, 'Paginate')))
 			return $this->Paginate;
 		
 		return $this->Paginate = Paginate::retrieve($class)->bind($this);
@@ -315,7 +315,7 @@ abstract class LayerPrototype extends Runner {
 		if(!$event || !in_array($event, $this->methods))
 			$event = $Configuration['default'];
 		
-		$base = array(strtolower($this->base));
+		$base = array(String::toLower($this->base));
 		if($title || ($event && ($event!=$Configuration['default'] || $showEvent))){
 			if(!$title) $base[] = $event;
 			else if(in_array($title, $this->methods) || $event!=$Configuration['default']) $base[] = array($event, $title);

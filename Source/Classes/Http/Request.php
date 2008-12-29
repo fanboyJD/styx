@@ -13,7 +13,7 @@ class Request {
 	private function __clone(){}
 	
 	public static function initialize(){
-		$method = isset($_SERVER['REQUEST_METHOD']) ? strtolower($_SERVER['REQUEST_METHOD']) : null;
+		$method = isset($_SERVER['REQUEST_METHOD']) ? String::toLower($_SERVER['REQUEST_METHOD']) : null;
 		
 		self::store('method', in_array($method, array('get', 'post', 'put', 'delete')) ? $method : 'get');
 		
@@ -22,7 +22,7 @@ class Request {
 	
 	public static function parse(){
 		foreach(array('post', 'cookie') as $v)
-			self::store($v, self::sanitize($GLOBALS['_'.strtoupper($v)]));
+			self::store($v, self::sanitize($GLOBALS['_'.String::toUpper($v)]));
 		
 		$request = self::processRequest();
 		
