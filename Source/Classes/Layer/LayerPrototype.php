@@ -7,7 +7,7 @@
  *
  */
 
-abstract class Layer extends Runner {
+abstract class LayerPrototype extends Runner {
 
 	protected 
 		/**

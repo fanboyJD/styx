@@ -91,7 +91,7 @@ class Cache extends Storage {
 			'encode' => true,
 		);
 		
-		if(Data::id($options)) Hash::extend($default, array('ttl' => $options));
+		if(is_numeric($options)) Hash::extend($default, array('ttl' => $options));
 		elseif(is_array($options)) Hash::extend($default, $options);
 		
 		if(!$default['ttl']) $default['type'] = 'file';
@@ -104,7 +104,7 @@ class Cache extends Storage {
 		
 		if(!empty($options['tags'])) $this->Meta[$id][] = array_values(Hash::splat($options['tags']));
 		
-		$content = $this->Meta[$id][2] ? json_encode(Data::clean($input)) : $input;
+		$content = $this->Meta[$id][2] ? json_encode($input) : $input;
 		
 		$this->{$this->cacheInstance && $this->Meta[$id][1] ? 'cacheInstance' : 'persistentInstance'}->store($id, $content, $default['ttl']);
 		

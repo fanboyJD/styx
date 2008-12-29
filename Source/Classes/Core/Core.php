@@ -101,6 +101,9 @@ class Core {
 			foreach(new ExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator(self::$Storage['app.path'].'/Classes/'))) as $file)
 				$List[strtolower(basename($file->getFileName(), '.php'))] = $file->getRealPath();
 			
+			foreach(new ExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator(self::$Storage['app.path'].'/Prototypes/'))) as $file)
+				$List[strtolower(basename($file->getFileName(), '.php'))] = $file->getRealPath();
+			
 			self::$Storage['Classes'] = $c->store('Core/Classes', $List, ONE_WEEK);
 		}
 		

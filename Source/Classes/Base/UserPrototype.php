@@ -7,7 +7,7 @@
  *
  */
 
-class User {
+class UserPrototype {
 	
 	private static $Configuration = array(),
 		$rights = array(),

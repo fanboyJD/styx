@@ -26,9 +26,16 @@ class Filecache {
 	}
 	
 	public function store($id, $content, $ttl = null){
+		static $loaded;
+		
 		$file = $this->Configuration['prefix'].$id.'.txt';
 		
 		if(!file_exists($file)){
+			if(!$loaded){
+				Core::loadClass('Utility', 'Folder');
+				$loaded = true;
+			}
+			
 			Folder::mkdir(dirname($file));
 			
 			touch($file); 

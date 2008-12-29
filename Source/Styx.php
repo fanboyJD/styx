@@ -17,7 +17,7 @@ require($Paths['app.path'].'/Config/Configuration.php');
 
 if(empty($Paths['path'])) $Paths['path'] = dirname(__FILE__).DIRECTORY_SEPARATOR;
 
-foreach(array('Storage', 'Hash', 'Core', 'String', 'Data') as $v)
+foreach(array('Storage', 'Hash', 'Core', 'String') as $v)
 	require($Paths['path'].'Classes/Core/'.$v.'.php');
 
 spl_autoload_register(array('Core', 'autoload'));

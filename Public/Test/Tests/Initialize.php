@@ -1,6 +1,6 @@
 <?php
 	include('../Assets/SimpleTest/autorun.php');
-	$use = 'debug';
+	include('../Assets/SimpleTest/browser.php');
 	
 	$Paths = array(
 		'app.path' => realpath('../../Sample/'),
@@ -8,10 +8,3 @@
 	);
 	
 	include('../../../Source/Styx.php');
-	
-	function initialize(){
-		Route::connect('logout', array(
-			'layer' => 'login',
-			'event' => 'logout',
-		));
-	}

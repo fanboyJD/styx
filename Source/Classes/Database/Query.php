@@ -147,7 +147,7 @@ class Query {
 		$query = Database::getInstance()->query($this->format());
 		
 		if($this->type!='select')
-			Cache::getInstance()->eraseBy('QueryCache/'.$this->table.'/')->eraseByTag('Database/'.$this->table);
+			Cache::getInstance()->eraseBy('QueryCache/'.$this->table.'/')->eraseByTag('Db/'.$this->table);
 		
 		return $query;
 	}

@@ -7,7 +7,7 @@
  *
  */
 
-class Validator {
+class ValidatorPrototype {
 	
 	private function __construct(){}
 	private function __clone(){}

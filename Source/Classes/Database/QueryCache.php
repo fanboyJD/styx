@@ -23,7 +23,7 @@ class QueryCache extends QuerySelect {
 		);
 		$data = $this->Storage->retrieve('join');
 		if(is_array($data) && !empty($data['table']))
-			$options['tags'] = array('Database/'.$data['table']);
+			$options['tags'] = array('Db/'.$data['table']);
 		
 		return Cache::getInstance()->store('QueryCache/'.$this->table.'/'.md5($this->format().$type), $content, $options);
 	}
