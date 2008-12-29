@@ -46,4 +46,15 @@ class String {
 		return str_replace($search, $replace, $subject, $count);
 	}
 	
+	public static function convert($array){
+		if(!is_array($array))
+			return iconv('UTF-8', 'UTF-8//IGNORE', $array);
+		
+		foreach(Hash::splat($array) as $k => $v)
+			if(is_array($v)) $array[$k] = self::convert($v);
+			else $array[$k] = iconv('UTF-8', 'UTF-8//IGNORE', $v);
+		
+		return $array;
+	}
+	
 }

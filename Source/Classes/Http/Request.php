@@ -22,7 +22,7 @@ class Request {
 	
 	public static function parse(){
 		foreach(array('post', 'cookie') as $v)
-			self::store($v, self::sanitize($GLOBALS['_'.String::toUpper($v)]));
+			self::store(String::convert($v), self::sanitize($GLOBALS['_'.String::toUpper($v)]));
 		
 		$request = self::processRequest();
 		
@@ -55,6 +55,8 @@ class Request {
 		$path = pick($path, isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '');
 		
 		if(!empty($processed[$path])) return $processed[$path];
+		
+		$path = String::convert($path);
 		
 		foreach(array('get', 'request', 'parts', 'keys') as $v)
 			$request[$v] = array();
