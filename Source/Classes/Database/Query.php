@@ -47,7 +47,6 @@ class Query {
 	
 	/*
 	 *	WHERE allows the following input methods:
-	 *		(int) 15 => "id='15'"
 	 *		(string) "id='15'"
 	 *		array(id=>15, 'AND', Query::in('uid', array(1, 2, 3)))
 	 *		array(array('id' => 5), 'OR', array('id' => 6))
@@ -76,9 +75,8 @@ class Query {
 	protected function formatLimit(){
 		$type = in_array($this->type, array('update', 'delete'));
 		
-		// This is awesome: through Storage it sets the limit value only if it has not been set yet
 		$limit = $this->Storage->retrieve('limit', $type ? array(0, 1) : null);
-		if(!$limit || (!$limit[0] && !$limit[1]))
+		if(!is_array($limit) || (!$limit[0] && !$limit[1]))
 			return '';
 		
 		return 'LIMIT '.(!$type ? $limit[0].',' : '').$limit[1];
@@ -116,10 +114,8 @@ class Query {
 	public function limit($limit, $val = null){
 		unset($this->formatted);
 		
-		if($val)
-			$limit = array($limit, $val);
-		elseif(!is_array($limit))
-			$limit = array(0, $limit);
+		if($val) $limit = array($limit, $val);
+		elseif(!is_array($limit)) $limit = array(0, $limit);
 		
 		$this->Storage->store('limit', $limit);
 		

@@ -9,7 +9,7 @@
 
 class QuerySelect extends Query implements Iterator, Countable {
 	
-	protected $cache = array(),
+	protected $Data = array(),
 		$queried = false;
 	
 	public function __construct($table){
@@ -143,7 +143,7 @@ class QuerySelect extends Query implements Iterator, Countable {
 	public function retrieve(){
 		$this->queried = false;
 		
-		return $this->cache = pick(Database::getInstance()->retrieve($this->format()), array());
+		return $this->Data = pick(Database::getInstance()->retrieve($this->format()), array());
 	}
 	
 	public function rewind(){
@@ -152,19 +152,19 @@ class QuerySelect extends Query implements Iterator, Countable {
 			$this->queried = true;
 		}
 		
-		reset($this->cache);
+		reset($this->Data);
 	}
 	
 	public function current(){
-		return current($this->cache);
+		return current($this->Data);
 	}
 	
 	public function key(){
-		return key($this->cache);
+		return key($this->Data);
 	}
 	
 	public function next(){
-		return next($this->cache);
+		return next($this->Data);
 	}
 	
 	public function valid(){
@@ -172,13 +172,13 @@ class QuerySelect extends Query implements Iterator, Countable {
 	}
 	
 	public function reset(){
-		return reset($this->cache);
+		return reset($this->Data);
 	}
 	
 	public function count(){
 		if(!$this->queried) $this->rewind();
 		
-		return count($this->cache);
+		return count($this->Data);
 	}
 	
 }

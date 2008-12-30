@@ -41,7 +41,7 @@ class QueryCache extends QuerySelect {
 		
 		$cache = $this->getCache();
 		
-		return $cache ? $this->cache = $cache : $this->setCache(parent::retrieve());
+		return $cache ? $this->Data = $cache : $this->setCache(parent::retrieve());
 	}
 	
 }

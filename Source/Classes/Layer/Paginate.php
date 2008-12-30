@@ -30,7 +30,7 @@ class Paginate {
 		
 		$count = 0;
 
-	public function initialize($data, $options){
+	public function initialize($data, $options = array()){
 		$this->initialized = true;
 		
 		$this->Data = $data;
