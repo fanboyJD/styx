@@ -30,7 +30,7 @@ class DataSetTest extends UnitTestCase {
 		$set = new DataSet($data);
 		$set->limit(4, 10);
 		
-		$this->assertEqual(count($set), 9);
+		$this->assertEqual(count($set), 8);
 		
 		$set = new DataSet($data);
 		$set->order('id DESC')->limit(2);
