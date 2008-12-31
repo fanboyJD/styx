@@ -31,6 +31,12 @@ class IndexLayer extends Layer {
 				),
 			)),
 			
+			new UploadInput(array(
+				'name' => 'image',
+				':caption' => Lang::retrieve('news.file'),
+				':alias' => true,
+			)),
+			
 			new Button(array(
 				'name' => 'bsave',
 				':caption' => Lang::retrieve('save'),
@@ -38,7 +44,8 @@ class IndexLayer extends Layer {
 			
 			new Field('uid'),
 			new Field('pagetitle'),
-			new Field('time')
+			new Field('time'),
+			new Field('picture')
 		);
 		
 		$this->requireSession(); // Adds an invisible element with the current session so everything is safe :)
@@ -47,6 +54,26 @@ class IndexLayer extends Layer {
 	public function onSave(){
 		if(!User::hasRight('layer.index.edit'))
 			throw new ValidatorException('rights');
+		
+		// With a try-catch-block we make the upload optional
+		if(Upload::exists('image')){
+			try{
+				$img = new Image(Upload::move('image', 'Files/', array('size' => 1024*512, 'mimes' => array('image/gif', 'image/png', 'image/jpeg'))));
+				$file = $img->resize(120)->save();
+				
+				$filename = basename($img->getPathname());
+				$this->setValue(array(
+					'picture' => 'Files/'.$filename,
+				));
+			}catch(UploadException $e){
+				$this->Template->append($e->getMessage());
+				return;
+			}
+		}else{
+			$this->setValue(array(
+				'picture' => $this->editing ? $this->content['picture'] : '',
+			));
+		}
 		
 		$this->setValue(array(
 			'uid' => $this->editing ? $this->content['uid'] : User::get('id'),

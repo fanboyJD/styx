@@ -7,6 +7,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	${package.style.css}${package.ie.css}${package.ie.js}${package.package1.js}
 	${scripts}
+	<link rel="shortcut icon" href="favicon.png" />
 	<link rel="alternate" type="application/rss+xml" title="${rss.title}" href="${rss.link}" />
 </head>
 <body>

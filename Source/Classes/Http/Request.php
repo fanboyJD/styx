@@ -56,8 +56,6 @@ class Request {
 		
 		if(!empty($processed[$path])) return $processed[$path];
 		
-		$path = String::convert($path);
-		
 		foreach(array('get', 'request', 'parts', 'keys') as $v)
 			$request[$v] = array();
 		

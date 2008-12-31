@@ -5,7 +5,7 @@ $CONFIGURATION['debug'] = array(
 	'app.name' => 'Styx Framework Application',
 	'app.link' => 'http://svn/Framework/trunk/Public/Sample/Public',
 	'app.mail' => 'someone@nowhere.ru',
-	'app.version' => '0.2dev',
+	'app.version' => '0.2beta',
 	
 	'debug' => true, // When debug is set to true no cache is used etc.
 	

@@ -181,9 +181,7 @@ class Elements extends Element {
 		
 		if(isset($elements[0]) && is_array($elements[0])) $options = array_shift($elements);
 		
-		if(count($elements))
-			foreach($elements as $el)
-				$this->elements[$el->options['name']] = $el;
+		$this->addElements($elements);
 		
 		parent::__construct($options, pick($name, get_class()), $type);
 	}
@@ -234,6 +232,12 @@ class Elements extends Element {
 		return !empty($this->elements[$el->options['name']]);
 	}
 	
+	public function hasInstanceOf($instance){
+		foreach($this->elements as $el)
+			if($el instanceof $instance)
+				return true;
+	}
+	
 	public function getElements(){
 		return $this->elements;
 	}
@@ -260,6 +264,23 @@ class HiddenInput extends Input {
 		$options['type'] = 'hidden';
 		
 		parent::__construct($options, get_class());
+	}
+	
+}
+
+class UploadInput extends Input {
+	
+	public function __construct($options){
+		$options['type'] = 'file';
+		
+		parent::__construct($options, get_class());
+	}
+	
+	public function format($pass = null){
+		if(empty($this->options[':template']))
+			$this->options[':template'] = 'Input';
+		
+		return parent::format($pass);
 	}
 	
 }

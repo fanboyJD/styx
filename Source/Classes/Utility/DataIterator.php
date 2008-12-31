@@ -1,20 +1,32 @@
 <?php
-/*
- * Styx::DataIterator - MIT-style License
- * Author: christoph.pojer@gmail.com
+/**
+ * Styx::DataIterator - Creates a tree out of flat data to iterate over it
+ * 
+ * @package Styx
+ * @subpackage Utility
  *
- * Usage: Creates a tree out of flat data to iterate over it
- *
+ * @license MIT-style License
+ * @author Christoph Pojer <christoph.pojer@gmail.com>
  */
 
 class DataIterator implements RecursiveIterator, Countable  {
 	
-	private
-		$Data,
-		$Current,
-		
-		$options = array();
+	/**
+	 * @var array
+	 */
+	private $Data;
+	/**
+	 * The array of the current tree-children
+	 *
+	 * @var array
+	 */
+	private $Current;
+	private $options = array();
 
+	/**
+	 * @param array $data
+	 * @param array $options
+	 */
 	public function __construct($data, $options = null){
 		$this->initialized = true;
 		
@@ -24,6 +36,14 @@ class DataIterator implements RecursiveIterator, Countable  {
 		$this->Current = $data[$this->options['current']];
 	}
 	
+	/**
+	 * Primarily used to create a fully functional DataIterator-Tree on which
+ 	 * foreach() can be used on
+	 *
+	 * @param array $data
+	 * @param array $options
+	 * @return RecursiveIteratorIterator
+	 */
 	public static function retrieve($data, $options = null){
 		$default = array(
 			'identifier' => null,

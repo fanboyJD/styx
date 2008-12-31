@@ -254,3 +254,10 @@ span.green {
 	width: 16px;
 	height: 16px;
 }
+
+.articleimg {
+	float: left;
+	border: 1px solid #555;
+	padding: 3px;
+	margin-right: 5px;
+}

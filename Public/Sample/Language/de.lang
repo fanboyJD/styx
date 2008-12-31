@@ -15,6 +15,8 @@ namespace news {
 	add = 'Neuigkeiten einfügen';
 	modify = 'Neuigkeiten bearbeiten';
 	
+	file = 'Artikelbild';
+	
 	saved = '<div class="inner">
 			<b>Dein Eintrag wurde gespeichert.</b><br/><br/>
 			<a href="%s" class="go icon">Zum News-Eintrag</a>
@@ -85,6 +87,19 @@ namespace admin {
 namespace paginate {
 	next = 'Weiter';
 	previous = 'Zurück';
+}
+
+namespace upload {
+	path = 'Der angegebene Upload-Ordner existiert nicht. Bitte kontaktiere den Administrator dieser Website.';
+	exists = 'Der angegebene Upload-Speicherort existiert bereits. Bitte kontaktiere den Administrator dieser Website.';
+	mime = 'Der angegebene Dateityp ist nicht erlaubt.';
+	extension = 'Die Datei hat eine unbekannte oder unerlaubte Datei-Erweiterung.';
+	
+	size = 'Die Datei, die du hochgeladen hast, ist zu groß um sie auf diesem Server zu verarbeiten. Bitte lade eine kleinere Datei hoch.';
+	partial = 'Die Datei wurde nur teilweise hochgeladen. Bitte lade sie erneut hoch.';
+	nofile = 'Es wurde keine Datei hochgeladen.';
+	
+	default = 'Der Datei-Upload ist fehlgeschlagen.';
 }
 
 namespace validator {

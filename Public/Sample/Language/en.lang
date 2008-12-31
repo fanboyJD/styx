@@ -15,6 +15,8 @@ namespace news {
 	add = 'Add news';
 	modify = 'Edit news';
 	
+	file = 'Article-Picture';
+	
 	saved = '<div class="inner">
 			<b>Your entry has been saved.</b><br/><br/>
 			<a href="%s" class="go icon">Go to the News-Entry</a>
@@ -86,6 +88,19 @@ namespace admin {
 namespace paginate {
 	next = 'Next';
 	previous = 'Previous';
+}
+
+namespace upload {
+	path = 'The specified Upload-Folder does not exist. Please contact the administrator of this Website.';
+	exists = 'The specified Upload-Location does already exist. Please contact the administrator of this Website.';
+	mime = 'The specified file-type is not allowed.';
+	extension = 'The uploaded file has an unknown or forbidden file extension.';
+	
+	size = 'The size of the file you uploaded is too big to be processed on this server. Please upload a smaller file.';
+	partial = 'The file you uploaded was only partially uploaded, please upload the file again.';
+	nofile = 'There was no file specified to be uploaded.';
+	
+	default = 'Something went wrong with the File-Upload.';
 }
 
 namespace validator {

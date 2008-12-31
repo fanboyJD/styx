@@ -33,7 +33,7 @@ function simpletest_autorun() {
         $suite = $loader->createSuiteFromClasses(
                 basename(initial_file()),
                 $loader->selectRunnableTests($candidates));
-        $result = $suite->run(new DefaultReporter());
+        $result = $suite->run(new StyxReporter());
     } catch (Exception $stack_frame_fix) {
         print $stack_frame_fix->getMessage();
         $result = false;

@@ -21,6 +21,9 @@ class Form extends Elements {
 	public function format(){
 		static $prefix = false;
 		
+		if($this->hasInstanceOf('UploadInput')) // Sets the enctype if needed and if hasn't been manually set yet
+			$this->get('enctype', 'multipart/form-data');
+		
 		$out = array('form.top' => '<form'.$this->implode('skipName').'><div>');
 		Hash::extend($out, parent::format());
 		$out['form.bottom'] = '</div></form>';
@@ -76,9 +79,10 @@ class Form extends Elements {
 			
 			$v = Validator::call($el->getValue(), $el->options[':validate']);
 			
-			if($v!==true) return array($v, $k, !empty($el->options[':caption']) ? $el->options[':caption'] : null);
+			if($v!==true) return array($v, !empty($el->options[':caption']) ? $el->options[':caption'] : null);
 		}
 		
 		return true;
 	}
+	
 }

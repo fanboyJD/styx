@@ -154,35 +154,39 @@ abstract class LayerPrototype extends Runner {
 				$this->prepare($this->post);
 			
 			$this->{'on'.String::ucfirst($event)}(isset($this->get[$event]) ? $this->get[$event] : null);
-		}catch(ValidatorException $e){
-			static $rebound;
-			
-			if(!$rebound && $this->options['rebound'] && $this->request=='post' && Hash::length($this->post)){
-				$rebound = true;
-				foreach($this->Form->prepare() as $name => $value)
-					$this->post[$name] = $value;
-				
-				$event = $this->getReboundEvent($this->event);
-				if(!$event) $event = $this->getDefaultEvent('edit');
-				
-				if($event){
-					$this->get[$event] = isset($this->get[$this->event]) ? $this->get[$this->event] : null;
-					
-					$this->fireEvent($event, $this->get, $this->post);
-				}
-			}
-			
-			$assign = $e->getMessage();
-			
-			if($this->Template->hasFile()){
-				$prefix = Core::retrieve('elements.prefix');
-				$this->Template->assign(array(($prefix ? $prefix.'.' : '').'form.message' => $assign));
-			}else{
-				$this->Template->append($assign, true);
-			}
+		}catch(Exception $e){
+			$this->rebound($e);
 		}
 		
 		return $this;
+	}
+	
+	public function rebound($e){
+		static $rebound;
+		
+		if(!$rebound && $this->options['rebound'] && $this->request=='post' && Hash::length($this->post)){
+			$rebound = true;
+			foreach($this->Form->prepare() as $name => $value)
+				$this->post[$name] = $value;
+			
+			$event = $this->getReboundEvent($this->event);
+			if(!$event) $event = $this->getDefaultEvent('edit');
+			
+			if($event){
+				$this->get[$event] = isset($this->get[$this->event]) ? $this->get[$this->event] : null;
+				
+				$this->fireEvent($event, $this->get, $this->post);
+			}
+		}
+		
+		$assign = $e->getMessage();
+		
+		if($this->Template->hasFile()){
+			$prefix = Core::retrieve('elements.prefix');
+			$this->Template->assign(array(($prefix ? $prefix.'.' : '').'form.message' => $assign));
+		}else{
+			$this->Template->append($assign, true);
+		}
 	}
 	
 	public function edit($options = array(

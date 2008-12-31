@@ -1,21 +1,36 @@
 <?php
-/*
- * Styx::Core - MIT-style License
- * Author: christoph.pojer@gmail.com
+/**
+ * Returns either {@link $a} if not empty, or {@link $b}
  *
- * Usage: Initializes the Styx Framework and handles basic stuff
- *
+ * @package Styx
+ * @param mixed $a
+ * @param mixed $b
+ * @return mixed
  */
-
 function pick($a, $b = null){
 	return $a ? $a : $b;
 }
 
+/**
+ * Styx::ExtensionFilter - Returns only the files by the specified extension
+ * when used with a DirectoryIterator
+ * 
+ * @package Styx
+ * @subpackage Core
+ *
+ * @license MIT-style License
+ * @author Christoph Pojer <christoph.pojer@gmail.com>
+ *
+ */
 class ExtensionFilter extends FilterIterator {
 	
 	private $it,
 		$ext = array();
 	
+	/**
+	 * @param RecursiveIteratorIterator $it
+	 * @param string|array $ext
+	 */
 	public function __construct(RecursiveIteratorIterator $it, $ext = null){
 		if(!$ext) $ext = 'php';
 		
@@ -25,12 +40,27 @@ class ExtensionFilter extends FilterIterator {
 		$this->it = $it;
 	}
 	
+	/**
+	 * Checks if the file matches one of the specified extensions
+	 *
+	 * @return bool Whether to accept the file or not
+	 */
 	public function accept(){
 		return !empty($this->it->isDir) || in_array(String::toLower(pathinfo($this->current(), PATHINFO_EXTENSION)), $this->ext);
 	}
 	
 }
 
+/**
+ * A class can extend from Runner to be used with {@link Template::bind}
+ * 
+ * @see Template::bind
+ * @package Styx
+ * @subpackage Core
+ *
+ * @license MIT-style License
+ * @author Christoph Pojer <christoph.pojer@gmail.com>
+ */
 abstract class Runner {
 	
 	public function execute(){
@@ -39,19 +69,29 @@ abstract class Runner {
 	
 }
 
+/**
+ * Styx::Core - Initializes the Styx Framework, holds the Configuration and 
+ * provides some basic functionality
+ * 
+ * @package Styx
+ * @subpackage Core
+ *
+ * @license MIT-style License
+ * @author Christoph Pojer <christoph.pojer@gmail.com>
+ */
 class Core {
 	
 	private function __construct(){}
 	private function __clone(){}
 	
 	/**
-	 * This method is only needed to load the basic Framework
-	 * Classes before it is initialized. As it is only used internally
-	 * no additional checks (e.g. file_exists) are done.
+	 * This method is only needed to load the basic Framework-Classes
+	 * before it is initialized. As it is only used internally
+	 * no additional checks (e.g. file_exists) are made
 	 *
 	 * @param string $dir
 	 * @param string $class
-	 * @return bool
+	 * @return bool Always true
 	 */
 	public static function loadClass($dir, $class){
 		$file = self::$Storage['path'].'Classes/'.String::ucfirst($dir).'/'.String::ucfirst(String::toLower($class)).'.php';
@@ -61,12 +101,26 @@ class Core {
 		return true;
 	}
 	
+	/**
+	 * Returns the filename of a class if it exists anywhere in the Framework
+	 * or in the Application. The class might not be loaded at that point as
+	 * it only checks if the given class-file exists
+	 *
+	 * @param string $class
+	 * @return mixed 
+	 */
 	public static function classExists($class){
 		$class = String::toLower($class);
 		
 		return !empty(self::$Storage['Classes'][$class]) || class_exists($class, false) ? self::$Storage['Classes'][$class] : false;	
 	}
 	
+	/**
+	 * Automatically loads the given class when used with "new Classname"
+	 *
+	 * @param string $class
+	 * @return bool
+	 */
 	public static function autoload($class){
 		$file = self::classExists($class);
 		
@@ -75,6 +129,11 @@ class Core {
 		return !!$file;
 	}
 	
+	/**
+	 * This method sets up the basic configuration of the Framework
+	 * and initializes the classes and templates that are available
+	 * in the Framework or the Application
+	 */
 	public static function initialize(){
 		self::$Storage['identifier'] = array(
 			'internal' => self::$Storage['identifier.internal'],
@@ -129,6 +188,20 @@ class Core {
 		}
 	}
 	
+	/**
+	 * Tries to call the static method given by {@link $event} on the Application Class
+	 * if the class and the method are available. This can be used at any time for any
+	 * specific event
+	 *
+	 * <b>Predefined Events</b>
+	 * <ul>
+	 * <li>initialize - Gets called before the magic happens, used to set up routes, handle a logged in user etc.</li>
+	 * <li>pageShow - Gets called shortly before the Page outputs the html and after most of the processing is done</li>
+	 * </ul>
+	 *
+	 * @param string $event
+	 * @return bool Returns true if the event was successfully executed
+	 */
 	public static function fireEvent($event){
 		static $Instance, $Methods = array();
 		
@@ -156,6 +229,13 @@ class Core {
 	/* Storage Methods (Will be moved to a StaticStorage-Class in PHP5.3) */
 	private static $Storage = array();
 	
+	/**
+	 * Stores a single value or an array of key/value pairs
+	 *
+	 * @param array|string $array
+	 * @param mixed $value
+	 * @return mixed
+	 */
 	public static function store($array, $value = null){
 		if(!is_array($array))
 			$array = array($array => $value);
@@ -169,6 +249,14 @@ class Core {
 		return Hash::length($array)==1 ? $value : $array;
 	}
 	
+	/**
+	 * Returns the value for a given key. If the second parameter is set,
+	 * it stores it and returns it only if the given key has not been set yet
+	 *
+	 * @param string $key
+	 * @param mixed $value
+	 * @return mixed
+	 */
 	public static function retrieve($key, $value = null){
 		if($value && empty(self::$Storage[$key]))
 			return self::store($key, $value);
@@ -176,6 +264,11 @@ class Core {
 		return !empty(self::$Storage[$key]) ? self::$Storage[$key] : null;
 	}
 	
+	/**
+	 * Retrieves the values to all given keys (given by one array or many arguments)
+	 *
+	 * @return array
+	 */
 	public static function fetch(){
 		$args = Hash::args(func_get_args());
 		
