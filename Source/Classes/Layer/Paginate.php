@@ -23,6 +23,7 @@ class Paginate {
 			'start' => 0,
 			'per' => 10,
 			'key' => 'start',
+			'options' => array(),
 			'template' => null,
 		),
 		
@@ -87,9 +88,13 @@ class Paginate {
 	public function getPer(){
 		return $this->options['per'];
 	}
-	
+
 	public function getKey(){
 		return $this->options['key'];
+	}
+	
+	public function getLinkOptions(){
+		return $this->options['options'];
 	}
 	
 	/**

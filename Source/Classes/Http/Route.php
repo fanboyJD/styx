@@ -59,7 +59,7 @@ class Route {
 		$layer = Layer::retrieve($action['layer']);
 		if(!$layer) return;
 		
-		$layer->fireEvent($action['event'], !empty($action['get']) ? $action['get'] : null)->register();
+		$layer->setMainLayer()->fireEvent($action['event'], !empty($action['get']) ? $action['get'] : null)->register();
 		self::$mainlayer = String::toLower($action['layer']);
 	}
 	

@@ -29,6 +29,7 @@ abstract class LayerPrototype extends Runner {
 		 */
 		$Paginate = null,
 		
+		$isMainLayer = false,
 		$name,
 		$base,
 		$table,
@@ -301,6 +302,16 @@ abstract class LayerPrototype extends Runner {
 	
 	public function getIdentifier($identifier = null){
 		return $identifier && !empty($this->options['identifier'][$identifier]) ? $this->options['identifier'][$identifier] : $this->options['identifier'];
+	}
+	
+	public function setMainLayer(){
+		$this->isMainLayer = true;
+		
+		return $this;
+	}
+	
+	public function isMainLayer(){
+		return $this->isMainLayer;
 	}
 	
 	public function paginate($class = null){
