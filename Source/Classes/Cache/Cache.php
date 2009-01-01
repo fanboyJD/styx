@@ -128,7 +128,6 @@ class Cache extends Storage {
 				continue;
 			
 			$list[$this->cacheInstance && $this->Meta[$id][1] ? 'cacheInstance' : 'persistentInstance'][] = $id;
-			
 			unset($this->Storage[$id], $this->Meta[$id]);
 		}
 		

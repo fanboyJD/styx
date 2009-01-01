@@ -129,6 +129,10 @@ abstract class LayerPrototype extends Runner {
 	
 	protected function populate(){}
 	
+	protected function access(){
+		return true;
+	}
+	
 	/**
 	 * @return Layer
 	 */
@@ -144,11 +148,12 @@ abstract class LayerPrototype extends Runner {
 			$event = $default;
 		}
 		
-		$this->Data = $this->table ? $this->select() : array();
 		$this->Template = Template::map()->base('Layers', $this->name)->bind($this);
+		$this->event = $event;
 		
 		try{
-			$this->event = $event;
+			if(!$this->access()) return $this;
+			$this->Data = $this->table ? $this->select() : array();
 			
 			if($this->request=='post' && Hash::length($this->post))
 				$this->prepare($this->post);
@@ -198,6 +203,8 @@ abstract class LayerPrototype extends Runner {
 	}
 	
 	public function add($options = null){
+		$this->populate();
+		
 		$array = array('preventDefault' => true);
 		
 		return $this->edit($options ? Hash::extend($options, $array) : $array);

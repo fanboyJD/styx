@@ -69,7 +69,7 @@ class Form extends Elements {
 			$els[$k] = $el->prepare();
 		}
 		
-		return count($els) ? $els : array();
+		return $els;
 	}
 	
 	public function validate(){

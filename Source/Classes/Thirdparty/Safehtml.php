@@ -25,7 +25,6 @@ class Safehtml {
 		$_liStack = array(),
 		$_regexps = array(),
 		
-		
 		$tagWhiteList = array(
 			'a', 'br', 'img', 'hr', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'div',
 			'sub', 'sup', 'table', 'tr', 'td', 'th', 'thead', 'tbody', 'tfood', 'ul',
@@ -71,7 +70,8 @@ class Safehtml {
 		$allowedAttributes = array(
 			'title', 'class', 'width', 'height', 'type', 'src', 'alt', 'style',
 			'rel', 'href', 'target', 'align', 'size', 'longdesc', 'border',
-			'cellpadding', 'cellspacing', 'valign', 'nowrap', 'rowspan', 'colspan', 
+			'cellpadding', 'cellspacing', 'valign', 'nowrap', 'rowspan', 'colspan',
+			'data',
 		),
 		
 		/* This is a little addition to be *more* valid */
@@ -101,7 +101,7 @@ class Safehtml {
 		$removeIfEmpty = array('src', 'href'),
 		
 		$cleanup = array(
-			'object' => array('width', 'height', 'type', 'classid', 'codebase'),
+			'object' => array('width', 'height', 'type', 'classid', 'codebase', 'data'),
 			'param' => array('name', 'value'),
 			'embed' => array('src', 'type', 'wmode', 'width', 'height'),
 		),
@@ -119,6 +119,7 @@ class Safehtml {
 			'wmode' => array('transparent'),
 			'name' => 'white',
 			'value' => 'white',
+			'data' => 'white',
 			'src' => 'white',
 			'classid' => array(
 				'clsid:d27cdb6e-ae6d-11cf-96b8-444553540000',

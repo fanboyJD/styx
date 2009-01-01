@@ -224,7 +224,11 @@ class Elements extends Element {
 	}
 	
 	public function removeElement($el){
+		if(is_string($el)) $el = $this->getElement($el);
+		
 		Hash::remove($this->elements, $el);
+		
+		return $this;
 	}
 	
 	public function hasElement($el){
