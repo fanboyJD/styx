@@ -72,7 +72,10 @@ class Database {
 	 * @return QuerySelect
 	 */
 	public static function select($table, $cache = true){
-		$class = 'Query'.($cache ? 'Cache' : 'Select');
+		static $databasecache;
+		if($databasecache===null) $databasecache = pick(Core::retrieve('database.cache'), false);
+		
+		$class = 'Query'.($cache && $databasecache ? 'Cache' : 'Select');
 		
 		return new $class($table);
 	}

@@ -17,6 +17,10 @@ class QuerySelect extends Query implements Iterator, Countable {
 		
 		parent::__construct($table, 'select');
 	}
+	
+	public function __clone(){
+		$this->Storage = clone $this->Storage;
+	}
 
 	protected function formatFields(){
 		$data = $this->Storage->retrieve('fields', '*');
@@ -133,7 +137,6 @@ class QuerySelect extends Query implements Iterator, Countable {
 	
 	public function quantity($field = null){
 		$query = clone $this;
-		$query->Storage = clone $this->Storage;
 		
 		$count = $query->fields("COUNT('".($field ? $field : Core::retrieve('identifier.internal'))."')")->fetch(MYSQL_NUM);
 		

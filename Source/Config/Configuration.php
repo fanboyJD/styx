@@ -20,6 +20,7 @@ Core::store(array(
 	'prefix' => 'styxapp',
 	
 	'debug' => false,
+	'database.cache' => true, // Determines whether to use caching of database results or not
 	
 	'template.default' => 'tpl',
 	'template.execute' => array('php', 'phtml'),

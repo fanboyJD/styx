@@ -144,7 +144,7 @@ abstract class LayerPrototype extends Runner {
 			$event = $default;
 		}
 		
-		$this->Data = $this->table ? Database::select($this->table, $this->options['cache']) : array();
+		$this->Data = $this->table ? $this->select() : array();
 		$this->Template = Template::map()->base('Layers', $this->name)->bind($this);
 		
 		try{
@@ -350,6 +350,10 @@ abstract class LayerPrototype extends Runner {
 		$el = $this->Form->getElement($this->generateSessionName());
 		
 		return !$el || ($el && User::checkSession($el->getValue()));
+	}
+	
+	public function select(){
+		return Database::select($this->table, $this->options['cache']);
 	}
 	
 	/* Form methods mapping */

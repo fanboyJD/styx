@@ -9,8 +9,8 @@
 
 class Element extends Runner {
 	
-	public $name = null,
-		$type = null,
+	public $type = null;
+	protected $name = null,
 		$options = array(
 			/*Keys:
 				:caption
@@ -29,14 +29,14 @@ class Element extends Runner {
 			*/
 		);
 	
-	public function __construct($options, $name = null, $type = null){
+	public function __construct($options, $type = null){
 		static $uid = 0;
 		$type = String::toLower($type);
 		
 		if(!empty($options[':tag'])){
 			$this->name = $this->type = $options[':tag'];
 		}else{
-			$this->name = $name;
+			if(!$this->name) $this->name = get_class($this);
 			$this->type = $type ? $type : 'element';
 		}
 		
@@ -168,12 +168,11 @@ class Elements extends Element {
 	protected $elements = array();
 	
 	public function __construct(){
-		$name = $type = null;
+		$type = null;
 		$elements = func_get_args();
 		
 		if(is_subclass_of($this, 'Elements')){
-			$name = isset($elements[1]) ? $elements[1] : null;
-			$type = isset($elements[2]) ? $elements[2] : null;
+			$type = isset($elements[1]) ? $elements[1] : null;
 			$elements = $elements[0];
 		}
 		
@@ -183,7 +182,7 @@ class Elements extends Element {
 		
 		$this->addElements($elements);
 		
-		parent::__construct($options, pick($name, get_class()), $type);
+		parent::__construct($options, $type);
 	}
 	
 	public function format(){
@@ -247,11 +246,11 @@ class Elements extends Element {
 /* INPUT CLASS */
 class Input extends Element {
 	
-	public function __construct($options, $name = null){
+	public function __construct($options){
 		if(empty($options['type']))
 			$options['type'] = 'text';
 		
-		parent::__construct($options, $name ? $name : get_class(), 'input');
+		parent::__construct($options, 'input');
 	}
 	
 }
@@ -263,7 +262,7 @@ class HiddenInput extends Input {
 	public function __construct($options){
 		$options['type'] = 'hidden';
 		
-		parent::__construct($options, get_class());
+		parent::__construct($options);
 	}
 	
 }
@@ -273,7 +272,7 @@ class UploadInput extends Input {
 	public function __construct($options){
 		$options['type'] = 'file';
 		
-		parent::__construct($options, get_class());
+		parent::__construct($options);
 	}
 	
 	public function format($pass = null){
@@ -289,7 +288,7 @@ class UploadInput extends Input {
 class Button extends Element {
 	
 	public function __construct($options){
-		parent::__construct($options, get_class(), 'button');
+		parent::__construct($options, 'button');
 		
 		$this->options['type'] = 'submit';
 	}
@@ -302,7 +301,7 @@ class Field extends Element {
 	public function __construct($options){
 		if(is_string($options)) $options = array('name' => $options);
 		
-		parent::__construct($options, get_class(), 'field');
+		parent::__construct($options, 'field');
 	}
 	
 	public function format(){
@@ -314,14 +313,12 @@ class Field extends Element {
 /* TEMPLATE CLASS FOR RADIO AND SELECT */
 class Radio extends Element {
 	
-	public function __construct($options, $name = null, $type = null){
-		if(!$name && !$type){
-			$options['type'] = $type = 'radio';
-			$name = get_class().'.php';
-		}
+	public function __construct($options, $type = null){
+		if(!$type) $options['type'] = $type = 'radio';
+		$this->name = get_class($this).'.php';
 		
 		Hash::splat($options[':elements']);
-		parent::__construct($options, $name, $type);
+		parent::__construct($options, $type);
 		
 		// This class returns the preset value if wrong value is set
 		if(isset($this->options[':empty']) && !$this->options[':empty'])
@@ -369,7 +366,7 @@ class Radio extends Element {
 class Select extends Radio {
 	
 	public function __construct($options){
-		parent::__construct($options, get_class().'.php', 'select');
+		parent::__construct($options, 'select');
 	}
 	
 	public function format(){
@@ -389,7 +386,7 @@ class Checkbox extends Element {
 		$options[':validate'] = 'bool';
 		if(isset($options[':default']) && $options[':default']!=1) $options[':default'] = 0;
 		
-		parent::__construct($options, get_class(), 'checkbox');
+		parent::__construct($options, 'checkbox');
 		
 		$this->addClass('checkbox');
 	}
@@ -421,7 +418,7 @@ class Textarea extends Element {
 		foreach(array('cols', 'rows') as $v)
 			if(empty($options[$v])) $options[$v] = 0;
 		
-		parent::__construct($options, get_class(), $type ? $type : 'textarea');
+		parent::__construct($options, $type ? $type : 'textarea');
 	}
 	
 	public function format(){
@@ -436,7 +433,7 @@ class Textarea extends Element {
 class RichText extends Textarea {
 	
 	public function __construct($options){
-		parent::__construct($options, get_class());
+		parent::__construct($options);
 		
 		$this->addClass('richtext');
 	}
@@ -448,7 +445,7 @@ class RichText extends Textarea {
 class OptionList extends Elements {
 	
 	public function __construct(){
-		parent::__construct(func_get_args(), get_class(), 'optionlist');
+		parent::__construct(func_get_args(), 'optionlist');
 		
 		if(!empty($this->options[':elements']) && is_array($this->options[':elements']))
 			array_walk($this->options[':elements'], array($this, 'createElement'));

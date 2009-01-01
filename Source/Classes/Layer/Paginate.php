@@ -26,13 +26,9 @@ class Paginate {
 			'template' => null,
 		),
 		
-		$initialized = false,
-		
 		$count = 0;
 
 	public function initialize($data, $options = array()){
-		$this->initialized = true;
-		
 		$this->Data = $data;
 		
 		Hash::extend($this->options, $options);
@@ -54,7 +50,7 @@ class Paginate {
 	}
 	
 	public function parse(){
-		if(!$this->initialized) return;
+		if(!$this->Data) return;
 		
 		$this->count = $this->Data->quantity($this->Layer->getIdentifier('internal'));
 		

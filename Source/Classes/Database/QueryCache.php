@@ -25,23 +25,21 @@ class QueryCache extends QuerySelect {
 		if(is_array($data) && !empty($data['table']))
 			$options['tags'] = array('Db/'.$data['table']);
 		
-		return Cache::getInstance()->store('QueryCache/'.$this->table.'/'.md5($this->format().$type), $content, $options);
+		return Cache::getInstance()->store('QueryCache/'.$this->table.'/'.md5($this->format().$type), $content ? $content : 'empty', $options);
 	}
 	
 	public function fetch($type = null){
 		$this->Storage->retrieve('limit', array(0, 1)); // To overcome big queries
 		
 		$cache = $this->getCache($type);
-		
-		return $cache ? $cache : $this->setCache(parent::fetch($type), $type);
+		return $cache=='empty' ? false : ($cache ? $cache : $this->setCache(parent::fetch($type), $type));
 	}
 	
 	public function retrieve(){
 		$this->queried = false;
 		
 		$cache = $this->getCache();
-		
-		return $cache ? $this->Data = $cache : $this->setCache(parent::retrieve());
+		return $cache=='empty' ? false : ($cache ? $this->Data = $cache : $this->setCache(parent::retrieve()));
 	}
 	
 }

@@ -11,14 +11,4 @@
  * @author Christoph Pojer <christoph.pojer@gmail.com>
  */
 
-class UploadException extends ValidatorException {
-
-	public function __construct(){
-		$this->namespace = 'upload';
-		
-		$args = Hash::args(func_get_args());
-		
-		parent::__construct($args);
-	}
-
-}
+class UploadException extends ValidatorException {}

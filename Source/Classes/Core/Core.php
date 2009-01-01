@@ -191,7 +191,7 @@ class Core {
 	/**
 	 * Tries to call the static method given by {@link $event} on the Application Class
 	 * if the class and the method are available. This can be used at any time for any
-	 * specific event
+	 * custom event
 	 *
 	 * <b>Predefined Events</b>
 	 * <ul>
@@ -200,7 +200,7 @@ class Core {
 	 * </ul>
 	 *
 	 * @param string $event
-	 * @return bool Returns true if the event was successfully executed
+	 * @return mixed Returns the event return-value or false if there is no Application class or the event does not exist
 	 */
 	public static function fireEvent($event){
 		static $Instance, $Methods = array();
@@ -221,9 +221,7 @@ class Core {
 		if(!in_array($event, $Methods))
 			return false;
 		
-		$Instance->{'on'.String::ucfirst($event)}();
-		
-		return true;
+		return $Instance->{'on'.String::ucfirst($event)}();
 	}
 	
 	/* Storage Methods (Will be moved to a StaticStorage-Class in PHP5.3) */
