@@ -45,6 +45,10 @@ class Form extends Elements {
 	public function setValue($data, $raw = false){
 		if(!is_array($data)) return;
 		
+		if($raw)
+			foreach($this->elements as $el)
+				$el->setValue(null);
+		
 		foreach($data as $k => $v)
 			if(!empty($this->elements[$k])){
 				$el = $this->elements[$k];
