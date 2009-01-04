@@ -102,6 +102,9 @@ class DataPrototype {
 			$input[$v] = $data[$k];
 		}
 		
+		if(!checkdate($input['m'], $input['d'], $input['y']))
+			return false;
+		
 		return mktime(0, 0, 0, $input['m'], $input['d'], $input['y']);
 	}
 	
@@ -201,7 +204,7 @@ class DataPrototype {
 		
 		preg_match('/(\s+(?!([^<]+)?>)(?!.*\s+).*)/is', $data, $m);
 		
-		if($m[1]){
+		if(!empty($m[1])){
 			$pos = strrpos($data, $m[1]);
 			if($pos!==false) $data = String::sub($data, 0, $pos);
 		}

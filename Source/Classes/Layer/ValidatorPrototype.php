@@ -51,7 +51,7 @@ class ValidatorPrototype {
 	}
 	
 	public function id($data){
-		return Data::id($data)>0;
+		return !!Data::id($data);
 	}
 	
 	public function numericrange($data, $options){
@@ -63,7 +63,7 @@ class ValidatorPrototype {
 	}
 	
 	public function bool($data){
-		return self::numericrange($data, array(0, 1));
+		return $data=='false' || self::numericrange($data, array(0, 1));
 	}
 	
 	public function date($data, $options = array()){

@@ -20,7 +20,6 @@ class Element extends Runner {
 				:elements
 				:unknown - name/id won't be set automatically when empty
 				:tag - type/name given by options
-				:standalone - for elements without template; if element gets closed inside the tag (like <img />)
 				:preset - stores the initial value for the validator
 				:realName - only internally; used in OptionList
 				:add - For Checkbox, Input, Radio, Select and Textarea - additional caption
@@ -69,7 +68,10 @@ class Element extends Runner {
 		
 		if(!is_array($out)) return $out;
 		
-		return '<'.$this->type.$pass['attributes'].(!empty($this->options[':standalone']) ? ' />' : '>'.$this->get(':caption').'</'.$this->type.'>');
+		if(in_array($this->type, array('area', 'br', 'img', 'input', 'hr', 'wbr', 'param', 'link')))
+			return '<'.$this->type.$pass['attributes'].' />';
+		
+		return '<'.$this->type.$pass['attributes'].'>'.$this->get(':caption').'</'.$this->type.'>';
 	}
 	
 	public static function skipable($key){

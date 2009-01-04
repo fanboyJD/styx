@@ -74,11 +74,12 @@ class Cache extends Storage {
 		if(empty($this->Storage[$id])){
 			$content = $this->{$this->cacheInstance && $this->Meta[$id][1] ? 'cacheInstance' : 'persistentInstance'}->retrieve($id);
 			
-			if(!$content) return null;
+			if(!$content){
+				unset($this->Meta[$id]);
+				return null;
+			}
 			
-			if($this->Meta[$id][2]) $content = json_decode($content, true);
-			
-			$this->Storage[$id] = $content;
+			$this->Storage[$id] = $this->Meta[$id][2] ? json_decode($content, true) : $content;
 		}
 		
 		return $this->Storage[$id];
@@ -89,6 +90,7 @@ class Cache extends Storage {
 			'type' => 'cache',
 			'ttl' => 3600,
 			'encode' => true,
+			'tags' => null,
 		);
 		
 		if(is_numeric($options)) Hash::extend($default, array('ttl' => $options));

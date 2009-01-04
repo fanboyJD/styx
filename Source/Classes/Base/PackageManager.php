@@ -27,7 +27,6 @@ class PackageManager {
 				'options' => array(
 					':tag' => 'link',
 					':unknown' => true,
-					':standalone' => true,
 					'rel' => 'stylesheet',
 					'media' => 'all',
 					'type' => 'text/css',

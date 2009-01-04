@@ -39,7 +39,7 @@ class Safehtml {
 		$keepClasses = false,
 		$allowedClasses = array(),
 		
-		$singleTags = array('area', 'br', 'img', 'input', 'hr', 'wbr', 'param'),
+		$singleTags = array('area', 'br', 'img', 'input', 'hr', 'wbr', 'param', 'link'),
 		$deleteTagsContent = array('textarea', 'script', 'style', 'title', 'xml'),
 		$blackProtocols = array(
 			'about', 'chrome', 'data', 'disk', 'hcp',  

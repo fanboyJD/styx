@@ -36,10 +36,7 @@ class String {
 	}
 	
 	public static function ucfirst($string){
-		$a = mb_substr($string, 0, 1);
-		$b = mb_substr($string, 1);
-		
-		return mb_strtoupper($a).mb_strtolower($b);
+		return mb_strtoupper(mb_substr($string, 0, 1)).mb_strtolower(mb_substr($string, 1));
 	}
 	
 	public static function replace($search, $replace, $subject, $count = null){
