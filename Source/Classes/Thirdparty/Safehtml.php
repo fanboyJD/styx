@@ -54,7 +54,7 @@ class Safehtml {
 			'xmpp', 'callto',
 		),
 		$protocolAttributes = array(
-			'action', 'background', 'codebase', 'dynsrc', 'href', 'lowsrc', 'src', 
+			'action', 'background', 'codebase', 'dynsrc', 'href', 'lowsrc', 'src', 'data',
 		),
 		
 		$cssKeywords = array(
@@ -69,9 +69,8 @@ class Safehtml {
 		
 		$allowedAttributes = array(
 			'title', 'class', 'width', 'height', 'type', 'src', 'alt', 'style',
-			'rel', 'href', 'target', 'align', 'size', 'longdesc', 'border',
+			'rel', 'href', 'target', 'align', 'size', 'longdesc', 'data',
 			'cellpadding', 'cellspacing', 'valign', 'nowrap', 'rowspan', 'colspan',
-			'data',
 		),
 		
 		/* This is a little addition to be *more* valid */

@@ -28,6 +28,14 @@ class String {
 	public static function toLower($string){
 		return mb_strtolower($string);
 	}
+
+	public static function pos($string, $look){
+		return mb_strpos($string, $look);
+	}
+	
+	public static function rpos($string, $look){
+		return mb_strrpos($string, $look);
+	}
 	
 	public static function sub($string, $start, $length = null){
 		if($length) return mb_substr($string, $start, $length);
