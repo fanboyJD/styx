@@ -81,7 +81,7 @@ class Response {
 		
 		if(Hash::length($options))
 			foreach($options as $k => $v)
-				$array[] = $k.($v ? $Configuration['path.separator'].$v : '');
+				$array[] = $k.($v || is_numeric($v) ? $Configuration['path.separator'].$v : '');
 		
 		if(count($array)) $array = implode('/', $array);
 		else $array = null;

@@ -11,7 +11,7 @@ foreach($this->Data as $user)
 			<span class="icon go">'.$user['name'].'</span>
 			<small>
 				[<a class="modifier" href="'.$this->link($user, 'edit').'"><img src="Images/pencil.png" alt="" />'.$edit.'</a>]
-				[<a class="modifier delete" href="'.$this->link($user, 'delete', 'json').'"><img src="Images/cross.png" alt="" title="'.$confirmdelete.'" />'.$delete.'</a>]
+				[<a class="modifier delete" href="'.$this->link($user, 'delete', 'json').'" rel="'.$this->generateSessionName().'"><img src="Images/cross.png" alt="" title="'.$confirmdelete.'" />'.$delete.'</a>]
 			</small>
 		</div>';
 ?>
