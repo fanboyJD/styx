@@ -173,7 +173,7 @@ abstract class LayerPrototype extends Runner {
 		if(!$rebound && $this->options['rebound'] && $this->request=='post' && Hash::length($this->post)){
 			$rebound = true;
 			foreach($this->Form->prepare() as $name => $value)
-				$this->post[$name] = $value;
+				$this->post[$name] = $this->Form->getElement($name)->get('type')=='password' ? null : $value;
 			
 			$event = $this->getReboundEvent($this->event);
 			if(!$event) $event = $this->getDefaultEvent('edit');

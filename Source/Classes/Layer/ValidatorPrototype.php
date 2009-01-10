@@ -24,16 +24,11 @@ class ValidatorPrototype {
 		if(is_string($validators))
 			$validators = array($validators => true);
 		
-		if(!empty($validators['notempty']) && !empty($validators['purify']))
-			$validators['notempty'] = array(
-				'purify' => $validators['purify'],
-			);
-		
 		foreach($validators as $validator => $options){
 			if(empty($options) || !in_array(String::toLower($validator), $Methods))
 				continue;
 			
-			if(!$Instance->{$validator}($data, is_array($options) ? $options : null))
+			if(!$Instance->{$validator}($data, is_array($options) ? $options : null, $validators))
 				return $validator;
 		}
 		
@@ -74,7 +69,11 @@ class ValidatorPrototype {
 		return true;
 	}
 	
-	public function notempty($data, $options = null){
+	public function notempty($data, $options = null, $validators){
+		if(empty($options['purify']) && !empty($validators['purify']))
+			$options['purify'] = $validators['purify'];
+		
+		
 		if(!empty($options['purify'])) $data = Data::purify($data, $options['purify']);
 		
 		return !!trim($data);

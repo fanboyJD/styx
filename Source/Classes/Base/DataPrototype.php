@@ -28,7 +28,7 @@ class DataPrototype {
 			if(empty($options) || !in_array(String::toLower($validator), $Methods))
 				continue;
 			
-			$data = $Instance->{$validator}($data, is_array($options) ? $options : null);
+			$data = $Instance->{$validator}($data, is_array($options) ? $options : null, $validators);
 		}
 		
 		return $data;

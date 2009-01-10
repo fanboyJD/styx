@@ -135,7 +135,7 @@ class Template extends Runner {
 		
 		preg_match_all($regex, $out, $vars);
 		
-		$rep = array(array_values($vars[0]));
+		$rep = array(array_values($vars[0]), array());
 		$i = 0;
 		foreach($vars[1] as $v){
 			$v = Data::clean(explode('|', $v));
@@ -153,9 +153,6 @@ class Template extends Runner {
 			
 			$i++;
 		}
-		
-		$rep[0][] = "\t";
-		$rep[1][] = '';
 		
 		$out = String::replace($rep[0], $rep[1], $out);
 		

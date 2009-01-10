@@ -100,6 +100,9 @@ class Page extends Template {
 		
 		Response::sendHeaders();
 		
+		if($ContentType->getType()=='html')
+			$out = preg_replace('/(<pre.*?>[\s\S]*?<\/pre>)|\t+/i', '$1', $out);
+		
 		if($return) return $out;
 		
 		echo $out;

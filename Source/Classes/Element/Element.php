@@ -140,27 +140,28 @@ class Element extends Runner {
 		return !empty($this->options[$key]) ? $this->options[$key] : null;
 	}
 	
-	public function implode($options = array(
+	public function implode($skip = array(
 		/*'skip*' => false,*/
-	)){
+	), $options = null){
 		$a = $this->options;
 		
-		if($options && !is_array($options))
-			$options = array($options);
+		if(is_array($options)) Hash::extend($a, $options);
 		
-		if(!is_array($a))
-			return '';
+		Hash::splat($skip);
+		
+		if(!Hash::length($a)) return '';
 		
 		if(is_array($a['class']) && count($a['class']))
 			$a['class'] = implode(' ', $a['class']);
 		else
 			unset($a['class']);
 		
+		$s = array();
 		foreach($a as $key => $val)
-			if(($val || $val===0) && !in_array('skip'.String::ucfirst($key), $options) && !self::skipable($key))
+			if(($val || $val===0) && !in_array('skip'.String::ucfirst($key), $skip) && !self::skipable($key))
 				$s[] = $key.'="'.($key=='style' ? String::replace('"', "'", $val) : Data::sanitize($val)).'"';
 		
-		return is_array($s) ? ' '.implode(' ', $s) : '';
+		return Hash::length($s) ? ' '.implode(' ', $s) : '';
 	}
 	
 }
@@ -323,7 +324,9 @@ class Radio extends Element {
 		if(!$type) $options['type'] = $type = 'radio';
 		$this->name = get_class($this).'.php';
 		
-		Hash::splat($options[':elements']);
+		if(empty($options[':elements']) || !is_array($options[':elements']))
+			$options[':elements'] = array();
+		
 		parent::__construct($options, $type);
 		
 		// This class returns the preset value if wrong value is set
