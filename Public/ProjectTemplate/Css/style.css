@@ -7,6 +7,7 @@ body {
 
 body, div, ul {margin: 0; padding: 0; }
 .clear { clear: both; }
+.nodisplay { display: none; }
 
 a#logo {
 	position: relative;

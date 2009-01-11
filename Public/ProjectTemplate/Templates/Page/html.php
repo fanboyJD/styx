@@ -14,7 +14,10 @@
 	</script>
 	${scripts}
 </head>
-<body>
+<body><div>
+<div class="nodisplay" style="font-family: Calibri; font-size: 12px; background: #FBE3E4; color: #8a1f11; margin: 1em 0; padding: .8em; border: 2px solid #FBC2C4;">
+	${lang.htaccess}
+</div>
 <a id="logo" href="${app.link}"></a>
 <?php
 	$user = User::retrieve();
@@ -44,6 +47,7 @@
 	<br/>
 	${layer | lang.validator.rightsError}
 	<div class="clear"></div>
+</div>
 </div>
 </body>
 </html>
