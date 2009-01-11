@@ -9,8 +9,8 @@
 
 class ValidatorPrototype {
 	
-	private function __construct(){}
-	private function __clone(){}
+	protected function __construct(){}
+	protected function __clone(){}
 	
 	public static function call($data, $validators){
 		static $Instance, $Methods = array();
