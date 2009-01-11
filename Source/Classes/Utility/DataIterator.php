@@ -20,7 +20,7 @@ class DataIterator implements RecursiveIterator, Countable  {
 	 *
 	 * @var array
 	 */
-	private $Current;
+	private $Current = array();
 	private $options = array();
 
 	/**
@@ -33,7 +33,9 @@ class DataIterator implements RecursiveIterator, Countable  {
 		$this->options = $options;
 		
 		$this->Data = $data;
-		$this->Current = $data[$this->options['current']];
+		
+		if(!empty($data[$this->options['current']]))
+			$this->Current = $data[$this->options['current']];
 	}
 	
 	/**
