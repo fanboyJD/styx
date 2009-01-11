@@ -29,6 +29,10 @@ class Query {
 		$this->Storage = new Storage();
 	}
 	
+	public function __clone(){
+		$this->Storage = clone $this->Storage;
+	}
+
 	/*
 	 *	UPDATE and INSERT allow two input methods:
 	 *		(string) "myField='something', myOtherField=10"

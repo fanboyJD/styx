@@ -18,10 +18,6 @@ class QuerySelect extends Query implements Iterator, Countable {
 		parent::__construct($table, 'select');
 	}
 	
-	public function __clone(){
-		$this->Storage = clone $this->Storage;
-	}
-
 	protected function formatFields(){
 		$data = $this->Storage->retrieve('fields', '*');
 		
