@@ -1,0 +1,91 @@
+rss.title = 'News-Feed';
+title = 'Title';
+text = 'Content';
+save = 'Save';
+edit = 'Edit';
+delete = 'Delete';
+confirmdelete = 'Are you sure to delete this entry?';
+deleted = 'The entry has been deleted!';
+
+running = 'Running %s';
+description = 'If you can read this, it seems like you installed this ProjectTemplate just fine! There is one more step included before you can start
+		creating your application: After changing the "secure"-String in your Configuration you should once reset your password. Note that you should
+		not change the "secure"-String at any time as it would invalidate all passwords. Please never expose this string and keep it private.
+		After a successful change of the password please try to login with the used password and the username "admin". You can change the username
+		at any time right in the database. For a little UsermanagementLayer see the Sample Application.
+		<br/><br/>
+		Make sure to remove the PasswordLayer and the corresponding output in the html-Template before pushing the application to the public.
+		<br/>
+		If possible please link to <a href="%s">styx.og5.net</a> and add the Mini-Logo to your Application: <img src="%s/Images/Styxmini.png" alt="" />
+		<br/>
+		Thanks for giving Styx the opportunity to become your Framework of choice <img src="%s/Images/Smile.gif" alt="" />
+	';
+
+namespace news {
+	posted = 'Posted by <b>%s</b> on %s';
+	
+	read = 'Read "%s"';
+	
+	add = 'Add news';
+	modify = 'Edit news';
+	
+	saved = 'Your entry has been saved.<br/><br/>
+			<a href="%s">Go to the News-Entry</a>';
+}
+
+namespace user {
+	name = 'Username';
+	pwd = 'Password';
+	
+	login = 'Login';
+	logout = 'Logout';
+	
+	hello = 'Hello %s';
+	
+	loggedin = 'Welcome %s';
+}
+
+namespace admin {
+	admin = 'Administration';
+	cache = 'Clear Cache';
+	allcache = 'Clear Filecache and Cache';
+	
+	cacheerased = 'Cache cleared';
+	allcacheerased = 'Filecache and Cache cleared';
+}
+
+namespace paginate {
+	next = 'Next';
+	previous = 'Previous';
+}
+
+namespace upload {
+	path = 'The specified Upload-Folder does not exist. Please contact the administrator of this Website.';
+	exists = 'The specified Upload-Location does already exist. Please contact the administrator of this Website.';
+	mime = 'The specified file-type is not allowed.';
+	extension = 'The uploaded file has an unknown or forbidden file extension.';
+	
+	size = 'The size of the file you uploaded is too big to be processed on this server. Please upload a smaller file.';
+	partial = 'The file you uploaded was only partially uploaded, please upload the file again.';
+	nofile = 'There was no file specified to be uploaded.';
+	
+	default = 'Something went wrong with the File-Upload.';
+}
+
+namespace validator {
+	content = '<div class="error">%s</div>';
+	
+	# Default
+	rights = 'You don\'t have the necessary rights to access this page.';
+	session = 'Your session has been expired. Please try again.';
+	contenttype = 'The Webserver does not know how to process your request.';
+	notempty = 'The field "<b>%s</b>" must not be empty';
+	
+	data = 'It was not possible to process your input data. Please try again.';
+	pagetitle = 'The field "<b>%s</b>" can only contain letters, numbers or an underscore (_).';
+	default = 'The field "<b>%s</b>" contains an invalid value.';
+	
+	# Custom
+	rightsError = '<div class="error">You don\'t have the necessary rights to access this page.</div>';
+	login = 'You have entered an invalid username or password.';
+}

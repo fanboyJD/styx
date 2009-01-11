@@ -5,21 +5,21 @@ label {
 	white-space: nowrap;
 	overflow: hidden;
 	
+	color: #000;
 	margin: 7px 0 3px;
 }
 
-input, select {
-	background: transparent url(../Images/form.png) no-repeat;
-	border: 1px solid #bbb;
-	padding: 3px 4px 1px;
-	width: 48%;
+input, select, textarea {
 	float: left;
+	width: 48%;
 	
+	padding: 3px 4px;
 	margin: 5px 0 3px;
+	font-family: Calibri, Tahoma, sans-serif;
+	font-size: 14px;
 	
-	-moz-border-radius: 10px;
-	-webkit-border-radius: 10px;
-	border-radius: 10px;
+	background-color: #fff;
+	border: 1px solid #666;
 }
 
 input:hover, textarea:hover, input:focus, texteara:focus {
@@ -32,45 +32,36 @@ input.radio, input.checkbox {
 }
 
 textarea {
-	background: #fff url(../Images/form.png) no-repeat;
-	border: 1px solid #bbb;
-	
-	padding: 3px 4px 1px;
-	margin: 5px 0;
-	
 	clear: both;
 	display: block;
+	
 	width: 98%;
 	height: 150px;
 	
-	-moz-border-radius: 10px;
-	-webkit-border-radius: 10px;
-	border-radius: 10px;
+	margin: 5px 0;
+	font-size: 12px;
 }
 
 button {
+	border: 1px solid #666;
 	float: left;
 	margin: 10px 5px;
 	clear: both;
 	display: block;
 	
-	height: 34px;
-	line-height: 34px;
-	width: 160px;
+	height: 20px;
+	line-height: 20px;
 	
 	font-family: Calibri, Tahoma, sans-serif;
 	font-size: 14;
-	padding: 0 0 2px;
-	color: #38702e;
+	padding: 0 5px 2px;
+	color: #000;
 	font-weight: bold;
 	letter-spacing: 1px;
 	
 	cursor: pointer;
-	border: 0;
-	background: url(../Images/button.png) no-repeat;
 }
 
 button:hover, button:focus {
-	color: #000;
-	background-position: 0 -34px;
+	color: #333;
 }

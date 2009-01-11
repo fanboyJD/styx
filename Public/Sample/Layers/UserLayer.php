@@ -27,7 +27,6 @@ class UserLayer extends Layer {
 				'name' => 'password',
 				'type' => 'password',
 				':alias' => true,
-				':add' => Lang::retrieve('user.pwdempty'),
 				':caption' => Lang::retrieve('user.pwd'),
 			)),
 			
@@ -42,10 +41,14 @@ class UserLayer extends Layer {
 		$this->requireSession(); // Adds an invisible element with the current session so everything is safe :)
 	}
 	
-	public function onSave(){
+	public function access(){
 		if(!User::hasRight('layer.user'))
 			throw new ValidatorException('rights');
 		
+		return true;
+	}
+	
+	public function onSave(){
 		$pw = $this->getValue('password');
 		$this->setValue(array(
 			'pwd' => !$pw && $this->editing ? $this->content['pwd'] : User::getPassword($pw),
@@ -57,10 +60,10 @@ class UserLayer extends Layer {
 	}
 	
 	public function onEdit(){
-		if(!User::hasRight('layer.user'))
-			throw new ValidatorException('rights');
-		
 		$this->edit();
+		
+		if($this->editing)
+			$this->Form->getElement('password')->set(':add', Lang::retrieve('user.pwdempty'));
 		
 		/* We put some styling here as we don't want to add a new Template for that :) */
 		$this->Template->append('<div class="inner">
@@ -72,9 +75,6 @@ class UserLayer extends Layer {
 	}
 	
 	public function onDelete($title){
-		if(!User::hasRight('layer.user'))
-			throw new ValidatorException('rights');
-		
 		if(Request::retrieve('behaviour')!='json')
 			throw new ValidatorException('contenttype');
 		
@@ -95,9 +95,6 @@ class UserLayer extends Layer {
 	}
 	
 	public function onView(){
-		if(!User::hasRight('layer.user'))
-			throw new ValidatorException('rights');
-		
 		$this->Template->apply('view.php');
 	}
 	

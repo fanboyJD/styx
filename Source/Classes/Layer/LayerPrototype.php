@@ -199,6 +199,7 @@ abstract class LayerPrototype extends Runner {
 		'preventDefault' => false,
 	)){
 		if(empty($options['preventDefault']) && $this->request!='post') $this->prepare(null, true);
+		else $this->populate();
 		
 		$this->Form->get('action', $this->link(!empty($this->content[$this->options['identifier']['external']]) ? $this->content[$this->options['identifier']['external']] : null, $this->getDefaultEvent('save')));
 	}

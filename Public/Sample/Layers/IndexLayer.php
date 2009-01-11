@@ -132,13 +132,14 @@ class IndexLayer extends Layer {
 			$this->Data->where(array(
 				'pagetitle' => array($title, 'pagetitle'),
 			))->limit(1);
-		}else{
-			if($contenttype=='html')
+		}elseif($contenttype=='html'){
 				$this->paginate()->initialize($this->Data, array(
 					'per' => 2,
 				));
 			
 			$this->isIndex = true;
+		}elseif($contenttype=='xml'){
+			$this->Data->limit(10);
 		}
 		
 		$this->Template->apply(($contenttype=='xml' ? 'xml' : '').'view.php');
