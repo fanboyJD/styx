@@ -4,6 +4,162 @@ require_once('./Initialize.php');
 
 class DataTest extends UnitTestCase {
 	
+	public function testAdd(){
+		$this->assertEqual(Data::add("Hello'Test"), "Hello\'Test");
+		
+		$this->assertEqual(Data::add("Hel\\lo'Te\nst"), 'Hel\\\lo\\\'Te'."\n".'st');
+	}
+	
+	public function testStrip(){
+		$this->assertEqual(Data::strip("Hallo\\\\Test"), "Hallo\\Test");
+	}
+	
+	public function testEscape(){
+		// This makes sure $ is escaped so ${blah} won't be replaced/removed by the template
+		// (This is customizable in an application and it can be removed if there is a custom regex for the templates)
+		$this->assertEqual(Data::escape('Te$t'), 'Te&#36;t');
+	}
+	
+	public function testSanitize(){
+		$this->assertEqual(Data::sanitize(' <Te$t> '), '&lt;Te&#36;t&gt;');
+	}
+	
+	public function testId(){
+		$this->assertEqual(Data::id(5), 5);
+		
+		$this->assertEqual(Data::id('5'), 5);
+		
+		$this->assertEqual(Data::id(' 5 '), 0);
+		
+		$this->assertEqual(Data::id(10, 5), 10);
+		$this->assertEqual(Data::id(11, 5), 10);
+		$this->assertEqual(Data::id(14, 5), 10);
+		$this->assertEqual(Data::id(15, 5), 15);
+		
+		$this->assertEqual(Data::id('5a'), 0);
+		$this->assertEqual(Data::id('a5'), 0);
+	}
+	
+	public function testBool(){
+		$this->assertFalse(Data::bool('false'));
+		$this->assertFalse(Data::bool(false));
+		$this->assertFalse(Data::bool(null));
+		$this->assertFalse(Data::bool(0));
+		
+		$this->assertTrue(Data::bool('true'));
+		$this->assertTrue(Data::bool(true));
+		$this->assertTrue(Data::bool(1));
+		$this->assertTrue(Data::bool(100));
+		$this->assertTrue(Data::bool('anything'));
+	}
+	
+	public function testNumericrange(){
+		$this->assertEqual(Data::numericrange(5, array(1, 10)), 5);
+		
+		$this->assertEqual(Data::numericrange(15, array(1, 10)), 0);
+		
+		$this->assertEqual(Data::numericrange('a', array(1, 10)), 0);
+		
+		$this->assertEqual(Data::numericrange(5, array(5, 10)), 5);
+		$this->assertEqual(Data::numericrange(5, array(6, 10)), 0);
+	}
+	
+	public function testDate(){
+		$this->assertEqual(Data::date('12.01.2009'), 1231714800);
+		
+		$this->assertEqual(Data::date('01.12.2009', array('order' => 'mdy')), 1231714800);
+		
+		$this->assertNull(Data::date('01/12/2009', array('order' => 'mdy')));
+		$this->assertEqual(Data::date('01/12/2009', array('order' => 'mdy', 'separator' => '/')), 1231714800);
+		
+		$day = date('j', time()+86400);
+		$month = date('n', time()+86400);
+		$year = date('Y', time()+86400);
+		$tomorrow = mktime(0, 0, 0, $month, $day, $year);
+		
+		$this->assertNull(Data::date($day.'.'.$month.'.'.$year));
+		$this->assertEqual(Data::date($day.'.'.$month.'.'.$year, array('future' => true)), $tomorrow);
+		$this->assertEqual(Data::date('12.01.2009', array('future' => true)), 1231714800);
+	}
+	
+	public function testExcerpt(){
+		$this->assertEqual(Data::excerpt('Hello World', array('length' => 3)), 'Hel...');
+		
+		$this->assertEqual(Data::excerpt('Hello World', array('length' => 3, 'dots' => false)), 'Hel');
+		
+		$this->assertEqual(Data::excerpt('<b>Hello World</b>', array('length' => 6, 'dots' => false)), '<b>Hel</b>');
+		$this->assertEqual(Data::excerpt('<b>Hello World</b>', array('length' => 2, 'dots' => false)), '<b></b>');
+		$this->assertEqual(Data::excerpt('<b>Hello World</b>', array('length' => 1, 'dots' => false)), '');
+	}
+	
+	public function testEncode(){
+		$array = array('test' => "js\ton");
+		
+		$this->assertEqual(Data::encode($array), '{"test":"json"}');
+	}
+	
+	public function testPagetitle(){
+		$this->assertEqual(Data::pagetitle('Täst'), 'Taest');
+		$this->assertEqual(Data::pagetitle('Täöst'), 'Taeoest');
+		
+		$this->assertEqual(Data::pagetitle('Te   st'), 'Te_st');
+		$this->assertEqual(Data::pagetitle('Test!§""§"'), 'Test');
+		$this->assertEqual(Data::pagetitle('^$§$Test!§""§"'), 'Test');
+		
+		$this->assertEqual(Data::pagetitle('Who\'s "this"?'), 'Whos_this');
+		
+		$options = array(
+			'identifier' => array(
+				'internal' => 'int',
+				'external' => 'ext',
+			),
+			'contents' => array(
+				array('int' => 1, 'ext' => 'Test_1'),
+				array('int' => 2, 'ext' => 'Test_2'),
+				array('int' => 3, 'ext' => 'Test_3'),
+				array('int' => 4, 'ext' => 'Test_4'),
+				array('int' => 5, 'ext' => 'Test'),
+				array('int' => 6, 'ext' => 'Test_5'),
+				array('int' => 7, 'ext' => 'Test_6'),
+				array('int' => 8, 'ext' => 'Test_7'),
+				array('int' => 9, 'ext' => 'Test_8'),
+				array('int' => 10, 'ext' => 'Test_9'),
+			),
+		);
+		
+		// We test the contents if we add a new one
+		$this->assertEqual(Data::pagetitle('Test', $options), 'Test_10');
+		
+		$this->assertEqual(Data::pagetitle('Test"§', $options), 'Test_10');
+		
+		// We produce a pagetitle while we try to "edit" the content with int => 5
+		$options['id'] = 5;
+		
+		$this->assertEqual(Data::pagetitle('Test', $options), 'Test');
+		
+		$this->assertEqual(Data::pagetitle('Test"§', $options), 'Test');
+		
+		$this->assertEqual(Data::pagetitle('Different', $options), 'Different');
+		
+		$options = array(
+			'contents' => array(
+				'Test_1',
+				'Test_2',
+				'Test_3',
+				'Test_4',
+				'Test_5',
+				'Test_6',
+				'Test_7',
+			),
+		);
+		
+		$this->assertEqual(Data::pagetitle('Test', $options), 'Test');
+		
+		$options['contents'][] = 'Test';
+		
+		$this->assertEqual(Data::pagetitle('Test', $options), 'Test_8');
+	}
+	
 	public function testPurify(){
 		/* Common XSS-Attacks used by the XSS-Me Firefox Extension. On the right side 
 		 * the expected output of the purifier, might not always be valid, but safe.

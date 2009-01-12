@@ -146,7 +146,7 @@ class QuerySelect extends Query implements Iterator, Countable {
 	}
 	
 	public function rewind(){
-		if(!$this->queried){
+		if(!$this->queried || empty($this->formatted)){
 			$this->retrieve();
 			$this->queried = true;
 		}
@@ -175,7 +175,7 @@ class QuerySelect extends Query implements Iterator, Countable {
 	}
 	
 	public function count(){
-		if(!$this->queried) $this->rewind();
+		if(!$this->queried || empty($this->formatted)) $this->rewind();
 		
 		return count($this->Data);
 	}

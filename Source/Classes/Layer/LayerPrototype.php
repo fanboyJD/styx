@@ -50,6 +50,7 @@ abstract class LayerPrototype extends Runner {
 			/*'table' => null,*/
 			'rebound' => true,
 			'cache' => true,
+			'preventPass' => array('post'), // Prevents passing post/get variable if the layer is not the Mainlayer
 			'identifier' => null,
 		),
 		
@@ -117,6 +118,9 @@ abstract class LayerPrototype extends Runner {
 		if(Hash::length($initialize) && is_array($initialize))
 			Hash::extend($this->options, $initialize);
 		
+		if(!is_array($this->options['preventPass']))
+			$this->options['preventPass'] = array();
+		
 		if(empty($this->options['identifier']))
 			$this->options['identifier'] = Core::retrieve('identifier');
 		elseif(!is_array($this->options['identifier']))
@@ -139,7 +143,7 @@ abstract class LayerPrototype extends Runner {
 	 */
 	public function fireEvent($event, $get = null, $post = null){
 		foreach(array('get', 'post') as $v)
-			$this->{$v} = Hash::length($$v) ? $$v : Request::retrieve($v);
+			$this->{$v} = Hash::length($$v) ? $$v : ($this->isMainLayer() || !in_array($v, $this->options['preventPass']) ? Request::retrieve($v) : array());
 		
 		$event = String::toLower($event);
 		if(!in_array($event, $this->methods)){
@@ -294,7 +298,7 @@ abstract class LayerPrototype extends Runner {
 			$options['contents'] = Hash::extend(Hash::splat($options['contents']), Database::select($this->table, $this->options['cache'])->fields(array_unique($this->options['identifier']))->retrieve());
 		
 		if(!empty($where[$this->options['identifier']['internal']]))
-			$options[$this->options['identifier']['internal']] = Data::call($where[$this->options['identifier']['internal']][0], $where[$this->options['identifier']['internal']][1]);
+			$options['id'] = Data::call($where[$this->options['identifier']['internal']][0], $where[$this->options['identifier']['internal']][1]);
 		
 		$options['identifier'] = $this->options['identifier'];
 		

@@ -32,6 +32,14 @@ class Setup {
 			Note: If you are using Linux and you are sure you have already configured your Apache to use mod_rewrite and put the .htaccess-File
 			to the right directory but it still does not work you may forgot to set the chmod 777 to the "Cache" Folder inside the Framework\'s Source-Folder
 		',
+	
+		'rights' => 'There was an error when rewriting the files. If you are operating on Linux you may
+			not have the necessary rights (owner/mode). Make sure your files have the same owner
+			as Apache (usually www-data) and the chmod rights 777.
+			<br/><br/>
+			Alternatively you can just remove the lines in the index.php-File and in the Templates/Page/html.php-Files
+			that start with an /**/. After you reload the page this message should be gone.
+		',
 		
 		'secure' => 'There is one more step included before you can start
 			creating your application: Please change the "secure"-String in the Configuration of your Application.
@@ -68,8 +76,8 @@ class Setup {
 		',
 	);
 	
-	public static function getError($msg){
-		return '<div class="nodisplay" style="font-family: Calibri; font-size: 12px; background: #FBE3E4; color: #8a1f11; margin: 1em 0; padding: .8em; border: 2px solid #FBC2C4;">
+	public static function getError($msg, $display = false){
+		return '<div'.(!$display ? ' class="nodisplay"' : '').' style="font-family: Calibri; font-size: 12px; background: #FBE3E4; color: #8a1f11; margin: 1em 0; padding: .8em; border: 2px solid #FBC2C4;">
 			'.self::getMessage($msg).'
 		</div>';
 	}
@@ -151,6 +159,8 @@ Core::store('setup', true);
 // Remove the setup lines from the html.php-Template
 $get = Request::retrieve('get');
 if($get && array_key_exists('cleanup', $get)){
+	Page::getInstance()->assign(array('layer' => 'Clean up successful, please delete Setup.php and PasswordLayer'));
+	
 	foreach(array(
 		Core::retrieve('app.path').'/Templates/Page/html.php',
 		Core::retrieve('app.public').'/index.php',
@@ -164,10 +174,13 @@ if($get && array_key_exists('cleanup', $get)){
 			if(String::starts(ltrim($v), '/**/') || String::starts(ltrim($v), '<?php /**/'))
 				unset($lines[$k]);
 		}
-		file_put_contents($file, implode("\n", $lines));
+		
+		if(!chmod($file, 0777) || !file_put_contents($file, implode("\n", $lines))){
+			Page::getInstance()->assign(array('layer' => Setup::getError('rights', true)));
+			
+			break;
+		}
 	}
-	
-	Page::getInstance()->assign(array('layer' => 'Clean up successful, please delete Setup.php and PasswordLayer'));
 }
 
 unset($news, $html, $get, $db, $file, $lines, $dbConfig);

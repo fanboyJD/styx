@@ -46,7 +46,7 @@ class ExtensionFilter extends FilterIterator {
 	 * @return bool Whether to accept the file or not
 	 */
 	public function accept(){
-		return !empty($this->it->isDir) || in_array(String::toLower(pathinfo($this->current(), PATHINFO_EXTENSION)), $this->ext);
+		return !$this->it->isLink() && ($this->it->isDir() || in_array(String::toLower(pathinfo($this->current(), PATHINFO_EXTENSION)), $this->ext));
 	}
 	
 }

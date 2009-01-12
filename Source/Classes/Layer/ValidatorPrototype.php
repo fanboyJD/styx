@@ -35,18 +35,20 @@ class ValidatorPrototype {
 		return true;
 	}
 	
+	public function id($data){
+		return !!Data::id($data);
+	}
+	
 	public function pagetitle($data){
 		return Data::pagetitle($data)==$data;
 	}
 	
 	public function mail($data){
+		$data = trim($data);
+		
 		if(!$data) return false;
 		
 		return !!filter_var($data, FILTER_VALIDATE_EMAIL);
-	}
-	
-	public function id($data){
-		return !!Data::id($data);
 	}
 	
 	public function numericrange($data, $options){
@@ -58,23 +60,34 @@ class ValidatorPrototype {
 	}
 	
 	public function bool($data){
-		return $data=='false' || self::numericrange($data, array(0, 1));
+		return Data::bool($data);
 	}
 	
 	public function date($data, $options = array()){
-		$time = Data::date($data, $options);
-		if(!$time || (empty($options['future']) && $time>time()) || $time<-2051222961)
-			return false;
+		$default = array(
+			'separator' => null,
+			'order' => null,
+			'future' => false,
+		);
 		
-		return true;
+		Hash::extend($default, $options);
+		
+		$time = Data::date($data, $default);
+		
+		return !!(!$time || $time<-2051222961);
 	}
 	
 	public function notempty($data, $options = null, $validators){
-		if(empty($options['purify']) && !empty($validators['purify']))
-			$options['purify'] = $validators['purify'];
+		$default = array(
+			'purify' => null,
+		);
 		
+		Hash::extend($default, $options);
 		
-		if(!empty($options['purify'])) $data = Data::purify($data, $options['purify']);
+		if(!$default['purify'] && !empty($validators['purify']))
+			$default['purify'] = $validators['purify'];
+		
+		if($default['purify']) $data = Data::purify($data, $default['purify']);
 		
 		return !!trim($data);
 	}

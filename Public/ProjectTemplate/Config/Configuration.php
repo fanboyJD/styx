@@ -19,7 +19,7 @@ $CONFIGURATION['debug'] = array(
 		'db' => 'application'
 	),
 	
-	'secure' => '-insecure-a', // This should be a safe, unique key for your application that shouldn't be exposed as it is used for additional security
+	'secure' => '-insecure-', // This should be a safe, unique key for your application that shouldn't be exposed as it is used for additional security
 	'languages' => array(
 		'en' => array('en-us', 'en-gb', 'en'),
 	),

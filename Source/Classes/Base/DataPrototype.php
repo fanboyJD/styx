@@ -68,51 +68,54 @@ class DataPrototype {
 		return self::escape(trim(htmlspecialchars($string, ENT_COMPAT, 'UTF-8', false)));
 	}
 	
-	public static function id($int, $divider = 0){
+	public static function id($int, $options = array()){
 		if(!is_numeric($int) || $int<0) return 0;
 		
-		if($divider){
-			$remainder = $int/$divider;
+		if($options){
+			if(!is_array($options)) $options = array('divider' => $options);
+			
+			$remainder = $int/$options['divider'];
 			if(round($remainder)!=$remainder)
-				$int -= $int%$divider;
+				$int -= $int%$options['divider'];
 		}
 		
 		return round($int);
 	}
 	
 	public static function bool($data){
-		return $data=='false' ? false : !!$data;
+		return $data==='false' ? false : !!$data;
 	}
 	
 	public static function numericrange($data, $options){
 		$data = self::id($data);
-		return ($data>=$options[0] && $data<=$options[1] ? $data : 0);
+		return $data>=$options[0] && $data<=$options[1] ? $data : 0;
 	}
 	
-	public static function date($data, $options = array(
-		'separator' => null,
-		'order' => null,
-		'future' => false,
-	)){
-		$data = explode(!empty($options['separator']) ? $options['separator'] : '.', $data);
+	public static function date($data, $options = array()){
+		$default = array(
+			'separator' => null,
+			'order' => null,
+			'future' => false,
+		);
 		
-		foreach(str_split(!empty($options['order']) ? $options['order'] : 'dmy') as $k => $v){
+		Hash::extend($default, $options);
+		
+		$data = explode(pick($default['separator'], '.'), $data);
+		
+		foreach(str_split(pick($default['order'], 'dmy')) as $k => $v){
 			if(!self::id($data[$k])) return null;
 			
 			$input[$v] = $data[$k];
 		}
 		
 		if(!checkdate($input['m'], $input['d'], $input['y']))
-			return false;
+			return null;
 		
-		return mktime(0, 0, 0, $input['m'], $input['d'], $input['y']);
+		$time = mktime(0, 0, 0, $input['m'], $input['d'], $input['y']);
+		return !$default['future'] && $time>time() ? null : $time;
 	}
 	
-	public static function pagetitle($title, $options = array(
-		'id' => null, // Key may be different
-		'identifier' => null,
-		'contents' => null,
-	)){
+	public static function pagetitle($title, $options = array()){
 		static $regex;
 		
 		if(!$regex){
@@ -125,30 +128,37 @@ class DataPrototype {
 			$regex[0][] = "'";
 		}
 		
+		$default = array(
+			'id' => null,
+			'identifier' => null,
+			'contents' => null,
+		);
+		
+		Hash::extend($default, $options);
+		
 		$title = trim(String::sub(preg_replace('/([^A-z0-9]|_|\^)+/i', '_', String::replace($regex[0], $regex[1], $title)), 0, 64), '_');
 		
-		if(empty($options['identifier'])){
+		if(!$default['identifier']){
 			static $identifier;
 			
 			if(!$identifier) $identifier = Core::retrieve('identifier');
 			
-			$options['identifier'] = $identifier;
+			$default['identifier'] = $identifier;
 		}
 		
-		return !empty($options['contents']) ? self::checkTitle($title, $options) : $title;
+		return $default['contents'] ? self::checkTitle($title, $default) : $title;
 	}
 	
-	protected static function checkTitle($title, $options = array(
-		'id' => null, // Key may be different
-		'identifier' => null,
-		'contents' => null,
-	), $i = 0){
+	protected static function checkTitle($title, $options = array(), $i = 0){
 		if(!is_array($options['contents'])) return $title;
 		
-		foreach($options['contents'] as $content){
+		foreach($options['contents'] as &$content){
 			if(!is_array($content)) $content = array($options['identifier']['external'] => $content);
 			
-			if((empty($options[$options['identifier']['internal']]) || $options[$options['identifier']['internal']]!=$content[$options['identifier']['internal']]) && String::toLower($content[$options['identifier']['external']])==String::toLower($title.($i ? '_'.$i : '')))
+			if(empty($content[$options['identifier']['external']]))
+				continue;
+			
+			if((empty($options['id']) || $options['id']!=$content[$options['identifier']['internal']]) && String::toLower($content[$options['identifier']['external']])==String::toLower($title.($i ? '_'.$i : '')))
 				return self::checkTitle($title, $options, ++$i);
 		}
 		
@@ -161,15 +171,19 @@ class DataPrototype {
 		return self::escape($purify->parse($data));
 	}
 	
-	public static function excerpt($data, $options = array(
-		'length' => 400,
-		'purify' => true,
-		'dots' => true,
-		'options' => false,
-	)){
-		if(String::length($data)<$options['length']) return $data;
+	public static function excerpt($data, $options = array()){
+		$default = array(
+			'length' => 400,
+			'purify' => true,
+			'dots' => true,
+			'options' => false,
+		);
 		
-		$data = String::sub($data, 0, $options['length']);
+		Hash::extend($default, $options);
+		
+		if(String::length($data)<$default['length']) return $data;
+		
+		$data = String::sub($data, 0, $default['length']);
 		
 		preg_match('/(\s+(?!([^<]+)?>)(?!.*\s+).*)/is', $data, $m);
 		
@@ -178,13 +192,17 @@ class DataPrototype {
 			if($pos!==false) $data = String::sub($data, 0, $pos);
 		}
 		
-		return (!empty($options['purify']) ? self::purify($data, $options['options']) : $data).(!empty($options['dots']) ? '...' : '');
+		return ($default['purify'] ? self::purify($data, $default['options']) : $data).($default['dots'] ? '...' : '');
 	}
 	
-	public static function encode($data, $options = array(
-		'whitespace' => true,
-	)){
-		return json_encode(self::clean($data, $options['whitespace']));
+	public static function encode($data, $options = array()){
+		$default = array(
+			'whitespace' => true,
+		);
+		
+		Hash::extend($default, $options);
+		
+		return json_encode(String::clean($data, $default['whitespace']));
 	}
 	
 }

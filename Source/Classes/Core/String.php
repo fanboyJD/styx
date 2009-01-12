@@ -129,7 +129,7 @@ final class String {
 		if(!is_array($array))
 			return iconv('UTF-8', 'UTF-8//IGNORE', $array);
 		
-		array_walk_recursive($array, array('self', 'convert'));
+		array_walk_recursive($array, 'self::convert');
 		
 		return $array;
 	}
