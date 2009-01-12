@@ -7,7 +7,10 @@
  *
  */
 
-class Hash {
+final class Hash {
+	
+	private function __construct(){}
+	private function __clone(){}
 	
 	public static function length($array){
 		return is_array($array) ? pick(count($array)) : null;
@@ -30,6 +33,22 @@ class Hash {
 			else $imploded[$prefix.$key] = $val;
 		
 		return $array = $imploded;
+	}
+	
+	public static function nullify($data){
+		if(is_array($data))
+			foreach($data as $k => &$val){
+				$num = array(
+					is_numeric($val) && $val==0,
+					ctype_digit((string)$val),
+				);
+				
+				if(!$val && !$num[0]) unset($data[$k]);
+				elseif($num[0] || $num[1]) $val = Data::id($val);
+				elseif(is_array($val)) $val = self::nullify($val);
+			}
+		
+		return self::splat($data);
 	}
 	
 	public static function extend(&$src, $extended){

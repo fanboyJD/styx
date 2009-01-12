@@ -108,37 +108,6 @@ class DataPrototype {
 		return mktime(0, 0, 0, $input['m'], $input['d'], $input['y']);
 	}
 	
-	public static function nullify($data){
-		if(is_array($data))
-			foreach($data as $k => &$val){
-				$num = array(
-					is_numeric($val) && $val==0,
-					ctype_digit((string)$val),
-				);
-				
-				if(!$val && !$num[0]) unset($data[$k]);
-				elseif($num[0] || $num[1]) $val = self::id($val);
-				elseif(is_array($val)) $val = self::nullify($val);
-			}
-		
-		return Hash::splat($data);
-	}
-	
-	public static function clean($array, $whitespaces = false){
-		if(is_array($array)){
-			foreach($array as $k => &$val){
-				$val = self::clean($val, $whitespaces);
-				
-				if(!$val && $val!==0) unset($array[$k]);
-			}
-		}else{
-			$array = trim($array);
-			if($whitespaces) $array = String::replace(array("\r\n", "\t", "\n", "\r"), array($whitespaces=='clean' ? "\n" : " ", "", $whitespaces=='clean' ? "\n" : " ", ""), $array);
-		}
-		
-		return $array;
-	}
-	
 	public static function pagetitle($title, $options = array(
 		'id' => null, // Key may be different
 		'identifier' => null,
@@ -169,7 +138,7 @@ class DataPrototype {
 		return !empty($options['contents']) ? self::checkTitle($title, $options) : $title;
 	}
 	
-	private static function checkTitle($title, $options = array(
+	protected static function checkTitle($title, $options = array(
 		'id' => null, // Key may be different
 		'identifier' => null,
 		'contents' => null,

@@ -127,7 +127,7 @@ class Route {
 		self::$routes[Data::pagetitle($priority, array(
 			'contents' => array_keys(self::$routes),
 		))] = array(
-			'route' => !empty($options['regex']) || !empty($options['equals']) ? $route : Data::nullify(explode('/', $route)),
+			'route' => !empty($options['regex']) || !empty($options['equals']) ? $route : Hash::nullify(explode('/', $route)),
 			'options' => $options
 		);
 	}

@@ -51,7 +51,7 @@ class Form extends Elements {
 				if($raw && !in_array($el->type, self::$formElements))
 					continue;
 				
-				$el->setValue(Data::clean($v));
+				$el->setValue($v);
 			}
 	}
 	

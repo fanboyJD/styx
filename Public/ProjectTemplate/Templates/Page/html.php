@@ -15,9 +15,7 @@
 	${scripts}
 </head>
 <body><div>
-<div class="nodisplay" style="font-family: Calibri; font-size: 12px; background: #FBE3E4; color: #8a1f11; margin: 1em 0; padding: .8em; border: 2px solid #FBC2C4;">
-	${lang.htaccess}
-</div>
+<?php if(Core::retrieve('setup')) echo Setup::getError('htaccess'); ?>
 <a id="logo" href="${app.link}"></a>
 <?php
 	$user = User::retrieve();
@@ -39,9 +37,9 @@
 	<a style="padding-left: 30px;" href="<?php echo Layer::retrieve('Login')->link(null, $action); ?>">${lang.user.<?php echo $action; ?>}</a>
 	<br/>
 	<?php
-		if(!$user && $PasswordLayer){
+		if(Core::retrieve('setup') && $PasswordLayer){
 			$styx = Core::retrieve('styx.link');
-			echo '<div class="notice">'.Lang::get('description', $styx, $styx, $styx).'</div>';
+			echo '<div class="notice">'.sprintf(Setup::getNotice('secure'), $styx, $styx, $styx).'</div>';
 		}
 	?>
 	<br/>

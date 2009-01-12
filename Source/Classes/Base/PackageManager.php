@@ -145,7 +145,7 @@ class PackageManager {
 				$content = String::replace(
 					array('{ ',' }', '; ', ';}', ': ', ', '),
 					array('{', '}', ';', '}', ':', ','),
-					Data::clean(preg_replace('/\s{2,}/', '', preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $content)), true)
+					String::clean(preg_replace('/\s{2,}/', '', preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $content)), true)
 				);
 			}
 		}

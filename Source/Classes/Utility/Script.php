@@ -48,6 +48,6 @@ class Script {
 	 * @return string
 	 */
 	public static function get(){
-		return Template::map('Utility', 'Script')->assign(Data::clean(self::$script, true))->parse(true);
+		return Template::map('Utility', 'Script')->assign(String::clean(self::$script, true))->parse(true);
 	}
 }

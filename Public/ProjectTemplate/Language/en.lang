@@ -8,23 +8,6 @@ confirmdelete = 'Are you sure to delete this entry?';
 deleted = 'The entry has been deleted!';
 
 running = 'Running %s';
-htaccess = 'If you can read this you most probably forgot to rename the file my.htaccess to .htaccess or mod_rewrite in your Apache-Installation is disabled.
-	<br/><br/>
-	You will see a nicely designed template if you fix this and then you are ready to go ;)
-	';
-
-description = 'If you can read this, it seems like you installed this ProjectTemplate just fine! There is one more step included before you can start
-		creating your application: After changing the "secure"-String in your Configuration you should once reset your password. Note that you should
-		not change the "secure"-String at any time as it would invalidate all passwords. Please never expose this string and keep it private.
-		After a successful change of the password please try to login with the used password and the username "admin". You can change the username
-		at any time right in the database. For a little UsermanagementLayer see the Sample Application.
-		<br/><br/>
-		Make sure to remove the PasswordLayer and the corresponding output in the html-Template before pushing the application to the public.
-		<br/>
-		If possible please link to <a href="%s">styx.og5.net</a> and add the Mini-Logo to your Application: <img src="%s/Images/Styxmini.png" alt="" />
-		<br/>
-		Thanks for giving Styx the opportunity to become your Framework of choice <img src="%s/Images/Smile.gif" alt="" />
-	';
 
 namespace news {
 	posted = 'Posted by <b>%s</b> on %s';

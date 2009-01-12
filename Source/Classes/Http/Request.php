@@ -22,7 +22,7 @@ class Request {
 	
 	public static function parse(){
 		foreach(array('post', 'cookie') as $v)
-			self::store(String::convert($v), self::sanitize($GLOBALS['_'.String::toUpper($v)]));
+			self::store($v, self::sanitize($GLOBALS['_'.String::toUpper($v)]));
 		
 		$request = self::processRequest();
 		
@@ -64,7 +64,7 @@ class Request {
 		
 		$i = 0;
 		foreach($vars as $k => $part){
-			$v = Data::clean($part);
+			$v = String::clean($part);
 			if(!$v) continue;
 			
 			$v = explode($Configuration['path.separator'], $v, 2);
@@ -97,13 +97,13 @@ class Request {
 	}
 	
 	public static function sanitize($data){
-		$data = Data::clean($data);
+		$data = String::clean($data);
 		
 		if(Hash::length($data)){
 			if(get_magic_quotes_gpc())
 				$data = array_map('stripslashes', $data);
 			
-			return $data;
+			return String::convert($data);
 		}
 		
 		return array();

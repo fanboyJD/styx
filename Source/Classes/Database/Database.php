@@ -67,6 +67,10 @@ class Database {
 		mysql_close($this->Connection['c']);
 	}
 	
+	public function isConnected(){
+		return $this->isConnected && !!$this->Connection['db'];
+	}
+	
 	/**
 	 * @param string $table
 	 * @return QuerySelect
@@ -121,7 +125,7 @@ class Database {
 			$this->query("SET NAMES 'utf8'");
 		}
 		
-		$query = mysql_query($sql);
+		$query = mysql_query($sql, $this->Connection['c']);
 		
 		if($debug){
 			$this->queries++;
@@ -152,7 +156,7 @@ class Database {
 		
 		mysql_free_result($query);
 		
-		return Data::nullify($rows);
+		return Hash::nullify($rows);
 	}
 	
 }

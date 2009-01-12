@@ -62,4 +62,7 @@ Core::store(array(
 	),
 	
 	'timezone' => 'Europe/Vienna',
+	
+	'feature.mbstring' => function_exists('mb_strlen'), // We check for support of a random mb_* method
+	'feature.iconv' => function_exists('iconv'),
 ));

@@ -138,8 +138,7 @@ class Template extends Runner {
 		$rep = array(array_values($vars[0]), array());
 		$i = 0;
 		foreach($vars[1] as $v){
-			$v = Data::clean(explode('|', $v));
-			foreach(Hash::splat($v) as $val){
+			foreach(Hash::splat(String::clean(explode('|', $v))) as $val){
 				if(!empty($this->assigned[$val])){
 					$rep[1][$i] = $this->assigned[$val];
 					break;
