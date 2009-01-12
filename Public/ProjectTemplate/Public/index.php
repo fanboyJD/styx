@@ -2,9 +2,7 @@
 	$use = 'debug';
 	
 	include('../../../Source/Styx.php');
-	
-	// Remove the following line after you have completed the setup
-	if(file_exists('./Setup.php')) include('./Setup.php');
+	/**/if(file_exists('./Setup.php')) include('./Setup.php');
 	
 	switch(Response::getContentType()){
 		case 'html':

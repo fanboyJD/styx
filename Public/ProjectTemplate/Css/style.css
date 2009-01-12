@@ -69,7 +69,7 @@ a.previous {
 	display: block;
 }
 
-.error, .notice {
+.error, .notice, .success {
 	background: #FBE3E4;
 	color: #8a1f11;
 	margin: 1em 0;
@@ -82,8 +82,11 @@ a.previous {
 	border-radius: 4px;
 }
 
-.error a { color: #8a1f11; }
 
 .notice { background: #FFF6BF; color: #514721; border-color: #FFD324; margin-bottom: 0; }
+.success { background: #E6EFC2; color: #264409; border-color: #C6D880; }
+
+.error a { color: #8a1f11; }
 .notice a { color: #514721; }
-.notice img { vertical-align: text-bottom; }
+.success a { color: #264409; }
+.error img, .notice img, .success img { vertical-align: text-bottom; }

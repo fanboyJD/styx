@@ -2,13 +2,14 @@
 
 class Setup {
 	
-	private static $errors = array(
+	private static $messages = array(
 		'nostyx' => '
 			The Framework was not found. Please adjust your include statement in the index.php-File.
 			<br/><br/>
 			In order to load the Framework you have to include the File "Styx.php" from the
 			Framework\'s Source-Folder.
-			',
+		',
+		
 		'nodb' => 'There is no Database connection to either the systen itself or the database "%s". You might
 			just see some errors above this message that can help you figure out how to solve the problem.
 			<br/><br/>
@@ -16,27 +17,50 @@ class Setup {
 			%s
 			<br/><br/>
 			Please adjust your database settings in the Config/Configuration.php-File of your Project-Root.
-			',
+		',
 		
 		'notable' => 'A database connection has been established, however there doesn\'t seem to be a users-Table.<br/><br/>
-			<b>You might just forgot to import the database-skeleton.</b> Import the file application.sql.bz2 to your
-			database and delete the file afterwards.
-			',
+			<b>You may just forgot to import the database-skeleton.</b> Import the file application.sql.bz2 to your
+			database.
+		',
 	
-		'htaccess' => 'If you can read this you most probably forgot to rename the file my.htaccess to .htaccess or mod_rewrite in your Apache-Installation is disabled.
+		'htaccess' => 'If you can read this you most probably forgot to rename the file my.htaccess to .htaccess or mod_rewrite in your
+			Apache-Installation is disabled.
 			<br/><br/>
 			You will see a nicely designed template if you fix this and then you are ready to go ;)
-			',
-	);
-	
-	public static $notices = array(
-		'secure' => 'If you can read this, it seems like you installed this ProjectTemplate just fine! There is one more step included before you can start
-			creating your application: After changing the "secure"-String in your Configuration you should once reset your password. Note that you should
+			<br/><br/>
+			Note: If you are using Linux and you are sure you have already configured your Apache to use mod_rewrite and put the .htaccess-File
+			to the right directory but it still does not work you may forgot to set the chmod 777 to the "Cache" Folder inside the Framework\'s Source-Folder
+		',
+		
+		'secure' => 'There is one more step included before you can start
+			creating your application: Please change the "secure"-String in the Configuration of your Application.
+		',
+		
+		'password' => 'After changing the "secure"-String in your Configuration you have to reset your password. Note that you should
 			not change the "secure"-String at any time as it would invalidate all passwords. Please never expose this string and keep it private.
 			After a successful change of the password please try to login with the used password and the username "admin". You can change the username
 			at any time right in the database. For a little UsermanagementLayer see the Sample Application.
+		',
+		
+		'mbstring' => 'Notice: The mbstring PHP-Extension was not found or manually disabled. It is recommended to enable it if you are creating
+			a multilingual website. Have a look at <a href="http://php.net/mbstring">php.net/mbstring</a>. Styx will fall back to use the internal
+			php functions like strlen instead of mb_strlen etc.
+		',
+		
+		'iconv' => 'Notice: The iconv PHP-Extension was not found or manually disabled. It is recommended to enable it. Iconv is used in Styx
+			to filter out bad UTF-8 sequences so your application will only contain valid characters.
+			More information: <a href="http://php.net/iconv">php.net/iconv</a>.
+		',
+		
+		'image' => 'Notice: The GD-Library was not found or misconfigured. If you want to use the Image-Class provided by Styx you should
+			enable it. How-To: <a href="http://php.net/gd">http://php.net/gd</a>
+		',
+		
+		'finished' => 'If you can read this, it seems like you have installed this ProjectTemplate just fine!
 			<br/><br/>
-			Make sure to remove the PasswordLayer and the corresponding output in the html-Template before pushing the application to the public.
+			Make sure to remove the Setup.php, the PasswordLayer and the corresponding output in the project before pushing the application to the public.
+			<br/><a href="%s">Automatically clean the Project-Files from Setup-related functions</a>
 			<br/>
 			If possible please link to <a href="%s">styx.og5.net</a> and add the Mini-Logo to your Application: <img src="%s/Images/Styxmini.png" alt="" />
 			<br/>
@@ -44,14 +68,39 @@ class Setup {
 		',
 	);
 	
-	public static function getError($error){
+	public static function getError($msg){
 		return '<div class="nodisplay" style="font-family: Calibri; font-size: 12px; background: #FBE3E4; color: #8a1f11; margin: 1em 0; padding: .8em; border: 2px solid #FBC2C4;">
-			'.self::$errors[$error].'
+			'.self::getMessage($msg).'
 		</div>';
 	}
 	
-	public static function getNotice($notice){
-		return self::$notices[$notice];
+	public static function getMessage($msg){
+		return self::$messages[$msg];
+	}
+	
+	public static function handleSetup(){
+		if(Layer::retrieve('Password')){
+			$user = Database::select('users')->fetch(); // Select first user
+			if(Core::retrieve('secure')=='-insecure-'){
+				return '<div class="notice">'.Setup::getMessage('secure').'</div>';
+			}elseif($user['pwd']=='8ce4625f597baf20d99917a52076d28070f6bb91'){ // Check if there is still the default password
+				return '<div class="notice">'.Setup::getMessage('password').'</div>';
+			}
+		}
+		
+		$data = array();
+		
+		if(!Core::retrieve('feature.mbstring'))
+			$data[] = '<div class="notice">'.Setup::getMessage('mbstring').'</div>';
+		if(!Core::retrieve('feature.iconv'))
+			$data[] = '<div class="notice">'.Setup::getMessage('iconv').'</div>';
+		if(!function_exists('imagepng'))
+			$data[] = '<div class="notice">'.Setup::getMessage('image').'</div>';
+		
+		$styx = Core::retrieve('styx.link');
+		$data[] = '<div class="success">'.sprintf(Setup::getMessage('finished'), Response::link(array('cleanup' => null)), $styx, $styx, $styx).'</div>';
+		
+		return implode($data);
 	}
 	
 	static function format($data){
@@ -98,3 +147,27 @@ if(empty($news['id'])){
 }
 
 Core::store('setup', true);
+
+// Remove the setup lines from the html.php-Template
+$get = Request::retrieve('get');
+if($get && array_key_exists('cleanup', $get)){
+	foreach(array(
+		Core::retrieve('app.path').'/Templates/Page/html.php',
+		Core::retrieve('app.public').'/index.php',
+	) as $file){
+		if(!file_exists($file))
+			continue;
+		
+		$lines = file($file);
+		foreach($lines as $k => $v){
+			$lines[$k] = $v = trim($v, "\r\n");
+			if(String::starts(ltrim($v), '/**/') || String::starts(ltrim($v), '<?php /**/'))
+				unset($lines[$k]);
+		}
+		file_put_contents($file, implode("\n", $lines));
+	}
+	
+	Page::getInstance()->assign(array('layer' => 'Clean up successful, please delete Setup.php and PasswordLayer'));
+}
+
+unset($news, $html, $get, $db, $file, $lines, $dbConfig);

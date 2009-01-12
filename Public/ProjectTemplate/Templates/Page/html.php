@@ -15,33 +15,23 @@
 	${scripts}
 </head>
 <body><div>
-<?php if(Core::retrieve('setup')) echo Setup::getError('htaccess'); ?>
+<?php /**/ if(Core::retrieve('setup')) echo Setup::getError('htaccess'); ?>
 <a id="logo" href="${app.link}"></a>
-<?php
-	$user = User::retrieve();
-	$action = $user ? 'logout' : 'login';
-	
-	$PasswordLayer = Layer::retrieve('Password');
-?>
 <div class="text">
 	${styx}
 	<?php 
 		if(User::hasRight('layer.index.edit.add'))
 			echo '<a style="padding-left: 30px;" href="'.Layer::retrieve('Index')->link(null, 'edit').'">${lang.news.add}</a>';
-	?>
-	<?php 
+
+		$user = User::retrieve();
+		$action = $user ? 'logout' : 'login';
 		if($user) echo '<a style="padding-left: 30px;" href="'.Response::link('admin').'">${lang.admin.admin}</a>';
-		
-		if($PasswordLayer) echo '<a style="padding-left: 30px;" href="'.$PasswordLayer->link().'">Reset Password</a>';
+		/**/ $PasswordLayer = Layer::retrieve('Password');
+		/**/ if($PasswordLayer) echo '<a style="padding-left: 30px;" href="'.$PasswordLayer->link().'">Reset Password</a>';
 	?>
 	<a style="padding-left: 30px;" href="<?php echo Layer::retrieve('Login')->link(null, $action); ?>">${lang.user.<?php echo $action; ?>}</a>
 	<br/>
-	<?php
-		if(Core::retrieve('setup') && $PasswordLayer){
-			$styx = Core::retrieve('styx.link');
-			echo '<div class="notice">'.sprintf(Setup::getNotice('secure'), $styx, $styx, $styx).'</div>';
-		}
-	?>
+	<?php /**/ if(Core::retrieve('setup')) echo Setup::handleSetup(); ?>
 	<br/>
 	${layer | lang.validator.rightsError}
 	<div class="clear"></div>

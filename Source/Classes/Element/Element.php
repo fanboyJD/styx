@@ -393,7 +393,7 @@ class Checkbox extends Element {
 		$options['type'] = 'checkbox';
 		$options['value'] = 1;
 		$options[':validate'] = 'bool';
-		if(isset($options[':default']) && $options[':default']!=1) $options[':default'] = 0;
+		if(empty($options[':default']) || $options[':default']!=1) $options[':default'] = 0;
 		
 		parent::__construct($options, 'checkbox');
 		

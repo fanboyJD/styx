@@ -36,7 +36,7 @@ unset($Paths, $CONFIGURATION); // Unset the whole array, so no data from it is a
 
 ini_set('date.timezone', Core::retrieve('timezone'));
 
-String::initialize(Core::retrieve('feature.mbstring'), Core::retrieve('feature.iconv'));
+String::initialize(Core::fetch('feature.mbstring', 'feature.iconv'));
 Core::initialize();
 
 Core::autoload('Element'); // We need to load Element as there are several Classes that are always needed

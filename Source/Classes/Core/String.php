@@ -18,18 +18,17 @@ final class String {
 	private function __construct(){}
 	private function __clone(){}
 	
-	public static function initialize($mbstring, $iconv){
-		$mbstring = !!$mbstring;
-		self::$Features = array(
-			'mbstring' => $mbstring,
-			'iconv' => !!$iconv,
-		);
-
+	public static function initialize($features){
+		foreach(self::$Features as $k => $v)
+			self::$Features[$k] = empty($features[$k]) ? false : !!$features[$k];
+		
 		foreach(array(
 			'strlen', 'strrpos', 'strpos', 'strlen', 'strtoupper', 'strtolower',
 			'substr', 'substr_count', 'stripos', 'strripos',
 		) as $v)
-			self::$Fn[$v] = ($mbstring ? 'mb_' : '').$v;
+			self::$Fn[$v] = (self::$Features['mbstring'] ? 'mb_' : '').$v;
+		
+		if(self::$Features['mbstring']) mb_internal_encoding('UTF-8');
 	}
 	
 	public static function ends($string, $look){

@@ -22,7 +22,7 @@ $CONFIGURATION['debug'] = array(
 		'db' => 'framework'
 	),
 	
-	'secure' => '32lms/(d902_3-k2"§$jsd', // This should be unique to your application and shouldn't be exposed since it is used for additional security
+	'secure' => '32lms/(d902_3-k2"§$jsd', // This should be a safe, unique key for your application that shouldn't be exposed as it is used for additional security
 	
 	'languages' => array(
 		'en' => array('en-us', 'en-gb', 'en'),
