@@ -68,9 +68,7 @@ class ValidatorPrototype {
 		
 		Hash::extend($default, $options);
 		
-		$time = Data::date($data, $default);
-		
-		return !!(!$time || $time<-2051222961);
+		return !!Data::date($data, $default);
 	}
 	
 	public function notempty($data, $options = null, $validators){
