@@ -28,19 +28,6 @@ class ValidatorTest extends UnitTestCase {
 		$this->assertFalse(Validator::id('a5'));
 	}
 	
-	public function testBool(){
-		$this->assertFalse(Validator::bool('false'));
-		$this->assertFalse(Validator::bool(false));
-		$this->assertFalse(Validator::bool(null));
-		$this->assertFalse(Validator::bool(0));
-		
-		$this->assertTrue(Validator::bool('true'));
-		$this->assertTrue(Validator::bool(true));
-		$this->assertTrue(Validator::bool(1));
-		$this->assertTrue(Validator::bool(100));
-		$this->assertTrue(Validator::bool('anything'));
-	}
-	
 	public function testNumericrange(){
 		$this->assertTrue(Validator::numericrange(5, array(1, 10)));
 		

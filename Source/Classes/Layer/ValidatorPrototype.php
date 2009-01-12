@@ -59,10 +59,6 @@ class ValidatorPrototype {
 		return false;
 	}
 	
-	public function bool($data){
-		return Data::bool($data);
-	}
-	
 	public function date($data, $options = array()){
 		$default = array(
 			'separator' => null,
