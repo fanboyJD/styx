@@ -21,6 +21,7 @@ class DataIterator implements RecursiveIterator, Countable  {
 	 * @var array
 	 */
 	private $Current = array();
+	private $Parents = array();
 	private $options = array();
 
 	/**
@@ -33,6 +34,12 @@ class DataIterator implements RecursiveIterator, Countable  {
 		$this->options = $options;
 		
 		$this->Data = $data;
+		
+		if(!empty($this->options['parents']))
+			$this->Parents = Hash::splat($this->options['parents']);
+		
+		if($this->options['current'])
+			array_push($this->Parents, $this->options['current']);
 		
 		if(!empty($data[$this->options['current']]))
 			$this->Current = $data[$this->options['current']];
@@ -50,6 +57,7 @@ class DataIterator implements RecursiveIterator, Countable  {
 		$default = array(
 			'identifier' => null,
 			'parent' => 'parent',
+			'passParents' => false,
 			'current' => 0,
 		);
 		
@@ -78,6 +86,7 @@ class DataIterator implements RecursiveIterator, Countable  {
 		
 		return new DataIterator($this->Data, Hash::extend($options, array(
 			'current' => $current[$options['identifier']],
+			'parents' => $this->Parents,
 		)));
 	}
 	
@@ -86,7 +95,11 @@ class DataIterator implements RecursiveIterator, Countable  {
 	}
 
 	public function current(){
-		return current($this->Current);
+		$current = current($this->Current);
+		if(!empty($this->options['passParents']))
+			$current[$this->options['passParents']] = $this->Parents;
+		
+		return $current;
 	}
 	
 	public function key(){
