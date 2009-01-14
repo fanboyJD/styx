@@ -7,7 +7,7 @@
  *
  */
 
-class Route {
+final class Route {
 	
 	private static $mainlayer = null,
 		$routes = array(),
@@ -127,7 +127,7 @@ class Route {
 		self::$routes[Data::pagetitle($priority, array(
 			'contents' => array_keys(self::$routes),
 		))] = array(
-			'route' => !empty($options['regex']) || !empty($options['equals']) ? $route : Hash::nullify(explode('/', $route)),
+			'route' => !empty($options['regex']) || !empty($options['equals']) ? $route : String::clean(explode('/', $route)),
 			'options' => $options
 		);
 	}

@@ -1,7 +1,7 @@
 <?php
 /**
  * Styx::DataSet - Interface for specific operations (pagination etc.) and database-data abstraction
- * 
+ *
  * @package Styx
  * @subpackage Utility
  *
@@ -92,7 +92,7 @@ class DataSet implements Iterator, Countable {
 	
 	/**
 	 * Limits the data, exactly resembles the MySQL Limit expression
-	 * 
+	 *
 	 * @see Query::limit
 	 * @param mixed $limit
 	 * @param mixed $val
@@ -254,7 +254,7 @@ class DataSet implements Iterator, Countable {
 
 /**
  * Styx::DataComparison - Compares any array-data based on the method calls to it
- * 
+ *
  * @package Styx
  * @subpackage Utility
  *

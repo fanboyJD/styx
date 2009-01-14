@@ -1,7 +1,7 @@
 <?php
 /**
  * Styx::DataIterator - Creates a tree out of flat data to iterate over it
- * 
+ *
  * @package Styx
  * @subpackage Utility
  *
@@ -12,6 +12,8 @@
 class DataIterator implements RecursiveIterator, Countable  {
 	
 	/**
+	 * All elements of the iterator
+	 *
 	 * @var array
 	 */
 	private $Data;
@@ -21,6 +23,11 @@ class DataIterator implements RecursiveIterator, Countable  {
 	 * @var array
 	 */
 	private $Current = array();
+	/**
+	 * Holds the parents of the current objects by identifier
+	 *
+	 * @var array
+	 */
 	private $Parents = array();
 	private $options = array();
 

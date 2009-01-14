@@ -96,6 +96,27 @@ class DataTest extends UnitTestCase {
 		$array = array('test' => "js\ton");
 		
 		$this->assertEqual(Data::encode($array), '{"test":"json"}');
+		
+		// Data::encode strips out empty values and typecasts numbers
+		$this->assertEqual(Data::encode(array(
+			'null' => 0,
+			'int' => 3,
+			'strint' => '31',
+			'float' => 1.03,
+			'strfloat' => '1.03',
+			'string' => 'Test',
+			'nil' => null,
+			'remove' => ' ',
+			'clean' => "Te\nst",
+		)), json_encode(array(
+			'null' => 0,
+			'int' => 3,
+			'strint' => 31,
+			'float' => 1.03,
+			'strfloat' => 1.03,
+			'string' => 'Test',
+			'clean' => 'Test',
+		)));
 	}
 	
 	public function testPagetitle(){

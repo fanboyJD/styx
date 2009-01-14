@@ -1,7 +1,7 @@
 <?php
 /**
  * Styx::Image - Provides an Interface to the GD-Library for image manipulation
- * 
+ *
  * @package Styx
  * @subpackage Utility
  *
@@ -150,7 +150,7 @@ class Image {
 	
 	/**
 	 * Crops the image. The values are given like margin/padding values in css
-	 * 
+	 *
 	 * <b>Example</b>
 	 * <ul>
 	 * <li>crop(10) - Crops by 10px on all sides</li>

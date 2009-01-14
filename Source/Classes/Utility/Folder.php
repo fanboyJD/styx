@@ -1,7 +1,7 @@
 <?php
 /**
  * Styx::Folder - Provides simple directory methods
- * 
+ *
  * @package Styx
  * @subpackage Utility
  *

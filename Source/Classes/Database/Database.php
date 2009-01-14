@@ -150,13 +150,12 @@ class Database {
 		if(!$query) return false;
 		
 		$rows = array();
-		
-		while($row = $this->fetch($query))
+		while($row = mysql_fetch_array($query))
 			$rows[] = $row;
 		
 		mysql_free_result($query);
 		
-		return Hash::nullify($rows);
+		return $rows;
 	}
 	
 }

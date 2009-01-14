@@ -7,7 +7,7 @@
  *
  */
 
-class Response {
+final class Response {
 
 	private static /**
 		 * @var ContentType

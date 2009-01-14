@@ -36,9 +36,9 @@ class StyxReporter extends HtmlReporter {
 		echo $this->trim('
 			<div class="'.($this->getFailCount() ? 'error' : ($this->getExceptionCount() ? 'notice' : 'success')).'">
 				'.$this->getTestCaseProgress() . "/" . $this->getTestCaseCount().' test cases complete:
-				<strong>'.$this->getPassCount().'</strong> passes, 
-				<strong>'.$this->getFailCount().'</strong> fails and 
-				<strong>'.$this->getExceptionCount().'</strong> exceptions.
+				<strong>'.pick($this->getPassCount(), 0).'</strong> passes, 
+				<strong>'.pick($this->getFailCount(), 0).'</strong> fails and 
+				<strong>'.pick($this->getExceptionCount(), 0).'</strong> exceptions.
 			</div>
 			</div>
 			</body>

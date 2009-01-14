@@ -3,6 +3,8 @@
  * Returns either {@link $a} if not empty, or {@link $b}
  *
  * @package Styx
+ * @subpackage Core
+ *
  * @param mixed $a
  * @param mixed $b
  * @return mixed
@@ -14,7 +16,7 @@ function pick($a, $b = null){
 /**
  * Styx::ExtensionFilter - Returns only the files by the specified extension
  * when used with a DirectoryIterator
- * 
+ *
  * @package Styx
  * @subpackage Core
  *
@@ -53,7 +55,7 @@ class ExtensionFilter extends FilterIterator {
 
 /**
  * A class can extend from Runner to be used with {@link Template::bind}
- * 
+ *
  * @see Template::bind
  * @package Styx
  * @subpackage Core
@@ -63,6 +65,10 @@ class ExtensionFilter extends FilterIterator {
  */
 abstract class Runner {
 	
+	/**
+	 * A template that is bound to a class uses this method to execute in class-scope
+	 *
+	 */
 	public function execute(){
 		include(func_get_arg(0));
 	}
@@ -72,7 +78,7 @@ abstract class Runner {
 /**
  * Styx::Core - Initializes the Styx Framework, holds the Configuration and 
  * provides some basic functionality
- * 
+ *
  * @package Styx
  * @subpackage Core
  *
@@ -116,7 +122,7 @@ class Core {
 	}
 	
 	/**
-	 * Automatically loads the given class when used with "new Classname"
+	 * Automatically loads the given class when used with "new Classname" or a static call to one of its methods (Classname::method())
 	 *
 	 * @param string $class
 	 * @return bool
@@ -133,6 +139,7 @@ class Core {
 	 * This method sets up the basic configuration of the Framework
 	 * and initializes the classes and templates that are available
 	 * in the Framework or the Application
+	 *
 	 */
 	public static function initialize(){
 		self::$Storage['identifier'] = array(
@@ -225,6 +232,11 @@ class Core {
 	}
 	
 	/* Storage Methods (Will be moved to a StaticStorage-Class in PHP5.3) */
+	/**
+	 * Holds all the stored variables
+	 *
+	 * @var array
+	 */
 	private static $Storage = array();
 	
 	/**

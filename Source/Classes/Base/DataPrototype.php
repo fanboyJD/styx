@@ -188,7 +188,7 @@ class DataPrototype {
 		preg_match('/(\s+(?!([^<]+)?>)(?!.*\s+).*)/is', $data, $m);
 		
 		if(!empty($m[1])){
-			$pos = strrpos($data, $m[1]);
+			$pos = String::rpos($data, $m[1]);
 			if($pos!==false) $data = String::sub($data, 0, $pos);
 		}
 		

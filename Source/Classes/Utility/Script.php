@@ -1,7 +1,7 @@
 <?php
 /**
  * Styx::Script - Holds certain JavaScript to be streamed to the client
- * 
+ *
  * @package Styx
  * @subpackage Utility
  *
@@ -42,7 +42,7 @@ class Script {
 	 * Retrieves the JavaScript that was set via Script::set and Script::log
 	 * Needs to be called right before the Page gets shown. See Application::onPageShow
 	 * in Classes-Folder of the Sample Application for example usage.
-	 * 
+	 *
 	 * @see Page::show()
 	 * @see Core::fireEvent()
 	 * @return string

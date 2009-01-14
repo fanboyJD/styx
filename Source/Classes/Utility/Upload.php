@@ -1,7 +1,7 @@
 <?php
 /**
  * Styx::Upload - Handles file uploads
- * 
+ *
  * @package Styx
  * @subpackage Utility
  *
