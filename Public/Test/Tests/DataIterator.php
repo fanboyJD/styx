@@ -38,7 +38,23 @@ class DataIteratorTest extends UnitTestCase {
 		
 		foreach($data as $v)
 			$this->assertEqual($data->getDepth(), $depths[$v['id']]);
+	}
+	
+	public function testRecursive(){
+		$data = DataIterator::retrieve(array(
+			array('id' => 1, 'parent' => 0),
+			array('id' => 2, 'parent' => 4),
+			array('id' => 3, 'parent' => 2),
+			array('id' => 4, 'parent' => 3),
+			array('id' => 5, 'parent' => 4),
+		), array('current' => 2));
 		
+		// This should run no more than 4 times and prevent creating an infinite loop
+		$i = 0;
+		foreach($data as $v)
+			$i++;
+		
+		$this->assertEqual($i, 4);
 	}
 
 }

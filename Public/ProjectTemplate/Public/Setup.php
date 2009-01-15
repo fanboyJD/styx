@@ -25,7 +25,8 @@ class Setup {
 		',
 	
 		'htaccess' => 'If you can read this you most probably forgot to rename the file my.htaccess to .htaccess or mod_rewrite in your
-			Apache-Installation is disabled.
+			Apache-Installation is disabled. Another source of problem can be that you did not set the "app.link"-Setting as an absolute
+			path to the Public-Folder of your project (The folder where your index.php is in).
 			<br/><br/>
 			You will see a nicely designed template if you fix this and then you are ready to go ;)
 			<br/><br/>

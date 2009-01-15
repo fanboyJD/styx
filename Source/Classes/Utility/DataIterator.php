@@ -84,7 +84,8 @@ class DataIterator implements RecursiveIterator, Countable  {
 	public function hasChildren(){
 		$current = current($this->Current);
 		
-		return !empty($this->Data[$current[$this->options['identifier']]]) && !!Hash::length($this->Data[$current[$this->options['identifier']]]);        
+		// This also prevents infinite loops, it does not return true if an element was already a node in the parent list of the current node
+		return !empty($current[$this->options['identifier']]) && !in_array($current[$this->options['identifier']], $this->Parents) && !empty($this->Data[$current[$this->options['identifier']]]) && !!Hash::length($this->Data[$current[$this->options['identifier']]]);        
 	}
 	
 	public function getChildren(){

@@ -4,26 +4,30 @@ require_once('./Initialize.php');
 
 class CoreTest extends UnitTestCase {
 	
-	public $layer = '';
+	public $folder;
 	
 	public function setUp(){
-		$appath = Core::retrieve('app.path');
+		$this->folder = Core::retrieve('app.public').'Temp';
 		
-		$this->layer = $appath.'Layers';
+		if(!is_dir($this->folder)) mkdir($this->folder);
 		
-		touch($this->layer.'/temp.php.tmp');
-		touch($this->layer.'/temp.tpl');
-		if(!file_exists($this->layer.'/test')) mkdir($this->layer.'/test');
-		touch($this->layer.'/test/temp.html');
-		touch($this->layer.'/test/test.php');
+		touch($this->folder.'/temp.tpl.tmp');
+		touch($this->folder.'/temp.tpl');
+		if(!is_dir($this->folder.'/test')) mkdir($this->folder.'/test');
+		touch($this->folder.'/test/temp.html');
+		touch($this->folder.'/test/test.html');
+		touch($this->folder.'/test/test.tpl');
+		touch($this->folder.'/test/test.php');
 	}
 	
 	public function tearDown(){
-		unlink($this->layer.'/temp.php.tmp');
-		unlink($this->layer.'/temp.tpl');
-		unlink($this->layer.'/test/temp.html');
-		unlink($this->layer.'/test/test.php');
-		rmdir($this->layer.'/test');
+		unlink($this->folder.'/temp.tpl.tmp');
+		unlink($this->folder.'/temp.tpl');
+		unlink($this->folder.'/test/temp.html');
+		unlink($this->folder.'/test/test.html');
+		unlink($this->folder.'/test/test.tpl');
+		unlink($this->folder.'/test/test.php');
+		rmdir($this->folder.'/test');
 	}
 	
 	public function testPick(){
@@ -51,15 +55,20 @@ class CoreTest extends UnitTestCase {
 	}
 	
 	public function testExtensionFilter(){
-		foreach(new ExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->layer))) as $file){
+		foreach(new ExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator(Core::retrieve('app.path').'/Layers'))) as $file){
 			$this->assertEqual(pathinfo($file->getFileName(), PATHINFO_EXTENSION), 'php');
 			$files[] = $file->getFileName();
 		}
 		
-		$this->assertEqual(count($files), 5);
-			
-		foreach(new ExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->layer)), array('html', 'tpl')) as $file)
+		$this->assertEqual(count($files), 4);
+		
+		$i = 0;
+		foreach(new ExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->folder)), array('html', 'tpl')) as $file){
 			$this->assertTrue(in_array(pathinfo($file->getFileName(), PATHINFO_EXTENSION), array('html', 'tpl')));
+			$i++;
+		}
+		
+		$this->assertEqual($i, 4);
 	}
 	
 	public function testConfigurationUnchanged(){
@@ -93,6 +102,35 @@ class CoreTest extends UnitTestCase {
 		new JavaScriptPacker('some_random_script();');
 		
 		$this->assertTrue(class_exists('JavaScriptPacker', false));
+	}
+	
+	public function testStorage(){
+		Core::store('hello', 'world');
+		
+		$this->assertEqual(Core::retrieve('hello'), 'world');
+		
+		Core::store('hello', null);
+		
+		$this->assertNull(Core::retrieve('hello'));
+		
+		$this->assertEqual(Core::retrieve('hello', 'world'), 'world');
+		
+		Core::store(array(
+			'key' => 'value',
+			'some' => 'test',
+		));
+		
+		$this->assertEqual(Core::retrieve('key'), 'value');
+		
+		$this->assertEqual(Core::retrieve('some', 'random'), 'test');
+		
+		$this->assertEqual(Core::fetch('key', 'some', 'undefined'), array('key' => 'value', 'some' => 'test'));
+		
+		Core::store(array(
+			'key' => null,
+			'hello' => null,
+			'some' => null,
+		));
 	}
 	
 }
