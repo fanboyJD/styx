@@ -10,38 +10,41 @@
 
 class Cache extends Storage {
 	private $Configuration = array(
+			'engine' => null,
 			'prefix' => null,
 			'root' => './Cache/',
-			'engine' => false,
 		),
 		$Meta = array(),
 		$time = null,
-		$cacheInstance = null,
-		$persistentInstance = null;
+		$engines = array();
 	
 	private function __construct(){
-		$options = Core::retrieve('cache');
+		Hash::extend($this->Configuration, Core::retrieve('cache'));
 		
-		if(empty($options['engine']) || $options['engine']=='eaccelerator')
-			$this->Configuration['engine'] = 'eaccelerator';
+		if(!$this->Configuration['prefix']) $this->Configuration['prefix'] = Core::retrieve('prefix');
 		
-		$this->Configuration['prefix'] = !empty($options['prefix']) ? $options['prefix'] : Core::retrieve('prefix');
-		
-		if(!empty($options['root'])) $this->Configuration['root'] = realpath($options['root']);
-		else $this->Configuration['root'] = Core::retrieve('path').$this->Configuration['root'];
-		
-		$class = String::ucfirst($this->Configuration['engine']).'cache';
-		if($this->Configuration['engine'] && Core::loadClass('Cache', $class))
-			$this->cacheInstance = new $class($this->Configuration);
-		
-		Core::loadClass('Cache', 'Filecache');
-		$this->persistentInstance = new Filecache($this->Configuration);
+		$this->Configuration['root'] = $this->Configuration['root']=='./Cache' ? Core::retrieve('path').$this->Configuration['root'] : realpath($this->Configuration['root']);
 		
 		$this->time = time();
 		
-		$this->Meta = json_decode($this->persistentInstance->retrieve('Cache/List'), true);
+		$engines = array();
+		foreach(glob(Core::retrieve('path').'Classes/Cache/*') as $file){
+			$class = String::toLower(basename($file, '.php'));
+			if(in_array($class, array('cache')))
+				continue;
+			
+			Core::loadClass('Cache', $class);
+			if(call_user_func(array($class, 'isAvailable')))
+				$engines[] = $class;
+		}
 		
-		if(!$this->Meta) $this->Meta = array();
+		$default = String::toLower($this->Configuration['engine']);
+		$this->Configuration['engine'] = $default && in_array($default, $engines) ? $default : reset($engines);
+		
+		foreach($engines as $engine)
+			$this->engines[String::sub($engine, 0, -5)] = new $engine($this->Configuration);
+		
+		$this->Meta = pick(json_decode($this->engines['file']->retrieve('Cache/List'), true), array());
 		
 		foreach($this->Meta as $k => $v)
 			if($v[0] && $v[0]<$this->time)
@@ -51,7 +54,7 @@ class Cache extends Storage {
 	private function __clone(){}
 	
 	public function __destruct(){
-		$this->persistentInstance->store('Cache/List', json_encode($this->Meta));
+		$this->engines['file']->store('Cache/List', json_encode($this->Meta));
 	}
 	
 	/**
@@ -64,22 +67,22 @@ class Cache extends Storage {
 		return $Instance ? $Instance : $Instance = new Cache();
 	}
 	
-	public function getEngine(){
-		return $this->Configuration['engine'];
+	public function getEngines(){
+		return array_keys($this->engines);
 	}
 	
 	public function retrieve($id){
 		if(empty($this->Meta[$id])) return null;
 		
 		if(empty($this->Storage[$id])){
-			$content = $this->{$this->cacheInstance && $this->Meta[$id][1] ? 'cacheInstance' : 'persistentInstance'}->retrieve($id);
+			$content = $this->engines[pick($this->Meta[$id][2], 'file')]->retrieve($id);
 			
 			if(!$content){
 				unset($this->Meta[$id]);
 				return null;
 			}
 			
-			$this->Storage[$id] = $this->Meta[$id][2] ? json_decode($content, true) : $content;
+			$this->Storage[$id] = $this->Meta[$id][1] ? json_decode($content, true) : $content;
 		}
 		
 		return $this->Storage[$id];
@@ -87,7 +90,7 @@ class Cache extends Storage {
 	
 	public function store($id, $input, $options = null){
 		$default = array(
-			'type' => 'cache',
+			'type' => null,
 			'ttl' => 3600,
 			'encode' => true,
 			'tags' => null,
@@ -97,18 +100,17 @@ class Cache extends Storage {
 		elseif(is_array($options)) Hash::extend($default, $options);
 		
 		if(!$default['ttl']) $default['type'] = 'file';
+		elseif(empty($this->engines[$default['type']])) $default['type'] = key($this->engines);
 		
 		$this->Meta[$id] = array(
 			$default['ttl'] ? $this->time+$default['ttl'] : 0,
-			$default['type']=='cache' ? 1 : 0,
 			$default['encode'] ? 1 : 0,
+			$default['type']=='file' ? 0 : $default['type'],
 		);
 		
 		if(!empty($options['tags'])) $this->Meta[$id][] = array_values(Hash::splat($options['tags']));
 		
-		$content = $this->Meta[$id][2] ? json_encode($input) : $input;
-		
-		$this->{$this->cacheInstance && $this->Meta[$id][1] ? 'cacheInstance' : 'persistentInstance'}->store($id, $content, $default['ttl']);
+		$this->engines[pick($this->Meta[$id][2], 'file')]->retrieve($id, $this->Meta[$id][1] ? json_encode($input) : $input, $default['ttl']);
 		
 		return $this->Storage[$id] = $input;
 	}
@@ -117,10 +119,7 @@ class Cache extends Storage {
 		if(!is_array($array))
 			$array = array($array);
 		
-		$list = array(
-			'cacheInstance' => array(),
-			'persistentInstance' => array(),
-		);
+		$list = array();
 		
 		foreach($array as $id){
 			if(empty($this->Meta[$id]))
@@ -129,13 +128,16 @@ class Cache extends Storage {
 			if(!$this->Meta[$id][0] && !$force)
 				continue;
 			
-			$list[$this->cacheInstance && $this->Meta[$id][1] ? 'cacheInstance' : 'persistentInstance'][] = $id;
+			if(empty($list[$this->Meta[$id][2]]))
+				$list[$this->Meta[$id][2]] = array();
+			
+			$list[$this->Meta[$id][2]][] = $id;
+			
 			unset($this->Storage[$id], $this->Meta[$id]);
 		}
 		
 		foreach($list as $k => $v)
-			if(Hash::length($v))
-				$this->{$k}->erase($v);
+			$this->engines[$k]->erase($v);
 		
 		return $this;
 	}

@@ -4,12 +4,6 @@ require_once('./Initialize.php');
 
 class CacheTest extends UnitTestCase {
 	
-	public function testEngine(){
-		$engine = function_exists('eaccelerator_put') ? 'eaccelerator' : false;
-		
-		$this->assertEqual(Cache::getInstance()->getEngine(), $engine);
-	}
-	
 	public function testCache(){
 		$c = Cache::getInstance();
 		
@@ -20,16 +14,31 @@ class CacheTest extends UnitTestCase {
 		
 		$this->assertNull($c->retrieve('Test/Cache'));
 		
-		$c->store('Test/Cache', 'random data');
-		$c->eraseBy('Test');
+		$c->store('Test/Cache', 'random data', array('type' => 'eaccelerator'));
 		
-		$this->assertNull($c->retrieve('Test/Cache'));
-		
+		$this->assertEqual($c->retrieve('Test/Cache'), 'random data');
+	}
+	
+	public function testTags(){
+		$c = Cache::getInstance();
 		
 		$c->store('Test/Cache', 'random data', array('tags' => array('random', 'tag')));
 		$c->eraseByTag('random');
 		
 		$this->assertNull($c->retrieve('Test/Cache'));
+	}
+	
+	public function testEraseBy(){
+		$c = Cache::getInstance();
+		
+		$c->store('Test/Cache', 'random data');
+		$c->eraseBy('Test');
+		
+		$this->assertNull($c->retrieve('Test/Cache'));
+	}
+	
+	public function testEraseAll(){
+		$c = Cache::getInstance();
 		
 		$c->store('Test/Cache', 'random data');
 		$c->eraseAll();

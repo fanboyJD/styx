@@ -1,36 +1,36 @@
 <?php
 /*
- * Styx::Eacceleratorcache - MIT-style License
+ * Styx::Apccache - MIT-style License
  * Author: christoph.pojer@gmail.com
  *
- * Usage: Cache-Interface for the eAccelerator-extension
+ * Usage: Cache-Interface for the apc-extension
  *
  */
 
 
-class Eacceleratorcache {
+class Apccache {
 	
 	private $prefix;
-
+	
 	public function __construct($Configuration){
 		$this->prefix = rtrim($Configuration['prefix'], '/').'/';
 	}
 	
 	public function retrieve($id){
-		return eaccelerator_get($this->prefix.$id);
+		return apc_fetch($this->prefix.$id);
 	}
 	
 	public function store($id, $content, $ttl = null){
-		eaccelerator_put($this->prefix.$id, $content, $ttl);
+		apc_store($this->prefix.$id, $content, $ttl);
 	}
 	
 	public function erase($array){
 		foreach($array as $id)
-			eaccelerator_rm($this->prefix.$id);
+			apc_delete($this->prefix.$id);
 	}
 	
 	public function isAvailable(){
-		return function_exists('eaccelerator_get');
+		return function_exists('apc_fetch');
 	}
 	
 }

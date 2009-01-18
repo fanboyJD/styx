@@ -100,7 +100,7 @@ class Core {
 	 * @return bool Always true
 	 */
 	public static function loadClass($dir, $class){
-		$file = self::$Storage['path'].'Classes/'.String::ucfirst($dir).'/'.String::ucfirst(String::toLower($class)).'.php';
+		$file = self::$Storage['path'].'Classes/'.String::ucfirst($dir).'/'.String::ucfirst($class).'.php';
 		
 		if(!class_exists($class, false)) require $file;
 		

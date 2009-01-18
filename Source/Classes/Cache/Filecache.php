@@ -52,4 +52,8 @@ class Filecache {
 		}
 	}
 	
+	public function isAvailable(){
+		return true;
+	}
+	
 }

@@ -26,7 +26,11 @@ Core::store(array(
 	'template.execute' => array('php', 'phtml'),
 	'template.regex' => '/\\$\{([A-z0-9\.:\s|]+)\}/i',
 	'template.encode' => array('$' => '&#36;'), // $ is escaped because user input might contain ${...} for Template-substitution. This prevents bad input.
-
+	
+	'cache' => array(
+		'engine' => 'apc',
+	),
+	
 	'user' => array(
 		'type' => 'cookie',
 		'table' => 'users',
