@@ -2,10 +2,11 @@
 
 chdir('..');
 
+$Helper = true;
 include('./Initialize.php');
 
 $c = Cache::getInstance();
 if(!empty($_GET['check']))
-	echo $c->retrieve('CacheTest/Helper')==false;
+	echo pick($c->retrieve('CacheTest/Helper'), 0);
 else
-	$c->store('CacheTest/Helper', true, 1); // We store that value for one second
+	$c->store('CacheTest/Helper', 1, 2); // We store that value for two seconds

@@ -15,11 +15,12 @@ class Filecache {
 		);
 	
 	public function __construct($Configuration){
-		$this->Configuration['prefix'] = $Configuration['root'].$Configuration['prefix'].'/';
+		$this->Configuration['prefix'] = $Configuration['root'].'/'.$Configuration['prefix'].'/';
 	}
 	
 	public function retrieve($id){
 		$file = $this->Configuration['prefix'].$id.'.txt';
+		
 		if(!file_exists($file)) return null;
 		
 		return file_get_contents($file);

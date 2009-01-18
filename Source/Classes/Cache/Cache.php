@@ -12,7 +12,7 @@ class Cache extends Storage {
 	private $Configuration = array(
 			'engine' => null,
 			'prefix' => null,
-			'root' => './Cache/',
+			'root' => null,
 		),
 		$Meta = array(),
 		$time = null,
@@ -23,7 +23,8 @@ class Cache extends Storage {
 		
 		if(!$this->Configuration['prefix']) $this->Configuration['prefix'] = Core::retrieve('prefix');
 		
-		$this->Configuration['root'] = $this->Configuration['root']=='./Cache' ? Core::retrieve('path').$this->Configuration['root'] : realpath($this->Configuration['root']);
+		if(!$this->Configuration['root']) $this->Configuration['root'] = Core::retrieve('path').'./Cache';
+		$this->Configuration['root'] = realpath($this->Configuration['root']);
 		
 		$this->time = time();
 		
@@ -39,7 +40,7 @@ class Cache extends Storage {
 		}
 		
 		$default = String::toLower($this->Configuration['engine']);
-		$this->Configuration['engine'] = $default && in_array($default, $engines) ? $default : reset($engines);
+		$this->Configuration['engine'] = $default && in_array($default.'cache', $engines) ? $default : reset($engines);
 		
 		foreach($engines as $engine)
 			$this->engines[String::sub($engine, 0, -5)] = new $engine($this->Configuration);
@@ -100,7 +101,7 @@ class Cache extends Storage {
 		elseif(is_array($options)) Hash::extend($default, $options);
 		
 		if(!$default['ttl']) $default['type'] = 'file';
-		elseif(empty($this->engines[$default['type']])) $default['type'] = key($this->engines);
+		elseif(empty($this->engines[$default['type']])) $default['type'] = $this->Configuration['engine'];
 		
 		$this->Meta[$id] = array(
 			$default['ttl'] ? $this->time+$default['ttl'] : 0,
@@ -110,7 +111,7 @@ class Cache extends Storage {
 		
 		if(!empty($options['tags'])) $this->Meta[$id][] = array_values(Hash::splat($options['tags']));
 		
-		$this->engines[pick($this->Meta[$id][2], 'file')]->retrieve($id, $this->Meta[$id][1] ? json_encode($input) : $input, $default['ttl']);
+		$this->engines[pick($this->Meta[$id][2], 'file')]->store($id, $this->Meta[$id][1] ? json_encode($input) : $input, $default['ttl']);
 		
 		return $this->Storage[$id] = $input;
 	}

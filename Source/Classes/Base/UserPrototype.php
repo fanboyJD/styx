@@ -56,14 +56,12 @@ class UserPrototype {
 		
 		$user = Database::select(self::$Configuration['table'], $cache)->where($fields)->fetch();
 		
-		if($user[self::$Configuration['identifier.internal']]) return self::store(Cache::getInstance()->store('User/userdata_'.$user[self::$Configuration['session']], $user, ONE_DAY));
+		if($user[self::$Configuration['identifier.internal']]) return self::store($user);
 		
 		self::logout();
 	}
 	
 	public static function login($user){
-		if(!empty($user[self::$Configuration['session']])) Cache::getInstance()->erase('User/userdata_'.$user[self::$Configuration['session']]);
-		
 		$rand = self::$Configuration['secure'].mt_rand(0, 100000);
 		$user[self::$Configuration['session']] = sha1($rand.uniqid($rand, true));
 		
@@ -84,8 +82,6 @@ class UserPrototype {
 	}
 	
 	public static function logout(){
-		Cache::getInstance()->erase('User/userdata_'.User::get(self::$Configuration['session']));
-		
 		if(self::$Configuration['type']=='cookie')
 			Response::removeCookie(self::$Configuration['prefix']);
 		

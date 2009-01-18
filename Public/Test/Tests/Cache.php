@@ -51,13 +51,21 @@ class CacheTest extends UnitTestCase {
 		$b = new SimpleBrowser();
 		$b->get('http://svn/Framework/trunk/Public/Test/Tests/Helper/Cache.php');
 		
-		sleep(2);
+		sleep(1);
 		
-		// If the cache is empty it should output "1"
+		// If the cache is not empty it should output "1"
 		$b = new SimpleBrowser();
 		$b->get('http://svn/Framework/trunk/Public/Test/Tests/Helper/Cache.php?check=true');
 		
 		$this->assertEqual($b->getContent(), 1);
+		
+		sleep(2);
+		
+		// If the cache is empty it should output "0"
+		$b = new SimpleBrowser();
+		$b->get('http://svn/Framework/trunk/Public/Test/Tests/Helper/Cache.php?check=true');
+		
+		$this->assertEqual($b->getContent(), 0);
 	}
 	
 }
