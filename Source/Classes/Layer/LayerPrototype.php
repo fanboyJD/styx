@@ -216,14 +216,6 @@ abstract class LayerPrototype extends Runner {
 		return $this->edit($options ? Hash::extend($options, $array) : $array);
 	}
 	
-	public function validate(){
-		$validate = $this->Form->validate();
-		
-		if($validate===true) return;
-		
-		throw new ValidatorException($validate);
-	}
-	
 	public function prepare($data = null, $fill = false){
 		if($this->event && !empty($this->get[$this->event]) && $this->table){
 			$this->content = Database::select($this->table, $this->options['cache'])->where(array(
@@ -244,16 +236,26 @@ abstract class LayerPrototype extends Runner {
 		$this->setValue(!$data && $fill && $this->content ? $this->content : $data, true);
 	}
 	
-	public function save($where = null){
+	public function validate(){
 		if(!$this->checkSession())
 			throw new ValidatorException('session');
 		
-		if(!$where) $where = $this->where;
+		$validate = $this->Form->validate();
 		
-		$this->validate();
+		if($validate!==true)
+			throw new ValidatorException($validate);
 		
 		$data = $this->Form->prepare();
-		if(!Hash::length($data)) throw new ValidatorException('data');
+		if(!Hash::length($data))
+			throw new ValidatorException('data');
+		
+		return $data;
+	}
+	
+	public function save($where = null){
+		if(!$where) $where = $this->where;
+		
+		$data = $this->validate();
 		
 		if(!$this->table) return;
 		

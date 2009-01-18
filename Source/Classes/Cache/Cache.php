@@ -8,7 +8,13 @@
  */
 
 
-class Cache extends Storage {
+class Cache {
+	/**
+	 * Holds all the stored variables
+	 *
+	 * @var array
+	 */
+	protected $Storage = array();
 	private $Configuration = array(
 			'engine' => null,
 			'prefix' => null,

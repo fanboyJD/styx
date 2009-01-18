@@ -9,8 +9,6 @@
 
 class Form extends Elements {
 	
-	protected static $formElements = array('input', 'checkbox', 'radio', 'select', 'textarea', 'richtext', 'optionlist');
-	
 	public function __construct(){
 		parent::__construct(func_get_args(), get_class());
 		
@@ -34,31 +32,6 @@ class Form extends Elements {
 		return $prefix ? array($prefix => $out) : $out;
 	}
 	
-	/**
-	 * Sets value for elements inside the given form.
-	 * If the second parameter is set true it does not set hidden elements like
-	 * field-elements
-	 *
-	 * @param array $data
-	 * @param bool $raw
-	 */
-	public function setValue($data, $raw = false){
-		if(!is_array($data)) return;
-		
-		foreach($data as $k => $v)
-			if(!empty($this->elements[$k])){
-				$el = $this->elements[$k];
-				if($raw && !in_array($el->type, self::$formElements))
-					continue;
-				
-				$el->setValue($v);
-			}
-	}
-	
-	public function getValue($name){
-		return !empty($this->elements[$name]) ? $this->elements[$name]->getValue() : false;
-	}
-	
 	public function prepare($alias = false){
 		$els = array();
 		
@@ -74,7 +47,7 @@ class Form extends Elements {
 	
 	public function validate(){
 		foreach($this->elements as $k => $el){
-			if(!in_array($el->type, self::$formElements) || empty($el->options[':validate']))
+			if(!in_array($el->type, self::$visibleElements) || empty($el->options[':validate']))
 				continue;
 			
 			$v = Validator::call($el->getValue(), $el->options[':validate']);

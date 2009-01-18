@@ -35,17 +35,17 @@ class LoginLayer extends Layer {
 	}
 	
 	public function onHandle(){
-		$this->validate();
+		$data = $this->validate();
 		
 		$user = $this->Data->where(array(
-			'name' => $this->getValue('name'),
+			'name' => $data['name'],
 			'AND',
-			'pwd' => User::getPassword($this->getValue('pwd')),
+			'pwd' => User::getPassword($data['pwd']),
 		))->fetch();
 		
 		if(!is_array($user)) throw new ValidatorException('login');
 		
-		$loggedin = User::login($user);
+		User::login($user);
 		
 		$this->Template->append(Lang::get('user.loggedin', $user['name']));
 	}

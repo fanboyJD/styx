@@ -168,6 +168,7 @@ class Element extends Runner {
 /* ELEMENTS ClASS */
 class Elements extends Element {
 	
+	protected static $visibleElements = array('input', 'checkbox', 'radio', 'select', 'textarea', 'richtext', 'optionlist');
 	protected $elements = array();
 	
 	public function __construct(){
@@ -201,6 +202,31 @@ class Elements extends Element {
 			$els['form.hidden'] = implode($els['form.hidden']);
 		
 		return $els;
+	}
+	
+	/**
+	 * Sets value for elements inside the container.
+	 * If the second parameter is set to true it does not set hidden elements like
+	 * field-elements
+	 *
+	 * @param array $data
+	 * @param bool $raw
+	 */
+	public function setValue($data, $raw = false){
+		if(!is_array($data)) return;
+		
+		foreach($data as $k => $v)
+			if(!empty($this->elements[$k])){
+				$el = $this->elements[$k];
+				if($raw && !in_array($el->type, self::$visibleElements))
+					continue;
+				
+				$el->setValue($v);
+			}
+	}
+	
+	public function getValue($name){
+		return !empty($this->elements[$name]) ? $this->elements[$name]->getValue() : false;
 	}
 	
 	/**

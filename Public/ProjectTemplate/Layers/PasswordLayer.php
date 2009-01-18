@@ -33,10 +33,7 @@ class PasswordLayer extends Layer {
 			'pwd' => User::getPassword($this->getValue('pwd')),
 		));
 		
-		$this->validate();
-		
-		$data = $this->Form->prepare();
-		if(!Hash::length($data)) throw new ValidatorException('data');
+		$data = $this->validate();
 		
 		Database::update($this->table)->set($data)->limit(0)->query();
 		
