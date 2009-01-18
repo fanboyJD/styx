@@ -58,7 +58,7 @@ class Upload {
 		if(is_dir($real))
 			$to = $real.'/'.pick($default['name'], $file['base']).'.'.$file['ext'];
 		
-		if($default['overwrite'] && file_exists($to))
+		if(!$default['overwrite'] && file_exists($to))
 			throw new UploadException('exists');
 		
 		if(!move_uploaded_file($file['tmp_name'], $to))
