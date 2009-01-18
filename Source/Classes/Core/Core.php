@@ -98,14 +98,11 @@ class Core {
 	 *
 	 * @param string $dir
 	 * @param string $class
-	 * @return bool Always true
 	 */
 	public static function loadClass($dir, $class){
 		$file = self::$Storage['path'].'Classes/'.String::ucfirst($dir).'/'.String::ucfirst($class).'.php';
 		
 		if(!class_exists($class, false)) require $file;
-		
-		return true;
 	}
 	
 	/**

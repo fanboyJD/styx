@@ -8,15 +8,21 @@ class CacheTest extends UnitTestCase {
 		$c = Cache::getInstance();
 		
 		$c->store('Test/Cache', 'random data');
+		$this->assertEqual($c->retrieve('Test/Cache'), 'random data');
+		$c->erase('Test/Cache');
+		$this->assertNull($c->retrieve('Test/Cache'));
+		
+		$c->store('Test/Cache', 'random data', array('type' => 'memcache'));
 		
 		$this->assertEqual($c->retrieve('Test/Cache'), 'random data');
 		$c->erase('Test/Cache');
-		
+		$c->erase('Test/Cache');
 		$this->assertNull($c->retrieve('Test/Cache'));
 		
 		$c->store('Test/Cache', 'random data', array('type' => 'eaccelerator'));
-		
 		$this->assertEqual($c->retrieve('Test/Cache'), 'random data');
+		$c->erase('Test/Cache');
+		$this->assertNull($c->retrieve('Test/Cache'));
 	}
 	
 	public function testTags(){

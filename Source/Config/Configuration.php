@@ -28,7 +28,8 @@ Core::store(array(
 	'template.encode' => array('$' => '&#36;'), // $ is escaped because user input might contain ${...} for Template-substitution. This prevents bad input.
 	
 	'cache' => array(
-		'engine' => 'apc',
+		'default' => 'apc',
+		'engines' => array('apc', 'memcache'),
 	),
 	
 	'user' => array(

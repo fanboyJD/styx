@@ -16,9 +16,11 @@ class Cache {
 	 */
 	protected $Storage = array();
 	private $Configuration = array(
-			'engine' => null,
+			'default' => null,
+			'engines' => array(),
 			'prefix' => null,
 			'root' => null,
+			'servers' => array(), // For memcached
 		),
 		$Meta = array(),
 		$time = null,
@@ -34,22 +36,30 @@ class Cache {
 		
 		$this->time = time();
 		
+		array_push($this->Configuration['engines'], 'file');
+		
 		$engines = array();
 		foreach(glob(Core::retrieve('path').'Classes/Cache/*') as $file){
-			$class = String::toLower(basename($file, '.php'));
-			if(in_array($class, array('cache')))
+			$class = String::toLower(String::sub(basename($file, '.php'), 0, -5));
+			if(!in_array($class, $this->Configuration['engines']))
 				continue;
 			
-			Core::loadClass('Cache', $class);
-			if(call_user_func(array($class, 'isAvailable')))
+			Core::loadClass('Cache', $class.'cache');
+			if(call_user_func(array($class.'cache', 'isAvailable')))
 				$engines[] = $class;
 		}
 		
-		$default = String::toLower($this->Configuration['engine']);
-		$this->Configuration['engine'] = $default && in_array($default.'cache', $engines) ? $default : reset($engines);
+		$default = String::toLower($this->Configuration['default']);
+		if(!$default || !in_array($default, $engines))
+			$this->Configuration['default'] = reset($engines);
 		
-		foreach($engines as $engine)
-			$this->engines[String::sub($engine, 0, -5)] = new $engine($this->Configuration);
+		$this->Configuration['engines'] = array();
+		foreach($engines as $engine){
+			$this->Configuration['engines'][] = $engine;
+			
+			$class = $engine.'cache';
+			$this->engines[$engine] = new $class($this->Configuration);
+		}
 		
 		$this->Meta = pick(json_decode($this->engines['file']->retrieve('Cache/List'), true), array());
 		
@@ -107,7 +117,7 @@ class Cache {
 		elseif(is_array($options)) Hash::extend($default, $options);
 		
 		if(!$default['ttl']) $default['type'] = 'file';
-		elseif(empty($this->engines[$default['type']])) $default['type'] = $this->Configuration['engine'];
+		elseif(empty($this->engines[$default['type']])) $default['type'] = $this->Configuration['default'];
 		
 		$this->Meta[$id] = array(
 			$default['ttl'] ? $this->time+$default['ttl'] : 0,
