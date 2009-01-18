@@ -116,13 +116,14 @@ class Image {
 	 * Rotates the image by the given angle
 	 *
 	 * @param int $angle
-	 * @param int $bgcolor
+	 * @param array $bgcolor An indexed array with red/green/blue/alpha values
 	 * @return Image
 	 */
-	public function rotate($angle, $bgcolor = 0){
+	public function rotate($angle, $bgcolor = null){
 		if(empty($this->image) || !$angle || $angle>=360) return $this;
 		
-		$this->set(imagerotate($this->image, $angle, $bgcolor));
+		$this->set(imagerotate($this->image, $angle, is_array($bgcolor) ? imagecolorallocatealpha($this->image, $bgcolor[0], $bgcolor[1], $bgcolor[2], !empty($bgcolor[3]) ? $bgcolor[3] : null) : $bgcolor));
+
 		return $this;
 	}
 	
