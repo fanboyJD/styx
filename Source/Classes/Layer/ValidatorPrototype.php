@@ -78,6 +78,9 @@ class ValidatorPrototype {
 		
 		Hash::extend($default, $options);
 		
+		if(!empty($validators['url']) && String::toLower($data)=='http://')
+			return false;
+		
 		if(!$default['purify'] && !empty($validators['purify']))
 			$default['purify'] = $validators['purify'];
 		

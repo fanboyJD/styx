@@ -59,8 +59,14 @@ class StringTest extends UnitTestCase {
 			'float' => 1.03,
 			'strfloat' => 1.03,
 			'string' => 'Test',
-			'clean' => 'Test',
+			'clean' => "Te\nst",
 		));
+		
+		$this->assertEqual(String::clean("Te\ns\tt\t"), "Te\nst");
+		
+		$this->assertEqual(String::clean("Te\ns\tt\t", false), "Te\ns\tt");
+		
+		$this->assertEqual(String::clean("Te\ns\tt\t", 'clean'), "Te st");
 	}
 	
 	public function testConvert(){

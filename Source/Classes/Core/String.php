@@ -241,7 +241,7 @@ final class String {
 	 * @param bool|string $whitespaces
 	 * @return mixed
 	 */
-	public static function clean($string, $whitespaces = false){
+	public static function clean($string, $whitespaces = true){
 		if(is_array($string)){
 			foreach($string as $k => &$v){
 				if($v==(string)(float)$v) $v = (float)$v;
@@ -252,7 +252,7 @@ final class String {
 			}
 		}else{
 			$string = trim($string);
-			if($whitespaces) $string = self::replace(array("\r\n", "\t", "\n"), array($whitespaces=='clean' ? "\n" : " ", "", "", $whitespaces=='clean' ? "\n" : " ", "", ""), $string);
+			if($whitespaces) $string = self::replace(array("\r\n", "\n", "\t"), array(($whitespaces==='clean' ? " " : "\n"), ($whitespaces==='clean' ? " " : "\n"), ""), $string);
 		}
 		
 		return $string;

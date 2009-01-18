@@ -115,6 +115,16 @@ class DataPrototype {
 		return !$default['future'] && $time>time() ? null : $time;
 	}
 	
+	public static function url($data){
+		if(!filter_var($data, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED))
+			return null;
+	
+		if(!String::starts(String::toLower($data), 'http://'))
+			$data = 'http://'.$data;
+		
+		return String::toLower($data)=='http://' ? null : self::sanitize($data);
+	}
+	
 	public static function pagetitle($title, $options = array()){
 		static $regex;
 		
@@ -197,7 +207,7 @@ class DataPrototype {
 	
 	public static function encode($data, $options = array()){
 		$default = array(
-			'whitespace' => true,
+			'whitespace' => 'clean',
 		);
 		
 		Hash::extend($default, $options);

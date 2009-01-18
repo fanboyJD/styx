@@ -43,7 +43,7 @@ class Template extends Runner {
 				if(empty($Configuration['Templates'][$file])) return;
 				
 				ob_start();
-				$this->bound->execute($Configuration['Templates'][$file]);
+				$this->bound->execute($this->assigned, $Configuration['Templates'][$file]);
 				return ob_get_clean();
 			}else{
 				/* 

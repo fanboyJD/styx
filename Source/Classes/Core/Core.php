@@ -68,9 +68,10 @@ abstract class Runner {
 	/**
 	 * A template that is bound to a class uses this method to execute in class-scope
 	 *
+	 * @param array $assigned All variables that are assigned to the array get passed
 	 */
-	public function execute(){
-		include(func_get_arg(0));
+	public function execute($assigned){
+		include(func_get_arg(1));
 	}
 	
 }

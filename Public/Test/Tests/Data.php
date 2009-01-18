@@ -82,6 +82,18 @@ class DataTest extends UnitTestCase {
 		$this->assertEqual(Data::date('12.01.2009', array('future' => true)), 1231714800);
 	}
 	
+	public function testUrl(){
+		$this->assertNull(Data::url('http'));
+		
+		$this->assertNull(Data::url('http://'));
+		
+		$this->assertEqual(Data::url('http://og5.net'), 'http://og5.net');
+		
+		$this->assertEqual(Data::url('http://og5.net/test/path'), 'http://og5.net/test/path');
+		
+		$this->assertEqual(Data::url('http://og5.net/t<>est'), 'http://og5.net/t&lt;&gt;est');
+	}
+	
 	public function testExcerpt(){
 		$this->assertEqual(Data::excerpt('Hello World', array('length' => 3)), 'Hel...');
 		
@@ -115,7 +127,7 @@ class DataTest extends UnitTestCase {
 			'float' => 1.03,
 			'strfloat' => 1.03,
 			'string' => 'Test',
-			'clean' => 'Test',
+			'clean' => "Te st",
 		)));
 	}
 	
