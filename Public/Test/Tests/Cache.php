@@ -47,15 +47,16 @@ class CacheTest extends UnitTestCase {
 	}
 	
 	public function testTime(){
+		$link = rtrim(Request::getUrl(), '/').'/';
 		// This sets the cache for 1 second
 		$b = new SimpleBrowser();
-		$b->get('http://svn/Framework/trunk/Public/Test/Tests/Helper/Cache.php');
+		$b->get($link.'Helper/Cache.php');
 		
 		sleep(1);
 		
 		// If the cache is not empty it should output "1"
 		$b = new SimpleBrowser();
-		$b->get('http://svn/Framework/trunk/Public/Test/Tests/Helper/Cache.php?check=true');
+		$b->get($link.'Helper/Cache.php?check=true');
 		
 		$this->assertEqual($b->getContent(), 1);
 		
@@ -63,7 +64,7 @@ class CacheTest extends UnitTestCase {
 		
 		// If the cache is empty it should output "0"
 		$b = new SimpleBrowser();
-		$b->get('http://svn/Framework/trunk/Public/Test/Tests/Helper/Cache.php?check=true');
+		$b->get($link.'Helper/Cache.php?check=true');
 		
 		$this->assertEqual($b->getContent(), 0);
 	}
