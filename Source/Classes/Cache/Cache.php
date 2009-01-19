@@ -1,31 +1,56 @@
 <?php
-/*
- * Styx::Cache - MIT-style License
- * Author: christoph.pojer@gmail.com
+/**
+ * Styx::Cache - Caches data to different backends to make them persistent over requests and allow faster execution
  *
- * Usage: Caches certain data (automatically) to an extension or to the harddisk
+ * @package Styx
+ * @subpackage Cache
  *
+ * @license MIT-style License
+ * @author Christoph Pojer <christoph.pojer@gmail.com>
  */
-
 
 class Cache {
 	/**
-	 * Holds all the stored variables
+	 * Configuration
 	 *
 	 * @var array
 	 */
-	protected $Storage = array();
 	private $Configuration = array(
 			'default' => null,
 			'engines' => array(),
 			'prefix' => null,
 			'root' => null,
 			'servers' => array(), // For memcached
-		),
-		$Meta = array(),
-		$time = null,
-		$engines = array();
+		);
+	/**
+	 * Holds all the stored variables
+	 *
+	 * @var array
+	 */
+	protected $Storage = array();
+	/**
+	 * The Metadata for all elements in the array
+	 *
+	 * @var array
+	 */
+	private	$Meta = array();
+	/**
+	 * Current Timestamp
+	 *
+	 * @var int
+	 */
+	private	$time = null;
+	/**
+	 * Holds the instances of all used engines
+	 *
+	 * @var array
+	 */
+	private	$engines = array();
 	
+	/**
+	 * Sets up the caching engines and reads the metadata
+	 *
+	 */
 	private function __construct(){
 		Hash::extend($this->Configuration, Core::retrieve('cache'));
 		
@@ -70,12 +95,17 @@ class Cache {
 	
 	private function __clone(){}
 	
+	/**
+	 * Saves the metadata list to the file-cache (as it is kind of "persistent")
+	 *
+	 */
 	public function __destruct(){
 		$this->engines['file']->store('Cache/List', json_encode($this->Meta));
 	}
 	
 	/**
-	 * @param array $options
+	 * Returns the Cache instance
+	 *
 	 * @return Cache
 	 */
 	public static function getInstance(){
@@ -84,10 +114,21 @@ class Cache {
 		return $Instance ? $Instance : $Instance = new Cache();
 	}
 	
+	/**
+	 * Returns a list of the currently used engines
+	 *
+	 * @return array
+	 */
 	public function getEngines(){
 		return array_keys($this->engines);
 	}
 	
+	/**
+	 * Returns a value by its id from the cache
+	 *
+	 * @param string $id
+	 * @return mixed
+	 */
 	public function retrieve($id){
 		if(empty($this->Meta[$id])) return null;
 		
@@ -105,6 +146,18 @@ class Cache {
 		return $this->Storage[$id];
 	}
 	
+	/**
+	 * Stores a value by id to the cache. Either stores to the given engine or the one cofigured
+	 * as the default engine. If {@link $options} is a number it stores the value for the given time
+	 * (in seconds). If this number is 0 it tries to store the data in the filecache and tries to keep
+	 * it for unlimited time. If {@link $options} is an array you can specify the type (engine), the ttl,
+	 * whether to encode the value or not (defaults to true) and it is possible to add tags
+	 *
+	 * @param string $id
+	 * @param mixed $input
+	 * @param int|array $options Either the lifetime as int or options as an array
+	 * @return mixed
+	 */
 	public function store($id, $input, $options = null){
 		$default = array(
 			'type' => null,
@@ -132,6 +185,13 @@ class Cache {
 		return $this->Storage[$id] = $input;
 	}
 	
+	/**
+	 * Erases either one ore more elements from the cache given by there id
+	 *
+	 * @param string|array $array
+	 * @param bool $force
+	 * @return Cache
+	 */
 	public function erase($array, $force = false){
 		if(!is_array($array))
 			$array = array($array);
@@ -159,6 +219,13 @@ class Cache {
 		return $this;
 	}
 	
+	/**
+	 * Erases all elements that start with the given string
+	 *
+	 * @param string $id
+	 * @param bool $force
+	 * @return Cache
+	 */
 	public function eraseBy($id, $force = false){
 		$list = array();
 		foreach($this->Meta as $k => $v)
@@ -171,6 +238,13 @@ class Cache {
 		return $this;
 	}
 	
+	/**
+	 * Erases all elements that are associated with the given tag
+	 *
+	 * @param string $tag
+	 * @param bool $force
+	 * @return Cache
+	 */
 	public function eraseByTag($tag, $force = false){
 		$list = array();
 		foreach($this->Meta as $k => $v)
@@ -183,6 +257,12 @@ class Cache {
 		return $this;
 	}
 	
+	/**
+	 * Removes any cached variable
+	 *
+	 * @param bool $force
+	 * @return Cache
+	 */
 	public function eraseAll($force = false){
 		$this->erase(array_keys($this->Meta), $force);
 		

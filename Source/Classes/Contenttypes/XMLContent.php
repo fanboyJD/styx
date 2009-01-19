@@ -1,14 +1,21 @@
 <?php
-/*
- * Styx::XMLContent - MIT-style License
- * Author: christoph.pojer@gmail.com
+/**
+ * Styx::XMLContent - For XML-Output
  *
- * Usage: XML content-type
+ * @package Styx
+ * @subpackage ContentType
  *
+ * @license MIT-style License
+ * @author Christoph Pojer <christoph.pojer@gmail.com>
  */
 
-class XMLContent extends ContentType {
+class XMLContent extends HTMLContent {
 	
+	/**
+	 * Returns headers for XML
+	 *
+	 * @return array
+	 */
 	public function getHeaders(){
 		return array(
 			'Content-Type' => 'application/xhtml+xml; charset=UTF-8',

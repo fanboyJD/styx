@@ -1,18 +1,34 @@
 <?php
-/*
- * Styx::Memcachecache - MIT-style License
- * Author: christoph.pojer@gmail.com
+/**
+ * Styx::Memcachecache - Cache-Interface for memcached
  *
- * Usage: Cache-Interface to memcached
+ * @package Styx
+ * @subpackage Cache
  *
+ * @license MIT-style License
+ * @author Christoph Pojer <christoph.pojer@gmail.com>
  */
-
 
 class Memcachecache {
 	
+	/**
+	 * The prefix to be used to not interfere with other Applications on the same server
+	 *
+	 * @var string
+	 */
 	private $prefix;
+	/**
+	 * An instance of the Memcache-Class
+	 *
+	 * @var Memcache
+	 */
 	private $memcache;
-
+	
+	/**
+	 * Sets up the backend engine
+	 *
+	 * @param array $Configuration
+	 */
 	public function __construct($Configuration){
 		$this->prefix = rtrim($Configuration['prefix'], '/').'/';
 		
@@ -38,20 +54,43 @@ class Memcachecache {
 		}
 	}
 	
+	/**
+	 * Fetches a value from the cache
+	 *
+	 * @param string $id
+	 * @return mixed
+	 */
 	public function retrieve($id){
 		return $this->memcache->get($this->prefix.$id);
 	}
 	
+	/**
+	 * Stores a value in the cache
+	 *
+	 * @param string $id
+	 * @param mixed $content
+	 * @param int $ttl
+	 */
 	public function store($id, $content, $ttl = null){
 		$this->memcache->set($this->prefix.$id, $content, false, $ttl);
 	}
 	
+	/**
+	 * Removes the given elements from the cache
+	 *
+	 * @param array $array
+	 */
 	public function erase($array){
 		foreach($array as $id)
 			$this->memcache->delete($this->prefix.$id);
 	}
 	
-	public function isAvailable(){
+	/**
+	 * Checks whether the extension is available or not
+	 *
+	 * @return bool
+	 */
+	public static function isAvailable(){
 		return class_exists('Memcache', false);
 	}
 	
