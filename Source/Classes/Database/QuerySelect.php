@@ -7,7 +7,7 @@
  *
  */
 
-class QuerySelect extends Query implements Iterator, Countable {
+class QuerySelect extends Query implements Iterator, ArrayAccess, Countable {
 	
 	protected $Data = array(),
 		$queried = false;
@@ -145,12 +145,36 @@ class QuerySelect extends Query implements Iterator, Countable {
 		return $this->Data = pick(Database::getInstance()->retrieve($this->format()), array());
 	}
 	
-	public function rewind(){
-		if(!$this->queried || empty($this->formatted)){
-			$this->retrieve();
-			$this->queried = true;
-		}
+	private function populate(){
+		if($this->queried && !empty($this->formatted))
+			return;
 		
+		$this->retrieve();
+		$this->queried = true;
+	}
+	
+	public function offsetExists($offset){
+		$this->populate();
+		return isset($this->Data[$offset]);
+	}
+	
+	public function offsetSet($offset, $value){
+		$this->populate();
+		$this->Data[$offset] = $value;
+	}
+	
+	public function offsetGet($offset){
+		$this->populate();
+		return isset($this->Data[$offset]) ? $this->Data[$offset] : null;
+	}
+	
+	public function offsetUnset($offset){
+		$this->populate();
+		unset($this->Data[$offset]);
+	}
+	
+	public function rewind(){
+		$this->populate();
 		reset($this->Data);
 	}
 	
@@ -175,8 +199,7 @@ class QuerySelect extends Query implements Iterator, Countable {
 	}
 	
 	public function count(){
-		if(!$this->queried || empty($this->formatted)) $this->rewind();
-		
+		$this->populate();
 		return count($this->Data);
 	}
 	

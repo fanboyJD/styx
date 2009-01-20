@@ -9,7 +9,7 @@
  * @author Christoph Pojer <christoph.pojer@gmail.com>
  */
 
-class DataSet implements Iterator, Countable {
+class DataSet implements Iterator, ArrayAccess, Countable {
 	
 	/**
 	 * The whole array the DataSet operates on
@@ -213,6 +213,22 @@ class DataSet implements Iterator, Countable {
 		Hash::remove($this->Data, $value);
 		
 		return $this;
+	}
+	
+	public function offsetExists($offset){
+		return isset($this->Data[$offset]);
+	}
+	
+	public function offsetSet($offset, $value){
+		$this->Data[$offset] = $value;
+	}
+	
+	public function offsetGet($offset){
+		return isset($this->Data[$offset]) ? $this->Data[$offset] : null;
+	}
+	
+	public function offsetUnset($offset){
+		unset($this->Data[$offset]);
 	}
 	
 	public function rewind(){
