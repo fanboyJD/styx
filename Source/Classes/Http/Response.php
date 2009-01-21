@@ -61,32 +61,34 @@ final class Response {
 	
 	public static function link($options = null, $base = null){
 		static $Configuration;	
-		if(!$Configuration)
+		if(!$Configuration){
 			$Configuration = Core::fetch('path.separator', 'app.link', 'contenttype.querystring');
+			if(empty($Configuration['contenttype.querystring'])) $Configuration['contenttype.querystring'] = null;
+		}
 		
 		if(!is_array($options) && $options){
-			$wrapper[$options] = null;
-			$options = $wrapper;
+			if(!$base) return $Configuration['app.link'].$options;
+			
+			$options = array($options => null);
 		}
 		
 		$array = array();
-		if(!empty($Configuration['contenttype.querystring']) && !empty($options[$Configuration['contenttype.querystring']])){
+		if(!empty($options[$Configuration['contenttype.querystring']])){
 			$array[] = $Configuration['contenttype.querystring'].$Configuration['path.separator'].$options[$Configuration['contenttype.querystring']];
 			unset($options[$Configuration['contenttype.querystring']]);
 		}
 		
-		if(Hash::length(Hash::splat($base)))
+		if(is_array($base))
 			foreach($base as $v)
 				$array[] = is_array($v) ? implode($Configuration['path.separator'], $v) : $v;
 		
-		if(Hash::length($options))
+		if(is_array($options))
 			foreach($options as $k => $v)
 				$array[] = $k.($v || is_numeric($v) ? $Configuration['path.separator'].$v : '');
 		
-		if(count($array)) $array = implode('/', $array);
-		else $array = null;
+		if(count($array)) return $Configuration['app.link'].implode('/', $array);
 		
-		return $Configuration['app.link'].$array;
+		return $Configuration['app.link'];
 	}
 	
 	public static function allow(){
@@ -114,7 +116,7 @@ final class Response {
 	
 	public static function setContentType($contentType){
 		if(is_string($contentType)){
-			$class = String::toLower($contentType).'content';
+			$class = strtolower($contentType).'content';
 			if(Core::classExists($class)) $contentType = new $class;
 			else return;
 		}

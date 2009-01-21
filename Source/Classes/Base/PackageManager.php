@@ -13,21 +13,16 @@ class PackageManager {
 			'js' => array(
 				'class' => 'JavaScript',
 				'directory' => 'JavaScript',
-				'attribute' => 'src',
+				'tag' => '<script src="{package}" type="{type}"></script>',
 				'options' => array(
-					':tag' => 'script',
-					':unknown' => true,
 					'type' => 'text/javascript',
 				),
 			),
 			'css' => array(
 				'class' => 'CSS',
 				'directory' => 'Css',
-				'attribute' => 'href',
+				'tag' => '<link rel="stylesheet" media="{media}" type="{type}" href="{package}" />',
 				'options' => array(
-					':tag' => 'link',
-					':unknown' => true,
-					'rel' => 'stylesheet',
 					'media' => 'all',
 					'type' => 'text/css',
 				),
@@ -37,19 +32,22 @@ class PackageManager {
 		$compress = null,
 		$encoding = null;
 	
-	public static function add($name, $options = array(
-		'type' => '',
-		'readable' => false,
-		'files' => array(),
-		'options' => array(),
-		'require' => array(),
-	)){
+	public static function add($name, $options = null){
 		static $version;
 		
 		if(!$version) $version = Core::retrieve('app.version');
 		
-		Hash::splat($options['files']);
-		Hash::splat($options['require']);
+		$default = array(
+			'type' => '',
+			'readable' => false,
+			'files' => array(),
+			'options' => array(),
+			'require' => array(),
+		);
+		
+		Hash::extend($default, $options);
+		
+		Hash::splat($default['files']);
 		
 		Route::connect($version.'/'.$name, array(
 			'package' => $name,
@@ -58,13 +56,14 @@ class PackageManager {
 			'preventDefault' => true, /* This is not necessary but a prevention :) */
 		));
 		
-		self::$Packages[$name] = $options;
+		self::$Packages[$name] = $default;
 	}
 	
 	public static function assignPackages(){
 		if(!count(self::$Packages)) return;
 		
 		$version = Core::retrieve('app.version');
+		
 		$assigned = array();
 		
 		foreach(self::$Packages as $name => $package){
@@ -72,12 +71,16 @@ class PackageManager {
 				continue;
 			
 			$element = self::$Elements[$package['type']];
-			Hash::extend($element['options'], Hash::splat($package['options']));
-			$element['options'][$element['attribute']] = $version.'/'.$name;
+			Hash::extend($element['options'], $package['options']);
 			
-			$el = new Element($element['options']);
+			$options = array();
+			foreach($element['options'] as $k => $option)
+				$options[] = '{'.$k.'}';
 			
-			$assigned['package.'.$name] = $el->format();
+			$options[] = '{package}';
+			$element['options'][] = $version.'/'.$name;
+			
+			$assigned['package.'.$name] = str_replace($options, $element['options'], $element['tag']);
 		}
 		
 		Page::getInstance()->assign($assigned);
@@ -142,7 +145,7 @@ class PackageManager {
 				$compressor = new JavaScriptPacker($content, 'None', false);
 				$content = $compressor->pack();
 			}else{
-				$content = String::replace(
+				$content = str_replace(
 					array('{ ',' }', '; ', ';}', ': ', ', '),
 					array('{', '}', ';', '}', ':', ','),
 					String::clean(preg_replace('/\s{2,}/', '', preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $content)), true)

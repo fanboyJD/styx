@@ -121,9 +121,9 @@ class Template extends Runner {
 	 * @return mixed
 	 */
 	public function parse($return = false){
-		static $regex;
+		static $Configuration;
 		
-		if(!$regex) $regex = Core::retrieve('template.regex');
+		if(!$Configuration) $Configuration = Core::fetch('template.regex', 'template.striptabs');
 		
 		if(!$this->hasFile()) return Hash::length($this->appended) ? implode($this->appended) : $this->assigned;
 		
@@ -133,7 +133,7 @@ class Template extends Runner {
 		Hash::splat($this->assigned);
 		Hash::flatten($this->assigned);
 		
-		preg_match_all($regex, $out, $vars);
+		preg_match_all($Configuration['template.regex'], $out, $vars);
 		
 		$rep = array(array_values($vars[0]), array());
 		$i = 0;
@@ -151,6 +151,11 @@ class Template extends Runner {
 			if(empty($rep[1][$i])) $rep[1][$i] = '';
 			
 			$i++;
+		}
+		
+		if(!empty($Configuration['template.striptabs'])){
+			$rep[0][] = "\t";
+			$rep[1][] = '';
 		}
 		
 		$out = String::replace($rep[0], $rep[1], $out);

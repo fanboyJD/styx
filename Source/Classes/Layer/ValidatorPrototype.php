@@ -19,13 +19,13 @@ class ValidatorPrototype {
 		
 		if(!Hash::length($Methods))
 			foreach(get_class_methods($Instance) as $method)
-				array_push($Methods, String::toLower($method));
+				array_push($Methods, strtolower($method));
 		
 		if(is_string($validators))
 			$validators = array($validators => true);
 		
 		foreach($validators as $validator => $options){
-			if(empty($options) || !in_array(String::toLower($validator), $Methods))
+			if(empty($options) || !in_array(strtolower($validator), $Methods))
 				continue;
 			
 			if(!$Instance->{$validator}($data, is_array($options) ? $options : null, $validators))

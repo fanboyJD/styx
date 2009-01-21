@@ -48,7 +48,7 @@ class ExtensionFilter extends FilterIterator {
 	 * @return bool Whether to accept the file or not
 	 */
 	public function accept(){
-		return !$this->it->isLink() && ($this->it->isDir() || in_array(String::toLower(pathinfo($this->current(), PATHINFO_EXTENSION)), $this->ext));
+		return !$this->it->isLink() && ($this->it->isDir() || in_array(strtolower(pathinfo($this->current(), PATHINFO_EXTENSION)), $this->ext));
 	}
 	
 }
@@ -100,7 +100,7 @@ class Core {
 	 * @param string $class
 	 */
 	public static function loadClass($dir, $class){
-		$file = self::$Storage['path'].'Classes/'.String::ucfirst($dir).'/'.String::ucfirst($class).'.php';
+		$file = self::$Storage['path'].'Classes/'.ucfirst($dir).'/'.ucfirst($class).'.php';
 		
 		if(!class_exists($class, false)) require $file;
 	}
@@ -114,7 +114,7 @@ class Core {
 	 * @return mixed 
 	 */
 	public static function classExists($class){
-		$class = String::toLower($class);
+		$class = strtolower($class);
 		
 		return !empty(self::$Storage['Classes'][$class]) || class_exists($class, false) ? self::$Storage['Classes'][$class] : false;	
 	}
@@ -126,11 +126,14 @@ class Core {
 	 * @return bool
 	 */
 	public static function autoload($class){
-		$file = self::classExists($class);
+		$class = strtolower($class);
 		
-		if($file && !class_exists($class, false)) require $file;
+		if(empty(self::$Storage['Classes'][$class]))
+			return false;
 		
-		return !!$file;
+		if(!class_exists($class, false)) require self::$Storage['Classes'][$class];
+		
+		return true;
 	}
 	
 	/**
@@ -160,13 +163,13 @@ class Core {
 			) as $files)
 				if(Hash::length($files))
 					foreach($files as $file)
-						$List[String::toLower(basename($file, '.php'))] = $file;
+						$List[strtolower(basename($file, '.php'))] = $file;
 			
 			foreach(new ExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator(self::$Storage['app.path'].'/Classes/'))) as $file)
-				$List[String::toLower(basename($file->getFileName(), '.php'))] = $file->getRealPath();
+				$List[strtolower(basename($file->getFileName(), '.php'))] = $file->getRealPath();
 			
 			foreach(new ExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator(self::$Storage['app.path'].'/Prototypes/'))) as $file)
-				$List[String::toLower(basename($file->getFileName(), '.php'))] = $file->getRealPath();
+				$List[strtolower(basename($file->getFileName(), '.php'))] = $file->getRealPath();
 			
 			self::$Storage['Classes'] = $c->store('Core/Classes', $List, ONE_WEEK);
 		}
@@ -180,12 +183,12 @@ class Core {
 				realpath(self::$Storage['path'].'/Templates/'),
 				realpath(self::$Storage['app.path'].'/Templates/'),
 			) as $path){
-				$length = String::length($path)+1;
+				$length = strlen($path)+1;
 				
 				foreach(new ExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path)), array('tpl', 'php')) as $file){
 					$realpath = $file->getRealPath();
 					
-					$Templates[String::replace('\\', '/', String::sub($realpath, $length))] = $realpath;
+					$Templates[str_replace('\\', '/', substr($realpath, $length))] = $realpath;
 				}
 			}
 			
@@ -218,15 +221,15 @@ class Core {
 		
 		if(!Hash::length($Methods))
 			foreach(get_class_methods($Instance) as $method)
-				if(String::starts($method, 'on') && String::length($method)>=3)
-					array_push($Methods, String::toLower(String::sub($method, 2)));
+				if(String::starts($method, 'on') && strlen($method)>=3)
+					array_push($Methods, strtolower(substr($method, 2)));
 		
-		$event = String::toLower($event);
+		$event = strtolower($event);
 		
 		if(!in_array($event, $Methods))
 			return false;
 		
-		return $Instance->{'on'.String::ucfirst($event)}();
+		return $Instance->{'on'.ucfirst($event)}();
 	}
 	
 	/* Storage Methods (Will be moved to a StaticStorage-Class in PHP5.3) */

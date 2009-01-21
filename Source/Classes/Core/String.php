@@ -214,6 +214,8 @@ final class String {
 	 * @return string
 	 */
 	public static function ucfirst($string){
+		if(!self::$Features['mbstring']) return ucfirst($string);
+		
 		$Fn = self::$Fn;
 		
 		return $Fn['strtoupper']($Fn['substr']($string, 0, 1)).$Fn['strtolower']($Fn['substr']($string, 1));

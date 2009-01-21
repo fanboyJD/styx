@@ -65,7 +65,7 @@ class Cache {
 		
 		$engines = array();
 		foreach(glob(Core::retrieve('path').'Classes/Cache/*') as $file){
-			$class = String::toLower(String::sub(basename($file, '.php'), 0, -5));
+			$class = strtolower(substr(basename($file, '.php'), 0, -5));
 			if(!in_array($class, $this->Configuration['engines']))
 				continue;
 			
@@ -74,7 +74,7 @@ class Cache {
 				$engines[] = $class;
 		}
 		
-		$default = String::toLower($this->Configuration['default']);
+		$default = strtolower($this->Configuration['default']);
 		if(!$default || !in_array($default, $engines))
 			$this->Configuration['default'] = reset($engines);
 		

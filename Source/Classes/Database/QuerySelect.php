@@ -48,7 +48,7 @@ class QuerySelect extends Query implements Iterator, ArrayAccess, Countable {
 		if(empty($data['on']) || empty($data['table']))
 			return;
 		
-		return $data ? (!empty($data['type']) && in_array($data['type'], array('LEFT', 'RIGHT', 'INNER', 'OUTER')) ? ' '.String::toUpper($data['type']) : '').
+		return $data ? (!empty($data['type']) && in_array($data['type'], array('LEFT', 'RIGHT', 'INNER', 'OUTER')) ? ' '.strtoupper($data['type']) : '').
 			' JOIN '.$data['table'].' ON ('.$data['on'].')' : '';
 	}
 	

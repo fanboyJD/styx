@@ -60,7 +60,7 @@ final class Route {
 		if(!$layer) return;
 		
 		$layer->setMainLayer()->fireEvent($action['event'], !empty($action['get']) ? $action['get'] : null)->register();
-		self::$mainlayer = String::toLower($action['layer']);
+		self::$mainlayer = strtolower($action['layer']);
 	}
 	
 	public static function getMainlayer(){

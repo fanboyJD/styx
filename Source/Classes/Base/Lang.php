@@ -33,7 +33,7 @@ final class Lang {
 	 * @param string $lang
 	 */
 	public static function setLanguage($lang){
-		self::$lang = String::toLower(pick($lang, 'en'));
+		self::$lang = strtolower(pick($lang, 'en'));
 		
 		self::$Fileparser = new Fileparser('Language/'.self::$lang.'.lang');
 	}

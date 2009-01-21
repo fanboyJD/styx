@@ -33,7 +33,7 @@ class Script {
 	 * @param string $type The method of the console object to be called (eg. debug, warn, info), defaults to "log"
 	 */
 	public static function log($data, $type = null){
-		$type = String::toLower($type);
+		$type = strtolower($type);
 		
 		self::set('console.'.(in_array($type, self::$API) ? $type : self::$API[0]).'('.json_encode($data).');');
 	}

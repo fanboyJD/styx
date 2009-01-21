@@ -30,7 +30,7 @@ class Element extends Runner {
 	
 	public function __construct($options, $type = null){
 		static $uid = 0;
-		$type = String::toLower($type);
+		$type = strtolower($type);
 		
 		if(!empty($options[':tag'])){
 			$this->name = $this->type = $options[':tag'];
@@ -75,7 +75,7 @@ class Element extends Runner {
 	}
 	
 	public static function skipable($key){
-		return String::starts($key, ':');
+		return strpos($key, ':')===0;
 	}
 	
 	public function setValue($v){
@@ -158,8 +158,8 @@ class Element extends Runner {
 		
 		$s = array();
 		foreach($a as $key => $val)
-			if(($val || $val===0) && !in_array('skip'.String::ucfirst($key), $skip) && !self::skipable($key))
-				$s[] = $key.'="'.($key=='style' ? String::replace('"', "'", $val) : Data::sanitize($val)).'"';
+			if(($val || $val===0) && !in_array('skip'.ucfirst($key), $skip) && !self::skipable($key))
+				$s[] = $key.'="'.($key=='style' ? str_replace('"', "'", $val) : Data::sanitize($val)).'"';
 		
 		return Hash::length($s) ? ' '.implode(' ', $s) : '';
 	}
