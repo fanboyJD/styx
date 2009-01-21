@@ -25,6 +25,16 @@ class DataComparison {
 	private $order = 1;
 	
 	/**
+	 * It is optionally possible to set the field and the sort-order in the constructor already
+	 *
+	 * @param string $field
+	 * @param int $order
+	 */
+	public function __construct($field = null, $order = null){
+		$this->setField($field)->setOrder(isset($order) ? $order : true);
+	}
+	
+	/**
 	 * The field that is used to sort the data
 	 *
 	 * @param string $field
