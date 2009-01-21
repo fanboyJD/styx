@@ -132,13 +132,13 @@ class DataSet implements Iterator, ArrayAccess, Countable {
 		/* Order */
 		$order = $this->Storage->retrieve('order');
 		if($order && $sequence = $this->getArguments($order)){
-			$DataComparison = new DataComparison($subset);
+			$DataComparison = new DataComparison;
 			foreach($sequence as $seq){
 				$seq = array_map('trim', explode(' ', $seq));
 				if(empty($seq[0])) continue;
 				
 				$DataComparison->setField($seq[0])->setOrder(!(!empty($seq[1]) && String::toLower($seq[1])=='desc'));
-				uksort($subset, array($DataComparison, 'sort'));
+				uasort($subset, array($DataComparison, 'sort'));
 			}
 		}
 		/* Limit */

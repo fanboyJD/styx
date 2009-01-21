@@ -12,12 +12,6 @@
 class DataComparison {
 	
 	/**
-	 * The data to sort/compare
-	 *
-	 * @var array
-	 */
-	private $Data;
-	/**
 	 * The field to be sorted
 	 *
 	 * @var string
@@ -31,13 +25,6 @@ class DataComparison {
 	private $order = 1;
 	
 	/**
-	 * @param array $data The data to sort/compare
-	 */
-	public function __construct($data){
-		$this->Data = $data;
-	}
-	
-	/**
 	 * The field that is used to sort the data
 	 *
 	 * @param string $field
@@ -45,7 +32,6 @@ class DataComparison {
 	 */
 	public function setField($field){
 		$this->field = $field;
-		
 		return $this;
 	}
 	
@@ -56,8 +42,7 @@ class DataComparison {
 	 * @return DataComparison
 	 */
 	public function setOrder($order){
-		$this->order = $order ? 1 : -1;
-		
+		$this->order = !$order || $order===-1 ? -1 : 1;
 		return $this;
 	}
 	
@@ -69,16 +54,13 @@ class DataComparison {
 	 * @return int
 	 */
 	public function sort($a, $b){
-		if(!isset($this->Data[$a][$this->field]))
-			return isset($this->Data[$b][$this->field]) ? 1*$this->order : 0;
+		if(!isset($a[$this->field]))
+			return isset($b[$this->field]) ? 1*$this->order : 0;
 		
-		if(!isset($this->Data[$b][$this->field]))
-			return isset($this->Data[$a][$this->field]) ? -1*$this->order : 0;
+		if(!isset($b[$this->field]))
+			return isset($a[$this->field]) ? -1*$this->order : 0;
 		
-		$a = $this->Data[$a][$this->field];
-		$b = $this->Data[$b][$this->field];
-		
-		return $a==$b ? 0 : ($a<$b ? -1*$this->order : 1*$this->order);
+		return $a[$this->field]==$b[$this->field] ? 0 : ($a[$this->field]<$b[$this->field] ? -1*$this->order : 1*$this->order);
 	}
 	
 }

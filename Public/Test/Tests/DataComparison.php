@@ -12,26 +12,26 @@ class DataComparisonTest extends UnitTestCase {
 			array('id' => 4, 'title' => 'B'),
 		);
 		
-		$DataComparison = new DataComparison($data);
+		$DataComparison = new DataComparison;
 		
 		$DataComparison->setField('id');
 		
-		uksort($data, array($DataComparison, 'sort'));
+		uasort($data, array($DataComparison, 'sort'));
 		$this->assertEqual(array_keys($data), array(0, 1, 2, 3));
 		
 		$DataComparison->setOrder(false);
 		
-		uksort($data, array($DataComparison, 'sort'));
+		uasort($data, array($DataComparison, 'sort'));
 		$this->assertEqual(array_keys($data), array(3, 2, 1, 0));
 		
 		$DataComparison->setField('title')->setOrder(true);
 		
-		uksort($data, array($DataComparison, 'sort'));
+		uasort($data, array($DataComparison, 'sort'));
 		$this->assertEqual(array_keys($data), array(2, 3, 0, 1));
 		
-		$DataComparison->setField('test')->setOrder(true);
+		$DataComparison->setField('test');
 		
-		uksort($data, array($DataComparison, 'sort'));
+		uasort($data, array($DataComparison, 'sort'));
 		$this->assertEqual(array_keys($data), array(1, 2, 3, 0));
 	}
 
