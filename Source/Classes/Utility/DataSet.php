@@ -131,14 +131,16 @@ class DataSet implements Iterator, ArrayAccess, Countable {
 		
 		/* Order */
 		$order = $this->Storage->retrieve('order');
-		if($order && $sequence = $this->getArguments($order))
+		if($order && $sequence = $this->getArguments($order)){
+			$DataComparison = new DataComparison($subset);
 			foreach($sequence as $seq){
 				$seq = array_map('trim', explode(' ', $seq));
 				if(empty($seq[0])) continue;
 				
-				uksort($subset, array(new DataComparison($subset, !empty($seq[1]) && String::toLower($seq[1])=='desc'), $seq[0]));
+				$DataComparison->setField($seq[0])->setOrder(!(!empty($seq[1]) && String::toLower($seq[1])=='desc'));
+				uksort($subset, array($DataComparison, 'sort'));
 			}
-		
+		}
 		/* Limit */
 		$limit = $this->Storage->retrieve('limit');
 		if(is_array($limit) && ($limit[0] || $limit[1])){
@@ -264,65 +266,6 @@ class DataSet implements Iterator, ArrayAccess, Countable {
 		if(!$this->queried) $this->retrieve();
 		
 		return count($this->Subset);
-	}
-	
-}
-
-/**
- * Styx::DataComparison - Compares any array-data based on the method calls to it
- *
- * @package Styx
- * @subpackage Utility
- *
- * @license MIT-style License
- * @author Christoph Pojer <christoph.pojer@gmail.com>
- */
-
-class DataComparison {
-	
-	/**
-	 * The data to sort/compare
-	 *
-	 * @var array
-	 */
-	private $Data;
-	/**
-	 * Is -1 when doing a descending sort and 1 otherwise
-	 *
-	 * @var int
-	 */
-	private $desc;
-	
-	/**
-	 * @param array $data The data to sort/compare
-	 * @param bool $desc Defines whether the sort should be descending (true) or ascending (false)
-	 */
-	public function __construct($data, $desc = false){
-		$this->Data = $data;
-		
-		$this->desc = $desc ? -1 : 1;
-	}
-	
-	/**
-	 * Every sort call gets routed to this method. The key to be sorted is passed as {@link $key}
-	 * as it was a function. Example: ->time(4, 5) tries to sort the entries with key 4 and 5 of the data
-	 * by time.
-	 *
-	 * @param string $key The method name and key (eg. "time") on which the data should be sorted
-	 * @param array $args
-	 * @return int
-	 */
-	public function __call($key, $args){
-		if(!isset($this->Data[$args[0]][$key]))
-			return isset($this->Data[$args[1]][$key]) ? 1*$this->desc : 0;
-		
-		if(!isset($this->Data[$args[1]][$key]))
-			return isset($this->Data[$args[0]][$key]) ? -1*$this->desc : 0;
-		
-		$a = $this->Data[$args[0]][$key];
-		$b = $this->Data[$args[1]][$key];
-		
-		return $a==$b ? 0 : ($a<$b ? -1*$this->desc : 1*$this->desc);
 	}
 	
 }

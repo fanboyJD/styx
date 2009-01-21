@@ -133,7 +133,11 @@ class Cache {
 		if(empty($this->Meta[$id])) return null;
 		
 		if(empty($this->Storage[$id])){
-			$content = $this->engines[pick($this->Meta[$id][2], 'file')]->retrieve($id);
+			$engine = pick($this->Meta[$id][2], 'file');
+			
+			$content = null;
+			if(!empty($this->engines[$engine]))
+				$content = $this->engines[$engine]->retrieve($id);
 			
 			if(!$content){
 				unset($this->Meta[$id]);
@@ -205,10 +209,11 @@ class Cache {
 			if(!$this->Meta[$id][0] && !$force)
 				continue;
 			
-			if(empty($list[$this->Meta[$id][2]]))
-				$list[$this->Meta[$id][2]] = array();
+			$engine = pick($this->Meta[$id][2], 'file');
+			if(empty($list[$engine]))
+				$list[$engine] = array();
 			
-			$list[$this->Meta[$id][2]][] = $id;
+			$list[$engine][] = $id;
 			
 			unset($this->Storage[$id], $this->Meta[$id]);
 		}
