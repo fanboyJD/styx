@@ -53,7 +53,7 @@ class DataSet implements Iterator, ArrayAccess, Countable {
 	 */
 	private function getArguments($args){
 		$array = array();
-		foreach($args as $arg)
+		foreach(Hash::splat($args) as $arg)
 			foreach(array_map('trim', explode(',', $arg)) as $field)
 				$array[] = $field;
 		
@@ -66,10 +66,9 @@ class DataSet implements Iterator, ArrayAccess, Countable {
 	 * @see QuerySelect::fields
 	 * @return DataSet
 	 */
-	public function fields(){
+	public function fields($data){
 		$this->queried = false;
 		
-		$data = Hash::args(func_get_args());
 		$this->Storage->store('fields', $data);
 		
 		return $this;
@@ -81,10 +80,9 @@ class DataSet implements Iterator, ArrayAccess, Countable {
 	 * @see QuerySelect::order
 	 * @return DataSet
 	 */
-	public function order(){
+	public function order($data){
 		$this->queried = false;
 		
-		$data = Hash::args(func_get_args());
 		$this->Storage->store('order', $data);
 		
 		return $this;

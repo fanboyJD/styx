@@ -101,10 +101,9 @@ class Query {
 	/**
 	 * @return Query
 	 */
-	public function where(){
+	public function where($data){
 		unset($this->formatted);
 		
-		$data = Hash::args(func_get_args());
 		$this->Storage->store('where', $data);
 		
 		return $this;

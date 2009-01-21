@@ -245,7 +245,6 @@ class Core {
 	 *
 	 * @param array|string $array
 	 * @param mixed $value
-	 * @return mixed
 	 */
 	public static function store($array, $value = null){
 		if(!is_array($array))
@@ -256,8 +255,6 @@ class Core {
 				if($value) self::$Storage[$key] = $value;
 				else unset(self::$Storage[$key]);
 			}
-		
-		return Hash::length($array)==1 ? $value : $array;
 	}
 	
 	/**
@@ -269,8 +266,10 @@ class Core {
 	 * @return mixed
 	 */
 	public static function retrieve($key, $value = null){
-		if($value && empty(self::$Storage[$key]))
-			return self::store($key, $value);
+		if($value && empty(self::$Storage[$key])){
+			self::store($key, $value);
+			return $value;
+		}
 		
 		return !empty(self::$Storage[$key]) ? self::$Storage[$key] : null;
 	}

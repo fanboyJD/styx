@@ -115,8 +115,7 @@ abstract class LayerPrototype extends Runner {
 			unset($initialize['table']);
 		}
 		
-		if(Hash::length($initialize) && is_array($initialize))
-			Hash::extend($this->options, $initialize);
+		Hash::extend($this->options, $initialize);
 		
 		if(!is_array($this->options['preventPass']))
 			$this->options['preventPass'] = array();

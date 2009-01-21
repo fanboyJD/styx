@@ -10,7 +10,7 @@
 
 class Template extends Runner {
 	
-	protected $assigned = null,
+	protected $assigned = array(),
 		$appended = array(),
 		$file = array(),
 		$bound = null;
@@ -38,7 +38,7 @@ class Template extends Runner {
 		$ext = pathinfo(end($this->file), PATHINFO_EXTENSION);
 		$file = implode('/', $this->file).(!$ext ? '.'.$Configuration['template.default'] : '');
 		
-		if(in_array(String::toLower($ext ? $ext : $Configuration['template.default']), $Configuration['template.execute'])){
+		if(in_array(strtolower($ext ? $ext : $Configuration['template.default']), $Configuration['template.execute'])){
 			if($this->bound && method_exists($this->bound, 'execute')){
 				if(empty($Configuration['Templates'][$file])) return;
 				
@@ -67,7 +67,7 @@ class Template extends Runner {
 	public function assign(){
 		$args = Hash::args(func_get_args());
 		
-		$this->assigned = Hash::extend($this->assigned, $args);
+		Hash::extend($this->assigned, $args);
 		
 		return $this;
 	}
@@ -125,12 +125,11 @@ class Template extends Runner {
 		
 		if(!$Configuration) $Configuration = Core::fetch('template.regex', 'template.striptabs');
 		
-		if(!$this->hasFile()) return Hash::length($this->appended) ? implode($this->appended) : $this->assigned;
+		if(!$this->hasFile()) return count($this->appended) ? implode($this->appended) : $this->assigned;
 		
 		$out = $this->getFile();
-		if(!$out && $return) return Hash::length($this->appended) ? implode($this->appended) : $this->assigned;
+		if(!$out && $return) return count($this->appended) ? implode($this->appended) : $this->assigned;
 		
-		Hash::splat($this->assigned);
 		Hash::flatten($this->assigned);
 		
 		preg_match_all($Configuration['template.regex'], $out, $vars);
@@ -138,13 +137,16 @@ class Template extends Runner {
 		$rep = array(array_values($vars[0]), array());
 		$i = 0;
 		foreach($vars[1] as $v){
-			foreach(Hash::splat(String::clean(explode('|', $v))) as $val){
-				if(!empty($this->assigned[$val])){
-					$rep[1][$i] = $this->assigned[$val];
-					break;
-				}elseif(String::starts($val, 'lang.') && $lang = Lang::retrieve(String::sub($val, 5))){
-					$rep[1][$i] = $lang;
-					break;
+			$vals = array_map('trim', explode('|', $v));
+			if($vals){
+				foreach($vals as $val){
+					if(!empty($this->assigned[$val])){
+						$rep[1][$i++] = $this->assigned[$val];
+						continue 2;
+					}elseif(String::starts($val, 'lang.') && $lang = Lang::retrieve(substr($val, 5))){
+						$rep[1][$i++] = $lang;
+						continue 2;
+					}
 				}
 			}
 			
@@ -158,7 +160,7 @@ class Template extends Runner {
 			$rep[1][] = '';
 		}
 		
-		$out = String::replace($rep[0], $rep[1], $out);
+		$out = str_replace($rep[0], $rep[1], $out);
 		
 		if($return) return $out;
 		

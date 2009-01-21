@@ -133,10 +133,12 @@ class UserPrototype {
 		
 		$args = Hash::args(func_get_args());
 		
+		$list = array();
 		foreach($args as $k => $arg)
-			$args[$k] = explode('.', $arg);
+			foreach(explode('.', $arg) as $a)
+				$list[] = $a;
 		
-		return !!self::checkRight(array_values(Hash::flatten($args)));
+		return !!self::checkRight($list);
 	}
 	
 	private static function checkRight($rights){

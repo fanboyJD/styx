@@ -197,6 +197,9 @@ final class Request {
 		if(!$lang){
 			$languages = Core::retrieve('languages');
 			
+			if(count($languages)==1)
+				return key($languages);
+			
 			foreach(self::getRequestedLanguages() as $langs)
 				foreach($languages as $k => $language)
 					if(in_array($langs, $language))
@@ -250,13 +253,13 @@ final class Request {
 				if($value) self::$Storage[$key] = $value;
 				else unset(self::$Storage[$key]);
 			}
-		
-		return Hash::length($array)==1 ? $value : $array;
 	}
 	
 	public static function retrieve($key, $value = null){
-		if($value && empty(self::$Storage[$key]))
-			return self::store($key, $value);
+		if($value && empty(self::$Storage[$key])){
+			self::store($key, $value);
+			return $value;
+		}
 		
 		return !empty(self::$Storage[$key]) ? self::$Storage[$key] : null;
 	}

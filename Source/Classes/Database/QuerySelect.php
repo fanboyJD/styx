@@ -55,10 +55,9 @@ class QuerySelect extends Query implements Iterator, ArrayAccess, Countable {
 	/**
 	 * @return QuerySelect
 	 */
-	public function fields(){
+	public function fields($data){
 		unset($this->formatted);
 		
-		$data = Hash::args(func_get_args());
 		$this->Storage->store('fields', $data);
 		
 		return $this;
@@ -67,10 +66,9 @@ class QuerySelect extends Query implements Iterator, ArrayAccess, Countable {
 	/**
 	 * @return QuerySelect
 	 */
-	public function order(){
+	public function order($data){
 		unset($this->formatted);
 		
-		$data = Hash::args(func_get_args());
 		$this->Storage->store('order', $data);
 		
 		return $this;

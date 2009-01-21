@@ -23,7 +23,6 @@ class Storage {
 	 *
 	 * @param array|string $array
 	 * @param mixed $value
-	 * @return mixed
 	 */
 	public function store($array, $value = null){
 		if(!is_array($array))
@@ -34,8 +33,6 @@ class Storage {
 				if($value) $this->Storage[$key] = $value;
 				else unset($this->Storage[$key]);
 			}
-		
-		return Hash::length($array)==1 ? $value : $array;
 	}
 	
 	/**
@@ -47,8 +44,10 @@ class Storage {
 	 * @return mixed
 	 */
 	public function retrieve($key, $value = null){
-		if($value && empty($this->Storage[$key]))
-			return $this->store($key, $value);
+		if($value && empty($this->Storage[$key])){
+			$this->store($key, $value);
+			return $value;
+		}
 		
 		return !empty($this->Storage[$key]) ? $this->Storage[$key] : null;
 	}
