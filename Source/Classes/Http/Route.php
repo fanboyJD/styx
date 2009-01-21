@@ -71,6 +71,7 @@ final class Route {
 		$path = Request::getPath();
 		
 		$routes = self::$routes;
+		Hash::flatten($routes, null, 1);
 		krsort($routes);
 		
 		foreach($routes as $route){
@@ -124,9 +125,10 @@ final class Route {
 	public static function connect($route, $options = array(), $priority = 50){
 		Hash::splat($options['match']);
 		
-		self::$routes[Data::pagetitle($priority, array(
-			'contents' => array_keys(self::$routes),
-		))] = array(
+		if(empty(self::$routes[$priority]))
+			self::$routes[$priority] = array();
+		
+		self::$routes[$priority][] = array(
 			'route' => !empty($options['regex']) || !empty($options['equals']) ? $route : String::clean(explode('/', $route)),
 			'options' => $options
 		);

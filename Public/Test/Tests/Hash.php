@@ -6,9 +6,9 @@ class HashTest extends UnitTestCase {
 	
 	public function testLength(){
 		
-		$this->assertNull(Hash::length(array()));
+		$this->assertEqual(Hash::length(array()), 0);
 		
-		$this->assertNull(Hash::length('string'));
+		$this->assertEqual(Hash::length('string'), 0);
 		
 		$this->assertEqual(Hash::length(array(1, 2, 3)), 3);
 		
@@ -33,7 +33,7 @@ class HashTest extends UnitTestCase {
 	}
 	
 	public function testFlatten(){
-		$array = array(
+		$barray = $array = array(
 			'some' => array(
 				'multi' => array(
 					'dimensional' => array(
@@ -52,6 +52,19 @@ class HashTest extends UnitTestCase {
 			'some.multi.user' => 'system',
 			'some.multi.0' => 'hello',
 		));
+		
+		Hash::flatten($barray, null, 1);
+		
+		$this->assertEqual($barray, array(
+			'some.multi' => array(
+				'dimensional' => array(
+					'array' => 'yes',
+				),
+				'user' => 'system',
+				'hello',
+			),
+		));
+		
 	}
 	
 	public function testExtend(){
@@ -132,14 +145,6 @@ class HashTest extends UnitTestCase {
 		$var = array(array(1), 'a', 'b');
 		
 		$this->assertEqual(Hash::args($var), array(array(1), 'a', 'b'));
-		
-		$var = null;
-		
-		$this->assertEqual(Hash::args($var), array());
-		
-		$var = 7;
-		
-		$this->assertEqual(Hash::args($var), array(7));
 	}
 	
 }

@@ -16,13 +16,13 @@ final class Hash {
 	private function __clone(){}
 	
 	/**
-	 * Returns the length of an array or null if no array was passed
+	 * Returns the length of an array or 0 if no array was passed
 	 *
 	 * @param mixed $array
 	 * @return int
 	 */
 	public static function length($array){
-		return is_array($array) ? pick(count($array)) : null;
+		return is_array($array) ? count($array) : 0;
 	}
 	
 	/**
@@ -45,16 +45,18 @@ final class Hash {
 	 *
 	 * @param array $array
 	 * @param string $prefix An optional prefix
+	 * @param int $levels The max levels to preserve arrays at a certain level
+	 * @param int $level (internal)
 	 * @return array
 	 */
-	public static function flatten(&$array, $prefix = null){
+	public static function flatten(&$array, $prefix = null, $levels = null, $level = null){
+		if(!$level) $level = 0;
 		if(!is_array($array)) return $array;
 		
 		$imploded = array();
 		if($prefix) $prefix .= '.';
-		
 		foreach($array as $key => $val)
-			if(is_array($val)) $imploded = array_merge($imploded, self::flatten($val, $prefix.$key));
+			if(is_array($val) && (!$levels || $levels>$level)) $imploded = array_merge($imploded, self::flatten($val, $prefix.$key, $levels, $level+1));
 			else $imploded[$prefix.$key] = $val;
 		
 		return $array = $imploded;
@@ -69,7 +71,7 @@ final class Hash {
 	 * @return array
 	 */
 	public static function extend(&$src, $extended){
-		if(!Hash::length($extended)) return $src;
+		if(!is_array($extended) || !count($extended)) return $src;
 		
 		foreach($extended as $key => $val)
 			$src[$key] = is_array($val) ? self::extend($src[$key], $val) : $val;
@@ -94,13 +96,11 @@ final class Hash {
 	 * Returns either the input array or its first element if it
 	 * only contains one element
 	 *
-	 * @param mixed $args
+	 * @param array $args
 	 * @return array
 	 */
 	public static function args($args){
-		$args = self::splat($args);
-		
-		return count($args)==1 ? self::splat($args[0]) : $args;
+		return count($args)==1 ? (is_array($args[0]) ? $args[0] : array($args[0])) : $args;
 	}
 	
 }
