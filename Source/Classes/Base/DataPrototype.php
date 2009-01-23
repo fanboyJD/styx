@@ -1,10 +1,12 @@
 <?php
-/*
- * Styx::Data - MIT-style License
- * Author: christoph.pojer@gmail.com
+/**
+ * Styx::DataPrototype - Is only accessed via {@see Data}. Is used to sanitize data to prevent malicious input
  *
- * Usage: Format/Validate/Sanitize Input-data
+ * @package Styx
+ * @subpackage Base
  *
+ * @license MIT-style License
+ * @author Christoph Pojer <christoph.pojer@gmail.com>
  */
 
 class DataPrototype {
@@ -12,14 +14,20 @@ class DataPrototype {
 	protected function __construct(){}
 	protected function __clone(){}
 	
+	/**
+	 * Calls all methods listed in {@see $validators} on {@see $data} 
+	 *
+	 * @param mixed $data
+	 * @param array $validators
+	 * @return mixed
+	 */
 	public static function call($data, $validators){
 		static $Instance, $Methods = array();
 		
 		if(!$Instance) $Instance = new Data();
 		
 		if(!Hash::length($Methods))
-			foreach(get_class_methods('Data') as $method)
-				array_push($Methods, strtolower($method));
+			$Methods = array_map('strtolower', get_class_methods($Instance));
 		
 		if(is_string($validators))
 			$validators = array($validators => true);
@@ -34,19 +42,12 @@ class DataPrototype {
 		return $data;
 	}
 	
-	public static function add($string){
-		return addslashes($string);
-	}
-	
-	public static function strip($string){
-		if(!$string) return '';
-		
-		if(is_array($string))
-			return array_map('Data::strip', $string);
-		
-		return stripslashes($string);
-	}
-	
+	/**
+	 * Escapes certain characters as listed in the configuration to prevent malicious input in templates
+	 *
+	 * @param string $string
+	 * @return string
+	 */
 	public static function escape($string){
 		static $replaces;
 		
@@ -61,13 +62,28 @@ class DataPrototype {
 		
 		if(!$replaces) return $string;
 		
-		return String::replace($replaces[0], $replaces[1], $string);
+		return str_replace($replaces[0], $replaces[1], $string);
 	}
 	
+	/**
+	 * Escapes a string with {@see htmlspecialchars} and uses {@see Data::espace} to make the string safe for output
+	 *
+	 * @param string $string
+	 * @return string
+	 */
 	public static function sanitize($string){
 		return self::escape(trim(htmlspecialchars($string, ENT_COMPAT, 'UTF-8', false)));
 	}
 	
+	/**
+	 * Always returns a positive integer or 0. If float is passed it rounds to the next integer value.
+	 * If options is an int or an array with key 'divider' => int it rounds the integer to a number where
+	 * the remainder is 0. For example Data::id(12, 10) returns 10
+	 *
+	 * @param mixed $int
+	 * @param array|int $options
+	 * @return int
+	 */
 	public static function id($int, $options = array()){
 		if(!is_numeric($int) || $int<0) return 0;
 		
@@ -82,15 +98,35 @@ class DataPrototype {
 		return round($int);
 	}
 	
+	/**
+	 * Returns false on false values or a string that equals to "false" and true in any other case
+	 *
+	 * @param mixed $data
+	 * @return bool
+	 */
 	public static function bool($data){
-		return $data==='false' ? false : !!$data;
+		return strtolower($data)==='false' ? false : !!$data;
 	}
 	
+	/**
+	 * Returns {@see $data} if the given value is within a given range
+	 *
+	 * @param int $data
+	 * @param array $options
+	 * @return int
+	 */
 	public static function numericrange($data, $options){
 		$data = self::id($data);
 		return $data>=$options[0] && $data<=$options[1] ? $data : 0;
 	}
 	
+	/**
+	 * Parses a date value consisting of day, month and year (for example TT.MM.YYYY) to a timestamp
+	 *
+	 * @param string $data
+	 * @param array $options
+	 * @return int
+	 */
 	public static function date($data, $options = array()){
 		$default = array(
 			'separator' => null,
@@ -115,17 +151,31 @@ class DataPrototype {
 		return !$default['future'] && $time>time() ? null : $time;
 	}
 	
+	/**
+	 * Sanitizes an url
+	 *
+	 * @param string $data
+	 * @return string
+	 */
 	public static function url($data){
 		if(!filter_var($data, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED))
 			return null;
 	
-		if(!String::starts(String::toLower($data), 'http://'))
+		if(!String::starts(strtolower($data), 'http://'))
 			$data = 'http://'.$data;
 		
-		return String::toLower($data)=='http://' ? null : self::sanitize($data);
+		return strtolower($data)=='http://' ? null : self::sanitize($data);
 	}
 	
-	public static function pagetitle($title, $options = array()){
+	/**
+	 * Parses a string so it can safely be used in URLS
+	 * For example "Die Äpfel" becomes "Die_Aepfel"
+	 *
+	 * @param string $data
+	 * @param array $options
+	 * @return string
+	 */
+	public static function pagetitle($data, $options = array()){
 		static $regex;
 		
 		if(!$regex){
@@ -146,7 +196,7 @@ class DataPrototype {
 		
 		Hash::extend($default, $options);
 		
-		$title = trim(String::sub(preg_replace('/([^A-z0-9]|_|\^)+/i', '_', String::replace($regex[0], $regex[1], $title)), 0, 64), '_');
+		$data = trim(String::sub(preg_replace('/([^A-z0-9]|_|\^)+/i', '_', String::replace($regex[0], $regex[1], $data)), 0, 64), '_');
 		
 		if(!$default['identifier']){
 			static $identifier;
@@ -156,11 +206,19 @@ class DataPrototype {
 			$default['identifier'] = $identifier;
 		}
 		
-		return $default['contents'] ? self::checkTitle($title, $default) : $title;
+		return $default['contents'] ? self::checkTitle($data, $default) : $data;
 	}
 	
-	protected static function checkTitle($title, $options = array(), $i = 0){
-		if(!is_array($options['contents'])) return $title;
+	/**
+	 * Internal method to determine the pagetitle if it collides with with another one given in the options
+	 *
+	 * @param string $data
+	 * @param array $options
+	 * @param int $i
+	 * @return string
+	 */
+	protected static function checkTitle($data, $options = array(), $i = 0){
+		if(!is_array($options['contents'])) return $data;
 		
 		foreach($options['contents'] as &$content){
 			if(!is_array($content)) $content = array($options['identifier']['external'] => $content);
@@ -168,19 +226,34 @@ class DataPrototype {
 			if(empty($content[$options['identifier']['external']]))
 				continue;
 			
-			if((empty($options['id']) || $options['id']!=$content[$options['identifier']['internal']]) && String::toLower($content[$options['identifier']['external']])==String::toLower($title.($i ? '_'.$i : '')))
-				return self::checkTitle($title, $options, ++$i);
+			if((empty($options['id']) || $options['id']!=$content[$options['identifier']['internal']]) && strtolower($content[$options['identifier']['external']])==strtolower($data.($i ? '_'.$i : '')))
+				return self::checkTitle($data, $options, ++$i);
 		}
 		
-		return $title.($i ? '_'.$i : '');
+		return $data.($i ? '_'.$i : '');
 	}
 	
+	/**
+	 * Removes all unwanted tags/attributes/values from HTML-Input to prevent XSS-Injections and the input of
+	 * any malicious data. Generates valid HTML as though it might not be valid XHTML as defined by the W3C
+	 *
+	 * @param string $data
+	 * @param array $options
+	 * @return string
+	 */
 	public static function purify($data, $options = array()){
 		$purify = new Safehtml($options);
 		
 		return self::escape($purify->parse($data));
 	}
 	
+	/**
+	 * Outputs an excerpt of a text but does not break inside words but only on whitespace characters
+	 *
+	 * @param string $data
+	 * @param array $options
+	 * @return string
+	 */
 	public static function excerpt($data, $options = array()){
 		$default = array(
 			'length' => 400,
@@ -205,6 +278,13 @@ class DataPrototype {
 		return ($default['purify'] ? self::purify($data, $default['options']) : $data).($default['dots'] ? '...' : '');
 	}
 	
+	/**
+	 * Encodes a value with {@see json_encode}
+	 *
+	 * @param mixed $data
+	 * @param array $options
+	 * @return string
+	 */
 	public static function encode($data, $options = array()){
 		$default = array(
 			'whitespace' => 'clean',

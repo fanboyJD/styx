@@ -4,16 +4,6 @@ require_once('./Initialize.php');
 
 class DataTest extends UnitTestCase {
 	
-	public function testAdd(){
-		$this->assertEqual(Data::add("Hello'Test"), "Hello\'Test");
-		
-		$this->assertEqual(Data::add("Hel\\lo'Te\nst"), 'Hel\\\lo\\\'Te'."\n".'st');
-	}
-	
-	public function testStrip(){
-		$this->assertEqual(Data::strip("Hallo\\\\Test"), "Hallo\\Test");
-	}
-	
 	public function testEscape(){
 		// This makes sure $ is escaped so ${blah} won't be replaced/removed by the template
 		// (This is customizable in an application and it can be removed if there is a custom regex for the templates)

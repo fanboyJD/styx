@@ -44,7 +44,7 @@ class Query {
 			return $data;
 		
 		foreach($data as $k => $v)
-			$out[] = $k.'='.($v!==null ? "'".Data::add(is_array($v) ? (count($v[1]) ? Data::call($v[0], $v[1]) : $v[0]) : $v)."'" : 'NULL');
+			$out[] = $k.'='.($v!==null ? "'".addslashes(is_array($v) ? (count($v[1]) ? Data::call($v[0], $v[1]) : $v[0]) : $v)."'" : 'NULL');
 		
 		return implode(', ', $out);
 	}
@@ -66,7 +66,7 @@ class Query {
 		
 		foreach($data as $k => $v){
 			if(!ctype_digit((string)$k))
-				$out[] = $k.'='.($v!==null ? "'".Data::add(is_array($v) ? (count($v[1]) ? Data::call($v[0], $v[1]) : $v[0]) : $v)."'" : 'NULL');
+				$out[] = $k.'='.($v!==null ? "'".addslashes(is_array($v) ? (count($v[1]) ? Data::call($v[0], $v[1]) : $v[0]) : $v)."'" : 'NULL');
 			elseif(is_array($v))
 				$out[] = '('.$this->formatWhere($v).')';
 			else
@@ -161,7 +161,7 @@ class Query {
 		
 		if($length>=2)
 			foreach($array as $k => $v)
-				$array[$k] = "'".Data::add($v)."'";
+				$array[$k] = "'".addslashes($v)."'";
 		
 		return $length<2 ? $key."='".($length==1 ? reset($array) : '')."'" : $key.' IN ('.implode(',', $array).')';
 	}

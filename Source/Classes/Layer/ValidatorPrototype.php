@@ -1,10 +1,12 @@
 <?php
-/*
- * Styx::Validator - MIT-style License
- * Author: christoph.pojer@gmail.com
+/**
+ * Styx::ValidatorPrototype - Is only accessed via {@see Validator}. Validates data and only returns true or false values in all methods,
  *
- * Usage: Validates input data to enable feedback to be send to the client
+ * @package Styx
+ * @subpackage Layer
  *
+ * @license MIT-style License
+ * @author Christoph Pojer <christoph.pojer@gmail.com>
  */
 
 class ValidatorPrototype {
@@ -12,14 +14,21 @@ class ValidatorPrototype {
 	protected function __construct(){}
 	protected function __clone(){}
 	
+	/**
+	 * Calls all methods listed in {@see $validators} on {@see $data} and returns true on success
+	 * or false if one of the given validators fails
+	 *
+	 * @param mixed $data
+	 * @param array $validators
+	 * @return bool
+	 */
 	public static function call($data, $validators){
 		static $Instance, $Methods = array();
 		
 		if(!$Instance) $Instance = new Validator();
 		
 		if(!Hash::length($Methods))
-			foreach(get_class_methods($Instance) as $method)
-				array_push($Methods, strtolower($method));
+			$Methods = array_map('strtolower', get_class_methods($Instance));
 		
 		if(is_string($validators))
 			$validators = array($validators => true);
@@ -35,14 +44,23 @@ class ValidatorPrototype {
 		return true;
 	}
 	
-	public function id($data){
-		return !!Data::id($data);
+	/**
+	 * Validates to true if a call to {@see Data::id} with {@see $data} returns anything else than 0 (eg. a positive number)
+	 *
+	 * @param mixed $int
+	 * @param array|int $options
+	 * @return bool
+	 */
+	public function id($data, $options = array()){
+		return !!Data::id($data, $options);
 	}
 	
-	public function pagetitle($data){
-		return Data::pagetitle($data)==$data;
-	}
-	
+	/**
+	 * Returns true if the given value is not empty and is a valid E-Mail-Address
+	 *
+	 * @param string $data
+	 * @return bool
+	 */
 	public function mail($data){
 		$data = trim($data);
 		
@@ -51,44 +69,56 @@ class ValidatorPrototype {
 		return !!filter_var($data, FILTER_VALIDATE_EMAIL);
 	}
 	
+	/**
+	 * Returns true if {@see $data} is within a given range
+	 *
+	 * @param int $data
+	 * @param array $options
+	 * @return bool
+	 */
 	public function numericrange($data, $options){
 		$data = Data::id($data);
-		if(($data || ($data==0 && is_numeric($data))) && $data>=$options[0] && $data<=$options[1])
-			return true;
-		
-		return false;
+		return $data>=$options[0] && $data<=$options[1];
 	}
 	
+	/**
+	 * Parses a date value consisting of day, month and year (for example TT.MM.YYYY) to a timestamp
+	 * and returns true if the input data is valid
+	 *
+	 * @param string $data
+	 * @param array $options
+	 * @return bool
+	 */
 	public function date($data, $options = array()){
-		$default = array(
-			'separator' => null,
-			'order' => null,
-			'future' => false,
-		);
-		
-		Hash::extend($default, $options);
-		
-		return !!Data::date($data, $default);
+		return !!Data::date($data, $options);
 	}
 	
+	/**
+	 * Returns if the given string is not empty, or if it is an url and it does not consist of "http://"
+	 * If the validator "purify" is specified it first cleans the input of malicious code
+	 *
+	 * @param string $data
+	 * @param array $options
+	 * @param array $validators
+	 * @return bool
+	 */
 	public function notempty($data, $options = null, $validators){
-		$default = array(
-			'purify' => null,
-		);
-		
-		Hash::extend($default, $options);
-		
-		if(!empty($validators['url']) && String::toLower($data)=='http://')
+		if(!empty($validators['url']) && strtolower($data)=='http://')
 			return false;
 		
-		if(!$default['purify'] && !empty($validators['purify']))
-			$default['purify'] = $validators['purify'];
-		
-		if($default['purify']) $data = Data::purify($data, $default['purify']);
+		if(!empty($validators['purify']))
+			$data = Data::purify($data, $validators['purify']);
 		
 		return !!trim($data);
 	}
 	
+	/**
+	 * Returns true if the given string is within the given length
+	 *
+	 * @param string $data
+	 * @param array $options
+	 * @return bool
+	 */
 	public function length($data, $options){
 		$data = trim($data);
 		

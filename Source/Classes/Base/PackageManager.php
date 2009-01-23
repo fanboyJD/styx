@@ -1,14 +1,21 @@
 <?php
-/*
- * Styx::PackageManager - MIT-style License
- * Author: christoph.pojer@gmail.com
+/**
+ * Styx::PackageManager - Manages, compresses and streams packages (CSS/JavaScript/...) to the client
  *
- * Usage: Manages, compresses and streams packages (CSS/JavaScript/...) for the application to the client
+ * @package Styx
+ * @subpackage Base
  *
+ * @license MIT-style License
+ * @author Christoph Pojer <christoph.pojer@gmail.com>
  */
 
 class PackageManager {
 	
+	/**
+	 * Holds the configuration for JavaScript and CSS Packages
+	 *
+	 * @var array
+	 */
 	private static $Elements = array(
 			'js' => array(
 				'class' => 'JavaScript',
@@ -27,15 +34,30 @@ class PackageManager {
 					'type' => 'text/css',
 				),
 			),
-		),
-		$Packages = array(),
-		$compress = null,
-		$encoding = null;
+		);
+	/**
+	 * Holds a list of the defined packages
+	 *
+	 * @var array
+	 */
+	private static $Packages = array();
+	/**
+	 * The encoding to be used
+	 *
+	 * @var string
+	 */
+	private static $encoding;
 	
+	/**
+	 * Adds a package with {@see $name} and the given {@see $options}
+	 *
+	 * @param string $name
+	 * @param array $options
+	 */
 	public static function add($name, $options = null){
-		static $version;
+		static $Configuration;
 		
-		if(!$version) $version = Core::retrieve('app.version');
+		if(!$Configuration) $Configuration = Core::fetch('app.version');
 		
 		$default = array(
 			'type' => '',
@@ -49,7 +71,7 @@ class PackageManager {
 		
 		Hash::splat($default['files']);
 		
-		Route::connect($version.'/'.$name, array(
+		Route::connect($Configuration['app.version'].'/'.$name, array(
 			'package' => $name,
 			'equals' => true,
 			'contenttype' => self::$Elements[$options['type']]['class'],
@@ -59,10 +81,16 @@ class PackageManager {
 		self::$Packages[$name] = $default;
 	}
 	
+	/**
+	 * Assigns the html-tags of the defined packages to the Page-Template
+	 *
+	 */
 	public static function assignPackages(){
 		if(!count(self::$Packages)) return;
 		
-		$version = Core::retrieve('app.version');
+		static $Configuration;
+		
+		if(!$Configuration) $Configuration = Core::fetch('app.version');
 		
 		$assigned = array();
 		
@@ -78,7 +106,7 @@ class PackageManager {
 				$options[] = '{'.$k.'}';
 			
 			$options[] = '{package}';
-			$element['options'][] = $version.'/'.$name;
+			$element['options'][] = $Configuration['app.version'].'/'.$name;
 			
 			$assigned['package.'.$name] = str_replace($options, $element['options'], $element['tag']);
 		}
@@ -86,6 +114,11 @@ class PackageManager {
 		Page::getInstance()->assign($assigned);
 	}
 	
+	/**
+	 * Outputs the given package
+	 *
+	 * @param string $name
+	 */
 	public static function showPackage($name){
 		if(empty(self::$Packages[$name])) die;
 		
@@ -93,6 +126,12 @@ class PackageManager {
 		die;
 	}
 	
+	/**
+	 * Compresses a package, gets called from {@see ContentType->process}
+	 *
+	 * @param array $content
+	 * @return string
+	 */
 	public static function compress($content){
 		if(empty($content['package']) || empty(self::$Packages[$content['package']]))
 			return '';
@@ -168,26 +207,39 @@ class PackageManager {
 		return $compress ? $gzipcontent : $content;
 	}
 	
+	/**
+	 * Checks if the client (browser) is able to retrieve gzip data (as certain IE versions don't really support it)
+	 *
+	 * @return bool
+	 */
 	private static function checkGzipCompress(){
-		if(self::$compress===null){
-			self::$compress = false;
+		static $compress;
+		
+		if($compress===null){
+			$compress = false;
 			
 			$client = Request::getClient();
 			
 			$encodings = array();
 			if($_SERVER['HTTP_ACCEPT_ENCODING'])
-				$encodings = explode(',', String::toLower(preg_replace('/\s+/', '', $_SERVER['HTTP_ACCEPT_ENCODING'])));
+				$encodings = explode(',', strtolower(preg_replace('/\s+/', '', $_SERVER['HTTP_ACCEPT_ENCODING'])));
 		
 			if((in_array('gzip', $encodings) || in_array('x-gzip', $encodings)) && !ini_get('zlib.output_compression'))
 				self::$encoding = (in_array('x-gzip', $encodings) ? 'x-' : '').'gzip';
 			
 			if(self::$encoding && ($client['browser']!='ie' || $client['version']>6 || $client['features']['servicePack']))
-				self::$compress = true;
+				$compress = true;
 		}
 		
-		return self::$compress && self::$encoding;
+		return $compress && self::$encoding;
 	}
 	
+	/**
+	 * Checks if the client (user, browser) matches the requirements to view the given package
+	 *
+	 * @param array $require
+	 * @return bool
+	 */
 	private static function checkRequired($require){
 		if(count($require)){
 			$client = Request::getClient();

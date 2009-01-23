@@ -149,19 +149,17 @@ class Element extends Runner {
 		
 		Hash::splat($skip);
 		
-		if(!Hash::length($a)) return '';
+		if(!count($a)) return '';
 		
-		if(is_array($a['class']) && count($a['class']))
-			$a['class'] = implode(' ', $a['class']);
-		else
-			unset($a['class']);
+		if(count($a['class'])) $a['class'] = implode(' ', $a['class']);
+		else unset($a['class']);
 		
 		$s = array();
 		foreach($a as $key => $val)
 			if(($val || $val===0) && !in_array('skip'.ucfirst($key), $skip) && !self::skipable($key))
 				$s[] = $key.'="'.($key=='style' ? str_replace('"', "'", $val) : Data::sanitize($val)).'"';
 		
-		return Hash::length($s) ? ' '.implode(' ', $s) : '';
+		return count($s) ? ' '.implode(' ', $s) : '';
 	}
 	
 }
