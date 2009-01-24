@@ -152,33 +152,46 @@ class Core {
 		
 		$c = Cache::getInstance();
 		
-		$List = self::$Storage['Classes'] = $c->retrieve('Core/Classes');
-		
-		if(!$List || !empty(self::$Storage['debug'])){
-			$List = array();
-			
+		self::$Storage['Classes'] = $c->retrieve('Core/Classes');
+		if(!self::$Storage['Classes'] || !empty(self::$Storage['debug'])){
+			self::$Storage['Classes'] = array();
 			foreach(array(
 				glob(self::$Storage['path'].'/Classes/*/*.php'),
 				glob(self::$Storage['app.path'].'/Layers/*.php'),
 			) as $files)
 				if(Hash::length($files))
 					foreach($files as $file)
-						$List[strtolower(basename($file, '.php'))] = $file;
+						self::$Storage['Classes'][strtolower(basename($file, '.php'))] = $file;
 			
 			foreach(new ExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator(self::$Storage['app.path'].'/Classes/'))) as $file)
-				$List[strtolower(basename($file->getFileName(), '.php'))] = $file->getRealPath();
+				self::$Storage['Classes'][strtolower(basename($file->getFileName(), '.php'))] = $file->getRealPath();
 			
 			foreach(new ExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator(self::$Storage['app.path'].'/Prototypes/'))) as $file)
-				$List[strtolower(basename($file->getFileName(), '.php'))] = $file->getRealPath();
+				self::$Storage['Classes'][strtolower(basename($file->getFileName(), '.php'))] = $file->getRealPath();
 			
-			self::$Storage['Classes'] = $c->store('Core/Classes', $List, ONE_WEEK);
+			$c->store('Core/Classes', self::$Storage['Classes'], ONE_WEEK);
 		}
 		
-		$Templates = self::$Storage['Templates'] = $c->retrieve('Core/Templates');
-		
-		if(!$Templates || !empty(self::$Storage['debug'])){
-			$Templates = array();
+		self::$Storage['Methods'] = $c->retrieve('Core/Methods');
+		if(!self::$Storage['Methods']){
+			self::$Storage['Methods'] = array();
+			foreach(self::$Storage['Classes'] as $class => $v)
+				if($class=='application' || (String::ends($class, 'layer') && is_subclass_of($class, 'Layer'))){
+					self::$Storage['Methods'][$class] = array();
+					foreach(get_class_methods($class) as $method)
+						if(String::starts($method, 'on') && strlen($method)>=3)
+							array_push(self::$Storage['Methods'][$class], strtolower(substr($method, 2)));
+				}
 			
+			foreach(array('data', 'validator') as $class)
+				self::$Storage['Methods'][$class] = array_map('strtolower', get_class_methods($class));
+			
+			$c->store('Core/Methods', self::$Storage['Methods'], ONE_WEEK);
+		}
+		
+		self::$Storage['Templates'] = $c->retrieve('Core/Templates');
+		if(!self::$Storage['Templates'] || !empty(self::$Storage['debug'])){
+			self::$Storage['Templates'] = array();
 			foreach(array(
 				realpath(self::$Storage['path'].'/Templates/'),
 				realpath(self::$Storage['app.path'].'/Templates/'),
@@ -188,12 +201,22 @@ class Core {
 				foreach(new ExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path)), array('tpl', 'php')) as $file){
 					$realpath = $file->getRealPath();
 					
-					$Templates[str_replace('\\', '/', substr($realpath, $length))] = $realpath;
+					self::$Storage['Templates'][str_replace('\\', '/', substr($realpath, $length))] = $realpath;
 				}
 			}
 			
-			self::$Storage['Templates'] = $c->store('Core/Templates', $Templates, ONE_WEEK);
+			$c->store('Core/Templates', self::$Storage['Templates'], ONE_WEEK);
 		}
+	}
+	
+	/**
+	 * Returns the methods/events for the given class. Class can either be a Layer, the Application-Class or Data/Validator-Class
+	 *
+	 * @param string $class
+	 * @return array
+	 */
+	public static function getMethods($class){
+		return !empty(self::$Storage['Methods'][$class]) ? self::$Storage['Methods'][$class] : array();
 	}
 	
 	/**
@@ -211,7 +234,7 @@ class Core {
 	 * @return mixed Returns the event return-value or false if there is no Application class or the event does not exist
 	 */
 	public static function fireEvent($event){
-		static $Instance, $Methods = array();
+		static $Instance;
 		
 		if($Instance===null)
 			$Instance = self::classExists('Application') ? new Application : false;
@@ -219,14 +242,9 @@ class Core {
 		if($Instance===false)
 			return false;
 		
-		if(!count($Methods))
-			foreach(get_class_methods($Instance) as $method)
-				if(String::starts($method, 'on') && strlen($method)>=3)
-					array_push($Methods, strtolower(substr($method, 2)));
-		
 		$event = strtolower($event);
 		
-		if(!in_array($event, $Methods))
+		if(!in_array($event, self::$Storage['Methods']['application']))
 			return false;
 		
 		return $Instance->{'on'.ucfirst($event)}();

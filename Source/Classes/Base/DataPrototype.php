@@ -26,8 +26,7 @@ class DataPrototype {
 		
 		if(!$Instance) $Instance = new Data();
 		
-		if(!count($Methods))
-			$Methods = array_map('strtolower', get_class_methods($Instance));
+		if(!count($Methods)) $Methods = Core::getMethods('data');
 		
 		if(is_string($validators))
 			$validators = array($validators => true);

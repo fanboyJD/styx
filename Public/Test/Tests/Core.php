@@ -84,6 +84,12 @@ class CoreTest extends UnitTestCase {
 			$this->assertEqual($value, Core::retrieve($key));
 	}
 	
+	public function testGetMethods(){
+		$methods = Core::getMethods('indexlayer');
+		
+		$this->assertEqual($methods, array('save', 'edit', 'delete', 'view'));
+	}
+	
 	public function testClassExists(){
 		$this->assertTrue(Core::classExists('IndexLayer'));
 		

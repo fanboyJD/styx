@@ -27,8 +27,7 @@ class ValidatorPrototype {
 		
 		if(!$Instance) $Instance = new Validator();
 		
-		if(!count($Methods))
-			$Methods = array_map('strtolower', get_class_methods($Instance));
+		if(!count($Methods)) $Methods = Core::getMethods('validator');
 		
 		if(is_string($validators))
 			$validators = array($validators => true);

@@ -100,9 +100,7 @@ abstract class LayerPrototype extends Runner {
 		$this->base = $this->name = ucfirst($name);
 		$this->table = $this->layername = strtolower($name);
 		
-		foreach(get_class_methods($this) as $method)
-			if(String::starts($method, 'on') && strlen($method)>=3)
-				array_push($this->methods, strtolower(substr($method, 2)));
+		$this->methods = Core::getMethods($this->layername.'layer');
 		
 		$this->request = Request::retrieve('method');
 		$this->Form = new Form();
