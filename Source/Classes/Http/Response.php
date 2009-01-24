@@ -61,10 +61,7 @@ final class Response {
 	
 	public static function link($options = null, $base = null){
 		static $Configuration;	
-		if(!$Configuration){
-			$Configuration = Core::fetch('path.separator', 'app.link', 'contenttype.querystring');
-			if(empty($Configuration['contenttype.querystring'])) $Configuration['contenttype.querystring'] = null;
-		}
+		if(!$Configuration) $Configuration = Core::fetch('path.separator', 'app.link', 'contenttype.querystring');
 		
 		if(!is_array($options) && $options){
 			if(!$base) return $Configuration['app.link'].$options;
@@ -99,7 +96,7 @@ final class Response {
 	
 	public static function setDefaultContentType(){
 		$args = Hash::args(func_get_args());
-		if(Hash::length($args)) self::allow($args);
+		if(count($args)) self::allow($args);
 		
 		$class = Request::retrieve('behaviour').'content';
 		
@@ -111,7 +108,7 @@ final class Response {
 			$class = new $class;
 		}
 		
-		self::setContentType(new $class);
+		self::$ContentType = $class;
 	}
 	
 	public static function setContentType($contentType){

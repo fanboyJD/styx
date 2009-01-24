@@ -13,7 +13,7 @@ class Page extends Template {
 		$substitution = null;
 	
 	protected function __construct(){
-		$this->base = 'Page';
+		$this->base = array('Page');
 		
 		Response::setHeader(array(
 			'Expires' => 'Fri, 01 Jan 1990 00:00:00 GMT',
@@ -71,7 +71,7 @@ class Page extends Template {
 		
 		$assign = array();
 		
-		if(Hash::length($this->Templates))
+		if(count($this->Templates))
 			foreach($this->Templates as $k => $v)
 				$assign[$k] = $v->parse(true);
 		

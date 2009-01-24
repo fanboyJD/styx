@@ -36,6 +36,16 @@ class CacheTest extends UnitTestCase {
 		$this->assertEqual($c->retrieve('Test/Cache'), 'random data');
 		$c->erase('Test/Cache');
 		$this->assertNull($c->retrieve('Test/Cache'));
+		
+		$array = array(
+			array('id' => 1, 'title' => 'C'),
+			array('id' => 2, 'title' => 'D', 'test' => 2),
+		);
+		
+		$c->store('Some/Cache', $array);
+		$this->assertEqual($c->retrieve('Some/Cache'), $array);
+		$c->erase('Some/Cache');
+		$this->assertNull($c->retrieve('Some/Cache'));
 	}
 	
 	public function testTags(){

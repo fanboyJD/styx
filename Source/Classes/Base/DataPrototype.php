@@ -26,7 +26,7 @@ class DataPrototype {
 		
 		if(!$Instance) $Instance = new Data();
 		
-		if(!Hash::length($Methods))
+		if(!count($Methods))
 			$Methods = array_map('strtolower', get_class_methods($Instance));
 		
 		if(is_string($validators))

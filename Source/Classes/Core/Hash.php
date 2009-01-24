@@ -16,7 +16,8 @@ final class Hash {
 	private function __clone(){}
 	
 	/**
-	 * Returns the length of an array or 0 if no array was passed
+	 * Returns the length of an array or 0 if no array was passed. Use count if you are sure
+	 * your variable is an array or this method otherwise
 	 *
 	 * @param mixed $array
 	 * @return int

@@ -153,7 +153,7 @@ class PackageManager {
 		
 		$c = Cache::getInstance();
 		
-		if(!empty($Configuration['debug'])){
+		if($Configuration['debug']){
 			$time = 0;
 			
 			/* We check here if the files have been modified */
@@ -169,7 +169,7 @@ class PackageManager {
 			));
 		}
 		
-		if(empty($Configuration['debug'])){
+		if(!$Configuration['debug']){
 			$output = $c->retrieve('Compressed/'.$name.($compress ? '1' : ''));
 			if($output) return $output;
 		}

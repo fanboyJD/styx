@@ -124,7 +124,7 @@ class CoreTest extends UnitTestCase {
 		
 		$this->assertEqual(Core::retrieve('some', 'random'), 'test');
 		
-		$this->assertEqual(Core::fetch('key', 'some', 'undefined'), array('key' => 'value', 'some' => 'test'));
+		$this->assertEqual(Core::fetch('key', 'some', 'undefined'), array('key' => 'value', 'some' => 'test', 'undefined' => null));
 		
 		Core::store(array(
 			'key' => null,

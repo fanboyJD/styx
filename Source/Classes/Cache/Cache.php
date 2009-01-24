@@ -86,7 +86,7 @@ class Cache {
 			$this->engines[$engine] = new $class($this->Configuration);
 		}
 		
-		$this->Meta = pick(json_decode($this->engines['file']->retrieve('Cache/List'), true), array());
+		$this->Meta = pick(unserialize($this->engines['file']->retrieve('Cache/List')), array());
 		
 		foreach($this->Meta as $k => $v)
 			if($v[0] && $v[0]<$this->time)
@@ -100,7 +100,7 @@ class Cache {
 	 *
 	 */
 	public function __destruct(){
-		$this->engines['file']->store('Cache/List', json_encode($this->Meta));
+		$this->engines['file']->store('Cache/List', serialize($this->Meta));
 	}
 	
 	/**
@@ -157,7 +157,7 @@ class Cache {
 				return null;
 			}
 			
-			$this->Storage[$id] = $this->Meta[$id][1] ? json_decode($content, true) : $content;
+			$this->Storage[$id] = $this->Meta[$id][1] ? unserialize($content) : $content;
 		}
 		
 		return $this->Storage[$id];
@@ -197,7 +197,7 @@ class Cache {
 		
 		if(!empty($options['tags'])) $this->Meta[$id][] = array_values(Hash::splat($options['tags']));
 		
-		$this->engines[pick($this->Meta[$id][2], 'file')]->store($id, $this->Meta[$id][1] ? json_encode($input) : $input, $default['ttl']);
+		$this->engines[pick($this->Meta[$id][2], 'file')]->store($id, $this->Meta[$id][1] ? serialize($input) : $input, $default['ttl']);
 		
 		return $this->Storage[$id] = $input;
 	}

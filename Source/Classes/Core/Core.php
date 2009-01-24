@@ -219,7 +219,7 @@ class Core {
 		if($Instance===false)
 			return false;
 		
-		if(!Hash::length($Methods))
+		if(!count($Methods))
 			foreach(get_class_methods($Instance) as $method)
 				if(String::starts($method, 'on') && strlen($method)>=3)
 					array_push($Methods, strtolower(substr($method, 2)));
@@ -285,8 +285,7 @@ class Core {
 		$array = array();
 		
 		foreach($args as $arg)
-			if(!empty(self::$Storage[$arg]))
-				$array[$arg] = self::$Storage[$arg];
+			$array[$arg] = !empty(self::$Storage[$arg]) ? self::$Storage[$arg] : null;
 		
 		return $array;
 	}

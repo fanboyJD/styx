@@ -44,11 +44,11 @@ final class Request {
 			$Configuration['checks'] = array();
 			
 			$check = array('behaviour' => 'contenttype.querystring');
-			if(!empty($Configuration['languages']) && Hash::length($Configuration['languages']))
+			if(Hash::length($Configuration['languages']))
 				$check['language'] = 'languages.querystring';
 			
 			foreach($check as $k => $v)
-				if(!empty($Configuration[$v]))
+				if($Configuration[$v])
 					$Configuration['checks'][$k] = $Configuration[$v];
 		}
 		

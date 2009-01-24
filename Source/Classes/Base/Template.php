@@ -13,7 +13,12 @@ class Template extends Runner {
 	protected $assigned = array(),
 		$appended = array(),
 		$file = array(),
+		$base = array(),
 		$bound = null;
+	
+	protected function __construct($file = null){
+		if(is_array($file)) $this->file = $file;
+	}
 	
 	/**
 	 * @return Template
@@ -24,50 +29,62 @@ class Template extends Runner {
 		return new Template($args);
 	}
 	
-	protected function __construct(){
-		$args = Hash::args(func_get_args());
-		
-		if($args) $this->apply($args);
-	}
-	
 	protected function getFile(){
 		static $Configuration;
-		if(!$Configuration)
-			$Configuration = Core::fetch('Templates', 'template.default', 'template.execute');
+		if(!$Configuration) $Configuration = Core::fetch('Templates', 'debug', 'template.regex', 'template.default', 'template.execute');
 		
-		$ext = pathinfo(end($this->file), PATHINFO_EXTENSION);
-		$file = implode('/', $this->file).(!$ext ? '.'.$Configuration['template.default'] : '');
+		$file = $this->file;
+		foreach(array_reverse(Hash::splat($this->base)) as $v)
+			array_unshift($file, $v);
 		
-		if(in_array(strtolower($ext ? $ext : $Configuration['template.default']), $Configuration['template.execute'])){
-			if($this->bound && method_exists($this->bound, 'execute')){
-				if(empty($Configuration['Templates'][$file])) return;
-				
-				ob_start();
-				$this->bound->execute($this->assigned, $Configuration['Templates'][$file]);
-				return ob_get_clean();
-			}else{
-				/* 
-				 * We stop here if the extension is not a template for 
-				 * security reasons (code may gets exposed)
-				 */
-				return;
-			}
+		$info = pathinfo(implode('/', $file));
+		if(empty($info['extension'])) $info['extension'] = $Configuration['template.default'];
+		$file = $info['dirname'].'/'.$info['filename'].'.'.$info['extension'];
+		
+		if(empty($Configuration['Templates'][$file])) return;
+		
+		$execute = in_array(strtolower($info['extension']), $Configuration['template.execute']) && $this->bound && method_exists($this->bound, 'execute');
+		
+		if(!$execute){
+			$c = Cache::getInstance();
+			
+			$array = $c->retrieve('Templates/'.$file);
+			if($array && !$Configuration['debug']) return $array;
+			
+			$content = file_get_contents($Configuration['Templates'][$file]);
+			if(!$content) return false;
+			
+			preg_match_all($Configuration['template.regex'], $content, $matches);
+			
+			return $c->store('Templates/'.$file, array(
+				'content' => $content,
+				'matches' => $matches,
+			), ONE_DAY);
 		}
 		
-		return !empty($Configuration['Templates'][$file]) ? file_get_contents($Configuration['Templates'][$file]) : false;
+		ob_start();
+		$this->bound->execute($this->assigned, $Configuration['Templates'][$file]);
+		$content = ob_get_clean();
+		
+		if(!$content) return;
+	
+		preg_match_all($Configuration['template.regex'], $content, $matches);
+		
+		return array(
+			'content' => $content,
+			'matches' => $matches,
+		);
 	}
 	
 	public function hasFile(){
-		return !!Hash::length($this->file);
+		return !!count($this->file);
 	}
 	
 	/**
 	 * @return Template
 	 */
-	public function assign(){
-		$args = Hash::args(func_get_args());
-		
-		Hash::extend($this->assigned, $args);
+	public function assign($assign){
+		Hash::extend($this->assigned, $assign);
 		
 		return $this;
 	}
@@ -95,12 +112,7 @@ class Template extends Runner {
 	 * @return Template
 	 */
 	public function apply(){
-		$args = Hash::args(func_get_args());
-		
-		foreach(array_reverse(Hash::splat($this->base)) as $v)
-			array_unshift($args, $v);
-		
-		$this->file = $args;
+		$this->file = Hash::args(func_get_args());
 		
 		return $this;
 	}
@@ -123,20 +135,18 @@ class Template extends Runner {
 	public function parse($return = false){
 		static $Configuration;
 		
-		if(!$Configuration) $Configuration = Core::fetch('template.regex', 'template.striptabs');
+		if(!$Configuration) $Configuration = Core::fetch('template.striptabs');
 		
 		if(!$this->hasFile()) return count($this->appended) ? implode($this->appended) : $this->assigned;
 		
-		$out = $this->getFile();
-		if(!$out && $return) return count($this->appended) ? implode($this->appended) : $this->assigned;
+		$array = $this->getFile();
+		if(!$array && $return) return count($this->appended) ? implode($this->appended) : $this->assigned;
 		
 		Hash::flatten($this->assigned);
 		
-		preg_match_all($Configuration['template.regex'], $out, $vars);
-		
-		$rep = array(array_values($vars[0]), array());
+		$rep = array(array_values($array['matches'][0]), array());
 		$i = 0;
-		foreach($vars[1] as $v){
+		foreach($array['matches'][1] as $v){
 			$vals = array_map('trim', explode('|', $v));
 			if($vals){
 				foreach($vals as $val){
@@ -155,16 +165,16 @@ class Template extends Runner {
 			$i++;
 		}
 		
-		if(!empty($Configuration['template.striptabs'])){
+		if($Configuration['template.striptabs']){
 			$rep[0][] = "\t";
 			$rep[1][] = '';
 		}
 		
-		$out = str_replace($rep[0], $rep[1], $out);
+		$array['content'] = str_replace($rep[0], $rep[1], $array['content']);
 		
-		if($return) return $out;
+		if($return) return $array['content'];
 		
-		echo $out;
+		echo $array['content'];
 		flush();
 	}
 }
