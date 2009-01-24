@@ -1,5 +1,18 @@
+if(Browser.Engine.trident4)
+	DD_belatedPNG.fix('div#content, a#logo, div#menuleft, div#footer, .go, .hicon img');
+
 var User = {};
 window.addEvent('domready', function(){
+	(function(){
+		Config.id = 0;
+		
+		$$('a:not(.target)[href^=http://]').each(function(el){
+			var href = el.getProperty('href');
+			if(href && !href.test('^'+Config.link, 'i') && href.test('^https?://'))
+				el.addClass('target').set('target', 'target_'+Config.id++);
+		});
+	})();
+	
 	(function(){
 		$$('div#languages a').set('tween', {duration: 200}).addEvents({
 			mouseenter: function(){
@@ -11,6 +24,7 @@ window.addEvent('domready', function(){
 			}
 		});
 	})();
+	
 	(function(){
 		$$('ul#menu li a').set({
 			morph: {duration: 300},

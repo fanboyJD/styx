@@ -1,4 +1,2 @@
-<div class="inner">
-	<h1>${rights}${title}</h1>
-	${content}
-</div>
+<h1>${rights}${title}</h1>
+${content}

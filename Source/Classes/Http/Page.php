@@ -15,11 +15,9 @@ class Page extends Template {
 	protected function __construct(){
 		$this->base = 'Page';
 		
-		$time = time();
 		Response::setHeader(array(
-			'Expires' => date('r', $time-1000),
-			'Last-Modified' => date('r', $time),
-			'Cache-Control' => 'no-cache, no-store, must-revalidate',
+			'Expires' => 'Fri, 01 Jan 1990 00:00:00 GMT',
+			'Cache-Control' => 'no-cache, no-store, max-age=0, must-revalidate',
 		));
 		
 		$this->bind($this);

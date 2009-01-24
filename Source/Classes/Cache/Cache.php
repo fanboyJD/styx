@@ -115,6 +115,19 @@ class Cache {
 	}
 	
 	/**
+	 * Returns the instance of a caching-interface so it can be used directly
+	 *
+	 * @return Apccache|Eacceleratorcache|Filecache|Memcache
+	 */
+	public static function getEngine($name = null){
+		if($name) $name = strtolower($name);
+		
+		$c = self::getInstance();
+		
+		return $name && !empty($c->engines[$name]) ? $c->engines[$name] : $c->engines[$c->Configuration['default']];
+	}
+	
+	/**
 	 * Returns a list of the currently used engines
 	 *
 	 * @return array

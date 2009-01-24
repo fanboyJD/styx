@@ -55,20 +55,14 @@ class IndexLayer extends Layer {
 		if(!User::hasRight('layer.index.edit'))
 			throw new ValidatorException('rights');
 		
-		// With a try-catch-block we make the upload optional
 		if(Upload::exists('image')){
-			try{
-				$img = new Image(Upload::move('image', 'Files/', array('size' => 1024*512, 'mimes' => array('image/gif', 'image/png', 'image/jpeg'))));
-				$file = $img->resize(120)->save();
-				
-				$filename = basename($img->getPathname());
-				$this->setValue(array(
-					'picture' => 'Files/'.$filename,
-				));
-			}catch(UploadException $e){
-				$this->Template->append($e->getMessage());
-				return;
-			}
+			$img = new Image(Upload::move('image', 'Files/', array('size' => 1024*512, 'mimes' => array('image/gif', 'image/png', 'image/jpeg'))));
+			$file = $img->resize(120)->save();
+			
+			$filename = basename($img->getPathname());
+			$this->setValue(array(
+				'picture' => 'Files/'.$filename,
+			));
 		}else{
 			$this->setValue(array(
 				'picture' => $this->editing ? $this->content['picture'] : '',
@@ -132,10 +126,13 @@ class IndexLayer extends Layer {
 			$this->Data->where(array(
 				'pagetitle' => array($title, 'pagetitle'),
 			))->limit(1);
+			
+			if(!count($this->Data))
+				throw new ValidatorException('newsnotavailable');
 		}elseif($contenttype=='html'){
-				$this->paginate()->initialize($this->Data, array(
-					'per' => 2,
-				));
+			$this->paginate()->initialize($this->Data, array(
+				'per' => 2,
+			));
 			
 			$this->isIndex = true;
 		}elseif($contenttype=='xml'){

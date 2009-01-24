@@ -4,6 +4,19 @@ require_once('./Initialize.php');
 
 class CacheTest extends UnitTestCase {
 	
+	public function testEngine(){
+		Cache::getEngine('apc')->store('test', true);
+		
+		$this->assertTrue(Cache::getEngine('apc')->retrieve('test'));
+		
+		$apc = Cache::getEngine('apc');
+		
+		$apc->erase(array('test'));
+		
+		// Should be either null or false, depending on what the engine returns
+		$this->assertTrue(in_array($apc->retrieve('test'), array(null, false)));
+	}
+	
 	public function testCache(){
 		$c = Cache::getInstance();
 		

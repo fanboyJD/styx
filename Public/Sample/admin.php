@@ -10,12 +10,11 @@
 	}
 	
 	Page::getInstance()->assign(array(
-		'layer' => '<div class="inner">
-				<h1>'.Lang::retrieve('user.admin').'</h1>
-				'.(!empty($msg) ? '<span class="go icon">'.Lang::retrieve('admin.'.$msg).'</span><br/><br/>' : '').'
-				<a class="go icon" href="'.Layer::retrieve('index')->link(null, 'edit').'">'.Lang::retrieve('news.add').'</a><br/>
-				<a class="go icon" href="admin/user">'.Lang::retrieve('admin.user').'</a><br/>
-				<a class="go icon" href="'.Response::link(array('admin' => null, 'do' => 'cache')).'">'.Lang::retrieve('admin.cache').'</a><br/>
-				<a class="go icon" href="'.Response::link(array('admin' => null, 'do' => 'allcache')).'">'.Lang::retrieve('admin.allcache').'</a>
-			</div>',
+		'layer' => '<h1>'.Lang::retrieve('user.admin').'</h1>
+			'.(!empty($msg) ? '<span class="go icon">'.Lang::retrieve('admin.'.$msg).'</span><br/><br/>' : '').'
+			<a class="go icon" href="'.Layer::retrieve('index')->link(null, 'edit').'">'.Lang::retrieve('news.add').'</a><br/>
+			<a class="go icon" href="admin/user">'.Lang::retrieve('admin.user').'</a><br/>
+			<a class="go icon" href="'.Response::link(array('admin' => null, 'do' => 'cache')).'">'.Lang::retrieve('admin.cache').'</a><br/>
+			<a class="go icon" href="'.Response::link(array('admin' => null, 'do' => 'allcache')).'">'.Lang::retrieve('admin.allcache').'</a>
+			',
 	));

@@ -66,11 +66,8 @@ class UserLayer extends Layer {
 			$this->Form->getElement('password')->set(':add', Lang::retrieve('user.pwdempty'));
 		
 		/* We put some styling here as we don't want to add a new Template for that :) */
-		$this->Template->append('<div class="inner">
-			<h1>'.Lang::retrieve('user.'.($this->editing ? 'modify' : 'add')).'</h1>
-			'.implode(array_map('implode', $this->format())).'
-			<div class="clear"></div>
-			</div>'
+		$this->Template->append('<h1>'.Lang::retrieve('user.'.($this->editing ? 'modify' : 'add')).'</h1>
+			'.implode(array_map('implode', $this->format()))
 		);
 	}
 	

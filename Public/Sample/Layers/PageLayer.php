@@ -65,12 +65,8 @@ class PageLayer extends Layer {
 			throw new ValidatorException('onlyedit');
 		
 		/* We put some styling here as we don't want to add a new Template for that :) */
-		$this->Template->append('<div class="inner">
-			<h1>'.Lang::retrieve('page.modify').'</h1>
-			'.implode(array_map('implode', $this->format())).'
-			<div class="clear"></div>
-			</div>'
-		);
+		$this->Template->append('<h1>'.Lang::retrieve('page.modify').'</h1>
+			'.implode(array_map('implode', $this->format())));
 	}
 	
 	public function onView($title){
@@ -80,10 +76,8 @@ class PageLayer extends Layer {
 				'pagetitle' => array($title, 'pagetitle'),
 			))->fetch();
 		
-		if(!$data){
-			$this->Template->assign(Lang::retrieve('page.notavailable'));
-			return;
-		}
+		if(!$data)
+			throw new ValidatorException('pagenotavailable');
 		
 		if(User::hasRight('layer.page.edit'))
 			$this->Template->assign(array(

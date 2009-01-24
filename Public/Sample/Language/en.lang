@@ -17,23 +17,15 @@ namespace news {
 	
 	file = 'Article-Picture';
 	
-	saved = '<div class="inner">
-			<b>Your entry has been saved.</b><br/><br/>
-			<a href="%s" class="go icon">Go to the News-Entry</a>
-		</div>';
+	saved = '<b>Your entry has been saved.</b><br/><br/>
+			<a href="%s" class="go icon">Go to the News-Entry</a>';
 }
 
 namespace page {
 	modify = 'Edit page';
 	
-	saved = '<div class="inner">
-			<b>Your page has been saved.</b><br/><br/>
-			<a href="%s" class="go icon">Go to the Page</a>
-		</div>';
-	
-	notavailable = '<div class="inner">
-			<span class="icon go">This page is not available.</span>
-		</div>';
+	saved = '<b>Your page has been saved.</b><br/><br/>
+			<a href="%s" class="go icon">Go to the Page</a>';
 }
 
 # The namespace for the framework :)
@@ -58,10 +50,8 @@ namespace user {
 	
 	hello = 'Hello %s';
 	
-	loggedin = '<div class="inner">
-			<h1>Administration</h1>
-			<span class="bold go">Welcome %s</span>
-		</div>';
+	loggedin = '<h1>Administration</h1>
+			<span class="bold go">Welcome %s</span>';
 	
 	add = 'Add user';
 	modify = 'Edit user';
@@ -69,10 +59,8 @@ namespace user {
 	confirmdelete = 'Are you sure to delete this user?';
 	deleted = 'The user has been deleted!';
 	pwdempty = ' <small>(leave empty to keep current)</small>';
-	saved = '<div class="inner">
-			<b>The user has been saved.</b><br/><br/>
-			<a href="%s" class="go icon">Back</a>
-		</div>';
+	saved = '<b>The user has been saved.</b><br/><br/>
+			<a href="%s" class="go icon">Back</a>';
 }
 
 namespace admin {
@@ -104,9 +92,7 @@ namespace upload {
 }
 
 namespace validator {
-	content = '<div class="inner">
-			<span class="icon go">%s</span>
-		</div>';
+	content = '<div class="error">%s</div>';
 	
 	# Default
 	rights = 'You don\'t have the necessary rights to access this page.';
@@ -119,7 +105,9 @@ namespace validator {
 	default = 'The field "<b>%s</b>" contains an invalid value.';
 	
 	# Custom
-	rightsWrapped = '<div class="inner">You don\'t have the necessary rights to access this page.</div>';
+	rightsWrapped = '<div class="error">You don\'t have the necessary rights to access this page.</div>';
 	login = 'You have entered an invalid username or password.';
 	onlyedit = 'You can only edit pages but not add new ones.';
+	newsnotavailable = 'This news entry is not available';
+	pagenotavailable = 'This page is not available.';
 }

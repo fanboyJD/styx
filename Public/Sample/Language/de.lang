@@ -17,23 +17,15 @@ namespace news {
 	
 	file = 'Artikelbild';
 	
-	saved = '<div class="inner">
-			<b>Dein Eintrag wurde gespeichert.</b><br/><br/>
-			<a href="%s" class="go icon">Zum News-Eintrag</a>
-		</div>';
+	saved = '<b>Dein Eintrag wurde gespeichert.</b><br/><br/>
+			<a href="%s" class="go icon">Zum News-Eintrag</a>';
 }
 
 namespace page {
 	modify = 'Seite bearbeiten';
 	
-	saved = '<div class="inner">
-			<b>Die Seite wurde gespeichert.</b><br/><br/>
-			<a href="%s" class="go icon">Zur Seite</a>
-		</div>';
-	
-	notavailable = '<div class="inner">
-			<span class="icon go">Diese Seite ist nicht verfügbar.</span>
-		</div>';
+	saved = '<b>Die Seite wurde gespeichert.</b><br/><br/>
+			<a href="%s" class="go icon">Zur Seite</a>';
 }
 
 # The namespace for the framework :)
@@ -57,10 +49,8 @@ namespace user {
 	
 	hello = 'Hallo %s';
 	
-	loggedin = '<div class="inner">
-			<h1>Administration</h1>
-			<span class="bold go">Willkommen %s</span>
-		</div>';
+	loggedin = '<h1>Administration</h1>
+			<span class="bold go">Willkommen %s</span>';
 	
 	add = 'Benutzer einfügen';
 	modify = 'Benutzer bearbeiten';
@@ -68,10 +58,8 @@ namespace user {
 	confirmdelete = 'Bist du sicher, dass du diesen Benutzer löschen möchtest?';
 	deleted = 'Der Benutzer wurde gelöscht!';
 	pwdempty = ' <small>(Freilassen um Passwort beizubehalten)</small>';
-	saved = '<div class="inner">
-			<b>Der Benutzer wurde gespeichert.</b><br/><br/>
-			<a href="%s" class="go icon">Zurück</a>
-		</div>';
+	saved = '<b>Der Benutzer wurde gespeichert.</b><br/><br/>
+			<a href="%s" class="go icon">Zurück</a>';
 }
 
 namespace admin {
@@ -103,9 +91,7 @@ namespace upload {
 }
 
 namespace validator {
-	content = '<div class="inner">
-			<span class="icon go">%s</span>
-		</div>';
+	content = '<div class="error">%s</div>';
 	
 	# Default
 	rights = 'Dir fehlen die erforderlichen Rechte um diese Seite aufzurufen.';
@@ -118,7 +104,9 @@ namespace validator {
 	default = 'Das Feld "<b>%s</b>" enthält einen ungültigen Wert.';
 	
 	# Custom
-	rightsWrapped = '<div class="inner">Dir fehlen die erforderlichen Rechte um diese Seite aufzurufen.</div>';
+	rightsWrapped = '<div class="error">Dir fehlen die erforderlichen Rechte um diese Seite aufzurufen.</div>';
 	login = 'Du hast einen falschen Benutzernamen oder ein falsches Password eingegeben.';
 	onlyedit = 'Du kannst nur Seiten bearbeiten aber keine neuen hinzufügen.';
+	newsnotavailable = 'Dieser Newseintrag ist nicht verfügbar.';
+	pagenotavailable = 'Diese Seite ist nicht verfügbar.';
 }

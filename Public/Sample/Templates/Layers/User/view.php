@@ -1,4 +1,3 @@
-<div class="inner">
 <h1>${lang.admin.user}</h1>
 <?php
 echo '<a class="go icon" href="'.$this->link(null, 'edit').'">'.Lang::retrieve('user.add').'</a><br/><br/>';
@@ -15,4 +14,3 @@ foreach($this->Data as $user)
 			</small>
 		</div>';
 ?>
-</div>
