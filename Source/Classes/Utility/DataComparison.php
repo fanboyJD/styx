@@ -30,8 +30,8 @@ class DataComparison {
 	 * @param string $field
 	 * @param int $order
 	 */
-	public function __construct($field = null, $order = null){
-		$this->setField($field)->setOrder(isset($order) ? $order : true);
+	public function __construct($field = null, $order = true){
+		$this->setField($field)->setOrder($order);
 	}
 	
 	/**

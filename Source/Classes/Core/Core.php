@@ -173,7 +173,7 @@ class Core {
 		}
 		
 		self::$Storage['Methods'] = $c->retrieve('Core/Methods');
-		if(!self::$Storage['Methods']){
+		if(!self::$Storage['Methods'] || !empty(self::$Storage['debug'])){
 			self::$Storage['Methods'] = array();
 			foreach(self::$Storage['Classes'] as $class => $v)
 				if($class=='application' || (String::ends($class, 'layer') && is_subclass_of($class, 'Layer'))){
@@ -183,8 +183,12 @@ class Core {
 							array_push(self::$Storage['Methods'][$class], strtolower(substr($method, 2)));
 				}
 			
-			foreach(array('data', 'validator') as $class)
-				self::$Storage['Methods'][$class] = array_map('strtolower', get_class_methods($class));
+			foreach(array('data', 'validator') as $class){
+				self::$Storage['Methods'][$class] = array();
+				foreach(get_class_methods($class) as $method)
+					if(!String::starts($method, '__') && $method!='call')
+						array_push(self::$Storage['Methods'][$class], strtolower($method));
+			}
 			
 			$c->store('Core/Methods', self::$Storage['Methods'], ONE_WEEK);
 		}
@@ -237,7 +241,7 @@ class Core {
 		static $Instance;
 		
 		if($Instance===null)
-			$Instance = self::classExists('Application') ? new Application : false;
+			$Instance = !empty(self::$Storage['Classes']['application']) ? new Application : false;
 		
 		if($Instance===false)
 			return false;

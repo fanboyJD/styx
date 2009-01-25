@@ -906,4 +906,3 @@ class XML_HTMLSax3 {
   $this->state_parser->parse($data);
  }
 }
-?>
