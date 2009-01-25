@@ -91,7 +91,7 @@ abstract class LayerPrototype extends Runner {
 		
 		$layer = strtolower($layer);
 		if(empty($Instances[$layer]))
-			return $Instances[$layer] = self::create($layer);
+			return $Instances[$layer] = Layer::create($layer);
 		
 		return $Instances[$layer];
 	}

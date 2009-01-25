@@ -86,7 +86,7 @@ class Page extends Template {
 		
 		Core::fireEvent('pageshow');
 		
-		if($this->substitution) $this->assigned = $this->assigned[$this->substitution];
+		if($this->substitution) $this->assigned = !empty($this->assigned[$this->substitution]) ? $this->assigned[$this->substitution] : null;
 		
 		$out = $ContentType->process($this->assigned);
 		

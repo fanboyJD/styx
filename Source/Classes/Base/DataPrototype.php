@@ -71,7 +71,7 @@ class DataPrototype {
 	 * @return string
 	 */
 	public static function sanitize($string){
-		return self::escape(trim(htmlspecialchars($string, ENT_COMPAT, 'UTF-8', false)));
+		return Data::escape(trim(htmlspecialchars($string, ENT_COMPAT, 'UTF-8', false)));
 	}
 	
 	/**
@@ -115,7 +115,7 @@ class DataPrototype {
 	 * @return int
 	 */
 	public static function numericrange($data, $options){
-		$data = self::id($data);
+		$data = Data::id($data);
 		return $data>=$options[0] && $data<=$options[1] ? $data : 0;
 	}
 	
@@ -138,7 +138,7 @@ class DataPrototype {
 		$data = explode(pick($default['separator'], '.'), $data);
 		
 		foreach(str_split(pick($default['order'], 'dmy')) as $k => $v){
-			if(!self::id($data[$k])) return null;
+			if(!Data::id($data[$k])) return null;
 			
 			$input[$v] = $data[$k];
 		}
@@ -163,7 +163,7 @@ class DataPrototype {
 		if(!String::starts(strtolower($data), 'http://'))
 			$data = 'http://'.$data;
 		
-		return strtolower($data)=='http://' ? null : self::sanitize($data);
+		return strtolower($data)=='http://' ? null : Data::sanitize($data);
 	}
 	
 	/**
@@ -205,7 +205,7 @@ class DataPrototype {
 			$default['identifier'] = $identifier;
 		}
 		
-		return $default['contents'] ? self::checkTitle($data, $default) : $data;
+		return $default['contents'] ? Data::checkTitle($data, $default) : $data;
 	}
 	
 	/**
@@ -226,7 +226,7 @@ class DataPrototype {
 				continue;
 			
 			if((empty($options['id']) || $options['id']!=$content[$options['identifier']['internal']]) && strtolower($content[$options['identifier']['external']])==strtolower($data.($i ? '_'.$i : '')))
-				return self::checkTitle($data, $options, ++$i);
+				return Data::checkTitle($data, $options, ++$i);
 		}
 		
 		return $data.($i ? '_'.$i : '');
@@ -243,7 +243,7 @@ class DataPrototype {
 	public static function purify($data, $options = array()){
 		$purify = new Safehtml($options);
 		
-		return self::escape($purify->parse($data));
+		return Data::escape($purify->parse($data));
 	}
 	
 	/**
@@ -274,7 +274,7 @@ class DataPrototype {
 			if($pos!==false) $data = String::sub($data, 0, $pos);
 		}
 		
-		return ($default['purify'] ? self::purify($data, $default['options']) : $data).($default['dots'] ? '...' : '');
+		return ($default['purify'] ? Data::purify($data, $default['options']) : $data).($default['dots'] ? '...' : '');
 	}
 	
 	/**
