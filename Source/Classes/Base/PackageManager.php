@@ -65,11 +65,10 @@ class PackageManager {
 			'files' => array(),
 			'options' => array(),
 			'require' => array(),
+			'replaces' => array(),
 		);
 		
 		Hash::extend($default, $options);
-		
-		Hash::splat($default['files']);
 		
 		Route::connect($Configuration['app.version'].'/'.$name, array(
 			'package' => $name,
@@ -178,6 +177,9 @@ class PackageManager {
 			$source[] = file_get_contents(realpath($Configuration['app.path'].'/'.self::$Elements[$package['type']]['directory'].'/'.$file.'.'.$package['type']));
 		
 		$content = implode($source);
+		
+		if($package['replaces'])
+			$content = str_replace(array_keys($package['replaces']), $package['replaces'], $content);
 		
 		if(empty($package['readable'])){
 			if($package['type']=='js'){
