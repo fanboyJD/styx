@@ -10,7 +10,7 @@ class Setup {
 			Framework\'s Source-Folder.
 		',
 		
-		'nodb' => 'There is no Database connection to either the systen itself or the database "%s". You might
+		'nodb' => 'There is no Database connection to either the system itself or the database "%s". You might
 			just see some errors above this message that can help you figure out how to solve the problem.
 			<br/><br/>
 			<b>Your database configuration:</b><br/>
