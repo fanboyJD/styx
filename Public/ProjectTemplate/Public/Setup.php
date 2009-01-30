@@ -40,7 +40,7 @@ class Setup {
 			not have the necessary rights (owner/mode). Make sure your files have the same owner
 			as Apache (usually www-data) and the chmod rights 777.
 			<br/><br/>
-			Alternatively you can just remove the lines in the index.php-File and in the Templates/Page/html.php-Files
+			Alternatively you can just remove the lines in the index.php-File and in the Templates/Page/html.php-File
 			that start with an /**/. After you reload the page this message should be gone.
 		',
 		
