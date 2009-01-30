@@ -3,6 +3,8 @@
 class Setup {
 	
 	private static $messages = array(
+		'guide' => '<span style="font-family: Calibri, Tahoma, sans-serif; font-size: 13px;">Need Help? <a href="http://styx.og5.net/docs/GettingStarted">GettingStarted</a></span><br/>',
+		
 		'nostyx' => '
 			The Framework was not found. Please adjust your include statement in the index.php-File.
 			<br/><br/>
@@ -52,12 +54,12 @@ class Setup {
 			at any time right in the database. For a little UsermanagementLayer see the Sample Application.
 		',
 		
-		'mbstring' => 'Notice: The mbstring PHP-Extension was not found or manually disabled. It is recommended to enable it if you are creating
+		'mbstring' => 'Notice: The mbstring PHP-Extension was not found or was manually disabled. It is recommended to enable it if you are creating
 			a multilingual website. Have a look at <a href="http://php.net/mbstring">php.net/mbstring</a>. Styx will fall back to use the internal
-			php functions like strlen instead of mb_strlen etc.
+			php functions like strlen instead of mb_strlen.
 		',
 		
-		'iconv' => 'Notice: The iconv PHP-Extension was not found or manually disabled. It is recommended to enable it. Iconv is used in Styx
+		'iconv' => 'Notice: The iconv PHP-Extension was not found or was manually disabled. It is recommended to enable it. Iconv is used in Styx
 			to filter out bad UTF-8 sequences so your application will only contain valid characters.
 			More information: <a href="http://php.net/iconv">php.net/iconv</a>.
 		',
@@ -78,7 +80,7 @@ class Setup {
 	);
 	
 	public static function getError($msg, $display = false){
-		return '<div'.(!$display ? ' class="nodisplay"' : '').' style="font-family: Calibri; font-size: 12px; background: #FBE3E4; color: #8a1f11; margin: 1em 0; padding: .8em; border: 2px solid #FBC2C4;">
+		return '<div'.(!$display ? ' class="nodisplay"' : '').' style="font-family: Calibri, Tahoma, sans-serif; font-size: 12px; background: #FBE3E4; color: #8a1f11; margin: 1em 0; padding: .8em; border: 2px solid #FBC2C4;">
 			'.self::getMessage($msg).'
 		</div>';
 	}
@@ -144,14 +146,14 @@ $db->selectDatabase();
 if(!$db->isConnected()){
 	$dbConfig = Core::retrieve('database');
 	$dbConfig['password'] = str_repeat('*', String::length($dbConfig['password']));
-	echo str_replace('${body}', sprintf(Setup::getError('nodb'), $dbConfig['db'], Setup::format($dbConfig)), $html);
+	echo str_replace('${body}', Setup::getMessage('guide').sprintf(Setup::getError('nodb'), $dbConfig['db'], Setup::format($dbConfig)), $html);
 	die;
 }
 
 /* Check if there is a users-Table */
 $news = Database::select('users')->fetch();
 if(empty($news['id'])){
-	echo str_replace('${body}', Setup::getError('notable'), $html);
+	echo str_replace('${body}', Setup::getMessage('guide').Setup::getError('notable'), $html);
 	die;
 }
 
