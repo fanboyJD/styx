@@ -25,7 +25,7 @@
 			$action = $user ? 'logout' : 'login';
 			
 			Page::getInstance()->apply('html')->assign(Core::fetch('app.name', 'app.link'))->assign(array(
-				'source' => 'http://framework.og5.net/dev/browser/trunk/Public/Sample',
+				'source' => 'http://styx.og5.net/code/listing.php?repname=Styx+PHP+Framework&path=%2Ftrunk%2FPublic%2FSample%2F',
 				
 				'rss' => array(
 					'link' => Layer::retrieve('index')->link(null, null, 'xml'),

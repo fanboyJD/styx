@@ -30,9 +30,9 @@ namespace page {
 
 # The namespace for the framework :)
 namespace framework {
-	description = '<span class="blue">Styx</span> ist ein PHP-Framework in einem frühen Alpha-Stadium.<br/><br/>
+	description = '<span class="blue">Styx</span> ist ein PHP-Framework in Entwicklung.<br/><br/>
 		Du kannst das SVN-Repository laden indem du folgenden Code ausführst<br/>
-			<span class="blue icon">svn checkout http://framework.og5.net/svn/</span>
+			<span class="blue icon">svn checkout http://styx.og5.net/svn/</span>
 		<br/><br/>
 		Wenn du helfen / daran arbeiten / Schreibrechte für svn oder Sonstiges möchtest, bitte kontaktiere
 		mich: <a href="mailto:christoph.pojer@gmail.com">E-Mail</a> |

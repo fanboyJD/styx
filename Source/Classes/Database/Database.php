@@ -118,11 +118,9 @@ class Database {
 		if($debug===null) $debug = pick(Core::retrieve('debug'), false);
 		
 		if(!$this->isConnected){
-			$this->connect();
+			if(!$this->connect()) die;
 			
-			if(!$this->isConnected) die;
-			
-			$this->query("SET NAMES 'utf8'");
+			mysql_set_charset('utf8');
 		}
 		
 		$query = mysql_query($sql, $this->Connection['c']);
