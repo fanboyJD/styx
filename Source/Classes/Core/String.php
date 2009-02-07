@@ -43,7 +43,7 @@ final class String {
 			self::$Features[$k] = empty($features['feature.'.$k]) ? false : !!$features['feature.'.$k];
 		
 		foreach(array(
-			'strlen', 'strrpos', 'strpos', 'strlen', 'strtoupper', 'strtolower',
+			'strlen', 'strrpos', 'strpos', 'strtoupper', 'strtolower',
 			'substr', 'substr_count', 'stripos', 'strripos',
 		) as $v)
 			self::$Fn[$v] = (self::$Features['mbstring'] ? 'mb_' : '').$v;

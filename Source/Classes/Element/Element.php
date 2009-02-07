@@ -163,6 +163,7 @@ class Element extends Runner {
 	}
 	
 }
+
 /* ELEMENTS ClASS */
 class Elements extends Element {
 	
@@ -287,7 +288,6 @@ class Input extends Element {
 }
 
 /* HIDDEN CLASS */
-
 class HiddenInput extends Input {
 	
 	public function __construct($options){
@@ -469,64 +469,6 @@ class RichText extends Textarea {
 		parent::__construct($options);
 		
 		$this->addClass('richtext');
-	}
-	
-}
-
-/* JSON OPTIONS CLASS */
-
-class OptionList extends Elements {
-	
-	public function __construct(){
-		parent::__construct(func_get_args(), 'optionlist');
-		
-		if(!empty($this->options[':elements']) && is_array($this->options[':elements']))
-			array_walk($this->options[':elements'], array($this, 'createElement'));
-		
-		unset($this->options[':elements']);
-	}
-	
-	public function format(){
-		return implode(parent::format());
-	}
-	
-	public function setValue($v){
-		if($v && !is_array($v)) $v = json_decode($v, true);
-		
-		if(!is_array($v)) return;
-		
-		foreach($this->elements as $el){
-			if(!$v[$el->options[':realName']]) continue;
-			
-			$el->setValue($v[$el->options[':realName']]);
-		}
-	}
-	
-	public function getValue(){
-		$json = array();
-		
-		foreach($this->elements as $el)
-			$json[$el->options[':realName']] = $el->getValue();
-		
-		return json_encode($json);
-	}
-	
-	/**
-	 * @return Element
-	 */
-	public function addElement($el){
-		return $this->createElement($el);
-	}
-	
-	private function createElement($el){
-		$el[':realName'] = $el['name'];
-		$el['name'] = $this->options['name'].'['.$el['name'].']';
-		
-		$element = new Checkbox($el);
-		if(!$this->hasElement($element))
-			$this->elements[$el['name']] = $element;
-			
-		return $this->elements[$el['name']];
 	}
 	
 }

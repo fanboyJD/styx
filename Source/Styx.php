@@ -10,7 +10,7 @@ if(!isset($Paths) || !is_array($Paths))
 	);
 else
 	foreach($Paths as $k => $path)
-		$Paths[$k] = rtrim($path, '/').'/'; // Custom Paths might not have a slash at the end
+		$Paths[$k] = rtrim($path, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR; // Custom Paths might not have a slash at the end
 
 require($Paths['app.path'].'/Config/Configuration.php');
 
@@ -32,14 +32,12 @@ require($Paths['path'].'/Config/Configuration.php');
 
 Core::store($CONFIGURATION[$use]);
 
-unset($Paths, $CONFIGURATION); // Unset the whole array, so no data from it is available any longer
+unset($use, $Paths, $CONFIGURATION); // Unset the whole array, so no data from it is available any longer
 
 ini_set('date.timezone', Core::retrieve('timezone'));
 
 String::initialize(Core::fetch('feature.mbstring', 'feature.iconv'));
 Core::initialize();
-
-Core::autoload('Element'); // We need to load Element as there are several Classes that are always needed
 
 Request::initialize();
 

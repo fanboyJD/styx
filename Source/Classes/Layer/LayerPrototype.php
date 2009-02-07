@@ -78,9 +78,7 @@ abstract class LayerPrototype extends Runner {
 		if(!is_subclass_of($class, 'layer'))
 			return false;
 		
-		$layer = new $class($layername);
-		
-		return $layer;
+		return new $class($layername);
 	}
 	
 	/**

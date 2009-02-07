@@ -28,12 +28,11 @@ final class Response {
 	}
 	
 	public static function sendHeaders(){
-		$ini = error_reporting(0);
+		if(headers_sent()) return false;
+		
 		$headers = self::$ContentType->getHeaders();
 		foreach(Hash::extend($headers, self::$Headers) as $key => $value)
 			header($key.': '.$value);
-		
-		error_reporting($ini);
 	}
 	
 	public static function setCookie($key, $value, $expire = null){

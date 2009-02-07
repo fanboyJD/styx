@@ -88,6 +88,15 @@ abstract class Runner {
  */
 class Core {
 	
+	/**
+	 * A list of classes that are in the file with the classname specified as key in this array
+	 *
+	 * @var array
+	 */
+	private static $Classes = array(
+		'element' => array('elements', 'input', 'hiddeninput', 'uploadinput', 'button', 'field', 'radio', 'select', 'checkbox', 'textarea', 'richtext'),
+	);
+	
 	private function __construct(){}
 	private function __clone(){}
 	
@@ -155,19 +164,16 @@ class Core {
 		self::$Storage['Classes'] = $c->retrieve('Core/Classes');
 		if(!self::$Storage['Classes'] || !empty(self::$Storage['debug'])){
 			self::$Storage['Classes'] = array();
-			foreach(array(
-				glob(self::$Storage['path'].'/Classes/*/*.php'),
-				glob(self::$Storage['app.path'].'/Layers/*.php'),
-			) as $files)
-				if(Hash::length($files))
-					foreach($files as $file)
-						self::$Storage['Classes'][strtolower(basename($file, '.php'))] = $file;
+			foreach(glob(self::$Storage['path'].'/Classes/*/*.php') as $file)
+				self::$Storage['Classes'][strtolower(basename($file, '.php'))] = $file;
 			
-			foreach(new ExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator(self::$Storage['app.path'].'/Classes/'))) as $file)
-				self::$Storage['Classes'][strtolower(basename($file->getFileName(), '.php'))] = $file->getRealPath();
+			foreach(self::$Classes as $class => $classes)
+				foreach($classes as $mapping)
+					self::$Storage['Classes'][$mapping] = self::$Storage['Classes'][$class];
 			
-			foreach(new ExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator(self::$Storage['app.path'].'/Prototypes/'))) as $file)
-				self::$Storage['Classes'][strtolower(basename($file->getFileName(), '.php'))] = $file->getRealPath();
+			Hash::extend(self::$Storage['Classes'], self::getClassList('Layers'));
+			Hash::extend(self::$Storage['Classes'], self::getClassList('Classes'));
+			Hash::extend(self::$Storage['Classes'], self::getClassList('Prototypes'));
 			
 			$c->store('Core/Classes', self::$Storage['Classes'], ONE_WEEK);
 		}
@@ -211,6 +217,21 @@ class Core {
 			
 			$c->store('Core/Templates', self::$Storage['Templates'], ONE_WEEK);
 		}
+	}
+	
+	/**
+	 * Returns a list with all PHP-Files in the given Folder inside the application
+	 *
+	 * @param string $folder
+	 * @return array
+	 */
+	protected static function getClassList($folder){
+		$files = array();
+		
+		foreach(new ExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator(self::$Storage['app.path'].'/'.$folder))) as $file)
+			$files[strtolower(basename($file->getFileName(), '.php'))] = $file->getRealPath();
+		
+		return $files;
 	}
 	
 	/**
