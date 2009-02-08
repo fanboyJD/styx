@@ -60,10 +60,4 @@ class Application {
 		Route::hide('User');
 	}
 	
-	public function onPageShow(){
-		Page::getInstance()->assign(array(
-			'scripts' => Script::get(),
-		));
-	}
-	
 }

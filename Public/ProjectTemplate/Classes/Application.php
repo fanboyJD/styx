@@ -24,8 +24,4 @@ class Application {
 		));
 	}
 	
-	public function onPageShow(){
-		
-	}
-	
 }

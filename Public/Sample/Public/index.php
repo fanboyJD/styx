@@ -32,6 +32,8 @@
 					'title' => Lang::retrieve('rss.title'),
 				),
 				
+				'scripts' => Script::get(),
+				
 				'framework.description' => Layer::retrieve('index')->isIndex ? '<div id="content">'.Lang::retrieve('framework.description').'</div>' : '',
 				
 				'languages' => implode($languages),

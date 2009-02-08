@@ -87,15 +87,9 @@ final class Response {
 		return $Configuration['app.link'];
 	}
 	
-	public static function allow(){
-		$args = Hash::args(func_get_args());
-		
-		self::$Types = array_map('String::toLower', $args);
-	}
-	
 	public static function setDefaultContentType(){
-		$args = Hash::args(func_get_args());
-		if(count($args)) self::allow($args);
+		$args = func_get_args();
+		if(count($args)) self::$Types = array_map('strtolower', $args);;
 		
 		$class = Request::retrieve('behaviour').'content';
 		
@@ -125,8 +119,7 @@ final class Response {
 	}
 	
 	public static function retrieveContentType(){
-		if(!self::$ContentType)
-			self::setDefaultContentType();
+		if(!self::$ContentType) self::setDefaultContentType();
 		
 		return self::$ContentType;
 	}

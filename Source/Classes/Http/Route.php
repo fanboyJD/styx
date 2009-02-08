@@ -70,12 +70,10 @@ final class Route {
 	public static function getRoute($action){
 		$path = Request::getPath();
 		
-		$routes = self::$routes;
-		Hash::flatten($routes, null, 1);
-		krsort($routes);
-		
-		foreach($routes as $route){
-			$i = -1;
+		usort(self::$routes, array(new DataComparison('priority', -1), 'sort'));
+		for($i = 0, $l = count(self::$routes); $i<$l; $i++){
+			$j = -1;
+			$route = self::$routes[$i];
 			if(!empty($route['options']['equals'])){
 				if($route['route']!=$path)
 					continue;
@@ -84,31 +82,31 @@ final class Route {
 					continue;
 			}else{
 				foreach($route['route'] as $r){
-					$i++;
+					$j++;
 					
-					if(!empty($route['options']['match'][$r]) && !empty($action['parts'][$i])){
+					if(!empty($route['options']['match'][$r]) && !empty($action['parts'][$j])){
 						$m = $route['options']['match'][$r];
 						
-						if(!empty($m['regex']) && !preg_match($m['regex'], $action['parts'][$i]))
+						if(!empty($m['regex']) && !preg_match($m['regex'], $action['parts'][$j]))
 							continue 2;
-						if(!empty($m['starts']) && !String::starts($action['parts'][$i], $m['starts']))
+						if(!empty($m['starts']) && !String::starts($action['parts'][$j], $m['starts']))
 							continue 2;
-						if(!empty($m['ends']) && !String::ends($action['parts'][$i], $m['ends']))
+						if(!empty($m['ends']) && !String::ends($action['parts'][$j], $m['ends']))
 							continue 2;
-						if(!empty($m['equals']) && $action['parts'][$i]!=$m['equals'])
+						if(!empty($m['equals']) && $action['parts'][$j]!=$m['equals'])
 							continue 2;
 						
-						if(!empty($action['keys'][$i])){
+						if(!empty($action['keys'][$j])){
 							if(!empty($m['as'])){
-								$action['get'][$m['as']] = pick($action['get'][$action['keys'][$i]], $action['keys'][$i]);
+								$action['get'][$m['as']] = pick($action['get'][$action['keys'][$j]], $action['keys'][$j]);
 								
-								unset($action['get'][$action['keys'][$i]]);
+								unset($action['get'][$action['keys'][$j]]);
 							}
 							
-							if(!empty($m['layer'])) $route['layer'] = $action['keys'][$i];
-							if(!empty($m['event'])) $route['event'] = $action['keys'][$i];
+							if(!empty($m['layer'])) $route['layer'] = $action['keys'][$j];
+							if(!empty($m['event'])) $route['event'] = $action['keys'][$j];
 						}
-					}elseif(empty($route['options']['match'][$r]['omit']) && (empty($action['parts'][$i]) || $action['parts'][$i]!=$r)){
+					}elseif(empty($route['options']['match'][$r]['omit']) && (empty($action['parts'][$j]) || $action['parts'][$j]!=$r)){
 						continue 2;
 					}
 				}
@@ -123,14 +121,10 @@ final class Route {
 	}
 	
 	public static function connect($route, $options = array(), $priority = 50){
-		Hash::splat($options['match']);
-		
-		if(empty(self::$routes[$priority]))
-			self::$routes[$priority] = array();
-		
-		self::$routes[$priority][] = array(
+		self::$routes[] = array(
 			'route' => !empty($options['regex']) || !empty($options['equals']) ? $route : String::clean(explode('/', $route)),
-			'options' => $options
+			'options' => $options,
+			'priority' => $priority,
 		);
 	}
 	

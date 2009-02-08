@@ -294,10 +294,8 @@ class Core {
 			$array = array($array => $value);
 		
 		foreach($array as $key => $value)
-			if(empty(self::$Storage[$key]) || self::$Storage[$key]!=$value){
-				if($value) self::$Storage[$key] = $value;
-				else unset(self::$Storage[$key]);
-			}
+			if($value) self::$Storage[$key] = $value;
+			else unset(self::$Storage[$key]);
 	}
 	
 	/**
@@ -324,11 +322,10 @@ class Core {
 	 */
 	public static function fetch(){
 		$args = Hash::args(func_get_args());
-		
 		$array = array();
 		
-		foreach($args as $arg)
-			$array[$arg] = !empty(self::$Storage[$arg]) ? self::$Storage[$arg] : null;
+		for($i = 0, $l = count($args); $i<$l; $i++)
+			$array[$args[$i]] = !empty(self::$Storage[$args[$i]]) ? self::$Storage[$args[$i]] : null;
 		
 		return $array;
 	}

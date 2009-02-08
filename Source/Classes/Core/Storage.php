@@ -29,10 +29,8 @@ class Storage {
 			$array = array($array => $value);
 		
 		foreach($array as $key => $value)
-			if(empty($this->Storage[$key]) || $this->Storage[$key]!=$value){
-				if($value) $this->Storage[$key] = $value;
-				else unset($this->Storage[$key]);
-			}
+			if($value) $this->Storage[$key] = $value;
+			else unset($this->Storage[$key]);
 	}
 	
 	/**

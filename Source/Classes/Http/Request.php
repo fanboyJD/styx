@@ -26,7 +26,7 @@ final class Request {
 		
 		$request = self::processRequest();
 		
-		if(!empty($request['language']))
+		if(!empty($request['language']) && Core::retrieve('languages.cookie'))
 			Response::setCookie(Core::retrieve('languages.cookie'), $request['language']);
 		
 		self::store($request);
@@ -63,8 +63,8 @@ final class Request {
 		array_shift($vars);
 		
 		$i = 0;
-		foreach($vars as $k => $part){
-			$v = String::clean($part);
+		for($k = 0, $l = count($vars); $k<$l; $k++){
+			$v = String::clean($vars[$k]);
 			if(!$v) continue;
 			
 			$v = explode($Configuration['path.separator'], $v, 2);
@@ -79,9 +79,9 @@ final class Request {
 				}
 			}
 			
-			$request['parts'][] = $part;
+			$request['parts'][] = $vars[$k];
 			$request['keys'][] = $v[0];
-			$request['get'][$v[0]] = $e ? pick($v[1]) : null;
+			$request['get'][$v[0]] = $e ? $v[1] : null;
 			$request['request'][Data::sanitize($v[0])] = $e ? Data::sanitize($v[1]) : null;
 			
 			if($i<2) $request[$i++ ? 'event' : 'layer'] = $v[0];
@@ -249,10 +249,8 @@ final class Request {
 			$array = array($array => $value);
 		
 		foreach($array as $key => $value)
-			if(empty(self::$Storage[$key]) || self::$Storage[$key]!=$value){
-				if($value) self::$Storage[$key] = $value;
-				else unset(self::$Storage[$key]);
-			}
+			if($value) self::$Storage[$key] = $value;
+			else unset(self::$Storage[$key]);
 	}
 	
 	public static function retrieve($key, $value = null){
@@ -266,12 +264,10 @@ final class Request {
 	
 	public static function fetch(){
 		$args = Hash::args(func_get_args());
-		
 		$array = array();
 		
-		foreach($args as $arg)
-			if(!empty(self::$Storage[$arg]))
-				$array[$arg] = self::$Storage[$arg];
+		for($i = 0, $l = count($args); $i<$l; $i++)
+			$array[$args[$i]] = !empty(self::$Storage[$args[$i]]) ? self::$Storage[$args[$i]] : null;
 		
 		return $array;
 	}

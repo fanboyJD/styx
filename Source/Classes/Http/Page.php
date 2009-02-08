@@ -84,8 +84,6 @@ class Page extends Template {
 		if($ContentType->getType()=='html')
 			PackageManager::assignPackages();
 		
-		Core::fireEvent('pageshow');
-		
 		if($this->substitution) $this->assigned = !empty($this->assigned[$this->substitution]) ? $this->assigned[$this->substitution] : null;
 		
 		$out = $ContentType->process($this->assigned);
