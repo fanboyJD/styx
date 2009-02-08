@@ -25,9 +25,7 @@ class Application {
 	}
 	
 	public function onPageShow(){
-		Page::getInstance()->assign(array(
-			'scripts' => Script::get(),
-		));
+		
 	}
 	
 }

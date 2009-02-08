@@ -127,8 +127,8 @@ class Database {
 		
 		if($debug){
 			$this->queries++;
-			Script::log($sql);
-			if(!$query) Script::log(mysql_error(), 'error');
+			Trace::log($sql);
+			if(!$query) Trace::log(mysql_error(), 'error');
 		}
 		
 		return pick($query, false);

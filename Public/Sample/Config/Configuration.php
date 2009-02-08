@@ -8,6 +8,7 @@ $CONFIGURATION['debug'] = array(
 	'app.version' => '0.2beta',
 	
 	'debug' => true, // When debug is set to true no cache is used etc.
+	'database.cache' => false,	
 	
 	'prefix' => 'sample', // Some unique [a-z] prefix for your Application
 	
@@ -33,6 +34,7 @@ $CONFIGURATION['debug'] = array(
 
 $CONFIGURATION['production'] = array_merge($CONFIGURATION['debug'], array(
 	'debug' => false,
+	'database.cache' => true,
 	'app.link' => 'http://styx.og5.net',
 	
 	'database' => array(

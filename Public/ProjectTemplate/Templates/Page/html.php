@@ -8,11 +8,6 @@
 	${package.style.css}
 	<link rel="shortcut icon" href="favicon.png" />
 	<link rel="alternate" type="application/rss+xml" title="${rss.title}" href="${rss.link}" />
-	<!-- Remove this following script-tag after including MooTools or overwrite Utility/Script.tpl -->
-	<script type="text/javascript">
-		window.addEvent = function(type, fn){fn()};
-	</script>
-	${scripts}
 </head>
 <body><div>
 <?php /**/ if(Core::retrieve('setup')) echo Setup::getError('htaccess'); ?>
