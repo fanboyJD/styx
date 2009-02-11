@@ -1,10 +1,16 @@
 <?php
 	$use = 'debug';
-	/*$Paths = array(
-		'app.path' => realpath('../'),
-		'app.public' => realpath('./'),
-	);*/
-	include('../../../Source/Styx.php');
+	if($use=='production'){
+		// Don't forget to adjust the Database-Settings :)
+		$Paths = array(
+			'app.path' => '/var/wusch/Sample/',
+			'app.public' => realpath('./'),
+		);
+
+		include('/var/wusch/Styx/Styx.php');
+	}else{
+		include('../../../Source/Styx.php');
+	}
 	
 	switch(Response::getContentType()){
 		case 'html':

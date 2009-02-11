@@ -58,7 +58,6 @@ class Cache {
 		
 		if(!$this->Configuration['root']) $this->Configuration['root'] = Core::retrieve('path').'./Cache';
 		$this->Configuration['root'] = realpath($this->Configuration['root']);
-		
 		$this->time = time();
 		
 		array_push($this->Configuration['engines'], 'file');

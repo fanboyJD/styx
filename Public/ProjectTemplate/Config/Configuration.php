@@ -3,7 +3,7 @@ $CONFIGURATION['debug'] = array(
 	'path.separator' => ';', // On Linux you can safely use : But on Windows using : with Apache results in a strange bug
 	
 	'app.name' => 'My Application',
-	'app.link' => 'http://svn/Framework/trunk/Public/ProjectTemplate/Public',
+	'app.link' => 'http://svn/Styx/Public/ProjectTemplate/Public',
 	'app.mail' => 'my@email.com',
 	'app.version' => '0.1',
 	
