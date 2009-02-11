@@ -7,8 +7,6 @@ delete = 'Delete';
 confirmdelete = 'Are you sure to delete this entry?';
 deleted = 'The entry has been deleted!';
 
-source = 'View Source';
-
 namespace news {
 	posted = 'Posted by <b>%s</b> on %s';
 	
@@ -32,12 +30,11 @@ namespace page {
 namespace framework {
 	description = '<span class="blue">Styx</span> is a PHP-Framework currently in development.
 		<br/><br/>
-		You can checkout the code by doing<br/>
-			<span class="blue icon">svn checkout http://styx.og5.net/svn/</span>
+		You can view the source by cloning the git-repository<br/>
+			<span class="blue icon">git clone git://og5.net/styx.git</span>
 		<br/><br/>
-		If you want to help / work on it / write access to svn or whatever, please contact
-		me: <a href="mailto:christoph.pojer@gmail.com">E-Mail</a> |
-		<a href="http://og5.net/christoph">Portfolio</a>';
+		If you want to help or work on it please contact me: <a href="http://og5.net/christoph/page/About">Contact-Info</a>
+	';
 }
 
 namespace user {

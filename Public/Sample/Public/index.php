@@ -6,7 +6,7 @@
 			'app.path' => '/var/wusch/Sample/',
 			'app.public' => realpath('./'),
 		);
-
+		
 		include('/var/wusch/Styx/Styx.php');
 	}else{
 		include('../../../Source/Styx.php');
@@ -31,8 +31,6 @@
 			$action = $user ? 'logout' : 'login';
 			
 			Page::getInstance()->apply('html')->assign(Core::fetch('app.name', 'app.link'))->assign(array(
-				'source' => 'http://styx.og5.net/code/listing.php?repname=Styx+PHP+Framework&path=%2Ftrunk%2FPublic%2FSample%2F',
-				
 				'rss' => array(
 					'link' => Layer::retrieve('index')->link(null, null, 'xml'),
 					'title' => Lang::retrieve('rss.title'),

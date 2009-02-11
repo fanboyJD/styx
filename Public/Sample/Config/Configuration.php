@@ -2,9 +2,9 @@
 $CONFIGURATION['debug'] = array(
 	'path.separator' => ';', // On Linux you can safely use : But on Windows using : with Apache results in a strange bug
 	
-	'app.name' => 'Styx Framework Application',
+	'app.name' => 'Styx PHP Framework',
 	'app.link' => 'http://svn/Styx/Public/Sample/Public',
-	'app.mail' => 'someone@nowhere.ru',
+	'app.mail' => 'christoph.pojer@gmail.com',
 	'app.version' => '0.2beta',
 	
 	'debug' => true, // When debug is set to true no cache is used etc.

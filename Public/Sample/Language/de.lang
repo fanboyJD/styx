@@ -7,8 +7,6 @@ delete = 'Löschen';
 confirmdelete = 'Bist du sicher, dass du diesen Inhalt löschen möchtest?';
 deleted = 'Der Inhalt wurde gelöscht!';
 
-source = 'Quelltext anzeigen';
-
 namespace news {
 	posted = 'Eingetragen von <b>%s</b> am %s';
 	
@@ -30,13 +28,13 @@ namespace page {
 
 # The namespace for the framework :)
 namespace framework {
-	description = '<span class="blue">Styx</span> ist ein PHP-Framework in Entwicklung.<br/><br/>
-		Du kannst das SVN-Repository laden indem du folgenden Code ausführst<br/>
-			<span class="blue icon">svn checkout http://styx.og5.net/svn/</span>
+	description = '<span class="blue">Styx</span> ist ein PHP-Framework in Entwicklung.
 		<br/><br/>
-		Wenn du helfen / daran arbeiten / Schreibrechte für svn oder Sonstiges möchtest, bitte kontaktiere
-		mich: <a href="mailto:christoph.pojer@gmail.com">E-Mail</a> |
-		<a href="http://og5.net/christoph">Portfolio</a>';
+		Du kannst den Source-Code vom git-repository klonen<br/>
+			<span class="blue icon">git clone git://og5.net/styx.git</span>
+		<br/><br/>
+		Wenn du helfen oder daran arbeiten möchtest, bitte kontaktiere mich: <a href="http://og5.net/christoph/page/About">Kontakt-Info</a>
+	';
 }
 
 namespace user {

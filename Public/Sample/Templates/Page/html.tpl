@@ -24,8 +24,7 @@
 <div id="footer">
 	<div>${user}</div>
 	<div style="float: left; margin-left: 10px;">
-	<a href="${source}">${lang.source}</a>
-	<small>${styx}</small>
+		${styx}
 	</div>
 </div>
 </body>
