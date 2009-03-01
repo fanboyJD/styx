@@ -125,6 +125,21 @@ class Query {
 		return $this;
 	}
 	
+	public function setCriteria($criteria){
+		foreach(array_intersect_key($criteria, array(
+			'fields' => true,
+			'order' => true,
+			'limit' => true,
+			'where' => true,
+			'order' => true,
+			'group' => true,
+			'having' => true,
+		)) as $key => $value)
+			$this->{$key}($value);
+		
+		return $this;
+	}
+	
 	public function format($part = false){
 		if(!empty($this->formatted)) return $this->formatted;
 		

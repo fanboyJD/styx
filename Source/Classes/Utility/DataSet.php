@@ -51,7 +51,7 @@ class DataSet implements Iterator, ArrayAccess, Countable {
 	 * @param array $args
 	 * @return array
 	 */
-	private function getArguments($args){
+	protected function getArguments($args){
 		$array = array();
 		foreach(Hash::splat($args) as $arg)
 			foreach(array_map('trim', explode(',', $arg)) as $field)
@@ -108,7 +108,24 @@ class DataSet implements Iterator, ArrayAccess, Countable {
 	}
 	
 	/**
-	 * Returns the count of all data stored in this DataSet
+	 * Applies criteria as key/value pairs
+	 *
+	 * @param array $criteria
+	 * @return DataSet
+	 */
+	public function setCriteria($criteria){
+		foreach(array_intersect_key($criteria, array(
+			'fields' => true,
+			'order' => true,
+			'limit' => true,
+		)) as $key => $value)
+			$this->{$key}($value);
+		
+		return $this;
+	}
+	
+	/**
+	 * Returns the amount of all data stored in this DataSet
 	 *
 	 * @return int
 	 */

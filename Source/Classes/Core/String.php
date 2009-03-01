@@ -269,14 +269,15 @@ final class String {
 	public static function convert($array){
 		if(!self::$Features['iconv']) return $array;
 		
-		$ini = error_reporting(0);
+		static $ini = false;
+		if($ini || $ini===false) $ini = error_reporting(0);
 		
 		if(is_array($array))
 			array_walk_recursive($array, array('self', 'convert'));
 		else 
 			$array = iconv('UTF-8', 'UTF-8//IGNORE', $array);
 		
-		error_reporting($ini);
+		if($ini) error_reporting($ini);
 		
 		return $array;
 	}
