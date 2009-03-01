@@ -241,6 +241,27 @@ class Core {
 	}
 	
 	/**
+	 * Returns an array with the internal and external identifier given by the input or the default identifiers
+	 *
+	 * @param mixed $identifier
+	 * @return array
+	 */
+	public static function getIdentifier($identifier = null){
+		if(!$identifier)
+			return self::$Storage['identifier'];
+		elseif(!is_array($identifier))
+			return array(
+				'internal' => $identifier,
+				'external' => $identifier,
+			);
+		
+		return array(
+			'internal' => isset($identifier['internal']) ? $identifier['internal'] : self::$Storage['identifier']['internal'],
+			'external' => isset($identifier['external']) ? $identifier['external'] : self::$Storage['identifier']['external'],
+		);
+	}
+	
+	/**
 	 * Tries to call the static method given by {@link $event} on the Application Class
 	 * if the class and the method are available. This can be used at any time for any
 	 * custom event

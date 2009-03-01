@@ -90,6 +90,23 @@ class CoreTest extends UnitTestCase {
 		$this->assertEqual($methods, array('save', 'edit', 'delete', 'view'));
 	}
 	
+	public function testGetIdentifier(){
+		$this->assertEqual(Core::getIdentifier(), array(
+			'internal' => 'id',
+			'external' => 'pagetitle',
+		));
+		
+		$this->assertEqual(Core::getIdentifier(array('external' => 'test')), array(
+			'internal' => 'id',
+			'external' => 'test',
+		));
+		
+		$this->assertEqual(Core::getIdentifier('id'), array(
+			'internal' => 'id',
+			'external' => 'id',
+		));
+	}
+	
 	public function testClassExists(){
 		$this->assertTrue(Core::classExists('IndexLayer'));
 		
