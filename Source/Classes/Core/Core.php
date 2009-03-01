@@ -169,7 +169,12 @@ class Core {
 				foreach($classes as $mapping)
 					self::$Storage['Classes'][$mapping] = self::$Storage['Classes'][$class];
 			
-			self::$Storage['Classes'] = array_merge(self::$Storage['Classes'], self::getClassList('Layers'), self::getClassList('Classes'), self::getClassList('Prototypes'));
+			self::$Storage['Classes'] = array_merge(self::$Storage['Classes'],
+				self::getClassList('Classes'),
+				self::getClassList('Layers'),
+				self::getClassList('Objects'),
+				self::getClassList('Prototypes')
+			);
 			
 			$c->store('Core/Classes', self::$Storage['Classes'], ONE_WEEK);
 		}
