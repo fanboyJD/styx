@@ -69,7 +69,7 @@ abstract class LayerPrototype extends Runner {
 	 * @return Layer
 	 */
 	public static function create($layername){
-		if(!$layername || !Core::autoload($layername.'layer'))
+		if(!Core::autoload($layername.'layer'))
 			return false;
 		
 		$layername = strtolower($layername);

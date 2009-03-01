@@ -163,9 +163,7 @@ class Core {
 		
 		self::$Storage['Classes'] = $c->retrieve('Core/Classes');
 		if(!self::$Storage['Classes'] || !empty(self::$Storage['debug'])){
-			self::$Storage['Classes'] = array();
-			foreach(glob(self::$Storage['path'].'/Classes/*/*.php') as $file)
-				self::$Storage['Classes'][strtolower(basename($file, '.php'))] = $file;
+			self::$Storage['Classes'] = self::getClassList('Classes', 'path');
 			
 			foreach(self::$Classes as $class => $classes)
 				foreach($classes as $mapping)
@@ -225,10 +223,10 @@ class Core {
 	 * @param string $folder
 	 * @return array
 	 */
-	protected static function getClassList($folder){
+	protected static function getClassList($folder, $path = 'app.path'){
 		$files = array();
 		
-		foreach(new ExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator(self::$Storage['app.path'].'/'.$folder))) as $file)
+		foreach(new ExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator(self::$Storage[$path].'/'.$folder))) as $file)
 			$files[strtolower(basename($file->getFileName(), '.php'))] = $file->getRealPath();
 		
 		return $files;
