@@ -68,17 +68,16 @@ abstract class LayerPrototype extends Runner {
 	/**
 	 * @return Layer
 	 */
-	public static function create($layername){
-		if(!Core::autoload($layername.'layer'))
+	public static function create($layer){
+		if(!Core::autoload($layer.'layer'))
 			return false;
 		
-		$layername = strtolower($layername);
-		$class = $layername.'layer';
+		$layer = strtolower($layer).'layer';
 		
-		if(!is_subclass_of($class, 'layer'))
+		if(!is_subclass_of($layer, 'layer'))
 			return false;
 		
-		return new $class($layername);
+		return new $layer();
 	}
 	
 	/**
@@ -94,9 +93,9 @@ abstract class LayerPrototype extends Runner {
 		return $Instances[$layer];
 	}
 	
-	protected function __construct($name){
-		$this->base = $this->name = ucfirst($name);
-		$this->table = $this->layername = strtolower($name);
+	protected function __construct(){
+		$this->base = $this->name = ucfirst(substr(get_class($this), 0, -5));
+		$this->table = $this->layername = strtolower($this->name);
 		
 		$this->methods = Core::getMethods($this->layername.'layer');
 		
@@ -116,13 +115,7 @@ abstract class LayerPrototype extends Runner {
 		if(!is_array($this->options['preventPass']))
 			$this->options['preventPass'] = array();
 		
-		if(empty($this->options['identifier']))
-			$this->options['identifier'] = Core::retrieve('identifier');
-		elseif(!is_array($this->options['identifier']))
-			$this->options['identifier'] = array(
-				'internal' => $this->options['identifier'],
-				'external' => $this->options['identifier'],
-			);
+		$this->options['identifier'] = Core::getIdentifier($this->options['identifier']);
 	}
 	
 	protected function initialize(){}

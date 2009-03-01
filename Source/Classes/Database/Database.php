@@ -138,7 +138,7 @@ class Database {
 		return $query ? pick(mysql_fetch_array($query, ($type ? $type : MYSQL_ASSOC)), false) : false;
 	}
 	
-	public function getId(){
+	public function getInsertId(){
 		return mysql_insert_id();
 	}
 	
