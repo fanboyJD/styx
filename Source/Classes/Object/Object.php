@@ -2,7 +2,7 @@
 
 class Object implements Iterator, ArrayAccess, Countable {
 	
-	protected $Storage;
+	protected $Data;
 	protected $Changed;
 	protected $name;
 	protected $structure;
@@ -13,8 +13,8 @@ class Object implements Iterator, ArrayAccess, Countable {
 	);
 	
 	public function __construct($data = null, $new = true){
-		$this->new = !!$new;
 		$this->name = ucfirst(substr(get_class($this), 0, -6));
+		$this->new = !!$new;
 		
 		$initialize = $this->initialize();
 		
@@ -32,13 +32,23 @@ class Object implements Iterator, ArrayAccess, Countable {
 		
 		$this->options['identifier'] = Core::getIdentifier($this->options['identifier']);
 		
-		if(is_array($data)) $this->store($data);
+		if(is_array($data)){
+			// If it is loaded from a datasource it should not care about the :public modifier
+			if($this->structure && !$this->new){
+				foreach($this->structure as $key => $value)
+					if(!empty($data[$key]))
+						$this->Data[$key] = $data[$key];
+			}else{
+				$this->store($data);
+			}
+		}
 	}
 	
 	protected function initialize(){}
 	protected function onSave($data){
 		return $data;
 	}
+	protected function onDelete(){}
 	
 	public function validate(){
 		foreach($this->Changed as $key => $value){
@@ -57,7 +67,7 @@ class Object implements Iterator, ArrayAccess, Countable {
 			if(empty($this->structure[$key][':validate']))
 				continue;
 			
-			$this->Changed[$key] = $this->Storage[$key] = Data::call($value, $this->structure[$key][':validate']);
+			$this->Changed[$key] = $this->Data[$key] = Data::call($value, $this->structure[$key][':validate']);
 		}
 		
 		return $this;
@@ -66,7 +76,7 @@ class Object implements Iterator, ArrayAccess, Countable {
 	public function prepare(){
 		if(!count($this->modified)) return false;
 		
-		$this->Changed = array_intersect_key($this->Storage, $this->modified);
+		$this->Changed = array_intersect_key($this->Data, $this->modified);
 		
 		$this->validate()->sanitize();
 		
@@ -85,19 +95,19 @@ class Object implements Iterator, ArrayAccess, Countable {
 	}
 	
 	public function delete(){
+		$this->onDelete();
 		$this->clear();
 		
 		return $this;
 	}
 	
 	public function store($array, $value = null){
-		if(!is_array($array))
-			$array = array($array => $value);
+		if(!is_array($array)) $array = array($array => $value);
 		
 		foreach($array as $key => $value){
-			if($this->structure && !isset($this->structure[$key])) continue;
+			if(($this->structure && !isset($this->structure[$key])) || empty($this->structure[$key][':public'])) continue;
 			
-			$this->Storage[$key] = $value;
+			$this->Data[$key] = $value;
 			$this->modified[$key] = true;
 		}
 		
@@ -105,28 +115,40 @@ class Object implements Iterator, ArrayAccess, Countable {
 	}
 	
 	public function retrieve($key, $value = null){
-		if($value && empty($this->Storage[$key]))
+		if($value && empty($this->Data[$key]))
 			$this->store($key, $value);
 		
-		return !empty($this->Storage[$key]) ? $this->Storage[$key] : null;
+		return !empty($this->Data[$key]) ? $this->Data[$key] : null;
 	}
 	
 	public function clear(){
-		$this->Storage = array();
+		$this->Data = array();
 		
 		if($this->structure)
 			foreach($this->structure as $key => $value)
-				$this->Storage[$key] = null;
+				$this->Data[$key] = null;
 		
 		return $this;
 	}
 	
+	public function getPagetitle($title, $options = array()){
+		$options['identifier'] = $this->options['identifier'];
+		$identifier = $this->options['identifier']['internal'];
+		if(!$this->new && !empty($this->Data[$identifier])){
+			$options['id'] = $this->Data[$identifier];
+			if(!empty($this->structure[$identifier][':validate']))
+				$options['id'] = Data::call($options['id'], $this->structure[$identifier][':validate']);
+		}
+		
+		return Data::pagetitle($title, $options);
+	}
+	
 	public function toArray(){
-		return $this->Storage;
+		return $this->Data;
 	}
 	
 	public function offsetExists($key){
-		return isset($this->Storage[$key]);
+		return isset($this->Data[$key]);
 	}
 	
 	public function offsetSet($key, $value){
@@ -134,27 +156,27 @@ class Object implements Iterator, ArrayAccess, Countable {
 	}
 	
 	public function offsetGet($key){
-		return isset($this->Storage[$key]) ? $this->Storage[$key] : null;
+		return isset($this->Data[$key]) ? $this->Data[$key] : null;
 	}
 	
 	public function offsetUnset($key){
-		unset($this->Storage[$key]);
+		unset($this->Data[$key]);
 	}
 	
 	public function rewind(){
-		reset($this->Storage);
+		reset($this->Data);
 	}
 	
 	public function current(){
-		return current($this->Storage);
+		return current($this->Data);
 	}
 	
 	public function key(){
-		return key($this->Storage);
+		return key($this->Data);
 	}
 	
 	public function next(){
-		return next($this->Storage);
+		return next($this->Data);
 	}
 	
 	public function valid(){
@@ -162,11 +184,11 @@ class Object implements Iterator, ArrayAccess, Countable {
 	}
 	
 	public function reset(){
-		return reset($this->Storage);
+		return reset($this->Data);
 	}
 	
 	public function count(){
-		return count($this->Storage);
+		return count($this->Data);
 	}
 	
 }

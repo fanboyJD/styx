@@ -4,17 +4,19 @@ require_once('./Initialize.php');
 
 class UserObject extends Object {
 	
-	public function initialize(){
+	protected function initialize(){
 		return array(
 			'structure' => array(
 				'id' => array(
 					':caption' => 'Id',
+					':public' => true,
 					':validate' => array(
 						'id' => true,
 					),
 				),
 				'name' => array(
 					':caption' => 'Username',
+					':public' => true,
 					':validate' => array(
 						'pagetitle' => true,
 						'notempty' => true,
@@ -22,6 +24,7 @@ class UserObject extends Object {
 				),
 				'job' => array(
 					':caption' => 'Job description',
+					':public' => true,
 					':validate' => array(
 						'sanitize' => true,
 					),
@@ -35,9 +38,7 @@ class UserObject extends Object {
 class ObjectTest extends UnitTestCase {
 	
 	public function testUserObject(){
-		$user = new UserObject();
-		
-		$user->store(array(
+		$user = new UserObject(array(
 			'id' => 1,
 			'name' => 'Admin',
 			'job' => 'Server Administrator',
@@ -60,9 +61,7 @@ class ObjectTest extends UnitTestCase {
 	}
 	
 	public function testSave(){
-		$user = new UserObject();
-		
-		$user->store(array(
+		$user = new UserObject(array(
 			'id' => 'Test',
 			'name' => 'Admin',
 			'job' => 'Server Administrator',
@@ -119,7 +118,6 @@ class ObjectTest extends UnitTestCase {
 		$this->assertEqual($news['title'], 'Newsheadline');
 		
 		$newEntry = new NewsObject(array(
-			'uid' => 1,
 			'title' => 'This is some interesting title',
 		));
 		
@@ -146,6 +144,40 @@ class ObjectTest extends UnitTestCase {
 		
 		// Double Check if it really is gone
 		$this->assertFalse(Database::select('news')->where(array('id' => $id))->fetch());
+	}
+	
+	public function testPagetitle(){
+		// New Object, but one with pagetitle "Title" is already available so it should save as "Test_1"
+		$newsEntry = new NewsObject(array(
+			'title' => 'Test',
+			'content' => 'This is a test',
+		));
+		$newsEntry->save();
+		
+		$this->assertEqual($newsEntry['pagetitle'], 'Test_1');
+		
+		// We select this object and check if it modifies the pagetitle (it should not!)
+		$newsEntry2 = new NewsObject(Database::select('news')->where(array('id' => $newsEntry['id']))->fetch(), false);
+		$newsEntry2['content'] = 'Changed Content';
+		$newsEntry2->save();
+		
+		$this->assertEqual($newsEntry2['pagetitle'], 'Test_1');
+		
+		// And now we create one with title Test again, should be saved as pagetitle Test_2
+		$newsEntry3 = new NewsObject(array(
+			'title' => 'Test',
+			'content' => 'This is a test',
+		));
+		
+		$newsEntry3->save();
+		$this->assertEqual($newsEntry3['pagetitle'], 'Test_2');
+		
+		$ids = array($newsEntry['id'], $newsEntry3['id']);
+		$newsEntry->delete();
+		$newsEntry3->delete();
+		
+		// There shouldn't be any news left
+		$this->assertEqual(Database::select('news')->where(Query::in('id', $ids))->quantity(), 0);
 	}
 	
 }
