@@ -29,6 +29,13 @@ class UserObject extends Object {
 						'sanitize' => true,
 					),
 				),
+				'time' => array(
+					':public' => true,
+					':default' => time(),
+					':validate' => array(
+						'id' => true,
+					),
+				),
 			),
 		);
 	}
@@ -56,7 +63,7 @@ class ObjectTest extends UnitTestCase {
 		$this->assertEqual($user['id'], 5);
 		
 		$user['blah'] = 'Testvalue should not be set';
-		$this->assertEqual(count($user), 3);
+		$this->assertEqual(count($user), 4);
 		$this->assertNull($user['blah']);
 	}
 	
@@ -99,6 +106,7 @@ class ObjectTest extends UnitTestCase {
 			'id' => 1,
 			'name' => 'Admin',
 			'job' => '  >Sanitized<  ',
+			'time' => time(),
 		));
 		
 		$user->save();
@@ -107,6 +115,7 @@ class ObjectTest extends UnitTestCase {
 			'id' => 1,
 			'name' => 'Admin',
 			'job' => '&gt;Sanitized&lt;',
+			'time' => time(),
 		));
 	}
 	

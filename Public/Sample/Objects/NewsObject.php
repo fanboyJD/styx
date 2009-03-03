@@ -32,9 +32,35 @@ class NewsObject extends DatabaseObject {
 		);
 	}
 	
+	protected function onFormCreate(){
+		$this->Form->addElements(
+			new UploadInput(array(
+				'name' => 'image',
+				':caption' => Lang::retrieve('news.file'),
+				':alias' => true,
+			)),
+			
+			new Button(array(
+				'name' => 'bsave',
+				':caption' => Lang::retrieve('save'),
+			))
+		);
+	}
+	
 	protected function onSave($data){
-		$data['time'] = $this->new ? time() : $this['time'];
-		$data['uid'] = $this->new ? User::get('id') : $this['uid'];
+		if(Upload::exists('image')){
+			$upload = Upload::move('image', 'Files/', array(
+				'size' => 1024*512,
+				'mimes' => array('image/gif', 'image/png', 'image/jpeg'),
+			));
+			$img = new Image($upload);
+			$data['picture'] = 'Files/'.basename($img->resize(120)->save()->getPathname());
+		}
+		
+		if($this->new){
+			$data['time'] = time();
+			$data['uid'] = User::get('id');
+		}
 		
 		if(isset($data['title'])) $data['pagetitle'] = $this->getPagetitle($this['title']);
 		

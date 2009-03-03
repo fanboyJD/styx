@@ -167,7 +167,7 @@ class Element extends Runner {
 /* ELEMENTS ClASS */
 class Elements extends Element {
 	
-	protected static $visibleElements = array('input', 'checkbox', 'radio', 'select', 'textarea', 'richtext', 'optionlist');
+	protected static $visibleElements = array('input', 'checkbox', 'radio', 'select', 'textarea', 'richtext');
 	protected $elements = array();
 	
 	public function __construct(){

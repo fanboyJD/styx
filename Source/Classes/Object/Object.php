@@ -4,6 +4,7 @@ class Object implements Iterator, ArrayAccess, Countable {
 	
 	protected $Data;
 	protected $Changed;
+	protected $Form;
 	protected $name;
 	protected $structure;
 	protected $modified = array();
@@ -24,8 +25,10 @@ class Object implements Iterator, ArrayAccess, Countable {
 			
 			$this->clear();
 			if($this->new)
-				foreach($this->structure as $key => $value)
+				foreach($this->structure as $key => $value){
 					$this->modified[$key] = true;
+					if(!empty($value[':default'])) $this->Data[$key] = $value[':default'];
+				}
 		}
 		
 		Hash::extend($this->options, Hash::splat($initialize));
@@ -49,6 +52,7 @@ class Object implements Iterator, ArrayAccess, Countable {
 		return $data;
 	}
 	protected function onDelete(){}
+	protected function onFormCreate(){}
 	
 	public function validate(){
 		foreach($this->Changed as $key => $value){
@@ -141,6 +145,26 @@ class Object implements Iterator, ArrayAccess, Countable {
 		}
 		
 		return Data::pagetitle($title, $options);
+	}
+	
+	public function createForm(){
+		if($this->Form) return $this->Form;
+		
+		if(!$this->structure) return;
+		
+		$this->Form = new Form;
+		foreach($this->structure as $key => $value){
+			if(empty($this->structure[':element']) || empty($this->structure[':public']) || !Core::classExists($this->structure[':element']))
+				continue;
+			
+			$structure = $this->structure;
+			$structure['name'] = $key;
+			$this->Form->addElement(new $this->structure[':element']($structure));
+		}
+		
+		$this->onFormCreate();
+		
+		return $this->Form;
 	}
 	
 	public function toArray(){
