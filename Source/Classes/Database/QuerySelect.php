@@ -52,6 +52,8 @@ class QuerySelect extends Query implements Iterator, ArrayAccess, Countable {
 			' JOIN '.$data['table'].' ON ('.$data['on'].')' : '';
 	}
 	
+	public function set($data){}
+	
 	/**
 	 * @return QuerySelect
 	 */

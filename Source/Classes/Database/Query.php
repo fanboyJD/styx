@@ -126,15 +126,21 @@ class Query {
 	}
 	
 	public function setCriteria($criteria){
-		foreach(array_intersect_key($criteria, array(
-			'fields' => true,
-			'order' => true,
+		$array = array(
+			'set' => true,
 			'limit' => true,
 			'where' => true,
-			'order' => true,
-			'group' => true,
-			'having' => true,
-		)) as $key => $value)
+		);
+		
+		if($this->type=='select')
+			$array = array_merge($array, array(
+				'fields' => true,
+				'order' => true,
+				'group' => true,
+				'having' => true,
+			));
+		
+		foreach(array_intersect_key($criteria, $array) as $key => $value)
 			$this->{$key}($value);
 		
 		return $this;
