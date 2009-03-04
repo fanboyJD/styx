@@ -317,7 +317,7 @@ abstract class LayerPrototype extends Runner {
 				'contenttype.querystring' => Core::retrieve('contenttype.querystring')
 			);
 		
-		if(is_array($title)) $title = $title[$this->options['identifier']['external']];
+		if(is_array($title) || is_object($title)) $title = $title[$this->options['identifier']['external']];
 		
 		if($options && !is_array($options) && !empty($Configuration['contenttype.querystring']))
 			$options = array($Configuration['contenttype.querystring'] => $options);

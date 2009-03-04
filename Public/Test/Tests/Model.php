@@ -2,29 +2,19 @@
 
 require_once('./Initialize.php');
 
-/*class UserModel extends Model {
-	
-	protected function initialize(){
-		return array(
-			
-		);
-	}
-	
-}*/
-
 class ModelTest extends UnitTestCase {
 	
-	public function testUserModel(){
-		error_reporting(E_ALL);
+	public function testNewsModel(){
 		$news = new NewsModel();
 		$myNews = $news->findByIdentifier('Test');
 		
 		$this->assertTrue($myNews instanceof NewsObject);
 		$this->assertEqual($myNews['id'], 2);
+		$this->assertFalse($myNews->isNew());
 	}
 	
 	public function testCreateModel(){
-		$myNews = Model::create('news')->find(array(
+		$myNews = Model::create('News')->find(array(
 			'where' => array('id' => 1),
 		));
 		

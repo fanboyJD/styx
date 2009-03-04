@@ -191,7 +191,7 @@ class QuerySelect extends Query implements Iterator, ArrayAccess, Countable {
 	}
 	
 	public function valid(){
-		return !is_null($this->key());
+		return !is_null(key($this->Data));
 	}
 	
 	public function reset(){

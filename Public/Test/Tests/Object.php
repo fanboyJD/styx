@@ -74,6 +74,8 @@ class ObjectTest extends UnitTestCase {
 			'job' => 'Server Administrator',
 		));
 		
+		$this->assertTrue($user->isNew());
+		
 		$exception = false;
 		try{
 			// Should throw an exception because id can't be 'Test'
@@ -90,6 +92,8 @@ class ObjectTest extends UnitTestCase {
 		));
 		
 		$user->save();
+		
+		$this->assertFalse($user->isNew());
 		
 		// Job should now be clean
 		$this->assertEqual($user['job'], '&gt;Sanitized&lt;');
@@ -122,6 +126,7 @@ class ObjectTest extends UnitTestCase {
 	public function testNewsObject(){
 		$news = new NewsObject(Database::select('news')->where(array('id' => 1))->fetch(), false);
 		
+		$this->assertFalse($news->isNew());
 		$this->assertEqual($news->getTable(), 'news');
 		
 		$this->assertEqual($news['title'], 'Newsheadline');

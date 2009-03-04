@@ -270,7 +270,7 @@ class DataSet implements Iterator, ArrayAccess, Countable {
 	}
 	
 	public function valid(){
-		return !is_null($this->key());
+		return !is_null(key($this->Subset));
 	}
 	
 	public function reset(){

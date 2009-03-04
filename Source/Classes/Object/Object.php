@@ -167,6 +167,10 @@ abstract class Object implements Iterator, ArrayAccess, Countable {
 		return $this->Form;
 	}
 	
+	public function isNew(){
+		return $this->new;
+	}
+	
 	public function toArray(){
 		return $this->Data;
 	}
@@ -204,7 +208,7 @@ abstract class Object implements Iterator, ArrayAccess, Countable {
 	}
 	
 	public function valid(){
-		return !is_null($this->key());
+		return !is_null(key($this->Data));
 	}
 	
 	public function reset(){

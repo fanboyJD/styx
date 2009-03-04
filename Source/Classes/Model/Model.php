@@ -1,12 +1,13 @@
 <?php
 
-abstract class Model {
+abstract class Model implements Iterator, Countable {
 	
 	protected $Collection = array();
 	protected $name;
 	protected $objectname;
 	protected $options = array(
 		'identifier' => null,
+		'cache' => true,
 	);
 	
 	/**
@@ -50,6 +51,8 @@ abstract class Model {
 		));
 	}
 	
+	public function select(){}
+	
 	public function save(){
 		$this->invoke('save');
 	}
@@ -78,6 +81,34 @@ abstract class Model {
 			$this->Collection[] = new $this->objectname($obj, false);
 		
 		return $this->Collection;
+	}
+	
+	public function rewind(){
+		reset($this->Collection);
+	}
+	
+	public function current(){
+		return current($this->Collection);
+	}
+	
+	public function key(){
+		return key($this->Collection);
+	}
+	
+	public function next(){
+		return next($this->Collection);
+	}
+	
+	public function valid(){
+		return !is_null(key($this->Collection));
+	}
+	
+	public function reset(){
+		return reset($this->Collection);
+	}
+	
+	public function count(){
+		return count($this->Collection);
 	}
 	
 }

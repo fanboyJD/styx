@@ -12,11 +12,21 @@ abstract class DatabaseModel extends Model {
 	}
 	
 	public function find($criteria){
-		return parent::make(Database::select($this->table)->setCriteria($criteria)->fetch());
+		return parent::make($this->select()->setCriteria($criteria)->fetch());
 	}
 	
 	public function findMany($criteria){
-		return parent::makeMany(Database::select($this->table)->setCriteria($criteria)->retrieve());
+		return parent::makeMany($this->select()->setCriteria($criteria)->retrieve());
+	}
+	
+	public function select(){
+		return Database::select($this->table, $this->options['cache']);
+	}
+	
+	public function destroy($criteria){
+		$this->Collection = array();
+		
+		Database::delete($this->table)->setCriteria($criteria)->query();
 	}
 	
 }

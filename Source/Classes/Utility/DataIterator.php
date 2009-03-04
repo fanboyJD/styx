@@ -119,7 +119,7 @@ class DataIterator implements RecursiveIterator, Countable  {
 	}
 	
 	public function valid(){
-		return !is_null($this->key());
+		return !is_null(key($this->Current));
 	}
 	
 	public function reset(){
