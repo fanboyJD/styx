@@ -21,7 +21,7 @@ abstract class DatabaseObject extends Object {
 	}
 	
 	public function save(){
-		if(!$this->prepare()) return $this;
+		if(!$this->prepare()) return false;
 		
 		$identifier = $this->options['identifier']['internal'];
 		
@@ -45,10 +45,12 @@ abstract class DatabaseObject extends Object {
 		$this->Changed = array();
 		$this->modified = array();
 		
-		return $this;
+		return true;
 	}
 	
 	public function delete(){
+		if($this->new) return parent::delete();
+		
 		$query = Database::delete($this->table);
 		$identifier = $this->options['identifier']['internal'];
 		

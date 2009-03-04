@@ -15,6 +15,7 @@ class NewsObject extends DatabaseObject {
 				),
 				'content' => array(
 					':caption' => Lang::retrieve('text'),
+					':element' => 'TextArea',
 					':public' => true,
 					':validate' => array(
 						'purify' => array( // These are the options for the Data-Class method "purify". In this case the classes in the HTML to be kept

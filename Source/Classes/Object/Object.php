@@ -88,18 +88,18 @@ abstract class Object implements Iterator, ArrayAccess, Countable {
 	}
 	
 	public function save(){
-		if(!$this->prepare()) return $this;
+		if(!$this->prepare()) return false;
 		
 		$this->Changed = $this->onSave($this->Changed);
 		$this->new = false;
 		$this->Changed = array();
 		$this->modified = array();
 		
-		return $this;
+		return true;
 	}
 	
 	public function delete(){
-		$this->onDelete();
+		if(!$this->new) $this->onDelete();
 		$this->clear();
 		
 		return $this;
@@ -123,6 +123,10 @@ abstract class Object implements Iterator, ArrayAccess, Countable {
 			$this->store($key, $value);
 		
 		return !empty($this->Data[$key]) ? $this->Data[$key] : null;
+	}
+	
+	public function getIdentifier($identifier = 'external'){
+		return $this->retrieve(empty($this->options['identifier'][$identifier]) ? 'external' : $identifier);
 	}
 	
 	public function clear(){
@@ -154,13 +158,13 @@ abstract class Object implements Iterator, ArrayAccess, Countable {
 		
 		$this->Form = new Form;
 		foreach($this->structure as $key => $value){
-			if(empty($this->structure[':public']))
+			if(empty($value[':public']))
 				continue;
 			
-			$structure = $this->structure;
-			$structure['name'] = $key;
-			$class = !empty($this->structure[':element']) ? $this->structure[':element'] : 'Input';
-			$this->Form->addElement(new $class($structure));
+			if(!empty($this->Data[$key])) $value['value'] = $this->Data[$key];
+			$value['name'] = $key;
+			$class = !empty($value[':element']) ? $value[':element'] : 'Input';
+			$this->Form->addElement(new $class($value));
 		}
 		$this->onFormCreate();
 		
