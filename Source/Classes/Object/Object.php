@@ -31,7 +31,7 @@ class Object implements Iterator, ArrayAccess, Countable {
 				}
 		}
 		
-		Hash::extend($this->options, Hash::splat($initialize));
+		if(is_array($initialize)) Hash::extend($this->options, $initialize);
 		
 		$this->options['identifier'] = Core::getIdentifier($this->options['identifier']);
 		
@@ -154,14 +154,14 @@ class Object implements Iterator, ArrayAccess, Countable {
 		
 		$this->Form = new Form;
 		foreach($this->structure as $key => $value){
-			if(empty($this->structure[':element']) || empty($this->structure[':public']) || !Core::classExists($this->structure[':element']))
+			if(empty($this->structure[':public']))
 				continue;
 			
 			$structure = $this->structure;
 			$structure['name'] = $key;
-			$this->Form->addElement(new $this->structure[':element']($structure));
+			$class = !empty($this->structure[':element']) ? $this->structure[':element'] : 'Input';
+			$this->Form->addElement(new $class($structure));
 		}
-		
 		$this->onFormCreate();
 		
 		return $this->Form;

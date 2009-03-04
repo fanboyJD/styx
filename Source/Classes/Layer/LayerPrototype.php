@@ -69,15 +69,10 @@ abstract class LayerPrototype extends Runner {
 	 * @return Layer
 	 */
 	public static function create($layer){
-		if(!Core::autoload($layer.'layer'))
+		if(!Core::autoload($layer .= 'layer'))
 			return false;
 		
-		$layer = strtolower($layer).'layer';
-		
-		if(!is_subclass_of($layer, 'layer'))
-			return false;
-		
-		return new $layer();
+		return is_subclass_of($layer, 'layer') ? new $layer() : false;
 	}
 	
 	/**
@@ -87,10 +82,8 @@ abstract class LayerPrototype extends Runner {
 		static $Instances;
 		
 		$layer = strtolower($layer);
-		if(empty($Instances[$layer]))
-			return $Instances[$layer] = Layer::create($layer);
 		
-		return $Instances[$layer];
+		return empty($Instances[$layer]) ? $Instances[$layer] = Layer::create($layer) : $Instances[$layer];
 	}
 	
 	protected function __construct(){
@@ -103,14 +96,13 @@ abstract class LayerPrototype extends Runner {
 		$this->Form = new Form();
 		
 		$initialize = $this->initialize();
-		Hash::splat($initialize);
 		
 		if(isset($initialize['table'])){
 			$this->table = pick($initialize['table']);
 			unset($initialize['table']);
 		}
 		
-		Hash::extend($this->options, $initialize);
+		if(is_array($initialize)) Hash::extend($this->options, $initialize);
 		
 		if(!is_array($this->options['preventPass']))
 			$this->options['preventPass'] = array();

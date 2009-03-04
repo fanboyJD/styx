@@ -61,7 +61,7 @@ class NewsObject extends DatabaseObject {
 			$data['uid'] = User::get('id');
 		}
 		
-		if(isset($data['title'])) $data['pagetitle'] = $this->getPagetitle($this['title']);
+		if(isset($data['title'])) $data['pagetitle'] = $this->getPagetitle($data['title']);
 		
 		return $data;
 	}
