@@ -266,20 +266,21 @@ final class String {
 	 * @param mixed $array
 	 * @return mixed
 	 */
-	public static function convert($array){
-		if(!self::$Features['iconv']) return $array;
+	public static function convert($data){
+		if(!self::$Features['iconv']) return $data;
 		
 		static $ini = false;
-		if($ini || $ini===false) $ini = error_reporting(0);
+		if($ini===false) $ini = error_reporting(0);
+		elseif($ini) error_reporting(0);
 		
-		if(is_array($array))
-			array_walk_recursive($array, array('self', 'convert'));
+		if(is_array($data))
+			array_walk_recursive($data, array('self', 'convert'));
 		else 
-			$array = iconv('UTF-8', 'UTF-8//IGNORE', $array);
+			$data = iconv('UTF-8', 'UTF-8//IGNORE', $data);
 		
 		if($ini) error_reporting($ini);
 		
-		return $array;
+		return $data;
 	}
 	
 }
