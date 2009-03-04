@@ -37,7 +37,6 @@ class NewsObject extends DatabaseObject {
 			new UploadInput(array(
 				'name' => 'image',
 				':caption' => Lang::retrieve('news.file'),
-				':alias' => true,
 			)),
 			
 			new Button(array(
