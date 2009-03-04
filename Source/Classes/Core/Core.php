@@ -172,6 +172,7 @@ class Core {
 			self::$Storage['Classes'] = array_merge(self::$Storage['Classes'],
 				self::getClassList('Classes'),
 				self::getClassList('Layers'),
+				self::getClassList('Models'),
 				self::getClassList('Objects'),
 				self::getClassList('Prototypes')
 			);

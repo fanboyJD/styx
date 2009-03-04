@@ -1,6 +1,6 @@
 <?php
 
-class Object implements Iterator, ArrayAccess, Countable {
+abstract class Object implements Iterator, ArrayAccess, Countable {
 	
 	protected $Data;
 	protected $Changed;

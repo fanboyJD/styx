@@ -1,6 +1,6 @@
 <?php
 
-class DatabaseObject extends Object {
+abstract class DatabaseObject extends Object {
 	
 	protected $table;
 	protected $criteria = array();
