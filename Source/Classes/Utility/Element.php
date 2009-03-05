@@ -158,7 +158,7 @@ class Elements extends Element {
 		
 		foreach($this->elements as $name => $el)
 			if($format = $el->format()){
-				if($el->name=='HiddenElement') $els['form.hidden'][] = $format;
+				if($el instanceof HiddenElement) $els['form.hidden'][] = $format;
 				else $els[$name] = $format;
 			}
 		
@@ -270,6 +270,12 @@ class HiddenElement extends InputElement {
 		$options['type'] = 'hidden';
 		
 		parent::__construct($options);
+	}
+	
+	public function format($pass = null){
+		if(empty($this->options[':template'])) $this->options[':template'] = 'Hidden';
+		
+		return parent::format($pass);
 	}
 	
 }

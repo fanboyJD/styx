@@ -157,6 +157,24 @@ class ElementTest extends StyxUnitTest {
 		$this->assertEqual($input->format(), '<label>Title</label><input name="title" value="Hello World" type="text" id="'.$input->get('id').'" />');
 	}
 	
+	public function testUploadElement(){
+		$input = new UploadElement(array(
+			'name' => 'title',
+			':caption' => 'Title',
+		));
+		
+		$this->assertEqual($input->format(), '<label>Title</label><input name="title" type="file" id="'.$input->get('id').'" />');
+	}
+	
+	public function testHiddenElement(){
+		$input = new HiddenElement(array(
+			'name' => 'title',
+			'value' => 'Hello World',
+		));
+		
+		$this->assertEqual($input->format(), '<input name="title" value="Hello World" type="hidden" id="'.$input->get('id').'" />');
+	}
+	
 	public function testButtonElement(){
 		$button = new ButtonElement(array(
 			'name' => 'myButton',
@@ -221,7 +239,7 @@ class ElementTest extends StyxUnitTest {
 		$this->assertTrue($el->hasElement($none));
 		$this->assertEqual($none, $el->getSelectedElement());
 		$this->assertEqual($el->get(':template'), 'Select.php');
-		$this->assertEqual($el->format(), '<label>Gender</label>'."\n".'<select name="gender" id="'.$el->get('id').'">'."\n".'<option value="1">Male</option><option value="2">Female</option><option value="3" selected="selected">None (no gender specified)</option></select>');
+		$this->assertEqual(str_replace(array("\n", "\r"), '', $el->format()), '<label>Gender</label><select name="gender" id="'.$el->get('id').'"><option value="1">Male</option><option value="2">Female</option><option value="3" selected="selected">None (no gender specified)</option></select>');
 	}
 
 	public function testTextAreaElement(){
