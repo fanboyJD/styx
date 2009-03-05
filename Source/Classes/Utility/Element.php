@@ -184,6 +184,11 @@ class Elements extends Element {
 		return !empty($this->elements[$name]) ? $this->elements[$name]->getValue() : false;
 	}
 	
+	public function validate(){
+		foreach($this->elements as $el)
+			$el->validate();
+	}
+	
 	/**
 	 * @return Element
 	 */

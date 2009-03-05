@@ -133,8 +133,8 @@ abstract class Object implements Iterator, ArrayAccess, Countable {
 		
 		if($this->structure)
 			foreach($this->structure as $key => $value)
-				$this->Data[$key] = null;
-		
+				$this->Data[$key] = !empty($value[':default']) ? $value[':default'] : null;
+			
 		return $this;
 	}
 	

@@ -84,7 +84,7 @@ class Template extends Runner {
 	 * @return Template
 	 */
 	public function assign($assign){
-		Hash::extend($this->assigned, $assign);
+		Hash::extend($this->assigned, is_object($assign) ? $assign->toArray() : $assign);
 		
 		return $this;
 	}

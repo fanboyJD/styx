@@ -2,7 +2,7 @@
 
 require_once('./Initialize.php');
 
-class UserObject extends Object {
+class TestuserObject extends Object {
 	
 	protected function initialize(){
 		return array(
@@ -44,8 +44,8 @@ class UserObject extends Object {
 
 class ObjectTest extends StyxUnitTest {
 	
-	public function testUserObject(){
-		$user = new UserObject(array(
+	public function testTestuserObject(){
+		$user = new TestuserObject(array(
 			'id' => 1,
 			'name' => 'Admin',
 			'job' => 'Server Administrator',
@@ -68,7 +68,7 @@ class ObjectTest extends StyxUnitTest {
 	}
 	
 	public function testSaveException(){
-		$user = new UserObject(array(
+		$user = new TestuserObject(array(
 			'id' => 'Test',
 			'name' => 'Admin',
 			'job' => 'Server Administrator',
@@ -82,7 +82,7 @@ class ObjectTest extends StyxUnitTest {
 	}
 	
 	public function testSave(){
-		$user = new UserObject(array(
+		$user = new TestuserObject(array(
 			'id' => 1,
 			'name' => 'Admin',
 			'job' => '  >Sanitized<  ',
@@ -97,7 +97,7 @@ class ObjectTest extends StyxUnitTest {
 	}
 
 	public function testToArray(){
-		$user = new UserObject(array(
+		$user = new TestuserObject(array(
 			'id' => 1,
 			'name' => 'Admin',
 			'job' => '  >Sanitized<  ',
@@ -118,6 +118,14 @@ class ObjectTest extends StyxUnitTest {
 			'job' => '&gt;Sanitized&lt;',
 			'time' => time(),
 		));
+	}
+	
+	public function testUserObject(){
+		$user = new UserObject();
+		
+		$this->assertEqual($user['rights'], '[]');
+		$user->clear();
+		$this->assertEqual($user['rights'], '[]');
 	}
 	
 	public function testNewsObjectException(){

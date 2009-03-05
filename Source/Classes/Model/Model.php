@@ -45,7 +45,7 @@ abstract class Model implements Iterator, Countable {
 	}
 	
 	public function find($criteria){}
-	public function findMany($criteria){}
+	public function findMany($criteria = array()){}
 	
 	public function findByIdentifier($data, $identifier = 'external'){
 		if(empty($this->options['identifier'][$identifier])) $identifier = 'external';
@@ -82,7 +82,7 @@ abstract class Model implements Iterator, Countable {
 	}
 	
 	public function make($array){
-		if(!count($array)) return false;
+		if(!$array) return false;
 		
 		$this->Collection = array(new $this->objectname($array, false));
 		return reset($this->Collection);
@@ -92,10 +92,11 @@ abstract class Model implements Iterator, Countable {
 		$this->Collection = array();
 		if(!count($list)) return false;
 		
-		foreach($array as $obj)
-			$this->Collection[] = new $this->objectname($obj, false);
+		foreach($list as $obj)
+			if(is_array($obj))
+				$this->Collection[] = new $this->objectname($obj, false);
 		
-		return $this->Collection;
+		return count($this->Collection) ? $this->Collection : false;
 	}
 	
 	public function rewind(){
