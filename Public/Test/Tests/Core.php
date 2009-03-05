@@ -2,7 +2,7 @@
 
 require_once('./Initialize.php');
 
-class CoreTest extends UnitTestCase {
+class CoreTest extends StyxUnitTest {
 	
 	public $folder;
 	

@@ -2,7 +2,7 @@
 
 require_once('./Initialize.php');
 
-class StringTest extends UnitTestCase {
+class StringTest extends StyxUnitTest {
 	
 	public function testEnds(){
 		if(Core::retrieve('feature.mbstring')){

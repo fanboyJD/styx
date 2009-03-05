@@ -2,7 +2,7 @@
 
 require_once('./Initialize.php');
 
-class CacheTest extends UnitTestCase {
+class CacheTest extends StyxUnitTest {
 	
 	public function testEngine(){
 		Cache::getEngine('apc')->store('test', true);

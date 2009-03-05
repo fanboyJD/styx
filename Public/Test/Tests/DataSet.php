@@ -2,7 +2,7 @@
 
 require_once('./Initialize.php');
 
-class DataSetTest extends UnitTestCase {
+class DataSetTest extends StyxUnitTest {
 	
 	public function testSet(){
 		$data = array(

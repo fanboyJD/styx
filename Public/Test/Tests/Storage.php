@@ -2,7 +2,7 @@
 
 require_once('./Initialize.php');
 
-class StorageTest extends UnitTestCase {
+class StorageTest extends StyxUnitTest {
 	
 	public function testStorage(){
 		$Storage = new Storage();

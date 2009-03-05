@@ -2,7 +2,7 @@
 
 require_once('./Initialize.php');
 
-class QueryTest extends UnitTestCase {
+class QueryTest extends StyxUnitTest {
 	
 	public function testInjection(){
 		/* Injections used by the Inject-Me Firefox Extension */

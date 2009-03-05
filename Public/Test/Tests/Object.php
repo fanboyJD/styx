@@ -42,7 +42,7 @@ class UserObject extends Object {
 	
 }
 
-class ObjectTest extends UnitTestCase {
+class ObjectTest extends StyxUnitTest {
 	
 	public function testUserObject(){
 		$user = new UserObject(array(
@@ -67,7 +67,7 @@ class ObjectTest extends UnitTestCase {
 		$this->assertNull($user['blah']);
 	}
 	
-	public function testSave(){
+	public function testSaveException(){
 		$user = new UserObject(array(
 			'id' => 'Test',
 			'name' => 'Admin',
@@ -76,15 +76,12 @@ class ObjectTest extends UnitTestCase {
 		
 		$this->assertTrue($user->isNew());
 		
-		$exception = false;
-		try{
-			// Should throw an exception because id can't be 'Test'
-			$user->save();
-		}catch(ValidatorException $e){
-			$exception = true;
-		}
-		$this->assertTrue($exception);
-		
+		$this->expectException('ValidatorException');
+		// Should throw an exception because id can't be 'Test'
+		$user->save();
+	}
+	
+	public function testSave(){
 		$user = new UserObject(array(
 			'id' => 1,
 			'name' => 'Admin',
@@ -123,7 +120,7 @@ class ObjectTest extends UnitTestCase {
 		));
 	}
 	
-	public function testNewsObject(){
+	public function testNewsObjectException(){
 		$news = new NewsObject(Database::select('news')->where(array('id' => 1))->fetch(), false);
 		
 		$this->assertFalse($news->isNew());
@@ -135,14 +132,15 @@ class ObjectTest extends UnitTestCase {
 			'title' => 'This is some interesting title',
 		));
 		
-		$exception = false;
-		try{
-			// Should throw an exception because "content" is empty
-			$newEntry->save();
-		}catch(ValidatorException $e){
-			$exception = true;
-		}
-		$this->assertTrue($exception);
+		$this->expectException('ValidatorException');
+		// Should throw an exception because "content" is empty
+		$newEntry->save();
+	}
+	
+	public function testNewsObject(){
+		$newEntry = new NewsObject(array(
+			'title' => 'This is some interesting title',
+		));
 		
 		$newEntry['content'] = '<b Malicious HTML';
 		

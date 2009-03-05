@@ -2,7 +2,7 @@
 
 require_once('./Initialize.php');
 
-class HashTest extends UnitTestCase {
+class HashTest extends StyxUnitTest {
 	
 	public function testLength(){
 		

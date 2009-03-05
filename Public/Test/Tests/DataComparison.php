@@ -2,7 +2,7 @@
 
 require_once('./Initialize.php');
 
-class DataComparisonTest extends UnitTestCase {
+class DataComparisonTest extends StyxUnitTest {
 	
 	public function testComparison(){
 		$data = array(

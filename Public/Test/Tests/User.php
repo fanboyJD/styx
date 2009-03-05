@@ -2,7 +2,7 @@
 
 require_once('./Initialize.php');
 
-class UserTest extends UnitTestCase {
+class UserTest extends StyxUnitTest {
 	
 	public function testRights(){
 		User::store(array(

@@ -2,7 +2,7 @@
 
 require_once('./Initialize.php');
 
-class LangTest extends UnitTestCase {
+class LangTest extends StyxUnitTest {
 	
 	public $folder;
 	public $original;

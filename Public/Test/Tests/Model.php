@@ -2,7 +2,7 @@
 
 require_once('./Initialize.php');
 
-class ModelTest extends UnitTestCase {
+class ModelTest extends StyxUnitTest {
 	
 	public function testNewsModel(){
 		$news = new NewsModel();

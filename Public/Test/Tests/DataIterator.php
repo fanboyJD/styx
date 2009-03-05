@@ -2,7 +2,7 @@
 
 require_once('./Initialize.php');
 
-class DataIteratorTest extends UnitTestCase {
+class DataIteratorTest extends StyxUnitTest {
 	
 	public function testIterator(){
 		$data = DataIterator::retrieve(array(

@@ -2,7 +2,7 @@
 
 require_once('./Initialize.php');
 
-class FileparserTest extends UnitTestCase {
+class FileparserTest extends StyxUnitTest {
 	
 	public $folder;
 	public $original;

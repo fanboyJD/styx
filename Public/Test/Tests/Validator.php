@@ -2,7 +2,7 @@
 
 require_once('./Initialize.php');
 
-class ValidatorTest extends UnitTestCase {
+class ValidatorTest extends StyxUnitTest {
 	
 	public function testCall(){
 		$this->assertTrue(Validator::call('data', 'some_nonexistend_validator'));

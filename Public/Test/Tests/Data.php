@@ -2,7 +2,7 @@
 
 require_once('./Initialize.php');
 
-class DataTest extends UnitTestCase {
+class DataTest extends StyxUnitTest {
 	
 	public function testEscape(){
 		// This makes sure $ is escaped so ${blah} won't be replaced/removed by the template
