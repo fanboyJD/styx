@@ -25,13 +25,13 @@ class UserObject extends DatabaseObject {
 	
 	protected function onFormCreate(){
 		$this->Form->addElements(
-			new Input(array(
+			new InputElement(array(
 				'name' => 'password',
 				'type' => 'password',
 				':caption' => Lang::retrieve('user.pwd'),
 			)),
 			
-			new Button(array(
+			new ButtonElement(array(
 				'name' => 'bsave',
 				':caption' => Lang::retrieve('save'),
 			))

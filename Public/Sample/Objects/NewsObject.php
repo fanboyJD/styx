@@ -35,12 +35,12 @@ class NewsObject extends DatabaseObject {
 	
 	protected function onFormCreate(){
 		$this->Form->addElements(
-			new UploadInput(array(
+			new UploadElement(array(
 				'name' => 'image',
 				':caption' => Lang::retrieve('news.file'),
 			)),
 			
-			new Button(array(
+			new ButtonElement(array(
 				'name' => 'bsave',
 				':caption' => Lang::retrieve('save'),
 			))

@@ -149,14 +149,14 @@ abstract class Object implements Iterator, ArrayAccess, Countable {
 		
 		if(!$this->structure) return;
 		
-		$this->Form = new Form;
+		$this->Form = new FormElement;
 		foreach($this->structure as $key => $value){
 			if(empty($value[':public']))
 				continue;
 			
 			if(!empty($this->Data[$key])) $value['value'] = $this->Data[$key];
 			$value['name'] = $key;
-			$class = !empty($value[':element']) ? $value[':element'] : 'Input';
+			$class = (!empty($value[':element']) ? $value[':element'] : 'Input').'Element';
 			$this->Form->addElement(new $class($value));
 		}
 		$this->onFormCreate();

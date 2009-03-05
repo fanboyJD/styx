@@ -94,7 +94,10 @@ class Core {
 	 * @var array
 	 */
 	private static $Classes = array(
-		'element' => array('elements', 'input', 'hiddeninput', 'uploadinput', 'button', 'field', 'radio', 'select', 'checkbox', 'textarea', 'richtext'),
+		'element' => array(
+			'elements', 'inputelement', 'hiddenelement', 'uploadelement', 'buttonelement',
+			'radioelement', 'selectelement', 'checkboxelement', 'textareaelement', 'richtextelement'
+		),
 	);
 	
 	private function __construct(){}

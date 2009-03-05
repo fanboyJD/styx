@@ -1,3 +1,3 @@
 <?php
 
-class StyxUnitTest extends UnitTestCase {}
+abstract class StyxUnitTest extends UnitTestCase {}
