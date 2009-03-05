@@ -151,7 +151,7 @@ abstract class Object implements Iterator, ArrayAccess, Countable {
 		return Data::pagetitle($title, $options);
 	}
 	
-	public function createForm(){
+	public function getForm(){
 		if($this->Form) return $this->Form;
 		
 		if(!$this->structure) return;

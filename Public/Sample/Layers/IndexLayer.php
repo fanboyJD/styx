@@ -30,11 +30,11 @@ class IndexLayer extends Layer {
 		if(!User::hasRight('layer.index.edit', $object->isNew() ? 'add' : 'modify'))
 			throw new ValidatorException('rights');
 		
-		$object->createForm()->get('action', $this->link($object->getIdentifier(), $this->getDefaultEvent('save')));
+		$object->getForm()->get('action', $this->link($object->getIdentifier(), $this->getDefaultEvent('save')));
 		
 		$this->Template->apply('edit')->assign(array(
 			'headline' => Lang::retrieve('news.'.($object->isNew() ? 'add' : 'modify')),
-		))->assign($object->createForm()->format());
+		))->assign($object->getForm()->format());
 	}
 	
 	public function onDelete($title){
@@ -48,8 +48,11 @@ class IndexLayer extends Layer {
 		Response::setContentType('json');
 		
 		try{
-			// FIXME when no data is found
-			$this->Model->findByIdentifier($title)->delete();
+			// FIXME needs testing
+			$object = $this->Model->findByIdentifier($title);
+			if(!$object) throw new ValidatorException('newsnotavailable');
+			$object->delete();
+			
 			$this->Template->assign(array(
 				'out' => 'success',
 				'msg' => Lang::retrieve('deleted'),
@@ -69,14 +72,10 @@ class IndexLayer extends Layer {
 		$contenttype = Response::getContentType();
 		
 		if($title){
-			$this->Data = array(
-				$this->Model->findByIdentifier($title),
-			);
-			
-			if(!count($this->Data))
-				throw new ValidatorException('newsnotavailable');
+			$this->Data = array($this->Model->findByIdentifier($title));
+			if(!$this->Data[0]) throw new ValidatorException('newsnotavailable');
 		}else{
-			$this->Data = $this->Model->select()->fields('news.*, users.name')->join('news.uid=users.id', 'users', 'left')->limit(0)->order('time DESC');
+			$this->Data = $this->Model->getLatestNews();
 			
 			if($contenttype=='html'){
 				$this->paginate()->initialize($this->Data, array(
