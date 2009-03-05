@@ -23,6 +23,12 @@ class Paginate {
 	 * @var Layer
 	 */
 	protected $Layer;
+	/**
+	 * The Model instance
+	 *
+	 * @var Model
+	 */
+	protected $Model;
 		
 	/**
 	 * Options
@@ -87,7 +93,7 @@ class Paginate {
 	public function parse(){
 		if(!$this->Data) return;
 		
-		$this->count = $this->Data->quantity($this->Layer->getIdentifier('internal'));
+		$this->count = $this->Data->quantity($this->Model->getIdentifier('internal'));
 		
 		if($this->options['start']>=$this->count)
 			$this->options['start'] = 0;
@@ -196,6 +202,17 @@ class Paginate {
 	 */
 	public function bind($bind){
 		if(is_object($bind)) $this->Layer = $bind;
+		
+		return $this;
+	}
+	
+	/**
+	 * Binds a Model to the template
+	 *
+	 * @return Paginate
+	 */
+	public function model($model){
+		if(is_object($model)) $this->Model = $model;
 		
 		return $this;
 	}

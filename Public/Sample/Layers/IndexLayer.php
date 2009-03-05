@@ -5,90 +5,36 @@ class IndexLayer extends Layer {
 	
 	public function initialize(){
 		return array(
-			'table' => 'news',
+			'model' => 'news',
 		);
 	}
 	
 	public function populate(){
-		$this->Form->addElements(
-			new Input(array(
-				'name' => 'title',
-				':caption' => Lang::retrieve('title'),
-				':validate' => array(
-					'sanitize' => true,
-					'notempty' => true,
-				),
-			)),
-			
-			new Textarea(array(
-				'name' => 'content',
-				':caption' => Lang::retrieve('text'),
-				':validate' => array(
-					'purify' => array( // These are the options for the Data-Class method "purify". In this case the classes in the HTML to be kept
-						'classes' => array('green', 'blue', 'b', 'icon', 'bold', 'italic'),
-					),
-					'notempty' => true,
-				),
-			)),
-			
-			new UploadInput(array(
-				'name' => 'image',
-				':caption' => Lang::retrieve('news.file'),
-				':alias' => true,
-			)),
-			
-			new Button(array(
-				'name' => 'bsave',
-				':caption' => Lang::retrieve('save'),
-			)),
-			
-			new Field('uid'),
-			new Field('pagetitle'),
-			new Field('time'),
-			new Field('picture')
-		);
-		
 		$this->requireSession(); // Adds an invisible element with the current session so everything is safe :)
 	}
 	
-	public function onSave(){
-		if(!User::hasRight('layer.index.edit'))
+	public function onSave($title){
+		$object = $this->Model->createOrFindBy($title)->store($this->post);
+		
+		if(!User::hasRight('layer.index.edit', $object->isNew() ? 'add' : 'modify'))
 			throw new ValidatorException('rights');
 		
-		if(Upload::exists('image')){
-			$img = new Image(Upload::move('image', 'Files/', array('size' => 1024*512, 'mimes' => array('image/gif', 'image/png', 'image/jpeg'))));
-			$file = $img->resize(120)->save();
-			
-			$filename = basename($img->getPathname());
-			$this->setValue(array(
-				'picture' => 'Files/'.$filename,
-			));
-		}else{
-			$this->setValue(array(
-				'picture' => $this->editing ? $this->content['picture'] : '',
-			));
-		}
+		if(!$object->save()) throw new ValidatorException('data');
 		
-		$this->setValue(array(
-			'uid' => $this->editing ? $this->content['uid'] : User::get('id'),
-			'time' => $this->editing ? $this->content['time'] : time(),
-			'pagetitle' => $this->getPagetitle($this->getValue('title')),
-		));
-		
-		$this->save();
-		
-		$this->Template->append(Lang::get('news.saved', $this->link($this->getValue('pagetitle'))));
+		$this->Template->append(Lang::get('news.saved', $this->link($object['pagetitle'])));
 	}
 	
-	public function onEdit(){
-		$this->edit();
+	public function onEdit($title){
+		$object = $this->Model->createOrFindBy($title);
 		
-		if(!User::hasRight('layer.index.edit', $this->editing ? 'modify' : 'add'))
+		if(!User::hasRight('layer.index.edit', $object->isNew() ? 'add' : 'modify'))
 			throw new ValidatorException('rights');
 		
+		$object->createForm()->get('action', $this->link($object->getIdentifier(), $this->getDefaultEvent('save')));
+		
 		$this->Template->apply('edit')->assign(array(
-			'headline' => Lang::retrieve('news.'.($this->editing ? 'modify' : 'add')),
-		))->assign($this->format());
+			'headline' => Lang::retrieve('news.'.($object->isNew() ? 'add' : 'modify')),
+		))->assign($object->createForm()->format());
 	}
 	
 	public function onDelete($title){
@@ -102,7 +48,8 @@ class IndexLayer extends Layer {
 		Response::setContentType('json');
 		
 		try{
-			$this->delete();
+			// FIXME when no data is found
+			$this->Model->findByIdentifier($title)->delete();
 			$this->Template->assign(array(
 				'out' => 'success',
 				'msg' => Lang::retrieve('deleted'),

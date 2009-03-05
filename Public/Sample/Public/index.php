@@ -14,7 +14,7 @@
 	
 	switch(Response::getContentType()){
 		case 'html':
-			Layer::create('Page')->fireEvent('menu')->register('pagemenu');
+			//Layer::create('Page')->fireEvent('menu')->register('pagemenu');
 			
 			$user = User::retrieve();
 			if($user) Script::set('User = '.json_encode(array(
@@ -42,8 +42,8 @@
 				
 				'languages' => implode($languages),
 				
-				'user' => ($user ? Lang::get('user.hello', $user['name']).' | <a href="admin">'.Lang::retrieve('user.admin').'</a> | ' : '').'
-					<a href="'.Layer::retrieve('login')->link(null, $action).'">'.Lang::retrieve('user.'.$action).'</a>',
+				/*'user' => ($user ? Lang::get('user.hello', $user['name']).' | <a href="admin">'.Lang::retrieve('user.admin').'</a> | ' : '').'
+					<a href="'.Layer::retrieve('login')->link(null, $action).'">'.Lang::retrieve('user.'.$action).'</a>',*/
 				
 				'styx' => implode(' ', Core::fetch('styx.name', 'styx.version')),
 			))->show();
