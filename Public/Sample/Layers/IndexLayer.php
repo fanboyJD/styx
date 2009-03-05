@@ -75,7 +75,7 @@ class IndexLayer extends Layer {
 			$this->Data = array($this->Model->findByIdentifier($title));
 			if(!$this->Data[0]) throw new ValidatorException('newsnotavailable');
 		}else{
-			$this->Data = $this->Model->getLatestNews();
+			$this->Data = $this->Model->findLatestNews();
 			
 			if($contenttype=='html'){
 				$this->paginate()->initialize($this->Data, array(

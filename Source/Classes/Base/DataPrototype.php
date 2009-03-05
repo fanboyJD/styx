@@ -195,7 +195,7 @@ class DataPrototype {
 		
 		Hash::extend($default, $options);
 		
-		$data = trim(String::sub(preg_replace('/([^A-z0-9]|_|\^)+/i', '_', String::replace($regex[0], $regex[1], $data)), 0, 64), '_');
+		$data = trim(String::sub(preg_replace('/(?:[^A-z0-9]|_|\^)+/i', '_', String::replace($regex[0], $regex[1], $data)), 0, 64), '_');
 		
 		if(!$default['identifier']){
 			static $identifier;

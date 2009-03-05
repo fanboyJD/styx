@@ -54,25 +54,19 @@ abstract class Object implements Iterator, ArrayAccess, Countable {
 	protected function onDelete(){}
 	protected function onFormCreate(){}
 	
-	public function validate(){
-		foreach($this->Changed as $key => $value){
-			if(empty($this->structure[$key][':validate']))
-				continue;
-			
-			if(($v = Validator::call($value, $this->structure[$key][':validate']))!==true)
-				throw new ValidatorException($v, !empty($this->structure[$key][':caption']) ? $this->structure[$key][':caption'] : $key);
-		}
+	protected function validate(){
+		foreach($this->Changed as $key => $value)
+			if(!empty($this->structure[$key][':validate']))
+				if(($v = Validator::call($value, $this->structure[$key][':validate']))!==true)
+					throw new ValidatorException($v, !empty($this->structure[$key][':caption']) ? $this->structure[$key][':caption'] : $key);
 		
 		return $this;
 	}
 	
-	public function sanitize(){
-		foreach($this->Changed as $key => $value){
-			if(empty($this->structure[$key][':validate']))
-				continue;
-			
-			$this->Changed[$key] = $this->Data[$key] = Data::call($value, $this->structure[$key][':validate']);
-		}
+	protected function sanitize(){
+		foreach($this->Changed as $key => $value)
+			if(!empty($this->structure[$key][':validate']))
+				 $this->Changed[$key] = $this->Data[$key] = Data::call($value, $this->structure[$key][':validate']);
 		
 		return $this;
 	}
@@ -81,7 +75,6 @@ abstract class Object implements Iterator, ArrayAccess, Countable {
 		if(!count($this->modified)) return false;
 		
 		$this->Changed = array_intersect_key($this->Data, $this->modified);
-		
 		$this->validate()->sanitize();
 		
 		return true;
