@@ -121,6 +121,17 @@ abstract class Object implements Iterator, ArrayAccess, Countable {
 		return $this;
 	}
 	
+	protected function modify($array, $value = null){
+		if(!is_array($array)) $array = array($array => $value);
+		
+		foreach($array as $key => $value){
+			$this->Data[$key] = $value;
+			$this->modified[$key] = true;
+		}
+		
+		return $this;
+	}
+	
 	public function retrieve($key, $value = null){
 		if($value && empty($this->Data[$key]))
 			$this->store($key, $value);

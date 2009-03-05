@@ -63,13 +63,7 @@ class UserPrototype {
 	
 	public static function login($user){
 		$rand = User::$Configuration['secure'].mt_rand(0, 100000);
-		$user[User::$Configuration['session']] = sha1($rand.uniqid($rand, true));
-		
-		Database::update(User::$Configuration['table'])->set(array(
-			User::$Configuration['session'] => $user[User::$Configuration['session']],
-		))->where(array(
-			User::$Configuration['identifier.internal'] => $user[User::$Configuration['identifier.internal']],
-		))->query();
+		$user->updateSession(sha1($rand.uniqid($rand, true)));
 		
 		if(User::$Configuration['type']=='cookie'){
 			foreach(User::$Configuration['fields'] as $v)

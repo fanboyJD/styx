@@ -5,6 +5,9 @@ class UserObject extends DatabaseObject {
 	protected function initialize(){
 		return array(
 			'table' => 'users',
+			'identifier' => array(
+				'external' => 'name',
+			),
 			'structure' => array(
 				'name' => array(
 					':caption' => Lang::retrieve('user.name'),
@@ -29,6 +32,7 @@ class UserObject extends DatabaseObject {
 				'name' => 'password',
 				'type' => 'password',
 				':caption' => Lang::retrieve('user.pwd'),
+				':add' => !$this->new ? Lang::retrieve('user.pwdempty') : '',
 			)),
 			
 			new ButtonElement(array(
@@ -43,6 +47,12 @@ class UserObject extends DatabaseObject {
 			$data['pwd'] = User::getPassword($this->Garbage['password']);
 		
 		return $data;
+	}
+	
+	public function updateSession($session){
+		$this->modify(array(
+			'session' => $session,
+		))->save();
 	}
 	
 }
