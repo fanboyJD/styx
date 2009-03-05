@@ -15,14 +15,19 @@ abstract class LayerPrototype extends Runner {
 		 */
 		$Form,
 		/**
-		 * @var QuerySelect
+		 * @var array
 		 */
-		$Data,
+		$Data = array(),
 	
 		/**
 		 * @var Template
 		 */
 		$Template = null,
+		
+		/**
+		 * @var Model
+		 */
+		$Model,
 		
 		/**
 		 * @var Paginate
@@ -32,7 +37,6 @@ abstract class LayerPrototype extends Runner {
 		$isMainLayer = false,
 		$name,
 		$base,
-		$table,
 		$layername,
 		
 		$events = array(
@@ -42,25 +46,16 @@ abstract class LayerPrototype extends Runner {
 			'save' => 'save',
 		),
 		
-		$rebounds = array(
-			
-		),
+		$rebounds = array(),
 		
 		$options = array(
-			/*'table' => null,*/
+			/*'model' => null,*/
 			'rebound' => true,
-			'cache' => true,
 			'preventPass' => array('post'), // Prevents passing post/get variable if the layer is not the Mainlayer
-			'identifier' => null,
 		),
 		
 		$methods = array(),
-		
-		$request = null,
-		$event = null,
-		$where = null,
-		$content = null,
-		$editing = false;
+		$event = null;
 	
 	public $get = array(),
 		$post = array();
@@ -69,10 +64,7 @@ abstract class LayerPrototype extends Runner {
 	 * @return Layer
 	 */
 	public static function create($layer){
-		if(!Core::autoload($layer .= 'layer'))
-			return false;
-		
-		return is_subclass_of($layer, 'layer') ? new $layer() : false;
+		return Core::classExists($layer .= 'layer') && is_subclass_of($layer, 'layer') ? new $layer() : false;
 	}
 	
 	/**
@@ -81,33 +73,26 @@ abstract class LayerPrototype extends Runner {
 	public static function retrieve($layer){
 		static $Instances;
 		
-		$layer = strtolower($layer);
-		
-		return empty($Instances[$layer]) ? $Instances[$layer] = Layer::create($layer) : $Instances[$layer];
+		return empty($Instances[$layer = strtolower($layer)]) ? $Instances[$layer] = Layer::create($layer) : $Instances[$layer];
 	}
 	
 	protected function __construct(){
 		$this->base = $this->name = ucfirst(substr(get_class($this), 0, -5));
-		$this->table = $this->layername = strtolower($this->name);
+		$this->layername = strtolower($this->name);
 		
 		$this->methods = Core::getMethods($this->layername.'layer');
 		
-		$this->request = Request::retrieve('method');
-		$this->Form = new Form();
-		
 		$initialize = $this->initialize();
-		
-		if(isset($initialize['table'])){
-			$this->table = pick($initialize['table']);
-			unset($initialize['table']);
-		}
 		
 		if(is_array($initialize)) Hash::extend($this->options, $initialize);
 		
+		$model = isset($this->options['model']) ? $this->options['model'] : strtolower($this->name);
+		if($model && $model .= 'model') $this->Model = new $model();
+		unset($this->options['model']);
+		
+		// FIXME
 		if(!is_array($this->options['preventPass']))
 			$this->options['preventPass'] = array();
-		
-		$this->options['identifier'] = Core::getIdentifier($this->options['identifier']);
 	}
 	
 	protected function initialize(){}
@@ -122,6 +107,7 @@ abstract class LayerPrototype extends Runner {
 	 * @return Layer
 	 */
 	public function fireEvent($event, $get = null, $post = null){
+		// FIXME
 		foreach(array('get', 'post') as $v)
 			$this->{$v} = Hash::length($$v) ? $$v : ($this->isMainLayer() || !in_array($v, $this->options['preventPass']) ? Request::retrieve($v) : array());
 		
@@ -139,10 +125,6 @@ abstract class LayerPrototype extends Runner {
 		
 		try{
 			if(!$this->access()) return $this;
-			$this->Data = $this->table ? $this->select() : array();
-			
-			if($this->request=='post' && Hash::length($this->post))
-				$this->prepare($this->post);
 			
 			$this->{'on'.ucfirst($event)}(isset($this->get[$event]) ? $this->get[$event] : null);
 		}catch(Exception $e){
@@ -155,8 +137,9 @@ abstract class LayerPrototype extends Runner {
 	public function rebound($e){
 		static $rebound;
 		
-		if(!$rebound && $this->options['rebound'] && $this->request=='post' && Hash::length($this->post)){
+		if(!$rebound && $this->options['rebound'] && Request::retrieve('method')=='post' && Hash::length($this->post)){
 			$rebound = true;
+			// FIXME
 			foreach($this->Form->prepare() as $name => $value)
 				$this->post[$name] = $this->Form->getElement($name)->get('type')=='password' ? null : $value;
 			
@@ -171,91 +154,12 @@ abstract class LayerPrototype extends Runner {
 		}
 		
 		$assign = $e->getMessage();
-		
 		if($this->Template->hasFile()){
 			$prefix = Core::retrieve('elements.prefix');
 			$this->Template->assign(array(($prefix ? $prefix.'.' : '').'form.message' => $assign));
 		}else{
 			$this->Template->append($assign, true);
 		}
-	}
-	
-	public function edit($options = array(
-		'preventDefault' => false,
-	)){
-		if(empty($options['preventDefault']) && $this->request!='post') $this->prepare(null, true);
-		else $this->populate();
-		
-		$this->Form->get('action', $this->link(!empty($this->content[$this->options['identifier']['external']]) ? $this->content[$this->options['identifier']['external']] : null, $this->getDefaultEvent('save')));
-	}
-	
-	public function add($options = null){
-		$this->populate();
-		
-		$array = array('preventDefault' => true);
-		
-		return $this->edit($options ? Hash::extend($options, $array) : $array);
-	}
-	
-	public function prepare($data = null, $fill = false){
-		if($this->event && !empty($this->get[$this->event]) && $this->table){
-			$this->content = Database::select($this->table, $this->options['cache'])->where(array(
-				$this->options['identifier']['external'] => array($this->get[$this->event], $this->options['identifier']['external']),
-			))->fetch();
-			
-			if($this->content){
-				$this->where = array(
-					$this->options['identifier']['internal'] => array($this->content[$this->options['identifier']['internal']], $this->options['identifier']['internal']),
-				);
-				
-				$this->editing = true;
-			}
-		}
-		
-		$this->populate();
-		
-		$this->setValue(!$data && $fill && $this->content ? $this->content : $data, true);
-	}
-	
-	public function validate(){
-		if(!$this->checkSession())
-			throw new ValidatorException('session');
-		
-		$validate = $this->Form->validate();
-		
-		if($validate!==true)
-			throw new ValidatorException($validate);
-		
-		$data = $this->Form->prepare();
-		if(!Hash::length($data))
-			throw new ValidatorException('data');
-		
-		return $data;
-	}
-	
-	public function save($where = null){
-		if(!$where) $where = $this->where;
-		
-		$data = $this->validate();
-		
-		if(!$this->table) return;
-		
-		if($where) $query = Database::update($this->table)->where($where);
-		else $query = Database::insert($this->table);
-		
-		$query->set($data)->query();
-	}
-	
-	public function delete($where = null){
-		if(!$this->editing)
-			throw new ValidatorException('data');
-		
-		if(!$this->checkSession())
-			throw new ValidatorException('session');
-		
-		if(!$where) $where = $this->where;
-		
-		Database::delete($this->table)->where($this->where)->query();
 	}
 	
 	public function getDefaultEvent($event){
@@ -274,24 +178,6 @@ abstract class LayerPrototype extends Runner {
 		return $this->rebounds[$event] = strtolower($to);
 	}
 	
-	public function getPagetitle($title, $where = null, $options = array()){
-		if(!$where) $where = $this->where;
-		
-		if($this->table)
-			$options['contents'] = Hash::extend(Hash::splat($options['contents']), Database::select($this->table, $this->options['cache'])->fields(array_unique($this->options['identifier']))->retrieve());
-		
-		if(!empty($where[$this->options['identifier']['internal']]))
-			$options['id'] = Data::call($where[$this->options['identifier']['internal']][0], $where[$this->options['identifier']['internal']][1]);
-		
-		$options['identifier'] = $this->options['identifier'];
-		
-		return Data::pagetitle($title, $options);
-	}
-	
-	public function getIdentifier($identifier = null){
-		return $identifier && !empty($this->options['identifier'][$identifier]) ? $this->options['identifier'][$identifier] : $this->options['identifier'];
-	}
-	
 	public function setMainLayer(){
 		$this->isMainLayer = true;
 		
@@ -306,7 +192,7 @@ abstract class LayerPrototype extends Runner {
 		if($this->Paginate && strtolower(get_class($this->Paginate))==strtolower(pick($class, 'Paginate')))
 			return $this->Paginate;
 		
-		return $this->Paginate = Paginate::retrieve($class)->bind($this);
+		return $this->Paginate = Paginate::retrieve($class)->bind($this)->model($this->Model);
 	}
 	
 	public function link($title = null, $event = null, $options = null, $showEvent = false){
@@ -317,7 +203,7 @@ abstract class LayerPrototype extends Runner {
 				'contenttype.querystring' => Core::retrieve('contenttype.querystring')
 			);
 		
-		if(is_array($title) || is_object($title)) $title = $title[$this->options['identifier']['external']];
+		if((is_array($title) || is_object($title)) && $this->Model) $title = $title[$this->Model->getIdentifier('external')];
 		
 		if($options && !is_array($options) && !empty($Configuration['contenttype.querystring']))
 			$options = array($Configuration['contenttype.querystring'] => $options);
@@ -356,24 +242,6 @@ abstract class LayerPrototype extends Runner {
 		$el = $this->Form->getElement($this->generateSessionName());
 		
 		return !$el || ($el && User::checkSession($el->getValue()));
-	}
-	
-	public function select(){
-		return Database::select($this->table, $this->options['cache']);
-	}
-	
-	/* Form methods mapping */
-	
-	public function format(){
-		return $this->Form->format();
-	}
-	
-	public function getValue($name){
-		return $this->Form->getValue($name);
-	}
-	
-	public function setValue($data, $raw = false){
-		$this->Form->setValue($data, $raw);
 	}
 	
 	public function parse($return = true){
