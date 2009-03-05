@@ -68,16 +68,15 @@ class IndexLayer extends Layer {
 		// We check for the used ContentType (xml or html) and assign the correct template for it
 		$contenttype = Response::getContentType();
 		
-		$newsModel = Model::create('News');
 		if($title){
 			$this->Data = array(
-				$newsModel->findByIdentifier($title),
+				$this->Model->findByIdentifier($title),
 			);
 			
 			if(!count($this->Data))
 				throw new ValidatorException('newsnotavailable');
 		}else{
-			$this->Data = $newsModel->select()->fields('news.*, users.name')->join('news.uid=users.id', 'users', 'left')->limit(0)->order('time DESC');
+			$this->Data = $this->Model->select()->fields('news.*, users.name')->join('news.uid=users.id', 'users', 'left')->limit(0)->order('time DESC');
 			
 			if($contenttype=='html'){
 				$this->paginate()->initialize($this->Data, array(
