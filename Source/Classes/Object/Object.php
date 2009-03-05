@@ -125,10 +125,6 @@ abstract class Object implements Iterator, ArrayAccess, Countable {
 		return !empty($this->Data[$key]) ? $this->Data[$key] : null;
 	}
 	
-	public function getIdentifier($identifier = 'external'){
-		return $this->retrieve(empty($this->options['identifier'][$identifier]) ? 'external' : $identifier);
-	}
-	
 	public function clear(){
 		$this->Data = array();
 		
@@ -137,6 +133,10 @@ abstract class Object implements Iterator, ArrayAccess, Countable {
 				$this->Data[$key] = null;
 		
 		return $this;
+	}
+	
+	public function getIdentifier($identifier = 'external'){
+		return $this->retrieve(empty($this->options['identifier'][$identifier]) ? $this->options['identifier']['external'] : $this->options['identifier'][$identifier]);
 	}
 	
 	public function getPagetitle($title, $options = array()){
