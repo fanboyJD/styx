@@ -97,8 +97,6 @@ abstract class LayerPrototype extends Runner {
 	
 	protected function initialize(){}
 	
-	protected function populate(){}
-	
 	protected function access(){
 		return true;
 	}
@@ -140,9 +138,9 @@ abstract class LayerPrototype extends Runner {
 		if(!$rebound && $this->options['rebound'] && Request::retrieve('method')=='post' && Hash::length($this->post)){
 			$rebound = true;
 			// FIXME
-			foreach($this->Form->prepare() as $name => $value)
+			/*foreach($this->Form->prepare() as $name => $value)
 				$this->post[$name] = $this->Form->getElement($name)->get('type')=='password' ? null : $value;
-			
+			*/
 			$event = $this->getReboundEvent($this->event);
 			if(!$event) $event = $this->getDefaultEvent('edit');
 			
@@ -219,29 +217,6 @@ abstract class LayerPrototype extends Runner {
 		}
 		
 		return Response::link($options, $base);
-	}
-	
-	protected function generateSessionName(){
-		return $this->name.'_session_'.sha1($this->name.'.'.Core::retrieve('secure'));
-	}
-	
-	public function requireSession(){
-		$name = $this->generateSessionName();
-		if($this->Form->getElement($name)) return;
-		
-		$uconfig = Core::retrieve('user');
-		
-		return $this->Form->addElement(new HiddenInput(array(
-			'name' => $name,
-			'value' => $this->request=='post' && !empty($this->post[$name]) ? $this->post[$name] : User::get($uconfig['session']),
-			':alias' => true,
-		)));
-	}
-	
-	public function checkSession(){
-		$el = $this->Form->getElement($this->generateSessionName());
-		
-		return !$el || ($el && User::checkSession($el->getValue()));
 	}
 	
 	public function parse($return = true){

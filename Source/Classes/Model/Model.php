@@ -7,6 +7,7 @@ abstract class Model implements Iterator, Countable {
 	protected $objectname;
 	protected $options = array(
 		'identifier' => null,
+		'objectname' => null,
 		'cache' => true,
 	);
 	
@@ -36,7 +37,7 @@ abstract class Model implements Iterator, Countable {
 	}
 	
 	public function getObjectname(){
-		return $this->objectname;
+		return substr($this->objectname, 0, -6);
 	}
 	
 	public function getIdentifier($identifier = null){

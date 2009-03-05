@@ -95,7 +95,7 @@ class Core {
 	 */
 	private static $Classes = array(
 		'element' => array(
-			'elements', 'inputelement', 'hiddenelement', 'uploadelement', 'buttonelement',
+			'elements', 'formelement', 'inputelement', 'hiddenelement', 'uploadelement', 'buttonelement',
 			'radioelement', 'selectelement', 'checkboxelement', 'textareaelement', 'richtextelement'
 		),
 	);
@@ -268,6 +268,16 @@ class Core {
 			'internal' => isset($identifier['internal']) ? $identifier['internal'] : self::$Storage['identifier']['internal'],
 			'external' => isset($identifier['external']) ? $identifier['external'] : self::$Storage['identifier']['external'],
 		);
+	}
+	
+	/**
+	 * Generates a session name for a Layer/Object-Component
+	 *
+	 * @param string $name
+	 * @return string
+	 */
+	public static function generateSessionName($name){
+		return '_session_'.sha1(strtolower($name).'.'.self::$Storage['secure']);
 	}
 	
 	/**

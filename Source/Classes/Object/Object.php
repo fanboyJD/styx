@@ -2,11 +2,13 @@
 
 abstract class Object implements Iterator, ArrayAccess, Countable {
 	
-	protected $Data;
-	protected $Changed;
+	protected $Data = array();
+	protected $Changed = array();
+	protected $Garbage = array();
 	protected $Form;
 	protected $name;
 	protected $structure;
+	protected $requireSession = false;
 	protected $modified = array();
 	protected $new = true;
 	protected $options = array(
@@ -39,8 +41,12 @@ abstract class Object implements Iterator, ArrayAccess, Countable {
 			// If it is loaded from a datasource it should not care about the :public modifier
 			if($this->structure && !$this->new){
 				foreach($this->structure as $key => $value)
-					if(!empty($data[$key]))
+					if(!empty($data[$key])){
 						$this->Data[$key] = $data[$key];
+						unset($data[$key]);
+					}
+				
+				$this->Garbage = $data;
 			}else{
 				$this->store($data);
 			}
@@ -74,6 +80,7 @@ abstract class Object implements Iterator, ArrayAccess, Countable {
 	public function prepare(){
 		if(!count($this->modified)) return false;
 		
+		$this->checkSession();
 		$this->Changed = array_intersect_key($this->Data, $this->modified);
 		$this->validate()->sanitize();
 		
@@ -102,7 +109,10 @@ abstract class Object implements Iterator, ArrayAccess, Countable {
 		if(!is_array($array)) $array = array($array => $value);
 		
 		foreach($array as $key => $value){
-			if(($this->structure && !isset($this->structure[$key])) || empty($this->structure[$key][':public'])) continue;
+			if(($this->structure && !isset($this->structure[$key])) || empty($this->structure[$key][':public'])){
+				$this->Garbage[$key] = $value;
+				continue;
+			}
 			
 			$this->Data[$key] = $value;
 			$this->modified[$key] = true;
@@ -145,9 +155,9 @@ abstract class Object implements Iterator, ArrayAccess, Countable {
 	}
 	
 	public function getForm(){
-		if($this->Form) return $this->Form;
+		if(!$this->structure) return false;
 		
-		if(!$this->structure) return;
+		if($this->Form) return $this->Form;
 		
 		$this->Form = new FormElement;
 		foreach($this->structure as $key => $value){
@@ -161,7 +171,32 @@ abstract class Object implements Iterator, ArrayAccess, Countable {
 		}
 		$this->onFormCreate();
 		
+		if($this->requireSession){
+			$config = Core::retrieve('user');
+			$this->Form->addElement(new HiddenElement(array(
+				'name' => Core::generateSessionName($this->name),
+				'value' => User::get($config['session']),
+			)));
+		}
+		
 		return $this->Form;
+	}
+	
+	public function requireSession(){
+		$this->requireSession = true;
+		
+		return $this;
+	}
+	
+	public function checkSession($container = null){
+		if(!$this->requireSession) return $this;
+		
+		$session = Core::generateSessionName($this->name);
+		if(!$container) $container = $this->Garbage;
+		if(empty($container[$session]) || !User::checkSession($container[$session]))
+			throw new ValidatorException('session');
+		
+		return $this;
 	}
 	
 	public function isNew(){

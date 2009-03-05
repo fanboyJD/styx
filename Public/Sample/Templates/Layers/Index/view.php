@@ -11,7 +11,7 @@
 			echo '<a class="hicon" href="'.$this->link($n, 'edit').'"><img src="Images/pencil.png" alt="${lang.edit}" /></a>';
 		
 		if(User::hasRight('layer.index.delete'))
-			echo '<a class="hicon delete" href="'.$this->link($n, 'delete', 'json').'" rel="'.$this->generateSessionName().'"><img src="Images/cross.png" alt="${lang.delete}" title="${lang.confirmdelete}" /></a>';
+			echo '<a class="hicon delete" href="'.$this->link($n, 'delete', 'json').'" rel="'.Core::generateSessionName($this->Model->getObjectname()).'"><img src="Images/cross.png" alt="${lang.delete}" title="${lang.confirmdelete}" /></a>';
 		
 		echo '<h1>'.$n['title'].'</h1>
 				<div>'.($n['picture'] ? '<img src="'.$n['picture'].'" class="articleimg" alt="" />' : '').$n['content'].'</div>

@@ -39,8 +39,8 @@ class UserObject extends DatabaseObject {
 	}
 	
 	protected function onSave($data){
-		$post = Request::retrieve('post');
-		if($this->new || isset($post['password'])) $data['pwd'] = User::getPassword($post['password']);
+		if($this->new || isset($this->Garbage['password']))
+			$data['pwd'] = User::getPassword($this->Garbage['password']);
 		
 		return $data;
 	}

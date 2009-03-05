@@ -9,12 +9,8 @@ class IndexLayer extends Layer {
 		);
 	}
 	
-	public function populate(){
-		$this->requireSession(); // Adds an invisible element with the current session so everything is safe :)
-	}
-	
 	public function onSave($title){
-		$object = $this->Model->createOrFindBy($title)->store($this->post);
+		$object = $this->Model->createOrFindBy($title)->store($this->post)->requireSession();
 		
 		if(!User::hasRight('layer.index.edit', $object->isNew() ? 'add' : 'modify'))
 			throw new ValidatorException('rights');
@@ -25,7 +21,7 @@ class IndexLayer extends Layer {
 	}
 	
 	public function onEdit($title){
-		$object = $this->Model->createOrFindBy($title);
+		$object = $this->Model->createOrFindBy($title)->requireSession();
 		
 		if(!User::hasRight('layer.index.edit', $object->isNew() ? 'add' : 'modify'))
 			throw new ValidatorException('rights');
@@ -48,10 +44,9 @@ class IndexLayer extends Layer {
 		Response::setContentType('json');
 		
 		try{
-			// FIXME needs testing
 			$object = $this->Model->findByIdentifier($title);
 			if(!$object) throw new ValidatorException('newsnotavailable');
-			$object->delete();
+			$object->requireSession()->checkSession($this->post)->delete();
 			
 			$this->Template->assign(array(
 				'out' => 'success',
