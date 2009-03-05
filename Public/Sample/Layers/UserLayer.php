@@ -1,44 +1,8 @@
 <?php
 class UserLayer extends Layer {
 	
-	public function initialize(){
+	protected function initialize(){
 		$this->base = 'admin/user';
-		
-		return array(
-			'identifier' => array(
-				'internal' => 'id',
-				'external' => 'name',
-			),
-			'table' => 'users',
-		);
-	}
-	
-	public function populate(){
-		$this->Form->addElements(
-			new Input(array(
-				'name' => 'name',
-				':caption' => Lang::retrieve('user.name'),
-				':validate' => array(
-					'pagetitle' => true,
-				),
-			)),
-			
-			new Input(array(
-				'name' => 'password',
-				'type' => 'password',
-				':alias' => true,
-				':caption' => Lang::retrieve('user.pwd'),
-			)),
-			
-			new Button(array(
-				'name' => 'bsave',
-				':caption' => Lang::retrieve('save'),
-			)),
-			
-			new Field('pwd')
-		);
-		
-		$this->requireSession(); // Adds an invisible element with the current session so everything is safe :)
 	}
 	
 	public function access(){
@@ -48,37 +12,35 @@ class UserLayer extends Layer {
 		return true;
 	}
 	
-	public function onSave(){
-		$pw = $this->getValue('password');
-		$this->setValue(array(
-			'pwd' => !$pw && $this->editing ? $this->content['pwd'] : User::getPassword($pw),
-		));
-		
-		$this->save();
+	public function onSave($name){
+		if(!$this->Model->createOrFindBy($name)->store($this->post)->requireSession()->save())
+			throw new ValidatorException('data');
 		
 		$this->Template->append(Lang::get('user.saved', $this->link()));
 	}
 	
-	public function onEdit(){
-		$this->edit();
+	public function onEdit($name){
+		$object = $this->Model->createOrFindBy($name)->store($this->post)->requireSession();
 		
-		if($this->editing)
-			$this->Form->getElement('password')->set(':add', Lang::retrieve('user.pwdempty'));
+		$object->getForm()->get('action', $this->link($object->getIdentifier(), $this->getDefaultEvent('save')));
 		
 		/* We put some styling here as we don't want to add a new Template for that :) */
-		$this->Template->append('<h1>'.Lang::retrieve('user.'.($this->editing ? 'modify' : 'add')).'</h1>
-			'.implode(array_map('implode', $this->format()))
+		$this->Template->append('<h1>'.Lang::retrieve('user.'.($object->isNew() ? 'add' : 'modify')).'</h1>
+			'.implode(array_map('implode', $object->getForm()->format()))
 		);
 	}
 	
-	public function onDelete($title){
+	public function onDelete($name){
 		if(Request::retrieve('behaviour')!='json')
 			throw new ValidatorException('contenttype');
 		
 		Response::setContentType('json');
 		
 		try{
-			$this->delete();
+			$object = $this->Model->findByIdentifier($name);
+			if(!$object) throw new ValidatorException('newsnotavailable');
+			$object->requireSession()->checkSession($this->post)->delete();
+			
 			$this->Template->assign(array(
 				'out' => 'success',
 				'msg' => Lang::retrieve('user.deleted'),
@@ -92,6 +54,7 @@ class UserLayer extends Layer {
 	}
 	
 	public function onView(){
+		$this->Model->findMany();
 		$this->Template->apply('view.php');
 	}
 	

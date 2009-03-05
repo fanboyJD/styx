@@ -5,7 +5,7 @@ echo '<a class="go icon" href="'.$this->link(null, 'edit').'">'.Lang::retrieve('
 $edit = Lang::retrieve('edit');
 $delete = Lang::retrieve('delete');
 $confirmdelete = Lang::retrieve('user.confirmdelete');
-foreach($this->Data as $user)
+foreach($this->Model as $user)
 	echo '<div class="anchor">
 			<span class="icon go">'.$user['name'].'</span>
 			<small>

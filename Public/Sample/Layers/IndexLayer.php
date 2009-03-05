@@ -3,7 +3,7 @@ class IndexLayer extends Layer {
 	
 	public $isIndex = false;
 	
-	public function initialize(){
+	protected function initialize(){
 		return array(
 			'model' => 'news',
 		);
