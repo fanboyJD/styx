@@ -97,7 +97,7 @@ final class Request {
 	}
 	
 	public static function sanitize($data){
-		$data = String::clean($data);
+		$data = String::clean($data, array('erase' => false));
 		
 		if(Hash::length($data)){
 			if(get_magic_quotes_gpc())

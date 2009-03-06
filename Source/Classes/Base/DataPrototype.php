@@ -51,11 +51,11 @@ class DataPrototype {
 		static $replaces;
 		
 		if($replaces===null){
-			$encode = Core::retrieve('template.encode');
+			$replaces = Core::retrieve('template.encode');
 			
-			$replaces = is_array($encode) ? array(
-				array_keys($encode),
-				array_values($encode),
+			$replaces = is_array($replaces) ? array(
+				array_keys($replaces),
+				array_values($replaces),
 			) : false;
 		}
 		

@@ -240,21 +240,29 @@ final class String {
 	 * typecasts floats and integers accordingly and unsets empty values
 	 *
 	 * @param mixed $string
-	 * @param bool|string $whitespaces
+	 * @param mixed $whitespaces
 	 * @return mixed
 	 */
-	public static function clean($string, $whitespaces = true){
+	public static function clean($string, $options = array()){
+		if(!is_array($options)) $options = array('whitespace' => $options);
+		$default = array(
+			'whitespace' => true,
+			'erase' => true,
+		);
+		
+		Hash::extend($default, $options);
+		
 		if(is_array($string)){
 			foreach($string as $k => &$v){
-				if($v==(string)(float)$v) $v = (float)$v;
+				$float = (float)$v;
+				if($v==(string)$float) $v = $float;
 				elseif($v==='0' || $v===0 || ctype_digit((string)$v)) $v = Data::id($v);
-				elseif(is_array($v)) $v = self::clean($v, $whitespaces);
-				elseif(!$v || !trim($v)) unset($string[$k]);
-				else $v = self::clean($v, $whitespaces);
+				elseif($default['erase'] && (!$v || !trim($v))) unset($string[$k]);
+				else $v = self::clean($v, $default);
 			}
 		}else{
 			$string = trim($string);
-			if($whitespaces) $string = self::replace(array("\r\n", "\n", "\t"), array(($whitespaces==='clean' ? " " : "\n"), ($whitespaces==='clean' ? " " : "\n"), ""), $string);
+			if($default['whitespace']) $string = self::replace(array("\r\n", "\n", "\t"), array(($default['whitespace']==='clean' ? " " : "\n"), ($default['whitespace']==='clean' ? " " : "\n"), ""), $string);
 		}
 		
 		return $string;

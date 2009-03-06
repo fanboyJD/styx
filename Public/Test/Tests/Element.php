@@ -152,9 +152,18 @@ class ElementTest extends StyxUnitTest {
 			'name' => 'title',
 			'value' => 'Hello World',
 			':caption' => 'Title',
+			':validate' => array(
+				'sanitize' => true,
+			),
 		));
 		
 		$this->assertEqual($input->format(), '<label>Title</label><input name="title" value="Hello World" type="text" id="'.$input->get('id').'" />');
+		
+		// getValue always sanitizes if a given sanitization method exists
+		$input->set('value', '>Test');
+		$this->assertEqual($input->getValue(), '&gt;Test');
+		$input->setValue('<Test');
+		$this->assertEqual($input->get('value'), '&lt;Test');
 	}
 	
 	public function testUploadElement(){

@@ -11,6 +11,7 @@ class Element extends Runner {
 	
 	protected $type = null;
 	protected $name = null;
+	protected $invalidatedValue = true;
 	protected $options = array(
 			/*
 			 * :tag - type/name given by options
@@ -62,12 +63,17 @@ class Element extends Runner {
 	}
 	
 	public function setValue($v){
+		$this->invalidatedValue = true;
 		$this->options['value'] = $v;
 	}
 	
 	public function getValue(){
-		if(!empty($this->options[':validate']))
-			return Data::call($this->options['value'], $this->options[':validate']);
+		if(!$this->options['value']) return null;
+		
+		if($this->invalidatedValue && !empty($this->options[':validate'])){
+			$this->options['value'] = Data::call($this->options['value'], $this->options[':validate']);
+			$this->invalidatedValue = false;
+		}
 		
 		return $this->options['value'];
 	}
@@ -107,12 +113,17 @@ class Element extends Runner {
 		if(!is_array($array)){
 			if($value) $this->options[$array] = $value;
 			else unset($this->options[$array]);
+			
+			if($array=='value') $this->invalidatedValue = true;
 			return $this;
 		}
 		
-		foreach($array as $key => $value)
+		foreach($array as $key => $value){
 			if($value) $this->options[$key] = $value;
 			else unset($this->options[$key]);
+			
+			if($key=='value') $this->invalidatedValue = true;
+		}
 		
 		return $this;
 	}
@@ -121,7 +132,7 @@ class Element extends Runner {
 		if($value && empty($this->options[$key]))
 			$this->set($key, $value);
 		
-		return !empty($this->options[$key]) ? $this->options[$key] : null;
+		return $key=='value' ? $this->getValue() : (!empty($this->options[$key]) ? $this->options[$key] : null);
 	}
 	
 	protected function skipable($key){
@@ -131,6 +142,9 @@ class Element extends Runner {
 	protected function implode($skip = array(
 		/*'skip*' => false,*/
 	), $options = null){
+		// Sanitize
+		if($this->options['value']) $this->getValue();
+		
 		$a = $this->options;
 		if(is_array($options)) Hash::extend($a, $options);
 		Hash::splat($skip);
@@ -178,7 +192,7 @@ class Elements extends Element {
 	}
 	
 	/**
-	 * Sets value for elements inside the container.
+	 * Sets values for elements inside the container.
 	 *
 	 * @param array $data
 	 */
@@ -188,6 +202,22 @@ class Elements extends Element {
 		foreach($data as $name => $el)
 			if(!empty($this->elements[$name]))
 				$this->elements[$name]->setValue($el);
+	}
+	
+	/**
+	 * Sets raw values for elements inside the container.
+	 *
+	 * @param array $data
+	 */
+	public function setRaw($data){
+		if(!Hash::length($data)) return;
+		
+		foreach($data as $name => $el){
+			if(empty($this->elements[$name]) || $this->type=='button' || $this->options['type']='hidden' || $this->options['type']=='password')
+				continue;
+			
+			$this->elements[$name]->setValue($el);
+		}
 	}
 	
 	public function getValue($name){
@@ -354,11 +384,11 @@ class RadioElement extends Element {
 	public function setValue($v){
 		foreach($this->options[':elements'] as $el)
 			if($v==$el['value']){
-				$this->options['value'] = $el['value'];
+				parent::setValue($el['value']);
 				return;
 			}
 		
-		$this->options['value'] = $this->options[':default'];
+		parent::setValue($this->options[':default']);
 	}
 	
 	public function getSelectedElement(){

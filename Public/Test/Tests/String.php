@@ -67,6 +67,16 @@ class StringTest extends StyxUnitTest {
 		$this->assertEqual(String::clean("Te\ns\tt\t", false), "Te\ns\tt");
 		
 		$this->assertEqual(String::clean("Te\ns\tt\t", 'clean'), "Te st");
+		
+		$this->assertEqual(String::clean(array(
+			'a' => true,
+			'b' => null,
+			'c' => '1',
+		), array('erase' => false)), array(
+			'a' => true,
+			'b' => null,
+			'c' => 1,
+		));
 	}
 	
 	public function testConvert(){
