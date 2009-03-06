@@ -25,8 +25,11 @@ class Storage {
 	 * @param mixed $value
 	 */
 	public function store($array, $value = null){
-		if(!is_array($array))
-			$array = array($array => $value);
+		if(!is_array($array)){
+			if($value) $this->Storage[$array] = $value;
+			else unset($this->Storage[$array]);
+			return;
+		}
 		
 		foreach($array as $key => $value)
 			if($value) $this->Storage[$key] = $value;
@@ -42,10 +45,8 @@ class Storage {
 	 * @return mixed
 	 */
 	public function retrieve($key, $value = null){
-		if($value && empty($this->Storage[$key])){
+		if($value && empty($this->Storage[$key]))
 			$this->store($key, $value);
-			return $value;
-		}
 		
 		return !empty($this->Storage[$key]) ? $this->Storage[$key] : null;
 	}

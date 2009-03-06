@@ -9,9 +9,9 @@
 
 class Element extends Runner {
 	
-	public $type = null;
-	protected $name = null,
-		$options = array(
+	protected $type = null;
+	protected $name = null;
+	protected $options = array(
 			/*
 			 * :tag - type/name given by options
 			 * :caption
@@ -104,8 +104,11 @@ class Element extends Runner {
 	 * @return Element
 	 */
 	public function set($array, $value = null){
-		if(!is_array($array))
-			$array = array($array => $value);
+		if(!is_array($array)){
+			if($value) $this->options[$array] = $value;
+			else unset($this->options[$array]);
+			return $this;
+		}
 		
 		foreach($array as $key => $value)
 			if($value) $this->options[$key] = $value;
@@ -125,7 +128,7 @@ class Element extends Runner {
 		return $key[0]==':';
 	}
 	
-	public function implode($skip = array(
+	protected function implode($skip = array(
 		/*'skip*' => false,*/
 	), $options = null){
 		$a = $this->options;

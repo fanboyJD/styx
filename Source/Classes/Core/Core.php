@@ -326,8 +326,11 @@ class Core {
 	 * @param mixed $value
 	 */
 	public static function store($array, $value = null){
-		if(!is_array($array))
-			$array = array($array => $value);
+		if(!is_array($array)){
+			if($value) self::$Storage[$array] = $value;
+			else unset(self::$Storage[$array]);
+			return;
+		}
 		
 		foreach($array as $key => $value)
 			if($value) self::$Storage[$key] = $value;
@@ -343,10 +346,8 @@ class Core {
 	 * @return mixed
 	 */
 	public static function retrieve($key, $value = null){
-		if($value && empty(self::$Storage[$key])){
+		if($value && empty(self::$Storage[$key]))
 			self::store($key, $value);
-			return $value;
-		}
 		
 		return !empty(self::$Storage[$key]) ? self::$Storage[$key] : null;
 	}
