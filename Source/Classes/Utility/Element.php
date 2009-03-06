@@ -152,6 +152,13 @@ class Elements extends Element {
 	
 	protected $elements = array();
 	
+	public function __construct($options = array()){
+		parent::__construct($options);
+		
+		if(!empty($this->options[':elements'])) $this->addElements($this->options[':elements']);
+		unset($this->options[':elements']);
+	}
+	
 	public function format(){
 		$els = array();
 		$els['form.hidden'] = array();

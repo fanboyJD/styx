@@ -64,6 +64,21 @@ final class Hash {
 	}
 	
 	/**
+	 * Recursively implodes an array and returns a string
+	 *
+	 * @param array $array
+	 * @return string
+	 */
+	public static function implode($array){
+		$string = '';
+		
+		foreach($array as $value)
+			$string .= is_array($value) ? self::implode($value) : $value;
+			
+		return $string;
+	}
+	
+	/**
 	 * Copies all the properties from the second array to the first array. Overwrites
 	 * existing values in the first array
 	 *
