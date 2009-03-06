@@ -15,31 +15,31 @@ class LoginLayer extends Layer {
 	}
 	
 	protected function access(){
-		if(in_array($this->event, array('handle', 'login'))){
+		if(in_array($this->event, array('handle', 'login')))
 			$this->Form = new FormElement(array(
 				'action' => $this->link(null, 'handle'),
+				':elements' => array(
+					new InputElement(array(
+						'name' => 'name',
+						':caption' => Lang::retrieve('user.name'),
+						':validate' => array(
+							'pagetitle' => true,
+						),
+					)),
+					
+					new InputElement(array(
+						'name' => 'pwd',
+						'type' => 'password',
+						':caption' => Lang::retrieve('user.pwd'),
+					)),
+					
+					new ButtonElement(array(
+						'name' => 'bsave',
+						':caption' => Lang::retrieve('user.login'),
+					)),
+				),
 			));
-			$this->Form->addElements(
-				new InputElement(array(
-					'name' => 'name',
-					':caption' => Lang::retrieve('user.name'),
-					':validate' => array(
-						'pagetitle' => true,
-					),
-				)),
-				
-				new InputElement(array(
-					'name' => 'pwd',
-					'type' => 'password',
-					':caption' => Lang::retrieve('user.pwd'),
-				)),
-				
-				new ButtonElement(array(
-					'name' => 'bsave',
-					':caption' => Lang::retrieve('user.login'),
-				))
-			);
-		}
+		
 		if($this->event=='handle') $this->Form->setValue($this->post);
 		
 		return true;
@@ -48,16 +48,8 @@ class LoginLayer extends Layer {
 	public function onHandle(){
 		$this->Form->validate();
 		
-		$user = $this->Model->find(array(
-			'where' => array(
-				'name' => $this->Form->getValue('name'),
-				'AND',
-				'pwd' => User::getPassword($this->Form->getValue('pwd')),
-			),
-		));
-		
+		$user = $this->Model->findByNameAndPwd($this->Form->getValue('name'), $this->Form->getValue('pwd'));
 		if(!$user) throw new ValidatorException('login');
-		
 		User::login($user);
 		
 		$this->Template->append(Lang::get('user.loggedin', $user['name']));

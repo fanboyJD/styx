@@ -24,7 +24,7 @@ class PageLayer extends Layer {
 		
 		/* We put some styling here as we don't want to add a new Template for that :) */
 		$this->Template->append('<h1>'.Lang::retrieve('page.modify').'</h1>
-			'.implode(array_map('implode', $object->getForm()->format())));
+			'.Hash::implode($object->getForm()->format()));
 	}
 	
 	public function onView($title){
@@ -41,7 +41,7 @@ class PageLayer extends Layer {
 	}
 	
 	public function onMenu(){
-		$this->Data = $this->Model->findMenuEntries();
+		$this->Model->findMenuEntries();
 		
 		$this->Template->apply('menu.php');
 	}
