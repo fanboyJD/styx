@@ -13,7 +13,7 @@ class Trace {
 		return $return;
 	}
 	
-	public static function inspect($data, $return = false){
+	public static function inspect($data = null, $return = false){
 		if(!Core::retrieve('debug')) return $return;
 		
 		$trace = debug_backtrace();
@@ -33,8 +33,9 @@ class Trace {
 			break;
 		}
 		
+		static $traces = 0;
 		self::log(Hash::extend($array, array(
-			'Message' => $data,
+			'Message' => $data ? $data : 'Trace #'.(++$traces),
 			'Trace' => $trace,
 		)), 'trace');
 		
