@@ -20,11 +20,12 @@ class PageLayer extends Layer {
 		
 		if(!User::hasRight('layer.index.edit')) throw new ValidatorException('rights');
 		
-		$object->requireSession()->getForm()->get('action', $this->link($object->getIdentifier(), $this->getDefaultEvent('save')));
+		$form = $object->requireSession()->getForm()->set('action', $this->link($object->getIdentifier(), 'save'));
+		if($this->isRebound()) $form->setRaw($this->post);
 		
 		/* We put some styling here as we don't want to add a new Template for that :) */
 		$this->Template->append('<h1>'.Lang::retrieve('page.modify').'</h1>
-			'.Hash::implode($object->getForm()->format()));
+			'.Hash::implode($form->format()));
 	}
 	
 	public function onView($title){

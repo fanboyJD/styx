@@ -12,13 +12,13 @@ class UserModel extends DatabaseModel {
 	}
 	
 	public function findByNameAndPwd($name, $pwd){
-		return $this->make($this->find(array(
+		return $this->find(array(
 			'where' => array(
 				'name' => $name,
 				'AND',
 				'pwd' => User::getPassword($pwd),
 			),
-		)));
+		));
 	}
 	
 }

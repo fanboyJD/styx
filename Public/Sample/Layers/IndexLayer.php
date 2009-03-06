@@ -26,7 +26,8 @@ class IndexLayer extends Layer {
 		if(!User::hasRight('layer.index.edit', $object->isNew() ? 'add' : 'modify'))
 			throw new ValidatorException('rights');
 		
-		$object->getForm()->get('action', $this->link($object->getIdentifier(), $this->getDefaultEvent('save')));
+		$form = $object->getForm()->set('action', $this->link($object->getIdentifier(), 'save'));
+		if($this->isRebound()) $form->setRaw($this->post);
 		
 		$this->Template->apply('edit')->assign(array(
 			'headline' => Lang::retrieve('news.'.($object->isNew() ? 'add' : 'modify')),

@@ -9,8 +9,8 @@ class UserObject extends DatabaseObject {
 				'external' => 'name',
 			),
 			'structure' => array(
-				'name' => array(),
 				'id' => array(),
+				'name' => array(),
 				'pwd' => array(),
 				'session' => array(),
 				'rights' => array(),

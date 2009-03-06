@@ -4,13 +4,11 @@ class LoginLayer extends Layer {
 	protected $Form;
 	
 	protected function initialize(){
-		$this->setDefaultEvent('save', 'handle');
-		$this->setDefaultEvent('edit', 'login');
-		$this->setDefaultEvent('view', 'login');
-		$this->setReboundEvent('handle', 'login'); // Not really needed here, but still nice =)
+		$this->setReboundEvent('handle', 'login');
 		
 		return array(
 			'model' => 'user',
+			'defaultEvent' => 'login',
 		);
 	}
 	
@@ -56,12 +54,12 @@ class LoginLayer extends Layer {
 	}
 	
 	public function onLogin(){
-		$user = User::retrieve();
-		
-		if($user){
+		if($user = User::retrieve()){
 			$this->Template->append(Lang::get('user.loggedin', $user['name']));
 			return;
 		}
+		
+		if($this->isRebound()) $this->Form->setRaw($this->post);
 		
 		$this->Template->apply('login')->assign($this->Form->format());
 	}

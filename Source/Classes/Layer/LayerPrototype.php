@@ -11,10 +11,6 @@ abstract class LayerPrototype extends Runner {
 
 	protected 
 		/**
-		 * @var Form
-		 */
-		$Form,
-		/**
 		 * @var array
 		 */
 		$Data = array(),
@@ -39,23 +35,19 @@ abstract class LayerPrototype extends Runner {
 		$base,
 		$layername,
 		
-		$events = array(
-			'view' => 'view',
-			'edit' => 'edit',
-			'add' => 'edit',
-			'save' => 'save',
-		),
-		
+		$rebound = false,
 		$rebounds = array(),
+		
+		$methods = array(),
+		$event = null,
 		
 		$options = array(
 			/*'model' => null,*/
 			'rebound' => true,
+			'defaultEvent' => 'view',
+			'defaultEditEvent' => 'edit',
 			'preventPass' => array('post'), // Prevents passing post/get variable if the layer is not the Mainlayer
-		),
-		
-		$methods = array(),
-		$event = null;
+		);
 	
 	public $get = array(),
 		$post = array();
@@ -79,40 +71,31 @@ abstract class LayerPrototype extends Runner {
 	protected function __construct(){
 		$this->base = $this->name = ucfirst(substr(get_class($this), 0, -5));
 		$this->layername = strtolower($this->name);
-		
 		$this->methods = Core::getMethods($this->layername.'layer');
 		
 		$initialize = $this->initialize();
-		
 		if(is_array($initialize)) Hash::extend($this->options, $initialize);
 		
-		$model = isset($this->options['model']) ? $this->options['model'] : strtolower($this->name);
-		if($model && $model .= 'model') $this->Model = new $model();
+		$model = (isset($this->options['model']) ? $this->options['model'] : strtolower($this->name)).'model';
+		if($model!='model' && Core::classExists($model)) $this->Model = new $model();
 		unset($this->options['model']);
-		
-		// FIXME
-		if(!is_array($this->options['preventPass']))
-			$this->options['preventPass'] = array();
 	}
 	
 	protected function initialize(){}
-	
-	protected function access(){
-		return true;
-	}
+	protected function access(){ return true; }
 	
 	/**
 	 * @return Layer
 	 */
 	public function fireEvent($event, $get = null, $post = null){
-		// FIXME
 		foreach(array('get', 'post') as $v)
-			$this->{$v} = Hash::length($$v) ? $$v : ($this->isMainLayer() || !in_array($v, $this->options['preventPass']) ? Request::retrieve($v) : array());
+			if(!$this->{$v})
+				$this->{$v} = Hash::length($$v) ? $$v : ($this->isMainLayer || !in_array($v, $this->options['preventPass']) ? Request::retrieve($v) : array());
 		
-		// Event may use some UTF-8 special chars, but there is no method with that, but we still play nice with String::toLower and mbstring
+		// Event may use some UTF-8 special chars and there is no method with that, but we still play nice with String::toLower and mbstring
 		$event = String::toLower($event);
 		if(!in_array($event, $this->methods)){
-			$default = $this->getDefaultEvent('view');
+			$default = $this->options['defaultEvent'];
 			
 			$this->get[$default] = $event;
 			$event = $default;
@@ -126,53 +109,39 @@ abstract class LayerPrototype extends Runner {
 			
 			$this->{'on'.ucfirst($event)}(isset($this->get[$event]) ? $this->get[$event] : null);
 		}catch(Exception $e){
-			$this->rebound($e);
+			$this->rebound($e->getMessage());
 		}
 		
 		return $this;
 	}
 	
-	public function rebound($e){
-		static $rebound;
-		
-		if(!$rebound && $this->options['rebound'] && Request::retrieve('method')=='post' && Hash::length($this->post)){
-			$rebound = true;
-			// FIXME
-			/*foreach($this->Form->prepare() as $name => $value)
-				$this->post[$name] = $this->Form->getElement($name)->get('type')=='password' ? null : $value;
-			*/
-			$event = $this->getReboundEvent($this->event);
-			if(!$event) $event = $this->getDefaultEvent('edit');
+	protected function rebound($message){
+		if(!$this->rebound && $this->options['rebound'] && Hash::length($this->post)){
+			$this->rebound = true;
 			
-			if($event){
+			$event = $this->getReboundEvent($this->event);
+			if(!$event) $event = $this->options['defaultEditEvent'];
+			
+			if($event && in_array($event, $this->methods)){
 				$this->get[$event] = isset($this->get[$this->event]) ? $this->get[$this->event] : null;
 				
 				$this->fireEvent($event, $this->get, $this->post);
 			}
 		}
 		
-		$assign = $e->getMessage();
 		if($this->Template->hasFile()){
 			$prefix = Core::retrieve('elements.prefix');
-			$this->Template->assign(array(($prefix ? $prefix.'.' : '').'form.message' => $assign));
+			$this->Template->assign(array(($prefix ? $prefix.'.' : '').'form.message' => $message));
 		}else{
-			$this->Template->append($assign, true);
+			$this->Template->prepend($message);
 		}
 	}
 	
-	public function getDefaultEvent($event){
-		return !empty($this->events[$event]) ? $this->events[$event] : null;
-	}
-	
-	public function setDefaultEvent($event, $name){
-		return $this->events[$event] = strtolower($name);
-	}
-	
-	public function getReboundEvent($from){
+	protected function getReboundEvent($from){
 		return !empty($this->rebounds[$from]) ? $this->rebounds[$from] : null;
 	}
 	
-	public function setReboundEvent($event, $to){
+	protected function setReboundEvent($event, $to){
 		return $this->rebounds[$event] = strtolower($to);
 	}
 	
@@ -186,6 +155,10 @@ abstract class LayerPrototype extends Runner {
 		return $this->isMainLayer;
 	}
 	
+	public function isRebound(){
+		return $this->rebound;
+	}
+	
 	public function paginate($class = null){
 		if($this->Paginate && strtolower(get_class($this->Paginate))==strtolower(pick($class, 'Paginate')))
 			return $this->Paginate;
@@ -197,7 +170,6 @@ abstract class LayerPrototype extends Runner {
 		static $Configuration;	
 		if(!$Configuration)
 			$Configuration = array(
-				'default' => $this->getDefaultEvent('view'),
 				'contenttype.querystring' => Core::retrieve('contenttype.querystring')
 			);
 		
@@ -207,12 +179,12 @@ abstract class LayerPrototype extends Runner {
 			$options = array($Configuration['contenttype.querystring'] => $options);
 		
 		if(!$event || !in_array($event, $this->methods))
-			$event = $Configuration['default'];
+			$event = $this->options['defaultEvent'];
 		
-		$base = array(String::toLower($this->base));
-		if($title || ($event && ($event!=$Configuration['default'] || $showEvent))){
+		$base = array(strtolower($this->base));
+		if($title || ($event && ($event!=$this->options['defaultEvent'] || $showEvent))){
 			if(!$title) $base[] = $event;
-			else if(in_array($title, $this->methods) || $event!=$Configuration['default']) $base[] = array($event, $title);
+			else if(in_array($title, $this->methods) || $event!=$this->options['defaultEvent']) $base[] = array($event, $title);
 			else $base[] = $title;
 		}
 		

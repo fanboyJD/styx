@@ -14,10 +14,16 @@ class UsermanagementObject extends DatabaseObject {
 					':public' => true,
 					':validate' => array(
 						'pagetitle' => true,
+						'notempty' => true,
 					),
 				),
 				'id' => array(),
-				'pwd' => array(),
+				'pwd' => array(
+					':caption' => Lang::retrieve('user.pwd'),
+					':validate' => array(
+						'notempty' => true,
+					),
+				),
 				'session' => array(),
 				'rights' => array(
 					':default' => '[]',
