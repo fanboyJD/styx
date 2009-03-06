@@ -37,6 +37,7 @@ abstract class Object implements Iterator, ArrayAccess, Countable {
 		
 		$this->options['identifier'] = Core::getIdentifier($this->options['identifier']);
 		
+		if(is_object($data)) $data = $data->toArray();
 		if(is_array($data)){
 			// If it is loaded from a datasource it should not care about the :public modifier
 			if($this->structure && !$this->new){
@@ -46,7 +47,7 @@ abstract class Object implements Iterator, ArrayAccess, Countable {
 						unset($data[$key]);
 					}
 				
-				$this->Garbage = $data;
+				if(count($data)) $this->Garbage = $data;
 			}else{
 				$this->store($data);
 			}
@@ -54,9 +55,7 @@ abstract class Object implements Iterator, ArrayAccess, Countable {
 	}
 	
 	protected function initialize(){}
-	protected function onSave($data){
-		return $data;
-	}
+	protected function onSave($data){ return $data; }
 	protected function onDelete(){}
 	protected function onFormCreate(){}
 	
@@ -91,9 +90,7 @@ abstract class Object implements Iterator, ArrayAccess, Countable {
 		if(!$this->prepare()) return false;
 		
 		$this->Changed = $this->onSave($this->Changed);
-		$this->new = false;
-		$this->Changed = array();
-		$this->modified = array();
+		$this->cleanup();
 		
 		return true;
 	}
@@ -109,7 +106,7 @@ abstract class Object implements Iterator, ArrayAccess, Countable {
 		if(!is_array($array)) $array = array($array => $value);
 		
 		foreach($array as $key => $value){
-			if(($this->structure && !isset($this->structure[$key])) || empty($this->structure[$key][':public'])){
+			if($this->structure && (!isset($this->structure[$key]) || empty($this->structure[$key][':public']))){
 				$this->Garbage[$key] = $value;
 				continue;
 			}
@@ -147,6 +144,12 @@ abstract class Object implements Iterator, ArrayAccess, Countable {
 				$this->Data[$key] = !empty($value[':default']) ? $value[':default'] : null;
 			
 		return $this;
+	}
+	
+	protected function cleanup(){
+		$this->new = false;
+		$this->Changed = array();
+		$this->modified = array();
 	}
 	
 	public function getIdentifier($identifier = 'external'){
@@ -218,10 +221,6 @@ abstract class Object implements Iterator, ArrayAccess, Countable {
 		return $this->Data;
 	}
 	
-	public function offsetExists($key){
-		return isset($this->Data[$key]);
-	}
-	
 	public function offsetSet($key, $value){
 		$this->store($key, $value);
 	}
@@ -230,8 +229,16 @@ abstract class Object implements Iterator, ArrayAccess, Countable {
 		return isset($this->Data[$key]) ? $this->Data[$key] : null;
 	}
 	
+	public function offsetExists($key){
+		return isset($this->Data[$key]);
+	}
+	
 	public function offsetUnset($key){
-		unset($this->Data[$key]);
+		if($this->structure && (!isset($this->structure[$key]) || empty($this->structure[$key][':public'])))
+			return;
+		
+		$this->Data[$key] = null;
+		$this->modified[$key] = true;
 	}
 	
 	public function rewind(){

@@ -232,16 +232,16 @@ class DataSet implements Iterator, ArrayAccess, Countable {
 		return $this;
 	}
 	
-	public function offsetExists($offset){
-		return isset($this->Data[$offset]);
-	}
-	
 	public function offsetSet($offset, $value){
 		$this->Data[$offset] = $value;
 	}
 	
 	public function offsetGet($offset){
 		return isset($this->Data[$offset]) ? $this->Data[$offset] : null;
+	}
+	
+	public function offsetExists($offset){
+		return isset($this->Data[$offset]);
 	}
 	
 	public function offsetUnset($offset){

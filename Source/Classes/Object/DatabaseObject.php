@@ -41,9 +41,7 @@ abstract class DatabaseObject extends Object {
 		if($this->new && empty($this->Data[$identifier]))
 			$this->Data[$identifier] = Database::getInsertId();
 		
-		$this->new = false;
-		$this->Changed = array();
-		$this->modified = array();
+		$this->cleanup();
 		
 		return true;
 	}

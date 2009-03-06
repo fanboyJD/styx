@@ -153,11 +153,6 @@ class QuerySelect extends Query implements Iterator, ArrayAccess, Countable {
 		$this->queried = true;
 	}
 	
-	public function offsetExists($offset){
-		$this->populate();
-		return isset($this->Data[$offset]);
-	}
-	
 	public function offsetSet($offset, $value){
 		$this->populate();
 		$this->Data[$offset] = $value;
@@ -166,6 +161,11 @@ class QuerySelect extends Query implements Iterator, ArrayAccess, Countable {
 	public function offsetGet($offset){
 		$this->populate();
 		return isset($this->Data[$offset]) ? $this->Data[$offset] : null;
+	}
+	
+	public function offsetExists($offset){
+		$this->populate();
+		return isset($this->Data[$offset]);
 	}
 	
 	public function offsetUnset($offset){

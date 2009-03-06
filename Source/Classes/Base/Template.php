@@ -92,9 +92,17 @@ class Template extends Runner {
 	/**
 	 * @return Template
 	 */
-	public function append($value, $unshift = false){
-		$fn = 'array_'.($unshift ? 'unshift' : 'push');
-		$fn($this->appended, $value);
+	public function prepend($value){
+		array_unshift($this->appended, $value);
+		
+		return $this;
+	}
+	
+	/**
+	 * @return Template
+	 */
+	public function append($value){
+		array_push($this->appended, $value);
 		
 		return $this;
 	}
