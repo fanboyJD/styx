@@ -62,6 +62,8 @@ abstract class ObjectPrototype implements Iterator, ArrayAccess, Countable {
 	
 	public function setCriteria($criteria){
 		$this->criteria = $criteria;
+		
+		return $this;
 	}
 	
 	protected function validate(){
@@ -110,7 +112,7 @@ abstract class ObjectPrototype implements Iterator, ArrayAccess, Countable {
 	public function store($array, $value = null){
 		if(is_scalar($array)) $array = array($array => $value);
 		
-		foreach($array as $key => $value){
+		foreach((array)$array as $key => $value){
 			if($this->structure && (!isset($this->structure[$key]) || empty($this->structure[$key][':public']))){
 				$this->Garbage[$key] = $value;
 				continue;
@@ -190,13 +192,11 @@ abstract class ObjectPrototype implements Iterator, ArrayAccess, Countable {
 		}
 		$this->onFormCreate();
 		
-		if($this->requireSession){
-			$config = Core::retrieve('user');
+		if($this->requireSession)
 			$this->Form->addElement(new HiddenElement(array(
 				'name' => Core::generateSessionName($this->name),
-				'value' => User::get($config['session']),
-			)));
-		}
+				'value' => User::retrieve()->getSession(),
+			)))->set('id', '');
 		
 		return $this->Form;
 	}

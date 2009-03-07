@@ -251,7 +251,7 @@ final class Request {
 			return;
 		}
 		
-		foreach($array as $key => $value)
+		foreach((array)$array as $key => $value)
 			if($value) self::$Storage[$key] = $value;
 			else unset(self::$Storage[$key]);
 	}

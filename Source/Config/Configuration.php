@@ -33,14 +33,6 @@ Core::store(array(
 		'engines' => array('apc', 'memcache'),
 	),
 	
-	'user' => array(
-		'type' => 'cookie',
-		'table' => 'users',
-		'fields' => array('name', 'pwd', 'session'),
-		'session' => 'session',
-		'rights' => 'rights',
-	),
-	
 	'layer.default' => array(
 		'layer' => 'index',
 		'event' => 'view'

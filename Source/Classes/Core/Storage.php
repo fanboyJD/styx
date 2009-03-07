@@ -31,7 +31,7 @@ class Storage {
 			return;
 		}
 		
-		foreach($array as $key => $value)
+		foreach((array)$array as $key => $value)
 			if($value) $this->Storage[$key] = $value;
 			else unset($this->Storage[$key]);
 	}

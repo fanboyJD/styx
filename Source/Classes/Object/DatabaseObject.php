@@ -13,6 +13,8 @@ abstract class DatabaseObject extends Object {
 	
 	public function setTable($table){
 		$this->table = $table;
+		
+		return $this;
 	}
 	
 	public function getTable(){

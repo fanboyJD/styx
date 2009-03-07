@@ -41,8 +41,6 @@ Core::initialize();
 
 Request::initialize();
 
-User::initialize();
-
 Core::fireEvent('initialize');
 
 if(!Response::getContentType())

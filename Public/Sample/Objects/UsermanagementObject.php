@@ -20,9 +20,6 @@ class UsermanagementObject extends DatabaseObject {
 				'id' => array(),
 				'pwd' => array(
 					':caption' => Lang::retrieve('user.pwd'),
-					':validate' => array(
-						'notempty' => true,
-					),
 				),
 				'session' => array(),
 				'rights' => array(
@@ -49,6 +46,9 @@ class UsermanagementObject extends DatabaseObject {
 	}
 	
 	protected function onSave($data){
+		if($this->new && empty($this->Garbage['password']))
+			throw new ValidatorException('notempty', Lang::retrieve('user.pwd'));
+		
 		if($this->new || isset($this->Garbage['password']))
 			$data['pwd'] = User::getPassword($this->Garbage['password']);
 		

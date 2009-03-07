@@ -212,11 +212,15 @@ class Elements extends Element {
 	public function setRaw($data){
 		if(!Hash::length($data)) return;
 		
-		foreach($data as $name => $el){
-			if(empty($this->elements[$name]) || $this->type=='button' || $this->options['type']='hidden' || $this->options['type']=='password')
+		foreach($data as $name => $value){
+			if(empty($this->elements[$name]))
 				continue;
 			
-			$this->elements[$name]->setValue($el);
+			$el = $this->elements[$name];
+			if($el->type=='button' || (!empty($el->options['type']) && ($el->options['type']=='hidden' || $el->options['type']=='password')))
+				continue;
+			
+			$el->setValue($value);
 		}
 	}
 	

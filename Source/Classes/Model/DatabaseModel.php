@@ -11,8 +11,16 @@ abstract class DatabaseModel extends Model {
 		unset($this->options['table']);
 	}
 	
+	public function setCache($cache){
+		$this->cache = !!$cache;
+		
+		return $this;
+	}
+	
 	public function setTable($table){
 		$this->table = $table;
+		
+		return $this;
 	}
 	
 	public function getTable(){

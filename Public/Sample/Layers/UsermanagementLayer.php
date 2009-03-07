@@ -20,7 +20,7 @@ class UsermanagementLayer extends Layer {
 	}
 	
 	public function onEdit($name){
-		$object = $this->Model->createOrFindBy($name)->store($this->post)->requireSession();
+		$object = $this->Model->createOrFindBy($name)->requireSession();
 		
 		$form = $object->getForm()->set('action', $this->link($object->getIdentifier(), 'save'));
 		if($this->isRebound()) $form->setRaw($this->post);

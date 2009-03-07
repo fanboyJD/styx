@@ -5,12 +5,12 @@ require_once('./Initialize.php');
 class UserTest extends StyxUnitTest {
 	
 	public function testRights(){
-		User::store(array(
+		User::store(new UserObject(array(
 			'id' => 1,
 			'name' => 'admin',
 			'pwd' => '0d0de95795a741adbe0ac22d788ef01d4d1ea226',
 			'session' => sha1(mt_rand(0, 10000)),
-		));
+		)));
 		
 		User::setRights('layer.index');
 		

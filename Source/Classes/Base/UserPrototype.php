@@ -9,18 +9,26 @@
 
 class UserPrototype {
 	
-	protected static $Configuration = array(),
-		$rights = array(),
-		$user = null;
+	protected static $rights = array();
+	protected static $user = null;
 	
-	public static function initialize(){
-		User::$Configuration = array_merge(Core::retrieve('user'), Core::fetch('prefix', 'identifier.internal', 'secure'));
+	protected static function onGetLoginData(){
+		$cookie = Request::retrieve('cookie');
+		return empty($cookie[$prefix = Core::retrieve('prefix')]) ? null : json_decode((string)$cookie[$prefix], true);
+	}
+	
+	protected static function onLogin($data){
+		Response::setCookie(Core::retrieve('prefix'), json_encode($data));
+	}
+	
+	protected static function onLogout(){
+		Response::removeCookie(Core::retrieve('prefix'));
 	}
 	
 	public static function store($user){
-		User::setRights($user && !empty(User::$Configuration['rights']) && !empty($user[User::$Configuration['rights']]) ? $user[User::$Configuration['rights']] : null);
+		User::setRights($user ? $user->getRights() : null);
 		
-		return User::$user = (is_array($user) ? $user : false);
+		return User::$user = pick($user, false);
 	}
 	
 	public static function retrieve(){
@@ -28,57 +36,30 @@ class UserPrototype {
 	}
 	
 	public static function get($name){
-		return User::$user && !empty(User::$user[$name]) ? User::$user[$name] : null;
+		return User::$user ? User::$user[$name] : null;
 	}
 	
-	private static function getLoginData(){
-		$data = array();
-		
-		if(User::$Configuration['type']=='cookie'){
-			$cookie = Request::retrieve('cookie');
-			
-			$data = json_decode(!empty($cookie[User::$Configuration['prefix']]) ? (string)$cookie[User::$Configuration['prefix']] : null, true);
-		}
-		
-		return Hash::length($data)==3 ? $data : false;
+	protected static function getLoginData(){
+		$data = (array)User::onGetLoginData();
+		return count(array_intersect_key($data, array(
+			'name' => true,
+			'pwd' => true,
+			'session' => true,
+		)))==3 ? $data : false;
 	}
 	
 	public static function handle($cache = true){
-		$data = User::getLoginData();
-		
-		if(!$data) return;
-		
-		foreach(User::$Configuration['fields'] as $v){
-			$fields[$v] = $data[$v];
-			$fields[] = 'AND';
-		}
-		array_pop($fields);
-		
-		$user = Database::select(User::$Configuration['table'], $cache)->where($fields)->fetch();
-		
-		if($user[User::$Configuration['identifier.internal']]) return User::store($user);
-		
-		User::logout();
+		return ($user = Model::create('User')->setCache($cache)->findByLoginData(User::getLoginData())) ? User::store($user) : User::logout();
 	}
 	
 	public static function login($user){
-		$rand = User::$Configuration['secure'].mt_rand(0, 100000);
-		$user->updateSession(sha1($rand.uniqid($rand, true)));
-		
-		if(User::$Configuration['type']=='cookie'){
-			foreach(User::$Configuration['fields'] as $v)
-				$json[$v] = $user[$v];
-			
-			Response::setCookie(User::$Configuration['prefix'], json_encode($json));
-		}
-		
+		$rand = Core::retrieve('secure').mt_rand(0, 100000);
+		User::onLogin($user->updateSession(sha1($rand.uniqid($rand, true)))->getLoginData());
 		return User::handle(false);
 	}
 	
 	public static function logout(){
-		if(User::$Configuration['type']=='cookie')
-			Response::removeCookie(User::$Configuration['prefix']);
-		
+		User::onLogout();
 		User::store(false);
 	}
 	
@@ -86,11 +67,11 @@ class UserPrototype {
 		$user = User::retrieve();
 		$data = User::getLoginData();
 		
-		if(!$user || $user[User::$Configuration['session']]!=$sid || $data[User::$Configuration['session']]!=$sid)
+		if(!$user || empty($data['session']) || !in_array($sid, array($user->getSession(), $data['session'])))
 			return false;
-
-		foreach(User::$Configuration['fields'] as $v)
-			if(!$user[$v] || !$data[$v] || $user[$v]!=$data[$v])
+		
+		foreach($user->getLoginData() as $key => $value)
+			if(!$value || empty($data[$key]) || $data[$key]!=$value)
 				return false;
 		
 		return true;
@@ -103,7 +84,7 @@ class UserPrototype {
 	public static function setRights(){
 		$args = Hash::args(func_get_args());
 		
-		if(Hash::length($args)==1 && !is_array($args[0])) $args = json_decode($args[0], true);
+		if(Hash::length($args)==1 && is_string($args[0])) $args = json_decode($args[0], true);
 		
 		User::$rights = Hash::flatten(Hash::splat($args));
 	}
@@ -122,13 +103,10 @@ class UserPrototype {
 	}
 	
 	public static function hasRight(){
-		if(!is_array(User::$user))
-			return false;
-		
-		$args = Hash::args(func_get_args());
+		if(!User::$user) return false;
 		
 		$list = array();
-		foreach($args as $k => $arg)
+		foreach(Hash::args(func_get_args()) as $k => $arg)
 			foreach(explode('.', $arg) as $a)
 				$list[] = $a;
 		
