@@ -30,12 +30,12 @@ abstract class LayerPrototype extends Runner {
 		 */
 		$Paginate = null,
 		
-		$isMainLayer = false,
 		$name,
 		$base,
 		$layername,
 		
-		$rebound = false,
+		$isMainLayer = false,
+		$isRebound = false,
 		$rebounds = array(),
 		
 		$methods = array(),
@@ -116,8 +116,8 @@ abstract class LayerPrototype extends Runner {
 	}
 	
 	protected function rebound($message){
-		if(!$this->rebound && $this->options['rebound'] && Hash::length($this->post)){
-			$this->rebound = true;
+		if(!$this->isRebound && $this->options['rebound'] && Hash::length($this->post)){
+			$this->isRebound = true;
 			
 			$event = $this->getReboundEvent($this->event);
 			if(!$event) $event = $this->options['defaultEditEvent'];
@@ -156,24 +156,25 @@ abstract class LayerPrototype extends Runner {
 	}
 	
 	public function isRebound(){
-		return $this->rebound;
+		return $this->isRebound;
 	}
 	
 	public function paginate($class = null){
 		if($this->Paginate && strtolower(get_class($this->Paginate))==strtolower(pick($class, 'Paginate')))
 			return $this->Paginate;
 		
-		return $this->Paginate = Paginate::retrieve($class)->bind($this)->model($this->Model);
+		return $this->Paginate = Paginate::retrieve($class)->bind($this)->object($this->Model);
 	}
 	
 	public function link($title = null, $event = null, $options = null, $showEvent = false){
 		static $Configuration;	
 		if(!$Configuration)
 			$Configuration = array(
+				'identifier' => $this->Model instanceof Model ? $this->Model->getIdentifier('external') : Core::retrieve('identifier.external'),
 				'contenttype.querystring' => Core::retrieve('contenttype.querystring')
 			);
 		
-		if((is_array($title) || is_object($title)) && $this->Model) $title = $title[$this->Model->getIdentifier('external')];
+		if((is_array($title) || is_object($title))) $title = $title[$Configuration['identifier']];
 		
 		if($options && !is_array($options) && !empty($Configuration['contenttype.querystring']))
 			$options = array($Configuration['contenttype.querystring'] => $options);

@@ -12,24 +12,25 @@
 class Paginate {
 	
 	/**
-	 * A QuerySelect or DataSet instance
-	 *
-	 * @var QuerySelect
-	 */
-	protected $Data;
-	/**
 	 * The Layer instance (mainly to generate the links)
 	 *
 	 * @var Layer
 	 */
 	protected $Layer;
 	/**
-	 * The Model instance
+	 * A Model, QuerySelect or DataSet to operate on
 	 *
-	 * @var Model
+	 * @var Model|QuerySelect|DataSet
 	 */
-	protected $Model;
+	protected $Object;
 		
+	/**
+	 * The criteria matching the data
+	 *
+	 * @var array
+	 */
+	protected $criteria;
+	
 	/**
 	 * Options
 	 *
@@ -55,12 +56,12 @@ class Paginate {
 	/**
 	 * Initializes the pagination class
 	 *
-	 * @param QuerySelect|DataSet $data
+	 * @param array $criteria
 	 * @param array $options
+	 * @return Paginate
 	 */
-	public function initialize($data, $options = array()){
-		$this->Data = $data;
-		
+	public function initialize($criteria, $options = array()){
+		$this->criteria = $criteria;
 		Hash::extend($this->options, $options);
 		
 		$this->options['per'] = Data::id($this->options['per']);
@@ -69,6 +70,8 @@ class Paginate {
 			$this->options['start'] = $this->Layer->get[$this->options['key']];
 		
 		$this->options['start'] = Data::id($this->options['start'], $this->options['per']);
+		
+		return $this;
 	}
 	
 	/**
@@ -77,7 +80,7 @@ class Paginate {
 	 * @param string $class
 	 * @return Paginate
 	 */
-	public static function retrieve($class){
+	public static function retrieve($class = null){
 		$self = strtolower(__CLASS__);
 		if(!$class || !Core::classExists($class) || (strtolower($class)!=$self && !is_subclass_of($class, $self)))
 			$class = $self;
@@ -91,14 +94,22 @@ class Paginate {
 	 * @return string
 	 */
 	public function parse(){
-		if(!$this->Data) return;
+		if(!$this->Object) return;
 		
-		$this->count = $this->Data->quantity($this->Model->getIdentifier('internal'));
+		$isModel = $this->Object instanceof Model;
+		
+		if($isModel) $query = $this->Object->select();
+		else $query = $this->Object;
+		
+		$this->count = $query->setCriteria($this->criteria)->quantity($isModel ? $this->Object->getIdentifier('internal') : (!empty($this->options['identifier']) ? $this->options['identifier'] : null));
 		
 		if($this->options['start']>=$this->count)
 			$this->options['start'] = 0;
 		
-		$this->Data->limit($this->options['start'], $this->options['per']);
+		$this->criteria['limit'] = array($this->options['start'], $this->options['per']);
+		
+		if($isModel) $this->Object->findMany($this->criteria);
+		else $this->Object->setCriteria($this->criteria);
 		
 		if($this->count<=$this->options['per'] && !$this->options['start']) return;
 		
@@ -207,12 +218,12 @@ class Paginate {
 	}
 	
 	/**
-	 * Binds a Model to the template
+	 * Binds an object to the pagination
 	 *
 	 * @return Paginate
 	 */
-	public function model($model){
-		if(is_object($model)) $this->Model = $model;
+	public function object($object){
+		if(is_object($object)) $this->Object = $object;
 		
 		return $this;
 	}

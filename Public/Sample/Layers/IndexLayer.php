@@ -68,19 +68,16 @@ class IndexLayer extends Layer {
 		$contenttype = Response::getContentType();
 		
 		if($title){
-			$this->Data = array($this->Model->findByIdentifier($title));
-			if(!$this->Data[0]) throw new ValidatorException('newsnotavailable');
+			$this->Model->findByIdentifier($title);
+			if(!count($this->Model)) throw new ValidatorException('newsnotavailable');
 		}else{
-			$this->Data = $this->Model->findLatestNews();
-			
 			if($contenttype=='html'){
-				$this->paginate()->initialize($this->Data, array(
+				$this->paginate()->initialize($this->Model->getLatestNews(), array(
 					'per' => 2,
 				));
-				
 				$this->isIndex = true;
 			}elseif($contenttype=='xml'){
-				$this->Data->limit(10);
+				$this->Model->findMany($this->Model->getLatestNews(10));
 			}
 		}
 	

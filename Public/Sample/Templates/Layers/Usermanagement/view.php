@@ -5,12 +5,13 @@ echo '<a class="go icon" href="'.$this->link(null, 'edit').'">'.Lang::retrieve('
 $edit = Lang::retrieve('edit');
 $delete = Lang::retrieve('delete');
 $confirmdelete = Lang::retrieve('user.confirmdelete');
+$session = Core::generateSessionName($this->Model->getObjectname());
+
 foreach($this->Model as $user)
 	echo '<div class="anchor">
 			<span class="icon go">'.$user['name'].'</span>
 			<small>
 				[<a class="modifier" href="'.$this->link($user, 'edit').'"><img src="Images/pencil.png" alt="" />'.$edit.'</a>]
-				[<a class="modifier delete" href="'.$this->link($user, 'delete', 'json').'" rel="'.Core::generateSessionName($this->Model->getObjectname()).'"><img src="Images/cross.png" alt="" title="'.$confirmdelete.'" />'.$delete.'</a>]
+				[<a class="modifier delete" href="'.$this->link($user, 'delete', 'json').'" rel="'.$session.'"><img src="Images/cross.png" alt="" title="'.$confirmdelete.'" />'.$delete.'</a>]
 			</small>
 		</div>';
-?>
