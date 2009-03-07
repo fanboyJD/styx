@@ -245,24 +245,20 @@ final class String {
 	 */
 	public static function clean($string, $options = array()){
 		if(is_scalar($options)) $options = array('whitespace' => $options);
-		$default = array(
-			'whitespace' => true,
-			'erase' => true,
-		);
-		
-		Hash::extend($default, $options);
+		if(!isset($options['whitespace'])) $options['whitespace'] = true;
+		if(!isset($options['erase'])) $options['erase'] = true;
 		
 		if(is_array($string)){
 			foreach($string as $k => &$v){
 				$float = (float)$v;
 				if($v==(string)$float) $v = $float;
 				elseif($v==='0' || $v===0 || ctype_digit((string)$v)) $v = Data::id($v);
-				elseif($default['erase'] && (!$v || !trim($v))) unset($string[$k]);
-				else $v = self::clean($v, $default);
+				elseif($options['erase'] && (!$v || !trim($v))) unset($string[$k]);
+				else $v = self::clean($v, $options);
 			}
 		}else{
 			$string = trim($string);
-			if($default['whitespace']) $string = self::replace(array("\r\n", "\n", "\t"), array(($default['whitespace']==='clean' ? " " : "\n"), ($default['whitespace']==='clean' ? " " : "\n"), ""), $string);
+			if($options['whitespace']) $string = self::replace(array("\r\n", "\n", "\t"), array(($options['whitespace']==='clean' ? " " : "\n"), ($options['whitespace']==='clean' ? " " : "\n"), ""), $string);
 		}
 		
 		return $string;

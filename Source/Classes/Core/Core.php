@@ -188,7 +188,7 @@ class Core {
 		if(!self::$Storage['Methods'] || !empty(self::$Storage['debug'])){
 			self::$Storage['Methods'] = array();
 			foreach(self::$Storage['Classes'] as $class => $v)
-				if($class=='application' || (String::ends($class, 'layer') && is_subclass_of($class, 'Layer'))){
+				if($class=='application' || String::ends($class, 'layer')){
 					self::$Storage['Methods'][$class] = array();
 					foreach(get_class_methods($class) as $method)
 						if(String::starts($method, 'on') && strlen($method)>=3)
