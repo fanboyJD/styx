@@ -42,7 +42,7 @@ class DataSet implements Iterator, ArrayAccess, Countable {
 	public function __construct($data){
 		$this->Data = $data;
 		
-		$this->Storage = new Storage();
+		$this->Storage = new Storage;
 	}
 	
 	/**

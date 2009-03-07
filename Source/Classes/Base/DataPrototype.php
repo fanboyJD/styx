@@ -24,7 +24,7 @@ class DataPrototype {
 	public static function call($data, $validators){
 		static $Instance, $Methods = array();
 		
-		if(!$Instance) $Instance = new Data();
+		if(!$Instance) $Instance = new Data;
 		
 		if(!count($Methods)) $Methods = Core::getMethods('data');
 		

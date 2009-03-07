@@ -110,7 +110,7 @@ class Cache {
 	public static function getInstance(){
 		static $Instance;
 		
-		return $Instance ? $Instance : $Instance = new Cache();
+		return $Instance ? $Instance : $Instance = new Cache;
 	}
 	
 	/**

@@ -140,10 +140,8 @@ class Core {
 	public static function autoload($class){
 		$class = strtolower($class);
 		
-		if(empty(self::$Storage['Classes'][$class])){
-			require_once(self::$Storage['path'].'PrototypeInstantiation.php');
+		if(empty(self::$Storage['Classes'][$class]))
 			return false;
-		}
 		
 		if(!class_exists($class, false)) require self::$Storage['Classes'][$class];
 		
@@ -183,6 +181,8 @@ class Core {
 			
 			$c->store('Core/Classes', self::$Storage['Classes'], ONE_WEEK);
 		}
+		
+		require_once(self::$Storage['path'].'PrototypeInstantiation.php');
 		
 		self::$Storage['Methods'] = $c->retrieve('Core/Methods');
 		if(!self::$Storage['Methods'] || !empty(self::$Storage['debug'])){

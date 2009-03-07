@@ -39,7 +39,7 @@ class Page extends Template {
 	public static function getInstance(){
 		static $Instance;
 		
-		return $Instance ? $Instance : $Instance = new Page();
+		return $Instance ? $Instance : $Instance = new Page;
 	}
 	
 	public function register($name, $obj){

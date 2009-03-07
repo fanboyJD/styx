@@ -41,7 +41,7 @@ class Database {
 	public static function getInstance(){
 		static $Instance;
 		
-		return $Instance ? $Instance : $Instance = new Database();
+		return $Instance ? $Instance : $Instance = new Database;
 	}
 	
 	public function connect(){

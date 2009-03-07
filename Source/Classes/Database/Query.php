@@ -26,7 +26,7 @@ class Query {
 		 * We cannot extend from Storage due to the
 		 * use of store/retrieve in QuerySelect
 		 */
-		$this->Storage = new Storage();
+		$this->Storage = new Storage;
 	}
 	
 	public function __clone(){

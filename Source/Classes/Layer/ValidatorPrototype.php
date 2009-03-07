@@ -25,7 +25,7 @@ class ValidatorPrototype {
 	public static function call($data, $validators){
 		static $Instance, $Methods = array();
 		
-		if(!$Instance) $Instance = new Validator();
+		if(!$Instance) $Instance = new Validator;
 		
 		if(!count($Methods)) $Methods = Core::getMethods('validator');
 		

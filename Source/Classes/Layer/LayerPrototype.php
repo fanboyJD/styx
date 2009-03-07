@@ -56,7 +56,7 @@ abstract class LayerPrototype extends Runner {
 	 * @return Layer
 	 */
 	public static function create($layer){
-		return Core::classExists($layer .= 'layer') && is_subclass_of($layer, 'layer') ? new $layer() : false;
+		return Core::classExists($layer .= 'layer') && is_subclass_of($layer, 'layer') ? new $layer : false;
 	}
 	
 	/**
@@ -76,8 +76,8 @@ abstract class LayerPrototype extends Runner {
 		$initialize = $this->initialize();
 		if(is_array($initialize)) Hash::extend($this->options, $initialize);
 		
-		$model = (isset($this->options['model']) ? $this->options['model'] : strtolower($this->name)).'model';
-		if($model!='model' && Core::classExists($model)) $this->Model = new $model();
+		$model = isset($this->options['model']) ? $this->options['model'] : strtolower($this->name);
+		if($model) $this->Model = Model::create($model);
 		unset($this->options['model']);
 	}
 	

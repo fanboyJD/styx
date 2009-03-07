@@ -15,7 +15,7 @@ abstract class ModelPrototype implements Iterator, Countable {
 	 * @return Model
 	 */
 	public static function create($model){
-		return Core::classExists($model .= 'model') && is_subclass_of($model, 'model') ? new $model() : false;
+		return Core::classExists($model .= 'model') && is_subclass_of($model, 'model') ? new $model : false;
 	}
 	
 	public function __construct(){
