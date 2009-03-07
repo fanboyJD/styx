@@ -1,10 +1,8 @@
 <?php
-	$paginate = $this->paginate()->parse();
-	
+	$paginate = count($this->Model) ? '' : $this->paginate()->parse();
 	echo $paginate;
 	
-	$count = count($this->Data);
-	foreach($this->Data as $n)
+	foreach($this->Model as $n)
 		echo '<h1>'.$n['title'].' <span>
 				'.Lang::get('news.posted', $n['name'], date('d.m.Y - H:i', $n['time'])).'
 				'.(User::hasRight('layer.index.edit.modify') ? '<a href="'.$this->link($n, 'edit').'">${lang.edit}</a>' : '').'

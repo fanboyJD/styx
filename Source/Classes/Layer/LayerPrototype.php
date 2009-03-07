@@ -93,21 +93,21 @@ abstract class LayerPrototype extends Runner {
 				$this->{$v} = Hash::length($$v) ? $$v : ($this->isMainLayer || !in_array($v, $this->options['preventPass']) ? Request::retrieve($v) : array());
 		
 		// Event may use some UTF-8 special chars and there is no method with that, but we still play nice with String::toLower and mbstring
-		$event = String::toLower($event);
-		if(!in_array($event, $this->methods)){
+		$fireEvent = String::toLower($event);
+		if(!in_array($fireEvent, $this->methods)){
 			$default = $this->options['defaultEvent'];
 			
 			$this->get[$default] = $event;
-			$event = $default;
+			$fireEvent = $default;
 		}
 		
 		$this->Template = Template::map()->base('Layers', $this->name)->bind($this);
-		$this->event = $event;
+		$this->event = $fireEvent;
 		
 		try{
 			if(!$this->access()) return $this;
 			
-			$this->{'on'.ucfirst($event)}(isset($this->get[$event]) ? $this->get[$event] : null);
+			$this->{'on'.ucfirst($fireEvent)}(isset($this->get[$fireEvent]) ? $this->get[$fireEvent] : null);
 		}catch(Exception $e){
 			$this->rebound($e->getMessage());
 		}

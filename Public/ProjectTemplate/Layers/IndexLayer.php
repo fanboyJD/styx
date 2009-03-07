@@ -1,96 +1,62 @@
 <?php
 class IndexLayer extends Layer {
 	
-	public function initialize(){
+	protected function initialize(){
 		return array(
-			'table' => 'news',
+			'model' => 'news',
 		);
 	}
 	
-	public function populate(){
-		if($this->event=='delete'){
-			$this->Form->addElements(
-				new Button(array(
-					'name' => 'bsave',
-					':caption' => Lang::retrieve('delete'),
-				))
-			);
-		}else{
-			$this->Form->addElements(
-				new Input(array(
-					'name' => 'title',
-					':caption' => Lang::retrieve('title'),
-					':validate' => array(
-						'sanitize' => true,
-						'notempty' => true,
-					),
-				)),
-				
-				new Textarea(array(
-					'name' => 'content',
-					':caption' => Lang::retrieve('text'),
-					':validate' => array(
-						'purify' => array( // These are the options for the Data-Class method "purify". In this case the classes in the HTML to be kept
-							'classes' => array('green', 'blue', 'b', 'icon', 'bold', 'italic'),
-						),
-						'notempty' => true,
-					),
-				)),
-				
-				new Button(array(
-					'name' => 'bsave',
-					':caption' => Lang::retrieve('save'),
-				)),
-				
-				new Field('uid'),
-				new Field('pagetitle'),
-				new Field('time')
-			);
-		}
+	public function onSave($title){
+		$object = $this->Model->createOrFindBy($title)->store($this->post)->requireSession();
 		
-		$this->requireSession(); // Adds an invisible element with the current session so everything is safe :)
-	}
-	
-	public function onSave(){
-		if(!User::hasRight('layer.index.edit'))
+		if(!User::hasRight('layer.index.edit', $object->isNew() ? 'add' : 'modify'))
 			throw new ValidatorException('rights');
 		
-		$this->setValue(array(
-			'uid' => $this->editing ? $this->content['uid'] : User::get('id'),
-			'time' => $this->editing ? $this->content['time'] : time(),
-			'pagetitle' => $this->getPagetitle($this->getValue('title')),
-		));
+		if(!$object->save()) throw new ValidatorException('data');
 		
-		$this->save();
-		
-		$this->Template->append(Lang::get('news.saved', $this->link($this->getValue('pagetitle'))));
+		$this->Template->append(Lang::get('news.saved', $this->link($object['pagetitle'])));
 	}
 	
-	public function onEdit(){
-		$this->edit();
+	public function onEdit($title){
+		$object = $this->Model->createOrFindBy($title)->requireSession();
 		
-		if(!User::hasRight('layer.index.edit', $this->editing ? 'modify' : 'add'))
+		if(!User::hasRight('layer.index.edit', $object->isNew() ? 'add' : 'modify'))
 			throw new ValidatorException('rights');
+		
+		$form = $object->getForm()->set('action', $this->link($object->getIdentifier(), 'save'));
+		if($this->isRebound()) $form->setRaw($this->post);
 		
 		$this->Template->apply('edit')->assign(array(
-			'headline' => Lang::retrieve('news.'.($this->editing ? 'modify' : 'add')),
-		))->assign($this->format());
+			'headline' => Lang::retrieve('news.'.($object->isNew() ? 'add' : 'modify')),
+		))->assign($object->getForm()->format());
 	}
 	
 	public function onDelete($title){
 		if(!User::hasRight('layer.index.delete'))
 			throw new ValidatorException('rights');
 		
+		$object = $this->Model->findByIdentifier($title);
+		if(!$object) throw new ValidatorException('data');
+		$object->requireSession();
 		if(!Hash::length($this->post)){
-			$this->prepare();
-			
-			if(!$this->editing)
-				throw new ValidatorException('data');
+			$form = new FormElement(array(
+				':elements' => array(
+					new HiddenElement(array(
+						'name' => Core::generateSessionName('news'),
+						'value' => User::get('session'),
+					)),
+					new ButtonElement(array(
+						'name' => 'bsave',
+						':caption' => Lang::retrieve('delete'),
+					)),
+				),
+			));
 			
 			$this->Template->append('<h1>'.Lang::retrieve('confirmdelete').'</h1>
-				'.implode(array_map('implode', $this->format())));
+				'.Hash::implode($form->format()));
 		}else{
-			$this->delete();
+			$object->checkSession($this->post)->delete();
 			$this->Template->append(Lang::retrieve('deleted'));
 		}
 	}
@@ -101,18 +67,18 @@ class IndexLayer extends Layer {
 		// We check for the used ContentType (xml or html) and assign the correct template for it
 		$contenttype = Response::getContentType();
 		
-		$this->Data->fields('news.*, users.name')->join('news.uid=users.id', 'users', 'left')->limit(0)->order('time DESC');
-		if($title)
-			$this->Data->where(array(
-				'pagetitle' => array($title, 'pagetitle'),
-			))->limit(1);
-		elseif($contenttype=='html')
-			$this->paginate()->initialize($this->Data, array(
-				'per' => 2,
-			));
-		elseif($contenttype=='xml')
-			$this->Data->limit(10);
-		
+		if($title){
+			$this->Model->findByIdentifier($title);
+			if(!count($this->Model)) throw new ValidatorException('rights');
+		}else{
+			if($contenttype=='html')
+				$this->paginate()->initialize($this->Model->getLatestNews(), array(
+					'per' => 2,
+				));
+			elseif($contenttype=='xml')
+				$this->Model->findMany($this->Model->getLatestNews(10));
+		}
+	
 		$this->Template->apply(($contenttype=='xml' ? 'xml' : '').'view.php');
 	}
 	

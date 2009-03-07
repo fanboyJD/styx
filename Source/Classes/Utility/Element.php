@@ -65,6 +65,8 @@ class Element extends Runner {
 	public function setValue($v){
 		$this->invalidatedValue = true;
 		$this->options['value'] = $v;
+		
+		return $this;
 	}
 	
 	public function getValue(){
@@ -82,6 +84,8 @@ class Element extends Runner {
 		if(!empty($this->options[':validate']))
 			if(($v = Validator::call($this->options['value'], $this->options[':validate']))!==true)
 				throw new ValidatorException($v, !empty($this->options[':caption']) ? $this->options[':caption'] : (!empty($this->options['name']) ? $this->options['name'] : null));
+		
+		return $this;
 	}
 	
 	/**
@@ -197,11 +201,13 @@ class Elements extends Element {
 	 * @param array $data
 	 */
 	public function setValue($data){
-		if(!Hash::length($data)) return;
+		if(!Hash::length($data)) return $this;
 		
 		foreach($data as $name => $el)
 			if(!empty($this->elements[$name]))
 				$this->elements[$name]->setValue($el);
+		
+		return $this;
 	}
 	
 	/**
@@ -210,7 +216,7 @@ class Elements extends Element {
 	 * @param array $data
 	 */
 	public function setRaw($data){
-		if(!Hash::length($data)) return;
+		if(!Hash::length($data)) return $this;
 		
 		foreach($data as $name => $value){
 			if(empty($this->elements[$name]))
@@ -222,6 +228,8 @@ class Elements extends Element {
 			
 			$el->setValue($value);
 		}
+		
+		return $this;
 	}
 	
 	public function getValue($name){
@@ -231,6 +239,8 @@ class Elements extends Element {
 	public function validate(){
 		foreach($this->elements as $el)
 			$el->validate();
+		
+		return $this;
 	}
 	
 	/**
@@ -299,6 +309,8 @@ class FormElement extends Elements {
 		foreach($this->elements as $el)
 			if($el instanceof $instance)
 				return true;
+		
+		return false;
 	}
 	
 }
@@ -387,12 +399,10 @@ class RadioElement extends Element {
 	
 	public function setValue($v){
 		foreach($this->options[':elements'] as $el)
-			if($v==$el['value']){
-				parent::setValue($el['value']);
-				return;
-			}
+			if($v==$el['value'])
+				return parent::setValue($el['value']);
 		
-		parent::setValue($this->options[':default']);
+		return parent::setValue($this->options[':default']);
 	}
 	
 	public function getSelectedElement(){
@@ -446,6 +456,8 @@ class CheckboxElement extends Element {
 	public function setValue($v){
 		$this->options['checked'] = $this->options['value']==$v;
 		$this->options[':default'] = !!$v;
+		
+		return $this;
 	}
 	
 	public function getValue(){

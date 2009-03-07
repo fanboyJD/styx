@@ -1,5 +1,5 @@
 <?php
-	$paginate = $this->paginate()->parse();
+	$paginate = count($this->Model) ? '' : $this->paginate()->parse();
 	
 	if($paginate) echo $paginate.'<div class="clear"></div>';
 	

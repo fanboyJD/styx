@@ -1,45 +1,42 @@
 <?php
 class PasswordLayer extends Layer {
 	
-	public function initialize(){
-		$this->setDefaultEvent('view', 'edit');
+	protected $Form;
+	protected function initialize(){
+		$this->Form = new FormElement(array(
+			':elements' => array(
+				new InputElement(array(
+					'name' => 'pwd',
+					'type' => 'password',
+					':caption' => Lang::retrieve('user.pwd'),
+					':validate' => array(
+						'notempty' => true,
+					),
+				)),
+				
+				new ButtonElement(array(
+					'name' => 'bsave',
+					':caption' => Lang::retrieve('save'),
+				)),
+			)
+		));
 		
 		return array(
-			'identifier' => 'id',
-			'table' => 'users',
-		);
-	}
-	
-	public function populate(){
-		$this->Form->addElements(
-			new Input(array(
-				'name' => 'pwd',
-				'type' => 'password',
-				':caption' => Lang::retrieve('user.pwd'),
-				':validate' => array(
-					'notempty' => true,
-				),
-			)),
-			
-			new Button(array(
-				'name' => 'bsave',
-				':caption' => Lang::retrieve('save'),
-			))
+			'defaultEvent' => 'edit',
 		);
 	}
 	
 	public function onSave(){
-		$this->setValue(array(
-			'pwd' => User::getPassword($this->getValue('pwd')),
-		));
+		$this->Form->setValue($this->post)->validate();
 		
-		$data = $this->validate();
-		
-		Database::update($this->table)->set($data)->limit(0)->query();
+		$pwd = $this->Form->getValue('pwd');
+		Database::update('users')->set(array(
+			'pwd' => User::getPassword($pwd)
+		))->limit(0)->query();
 		
 		$user = User::retrieve();
 		if($user){
-			$user['pwd'] = $this->getValue('pwd');
+			$user['pwd'] = $pwd;
 			User::login($user);
 		}
 		
@@ -47,10 +44,10 @@ class PasswordLayer extends Layer {
 	}
 	
 	public function onEdit(){
-		$this->edit(array('preventDefault' => true));
+		$this->Form->set('action', $this->link(null, 'save'));
 		
 		$this->Template->append('<h1>Change Password</h1>
-			'.implode(array_map('implode', $this->format())));
+			'.Hash::implode($this->Form->format()));
 	}
 	
 }

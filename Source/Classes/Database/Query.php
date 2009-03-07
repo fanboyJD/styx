@@ -141,7 +141,7 @@ class Query {
 				'join' => true,
 			));
 		
-		foreach(array_intersect_key($criteria, $array) as $key => $value)
+		foreach(array_intersect_key((array)$criteria, $array) as $key => $value)
 			$this->{$key}($value);
 		
 		return $this;
