@@ -93,7 +93,7 @@ abstract class ModelPrototype implements Iterator, Countable {
 		if(!count($list)) return false;
 		
 		foreach($list as $obj)
-			if(is_array($obj))
+			if(is_array($obj) || is_object($obj))
 				$this->Collection[] = new $this->objectname($obj, false);
 		
 		return count($this->Collection) ? $this->Collection : false;

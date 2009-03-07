@@ -100,7 +100,7 @@ class DataSet implements Iterator, ArrayAccess, Countable {
 		$this->queried = false;
 		
 		if($val) $limit = array($limit, $val);
-		elseif(!is_array($limit)) $limit = array(0, $limit);
+		elseif(is_scalar($limit)) $limit = array(0, $limit);
 		
 		$this->Storage->store('limit', $limit);
 		

@@ -40,11 +40,11 @@ class Query {
 	 */
 	protected function formatSet(){
 		$data = $this->Storage->retrieve('set');
-		if(!is_array($data))
+		if(is_scalar($data))
 			return $data;
 		
 		foreach($data as $k => $v)
-			$out[] = $k.'='.($v!==null ? "'".addslashes(is_array($v) ? (count($v[1]) ? Data::call($v[0], $v[1]) : $v[0]) : $v)."'" : 'NULL');
+			$out[] = $k.'='.($v!==null ? "'".addslashes(is_scalar($v) ? $v : (count($v[1]) ? Data::call($v[0], $v[1]) : $v[0]))."'" : 'NULL');
 		
 		return implode(', ', $out);
 	}
@@ -59,14 +59,14 @@ class Query {
 		if($deep) $data = &$deep;
 		else $data = $this->Storage->retrieve('where');
 		
-		if(!is_array($data) && is_string($data))
+		if(is_scalar($data))
 			return ' WHERE '.($data ? $data : 1);
 		elseif(!$deep && !$data)
 			return '';
 		
 		foreach($data as $k => $v){
 			if(!ctype_digit((string)$k))
-				$out[] = $k.'='.($v!==null ? "'".addslashes(is_array($v) ? (count($v[1]) ? Data::call($v[0], $v[1]) : $v[0]) : $v)."'" : 'NULL');
+				$out[] = $k.'='.($v!==null ? "'".addslashes(is_scalar($v) ? $v : (count($v[1]) ? Data::call($v[0], $v[1]) : $v[0]))."'" : 'NULL');
 			elseif(is_array($v))
 				$out[] = '('.$this->formatWhere($v).')';
 			else
@@ -118,7 +118,7 @@ class Query {
 		unset($this->formatted);
 		
 		if($val) $limit = array($limit, $val);
-		elseif(!is_array($limit)) $limit = array(0, $limit);
+		elseif(is_scalar($limit)) $limit = array(0, $limit);
 		
 		$this->Storage->store('limit', $limit);
 		

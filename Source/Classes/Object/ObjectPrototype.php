@@ -22,7 +22,7 @@ abstract class ObjectPrototype implements Iterator, ArrayAccess, Countable {
 		
 		$initialize = $this->initialize();
 		
-		if(isset($initialize['structure']) && is_array($initialize['structure'])){
+		if(isset($initialize['structure'])){
 			$this->structure = $initialize['structure'];
 			unset($initialize['structure']);
 			
@@ -108,7 +108,7 @@ abstract class ObjectPrototype implements Iterator, ArrayAccess, Countable {
 	}
 	
 	public function store($array, $value = null){
-		if(!is_array($array)) $array = array($array => $value);
+		if(is_scalar($array)) $array = array($array => $value);
 		
 		foreach($array as $key => $value){
 			if($this->structure && (!isset($this->structure[$key]) || empty($this->structure[$key][':public']))){
@@ -124,7 +124,7 @@ abstract class ObjectPrototype implements Iterator, ArrayAccess, Countable {
 	}
 	
 	protected function modify($array, $value = null){
-		if(!is_array($array)) $array = array($array => $value);
+		if(is_scalar($array)) $array = array($array => $value);
 		
 		foreach($array as $key => $value){
 			$this->Data[$key] = $value;

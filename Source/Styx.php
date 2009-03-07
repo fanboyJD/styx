@@ -3,7 +3,7 @@
  * Styx - MIT-style License
  * Author: christoph.pojer@gmail.com
  */
-if(!isset($Paths) || !is_array($Paths))
+if(!isset($Paths))
 	$Paths = array(
 		'app.path' => realpath('../').DIRECTORY_SEPARATOR,
 		'app.public' => realpath('./').DIRECTORY_SEPARATOR,

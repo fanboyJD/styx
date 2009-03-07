@@ -24,11 +24,11 @@ class UserPrototype {
 	}
 	
 	public static function retrieve(){
-		return is_array(User::$user) ? User::$user : false;
+		return User::$user ? User::$user : false;
 	}
 	
 	public static function get($name){
-		return is_array(User::$user) && User::$user[$name] ? User::$user[$name] : null;
+		return User::$user && !empty(User::$user[$name]) ? User::$user[$name] : null;
 	}
 	
 	private static function getLoginData(){

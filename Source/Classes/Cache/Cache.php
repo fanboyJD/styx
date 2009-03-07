@@ -209,7 +209,7 @@ class Cache {
 	 * @return Cache
 	 */
 	public function erase($array, $force = false){
-		if(!is_array($array))
+		if(is_scalar($array))
 			$array = array($array);
 		
 		$list = array();

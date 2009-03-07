@@ -244,7 +244,7 @@ final class String {
 	 * @return mixed
 	 */
 	public static function clean($string, $options = array()){
-		if(!is_array($options)) $options = array('whitespace' => $options);
+		if(is_scalar($options)) $options = array('whitespace' => $options);
 		$default = array(
 			'whitespace' => true,
 			'erase' => true,

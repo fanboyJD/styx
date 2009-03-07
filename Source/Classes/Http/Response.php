@@ -17,7 +17,7 @@ final class Response {
 		$Types = array();
 	
 	public static function setHeader($array, $value = null){
-		if(!is_array($array))
+		if(is_scalar($array))
 			$array = array($array => $value);
 		
 		foreach($array as $key => $value)
@@ -62,7 +62,7 @@ final class Response {
 		static $Configuration;	
 		if(!$Configuration) $Configuration = Core::fetch('path.separator', 'app.link', 'contenttype.querystring');
 		
-		if(!is_array($options) && $options){
+		if(is_scalar($options) && $options){
 			if(!$base) return $Configuration['app.link'].$options;
 			
 			$options = array($options => null);
@@ -76,7 +76,7 @@ final class Response {
 		
 		if(is_array($base))
 			foreach($base as $v)
-				$array[] = is_array($v) ? implode($Configuration['path.separator'], $v) : $v;
+				$array[] = is_scalar($v) ? $v : implode($Configuration['path.separator'], $v);
 		
 		if(is_array($options))
 			foreach($options as $k => $v)

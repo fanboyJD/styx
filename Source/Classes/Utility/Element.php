@@ -41,7 +41,7 @@ class Element extends Runner {
 		if(!$hasId && $hasName) $options['id'] = preg_replace('/(?:[^A-z0-9]|_|\^)+/', '_', $options['name'].'_'.($uid++));
 		elseif($hasId && !$hasName) $options['name'] = $options['id'];
 		
-		if(!empty($options['class']) && !is_array($options['class'])) $options['class'] = explode(' ', $options['class']);
+		if(!empty($options['class']) && is_scalar($options['class'])) $options['class'] = explode(' ', $options['class']);
 		elseif(empty($options['class'])) $options['class'] = array();
 		
 		if(empty($options['value'])) $options['value'] = null;
@@ -54,7 +54,7 @@ class Element extends Runner {
 		
 		$out = Template::map('Element', !empty($this->options[':template']) ? $this->options[':template'] : $this->name)->bind($this)->assign($this->options)->assign($pass)->parse(true);
 		
-		if(!is_array($out)) return $out;
+		if(is_scalar($out)) return $out;
 		
 		if(in_array($this->type, array('area', 'br', 'img', 'input', 'hr', 'wbr', 'param', 'link')))
 			return '<'.$this->type.$pass['attributes'].' />';
@@ -110,7 +110,7 @@ class Element extends Runner {
 	 * @return Element
 	 */
 	public function set($array, $value = null){
-		if(!is_array($array)){
+		if(is_scalar($array)){
 			if($value) $this->options[$array] = $value;
 			else unset($this->options[$array]);
 			

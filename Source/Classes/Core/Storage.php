@@ -25,7 +25,7 @@ class Storage {
 	 * @param mixed $value
 	 */
 	public function store($array, $value = null){
-		if(!is_array($array)){
+		if(is_scalar($array)){
 			if($value) $this->Storage[$array] = $value;
 			else unset($this->Storage[$array]);
 			return;

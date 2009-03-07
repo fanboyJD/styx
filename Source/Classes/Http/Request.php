@@ -245,7 +245,7 @@ final class Request {
 	private static $Storage = array();
 	
 	public static function store($array, $value = null){
-		if(!is_array($array)){
+		if(is_scalar($array)){
 			if($value) self::$Storage[$array] = $value;
 			else unset(self::$Storage[$array]);
 			return;

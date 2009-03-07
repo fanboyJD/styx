@@ -21,7 +21,7 @@ class QuerySelect extends Query implements Iterator, ArrayAccess, Countable {
 	protected function formatFields(){
 		$data = $this->Storage->retrieve('fields', '*');
 		
-		return is_array($data) ? implode(',', $data) : $data;
+		return is_scalar($data) ? $data : implode(',', $data);
 	}
 	
 	protected function formatOrder(){

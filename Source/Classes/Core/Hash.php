@@ -87,7 +87,7 @@ final class Hash {
 	 * @return array
 	 */
 	public static function extend(&$src, $extended){
-		if(!is_array($extended) || !count($extended)) return $src;
+		if(!is_array($extended)) return $src;
 		
 		foreach($extended as $key => $val)
 			$src[$key] = is_array($val) ? self::extend($src[$key], $val) : $val;

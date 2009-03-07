@@ -259,7 +259,7 @@ class Core {
 	public static function getIdentifier($identifier = null){
 		if(!$identifier)
 			return self::$Storage['identifier'];
-		elseif(!is_array($identifier))
+		elseif(is_scalar($identifier))
 			return array(
 				'internal' => $identifier,
 				'external' => $identifier,
@@ -327,7 +327,7 @@ class Core {
 	 * @param mixed $value
 	 */
 	public static function store($array, $value = null){
-		if(!is_array($array)){
+		if(is_scalar($array)){
 			if($value) self::$Storage[$array] = $value;
 			else unset(self::$Storage[$array]);
 			return;

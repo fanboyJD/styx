@@ -87,7 +87,7 @@ class DataPrototype {
 		if(!is_numeric($int) || $int<0) return 0;
 		
 		if($options){
-			if(!is_array($options)) $options = array('divider' => $options);
+			if(is_scalar($options)) $options = array('divider' => $options);
 			
 			$remainder = $int/$options['divider'];
 			if(round($remainder)!=$remainder)
@@ -220,7 +220,7 @@ class DataPrototype {
 		if(!is_array($options['contents'])) return $data;
 		
 		foreach($options['contents'] as &$content){
-			if(!is_array($content)) $content = array($options['identifier']['external'] => $content);
+			if(is_scalar($content)) $content = array($options['identifier']['external'] => $content);
 			
 			if(empty($content[$options['identifier']['external']]))
 				continue;
