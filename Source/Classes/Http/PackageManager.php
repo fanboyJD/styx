@@ -59,16 +59,14 @@ class PackageManager {
 		
 		if(!$Configuration) $Configuration = Core::fetch('app.version');
 		
-		$default = array(
+		$default = array_merge(array(
 			'type' => '',
 			'readable' => false,
 			'files' => array(),
 			'options' => array(),
 			'require' => array(),
 			'replaces' => array(),
-		);
-		
-		Hash::extend($default, $options);
+		), $options);
 		
 		Route::connect($Configuration['app.version'].'/'.$name, array(
 			'package' => $name,
