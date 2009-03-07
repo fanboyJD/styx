@@ -134,20 +134,21 @@ class Database {
 	}
 	
 	public function fetch($query, $type = null){
-		return $query ? pick(mysql_fetch_array($query, ($type ? $type : MYSQL_ASSOC)), false) : false;
+		return $query ? pick(mysql_fetch_array($query, pick($type, MYSQL_ASSOC)), false) : false;
 	}
 	
 	public static function getInsertId(){
 		return mysql_insert_id();
 	}
 	
-	public function retrieve($sql){
+	public function retrieve($sql, $type = null){
 		$query = $this->query($sql);
+		if(!$type) $type = MYSQL_ASSOC;
 		
 		if(!$query) return false;
 		
 		$rows = array();
-		while($row = mysql_fetch_array($query))
+		while($row = mysql_fetch_array($query, $type))
 			$rows[] = $row;
 		
 		mysql_free_result($query);

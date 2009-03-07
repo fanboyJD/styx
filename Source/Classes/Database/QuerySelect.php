@@ -144,10 +144,10 @@ class QuerySelect extends Query implements Iterator, ArrayAccess, Countable {
 		return pick($count[0], 0);
 	}
 	
-	public function retrieve(){
+	public function retrieve($type = null){
 		$this->queried = false;
 		
-		return $this->Data = pick(Database::getInstance()->retrieve($this->format()), array());
+		return $this->Data = pick(Database::getInstance()->retrieve($this->format(), $type), array());
 	}
 	
 	private function populate(){

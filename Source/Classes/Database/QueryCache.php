@@ -36,10 +36,10 @@ class QueryCache extends QuerySelect {
 		return ($cache = $this->getCache($type)) ? $cache : $this->setCache(parent::fetch($type), $type);
 	}
 	
-	public function retrieve(){
+	public function retrieve($type = null){
 		$this->queried = false;
 		
-		return ($cache = $this->getCache()) ? $this->Data = $cache : $this->setCache(parent::retrieve());
+		return ($cache = $this->getCache($type)) ? $this->Data = $cache : $this->setCache(parent::retrieve($type), $type);
 	}
 	
 }

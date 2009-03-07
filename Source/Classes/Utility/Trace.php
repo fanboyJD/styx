@@ -5,6 +5,10 @@ class Trace {
 	protected static $version = '0.2.1';
 	protected static $API = array('log', 'info', 'warn', 'error', 'trace');
 	
+	public static function errorHandler($errno, $errstr, $errfile, $errline){
+		self::inspect($errstr.' in '.$errfile.' on line '.$errline);
+	}
+	
 	public static function error($data, $return = false){
 		if(!Core::retrieve('debug')) return $return;
 		

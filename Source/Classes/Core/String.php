@@ -253,7 +253,7 @@ final class String {
 				$float = (float)$v;
 				if($v==(string)$float) $v = $float;
 				elseif($v==='0' || $v===0 || ctype_digit((string)$v)) $v = Data::id($v);
-				elseif($options['erase'] && (!$v || !trim($v))) unset($string[$k]);
+				elseif($options['erase'] && (!$v || (is_string($v) && !trim($v)))) unset($string[$k]);
 				else $v = self::clean($v, $options);
 			}
 		}else{
