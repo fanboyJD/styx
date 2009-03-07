@@ -136,13 +136,7 @@ final class Request {
 	public function getUrl(){
 		static $url;
 		
-		if(!$url){
-			$url = self::getProtocol().'://'.self::getServer().self::getScript().self::getPath();
-			
-			if(!String::ends($url, '/')) $url .= '/';
-		}
-		
-		return $url;
+		return !$url ? $url = rtrim(self::getProtocol().'://'.self::getServer().self::getScript().self::getPath(), '/').'/' : $url;
 	}
 	
 	public static function isSecure(){
