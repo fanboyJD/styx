@@ -8,6 +8,7 @@ abstract class ObjectPrototype implements Iterator, ArrayAccess, Countable {
 	protected $Form;
 	protected $name;
 	protected $structure;
+	protected $criteria = array();
 	protected $requireSession = false;
 	protected $modified = array();
 	protected $new = true;
@@ -58,6 +59,10 @@ abstract class ObjectPrototype implements Iterator, ArrayAccess, Countable {
 	protected function onSave($data){ return $data; }
 	protected function onDelete(){}
 	protected function onFormCreate(){}
+	
+	public function setCriteria($criteria){
+		$this->criteria = $criteria;
+	}
 	
 	protected function validate(){
 		foreach($this->Changed as $key => $value)

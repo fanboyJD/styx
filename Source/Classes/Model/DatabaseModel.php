@@ -11,6 +11,14 @@ abstract class DatabaseModel extends Model {
 		unset($this->options['table']);
 	}
 	
+	public function setTable($table){
+		$this->table = $table;
+	}
+	
+	public function getTable(){
+		return $this->table;
+	}
+	
 	public function find($criteria){
 		return $this->make($this->select()->setCriteria($criteria)->fetch());
 	}

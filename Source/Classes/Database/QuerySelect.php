@@ -104,13 +104,18 @@ class QuerySelect extends Query implements Iterator, ArrayAccess, Countable {
 	 * @param mixed $data
 	 * @return QuerySelect
 	 */
-	public function join($on, $table, $type = null){
+	public function join($on, $table = null, $type = null){
+		if(!$table && !$type) $args = Hash::args(func_get_args());
+		else $args = array($on, $table, $type);
+		
+		if(empty($args[1]) || empty($args[2])) return;
+		
 		unset($this->formatted);
 		
 		$this->Storage->store('join', array(
-			'on' => $on,
-			'table' => $table,
-			'type' => $type,
+			'on' => $args[0],
+			'table' => $args[1],
+			'type' => $args[2],
 		));
 		
 		return $this;

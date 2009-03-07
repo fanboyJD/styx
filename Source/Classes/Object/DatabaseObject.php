@@ -3,7 +3,6 @@
 abstract class DatabaseObject extends Object {
 	
 	protected $table;
-	protected $criteria = array();
 	
 	public function __construct($data = null, $new = true){
 		parent::__construct($data, $new);
@@ -12,12 +11,12 @@ abstract class DatabaseObject extends Object {
 		unset($this->options['table']);
 	}
 	
-	public function getTable(){
-		return $this->table;
+	public function setTable($table){
+		$this->table = $table;
 	}
 	
-	public function setCriteria($criteria){
-		$this->criteria = $criteria;
+	public function getTable(){
+		return $this->table;
 	}
 	
 	public function save(){

@@ -138,6 +138,7 @@ class Query {
 				'order' => true,
 				'group' => true,
 				'having' => true,
+				'join' => true,
 			));
 		
 		foreach(array_intersect_key($criteria, $array) as $key => $value)
