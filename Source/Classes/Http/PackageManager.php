@@ -181,6 +181,11 @@ class PackageManager {
 		if($package['replaces'])
 			$content = str_replace(array_keys($package['replaces']), $package['replaces'], $content);
 		
+		if($onCreate = Core::fireEvent('packageCreate', array(
+			'name' => $name,
+			'content' => $content,
+		))) $content = $onCreate;
+		
 		if(empty($package['readable'])){
 			if($package['type']=='js'){
 				$compressor = new JavaScriptPacker($content, 'None', false);

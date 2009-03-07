@@ -5,3 +5,5 @@ if(empty(self::$Storage['Classes']['object'])){ class Object extends ObjectProto
 if(empty(self::$Storage['Classes']['validator'])){ class Validator extends ValidatorPrototype {} }
 if(empty(self::$Storage['Classes']['data'])){ class Data extends DataPrototype {} }
 if(empty(self::$Storage['Classes']['user'])){ class User extends UserPrototype {} }
+
+if(empty(self::$Storage['Classes']['application'])){ class Application {} }

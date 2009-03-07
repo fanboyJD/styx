@@ -60,4 +60,6 @@ class Application {
 		Route::hide('User');
 	}
 	
+	public function onPackageCreate($data){}
+	
 }

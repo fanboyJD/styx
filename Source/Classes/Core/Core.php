@@ -283,33 +283,24 @@ class Core {
 	
 	/**
 	 * Tries to call the static method given by {@link $event} on the Application Class
-	 * if the class and the method are available. This can be used at any time for any
-	 * custom event
+	 * if even is available. This can be used at any time for any custom event
 	 *
 	 * <b>Predefined Events</b>
 	 * <ul>
 	 * <li>initialize - Gets called before the magic happens, used to set up routes, handle a logged in user etc.</li>
-	 * <li>pageShow - Gets called shortly before the Page outputs the html and after most of the processing is done</li>
+	 * <li>pageShow - Is called shortly before the Page outputs the html and after most of the processing is done</li>
+	 * <li>packageCreate - Automatically fired on every package when it gets created to operate on the output or add additional generated code</li>
 	 * </ul>
 	 *
 	 * @param string $event
-	 * @return mixed Returns the event return-value or false if there is no Application class or the event does not exist
+	 * @param mixed $arg Optional argument
+	 * @return mixed Returns the event return-value or false the event does not exist
 	 */
-	public static function fireEvent($event){
+	public static function fireEvent($event, $arg = null){
 		static $Instance;
+		if($Instance===null) $Instance = new Application;
 		
-		if($Instance===null)
-			$Instance = !empty(self::$Storage['Classes']['application']) ? new Application : false;
-		
-		if($Instance===false)
-			return false;
-		
-		$event = strtolower($event);
-		
-		if(!in_array($event, self::$Storage['Methods']['application']))
-			return false;
-		
-		return $Instance->{'on'.ucfirst($event)}();
+		return in_array(strtolower($event), self::$Storage['Methods']['application']) ? $Instance->{'on'.$event}($arg) : false;
 	}
 	
 	/* Storage Methods (Will be moved to a StaticStorage-Class in PHP5.3) */
