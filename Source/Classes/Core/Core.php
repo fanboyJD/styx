@@ -140,8 +140,10 @@ class Core {
 	public static function autoload($class){
 		$class = strtolower($class);
 		
-		if(empty(self::$Storage['Classes'][$class]))
+		if(empty(self::$Storage['Classes'][$class])){
+			require_once(self::$Storage['path'].'PrototypeInstantiation.php');
 			return false;
+		}
 		
 		if(!class_exists($class, false)) require self::$Storage['Classes'][$class];
 		
@@ -176,8 +178,7 @@ class Core {
 				self::getClassList('Classes'),
 				self::getClassList('Layers'),
 				self::getClassList('Models'),
-				self::getClassList('Objects'),
-				self::getClassList('Prototypes')
+				self::getClassList('Objects')
 			);
 			
 			$c->store('Core/Classes', self::$Storage['Classes'], ONE_WEEK);

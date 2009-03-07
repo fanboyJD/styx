@@ -1,6 +1,6 @@
 <?php
 
-abstract class Model implements Iterator, Countable {
+abstract class ModelPrototype implements Iterator, Countable {
 	
 	protected $Collection = array();
 	protected $name;

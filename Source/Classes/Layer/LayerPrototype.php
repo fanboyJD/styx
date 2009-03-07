@@ -137,14 +137,6 @@ abstract class LayerPrototype extends Runner {
 		}
 	}
 	
-	protected function getReboundEvent($from){
-		return !empty($this->rebounds[$from]) ? $this->rebounds[$from] : null;
-	}
-	
-	protected function setReboundEvent($event, $to){
-		return $this->rebounds[$event] = strtolower($to);
-	}
-	
 	public function setMainLayer(){
 		$this->isMainLayer = true;
 		
@@ -153,6 +145,14 @@ abstract class LayerPrototype extends Runner {
 	
 	public function isMainLayer(){
 		return $this->isMainLayer;
+	}
+	
+	protected function getReboundEvent($from){
+		return !empty($this->rebounds[$from]) ? $this->rebounds[$from] : null;
+	}
+	
+	protected function setReboundEvent($event, $to){
+		return $this->rebounds[$event] = strtolower($to);
 	}
 	
 	public function isRebound(){
