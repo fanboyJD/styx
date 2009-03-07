@@ -46,6 +46,12 @@ class Cache {
 	 * @var array
 	 */
 	private	$engines = array();
+	/**
+	 * Holds a list of available engines
+	 *
+	 * @var array
+	 */
+	private	$availableEngines = array('apc', 'memcache', 'eaccelerator', 'file');
 	
 	/**
 	 * Sets up the caching engines and reads the metadata
@@ -55,16 +61,14 @@ class Cache {
 		Hash::extend($this->Configuration, Core::retrieve('cache'));
 		
 		if(!$this->Configuration['prefix']) $this->Configuration['prefix'] = Core::retrieve('prefix');
-		
 		if(!$this->Configuration['root']) $this->Configuration['root'] = Core::retrieve('path').'./Cache';
 		$this->Configuration['root'] = realpath($this->Configuration['root']);
+		
 		$this->time = time();
 		
-		array_push($this->Configuration['engines'], 'file');
-		
 		$engines = array();
-		foreach(glob(Core::retrieve('path').'Classes/Cache/*') as $file){
-			$class = strtolower(substr(basename($file, '.php'), 0, -5));
+		array_push($this->Configuration['engines'], 'file');
+		foreach($this->availableEngines as $class){
 			if(!in_array($class, $this->Configuration['engines']))
 				continue;
 			
@@ -73,20 +77,16 @@ class Cache {
 				$engines[] = $class;
 		}
 		
-		$default = strtolower($this->Configuration['default']);
-		if(!$default || !in_array($default, $engines))
+		if(!$this->Configuration['default'] || !in_array($this->Configuration['default'], $engines))
 			$this->Configuration['default'] = reset($engines);
 		
-		$this->Configuration['engines'] = array();
+		$this->Configuration['engines'] = $engines;
 		foreach($engines as $engine){
-			$this->Configuration['engines'][] = $engine;
-			
 			$class = $engine.'cache';
 			$this->engines[$engine] = new $class($this->Configuration);
 		}
 		
 		$this->Meta = pick(unserialize($this->engines['file']->retrieve('Cache/List')), array());
-		
 		foreach($this->Meta as $k => $v)
 			if($v[0] && $v[0]<$this->time)
 				unset($this->Meta[$k]);
@@ -119,11 +119,9 @@ class Cache {
 	 * @return Apccache|Eacceleratorcache|Filecache|Memcache
 	 */
 	public static function getEngine($name = null){
-		if($name) $name = strtolower($name);
-		
 		$c = self::getInstance();
 		
-		return $name && !empty($c->engines[$name]) ? $c->engines[$name] : $c->engines[$c->Configuration['default']];
+		return ($name = strtolower($name)) && !empty($c->engines[$name]) ? $c->engines[$name] : $c->engines[$c->Configuration['default']];
 	}
 	
 	/**

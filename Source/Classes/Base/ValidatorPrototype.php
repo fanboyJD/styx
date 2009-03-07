@@ -33,10 +33,10 @@ class ValidatorPrototype {
 			$validators = array($validators => true);
 		
 		foreach($validators as $validator => $options){
-			if(empty($options) || !in_array(strtolower($validator), $Methods))
+			if(empty($options) || !in_array($validator, $Methods))
 				continue;
 			
-			if(!$Instance->{$validator}($data, is_array($options) ? $options : null, $validators))
+			if(!$Instance->{$validator}($data, $options, $validators))
 				return $validator;
 		}
 		

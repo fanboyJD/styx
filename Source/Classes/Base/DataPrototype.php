@@ -32,10 +32,10 @@ class DataPrototype {
 			$validators = array($validators => true);
 		
 		foreach($validators as $validator => $options){
-			if(empty($options) || !in_array(strtolower($validator), $Methods))
+			if(empty($options) || !in_array($validator, $Methods))
 				continue;
 			
-			$data = $Instance->{$validator}($data, is_array($options) ? $options : null, $validators);
+			$data = $Instance->{$validator}($data, $options, $validators);
 		}
 		
 		return $data;
