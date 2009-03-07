@@ -226,6 +226,10 @@ abstract class ObjectPrototype implements Iterator, ArrayAccess, Countable {
 		return $this->Data;
 	}
 	
+	public function toJSON(){
+		return Data::encode($this->Data);
+	}
+	
 	public function offsetSet($key, $value){
 		$this->store($key, $value);
 	}
