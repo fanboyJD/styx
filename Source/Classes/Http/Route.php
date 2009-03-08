@@ -127,7 +127,7 @@ final class Route {
 	}
 	
 	public static function hide($layer, $event = null){
-		self::$hidden[]  = array(
+		self::$hidden[] = array(
 			'layer' => strtolower($layer),
 			'event' => pick(strtolower($event), '*'),
 		);

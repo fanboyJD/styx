@@ -9,7 +9,7 @@
  * @author Christoph Pojer <christoph.pojer@gmail.com>
  */
 
-class DataIterator implements RecursiveIterator, Countable  {
+class DataIterator implements RecursiveIterator, Countable {
 	
 	/**
 	 * All elements of the iterator
@@ -85,7 +85,7 @@ class DataIterator implements RecursiveIterator, Countable  {
 		$current = current($this->Current);
 		
 		// This also prevents infinite loops, it does not return true if an element was already a node in the parent list of the current node
-		return !empty($current[$this->options['identifier']]) && !in_array($current[$this->options['identifier']], $this->Parents) && !empty($this->Data[$current[$this->options['identifier']]]) && !!Hash::length($this->Data[$current[$this->options['identifier']]]);        
+		return !empty($current[$this->options['identifier']]) && !in_array($current[$this->options['identifier']], $this->Parents) && !empty($this->Data[$current[$this->options['identifier']]]) && !!Hash::length($this->Data[$current[$this->options['identifier']]]);
 	}
 	
 	public function getChildren(){

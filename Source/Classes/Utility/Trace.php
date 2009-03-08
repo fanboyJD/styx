@@ -66,7 +66,7 @@ class Trace {
 		), $data));
 		
 		$headers = array();
-   		
+		
 		static $index = 1;
 		$parts = explode("\n", chunk_split($output, 5000, "\n"));
 		for($i=0, $l = count($parts);$i<$l;$i++){
@@ -76,10 +76,10 @@ class Trace {
 			else $headers['X-Wf-1-1-1-'.$index++] = strlen($parts[$i]).'|'.$parts[$i].'|';
 		}
 		
-	    $headers['X-Wf-1-Index'] = $index-1;
-	    
-	    self::setHeader();
-	  	Response::setHeader($headers);
+		$headers['X-Wf-1-Index'] = $index-1;
+		
+		self::setHeader();
+		Response::setHeader($headers);
 	}
 	
 	protected static function setHeader(){
