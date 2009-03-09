@@ -40,7 +40,7 @@ $CONFIGURATION['production'] = array_merge($CONFIGURATION['debug'], array(
 	'database' => array(
 		'host' => 'localhost',
 		'user' => 'wusch',
-		'password' => '',
+		'password' => 'DBPASS',
 		'db' => 'wusch_framework'
 	),
 	
