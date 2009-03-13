@@ -30,6 +30,8 @@ class Template extends Runner {
 	}
 	
 	protected function getFile(){
+		if(!$this->hasFile()) return false;
+		
 		static $Configuration;
 		if(!$Configuration) $Configuration = Core::fetch('Templates', 'debug', 'template.regex', 'template.default', 'template.execute');
 		
@@ -41,7 +43,7 @@ class Template extends Runner {
 		if(empty($info['extension'])) $info['extension'] = $Configuration['template.default'];
 		$file = $info['dirname'].'/'.$info['filename'].'.'.$info['extension'];
 		
-		if(empty($Configuration['Templates'][$file])) return;
+		if(empty($Configuration['Templates'][$file])) return null;
 		
 		$execute = in_array(strtolower($info['extension']), $Configuration['template.execute']) && $this->bound && method_exists($this->bound, 'execute');
 		
@@ -52,7 +54,7 @@ class Template extends Runner {
 			if($array && !$Configuration['debug']) return $array;
 			
 			$content = file_get_contents($Configuration['Templates'][$file]);
-			if(!$content) return false;
+			if(!$content) return null;
 			
 			preg_match_all($Configuration['template.regex'], $content, $matches);
 			
@@ -66,7 +68,7 @@ class Template extends Runner {
 		$this->bound->execute($this->assigned, $Configuration['Templates'][$file]);
 		$content = ob_get_clean();
 		
-		if(!$content) return;
+		if(!$content) return null;
 	
 		preg_match_all($Configuration['template.regex'], $content, $matches);
 		
@@ -143,46 +145,40 @@ class Template extends Runner {
 	public function parse($return = false){
 		static $Configuration;
 		
-		if(!$Configuration) $Configuration = Core::fetch('template.striptabs');
-		
-		if(!$this->hasFile()) return count($this->appended) ? implode($this->appended) : $this->assigned;
-		
 		$array = $this->getFile();
-		if(!$array && $return) return count($this->appended) ? implode($this->appended) : $this->assigned;
+		if($array===false || ($array===null && $return))
+			return count($this->appended) ? implode($this->appended) : $this->assigned;
 		
-		Hash::flatten($this->assigned);
+		$assigned = $this->assigned;
+		Hash::flatten($assigned);
 		
 		$rep = array(array_values($array['matches'][0]), array());
-		$i = 0;
-		foreach($array['matches'][1] as $v){
-			$vals = array_map('trim', explode('|', $v));
-			if($vals){
-				foreach($vals as $val){
-					if(!empty($this->assigned[$val])){
-						$rep[1][$i++] = $this->assigned[$val];
-						continue 2;
-					}elseif(String::starts($val, 'lang.') && $lang = Lang::retrieve(substr($val, 5))){
-						$rep[1][$i++] = $lang;
-						continue 2;
-					}
+		for($i = 0, $l = count($array['matches'][1]); $i < $l; $i++){
+			$val = $array['matches'][1][$i];
+			if(!empty($assigned[$val])){
+				$rep[1][$i] = $assigned[$val];
+				continue;
+			}elseif(strpos($val, '.')){
+				$val = explode('.', $val, 2);
+				if($val[0]=='lang' && $val[1] && ($lang = Lang::retrieve($val[1]))){
+					$rep[1][$i] = $lang;
+					continue;
 				}
 			}
 			
-			if(empty($rep[1][$i])) $rep[1][$i] = '';
-			
-			$i++;
+			$rep[1][$i] = '';
 		}
 		
+		if(!$Configuration) $Configuration = Core::fetch('template.striptabs');
 		if($Configuration['template.striptabs']){
 			$rep[0][] = "\t";
 			$rep[1][] = '';
 		}
 		
-		$array['content'] = str_replace($rep[0], $rep[1], $array['content']);
+		$content = str_replace($rep[0], $rep[1], $array['content']);
+		if($return) return $content;
 		
-		if($return) return $array['content'];
-		
-		echo $array['content'];
+		echo $content;
 		flush();
 	}
 }

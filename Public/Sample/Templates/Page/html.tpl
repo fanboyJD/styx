@@ -17,7 +17,7 @@
 	${layer.pagemenu}
 	${framework.description}
 	<div id="text">
-		${layer | lang.validator.rightsWrapped}
+		${layer}
 		<div class="clear"></div>
 	</div>
 </div>

@@ -28,7 +28,7 @@
 	<br/>
 	<?php /**/ if(Core::retrieve('setup')) echo Setup::handleSetup(); ?>
 	<br/>
-	${layer | lang.validator.rightsError}
+	<?php echo !empty($assigned['layer']) ? $assigned['layer'] : '${lang.validator.rightsError}'; ?>
 	<div class="clear"></div>
 </div>
 </div>

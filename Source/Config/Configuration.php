@@ -24,7 +24,7 @@ Core::store(array(
 	
 	'template.default' => 'tpl',
 	'template.execute' => array('php', 'phtml'),
-	'template.regex' => '/\\$\{([A-z0-9\.:\s|]+)\}/i',
+	'template.regex' => '/\\$\{([A-z0-9\.:]+?)\}/i',
 	'template.striptabs' => true,
 	'template.encode' => array('$' => '&#36;'), // $ is escaped because user input might contain ${...} for Template-substitution. This prevents bad input.
 	
