@@ -18,9 +18,11 @@ class UserObject extends DatabaseObject {
 		);
 	}
 	
+	protected function onInsert($data){
+		throw new ValidatorException('data');
+	}
+	
 	protected function onSave($data){
-		if($this->new) throw new ValidatorException('data');
-		
 		return $data;
 	}
 	

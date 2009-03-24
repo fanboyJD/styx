@@ -47,6 +47,13 @@ class NewsObject extends DatabaseObject {
 		);
 	}
 	
+	protected function onInsert($data){
+		$data['time'] = time();
+		$data['uid'] = User::get('id');
+		
+		return $data;
+	}
+	
 	protected function onSave($data){
 		if(Upload::exists('image')){
 			$upload = Upload::move('image', 'Files/', array(
@@ -55,11 +62,6 @@ class NewsObject extends DatabaseObject {
 			));
 			$img = new Image($upload);
 			$data['picture'] = 'Files/'.basename($img->resize(120)->save()->getPathname());
-		}
-		
-		if($this->new){
-			$data['time'] = time();
-			$data['uid'] = User::get('id');
 		}
 		
 		if(isset($data['title'])) $data['pagetitle'] = $this->getPagetitle($data['title']);

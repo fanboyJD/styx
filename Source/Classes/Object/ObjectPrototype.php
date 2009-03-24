@@ -57,6 +57,7 @@ abstract class ObjectPrototype implements Iterator, ArrayAccess, Countable {
 	
 	protected function initialize(){}
 	protected function onSave($data){ return $data; }
+	protected function onInsert($data){ return $data; }
 	protected function onDelete(){}
 	protected function onFormCreate(){}
 	
@@ -96,7 +97,8 @@ abstract class ObjectPrototype implements Iterator, ArrayAccess, Countable {
 	public function save(){
 		if(!$this->prepare()) return false;
 		
-		$this->Changed = $this->onSave($this->Changed);
+		$this->Changed = Hash::remove($this->onSave($this->new ? $this->onInsert($this->Changed) : $this->Changed), null);
+		Hash::extend($this->Data, $this->Changed);
 		$this->cleanup();
 		
 		return true;

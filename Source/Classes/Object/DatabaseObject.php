@@ -35,7 +35,7 @@ abstract class DatabaseObject extends Object {
 		
 		if(count($this->criteria)) $query->setCriteria($this->criteria);
 		
-		$this->Changed = Hash::remove($this->onSave($this->Changed), null);
+		$this->Changed = Hash::remove($this->onSave($this->new ? $this->onInsert($this->Changed) : $this->Changed), null);
 		Hash::extend($this->Data, $this->Changed);
 		$query->set($this->Changed)->query();
 		
