@@ -36,10 +36,6 @@ abstract class ModelPrototype implements Iterator, Countable {
 		return new $this->objectname($data, $new);
 	}
 	
-	public function getObjectname(){
-		return substr($this->objectname, 0, -6);
-	}
-	
 	public function getIdentifier($identifier = null){
 		return $identifier && !empty($this->options['identifier'][$identifier]) ? $this->options['identifier'][$identifier] : $this->options['identifier'];
 	}

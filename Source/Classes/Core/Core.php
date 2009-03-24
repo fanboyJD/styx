@@ -176,6 +176,7 @@ class Core {
 				self::getClassList('Classes'),
 				self::getClassList('Layers'),
 				self::getClassList('Models'),
+				self::getClassList('Modules'),
 				self::getClassList('Objects')
 			);
 			
