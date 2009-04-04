@@ -19,8 +19,12 @@ abstract class ModelPrototype implements Iterator, Countable {
 		$this->name = ucfirst(substr(get_class($this), 0, -5));
 		
 		$this->Module = Module::retrieve($this->getModuleName());
-		$this->options = $this->Module->getOptions();
-		$this->objectname = $this->Module->getName('object').'object';
+		if($this->Module){
+			$this->options = $this->Module->getOptions();
+			$this->objectname = $this->Module->getName('object').'object';
+		}else{
+			$this->objectname = $this->name.'object';
+		}
 	}
 	
 	protected function getModuleName(){
