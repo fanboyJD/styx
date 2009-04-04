@@ -6,26 +6,24 @@ abstract class ObjectPrototype implements Iterator, ArrayAccess, Countable {
 	protected $Changed = array();
 	protected $Garbage = array();
 	protected $Form;
+	protected $Module;
 	protected $name;
 	protected $structure;
 	protected $criteria = array();
 	protected $requireSession = false;
 	protected $modified = array();
 	protected $new = true;
-	protected $options = array(
-		'identifier' => null,
-	);
+	protected $options = array();
 	
 	public function __construct($data = null, $new = true){
 		$this->name = ucfirst(substr(get_class($this), 0, -6));
 		$this->new = !!$new;
 		
-		$initialize = $this->initialize();
+		$this->Module = Module::retrieve($this->getModuleName());
+		$this->options = $this->Module->getOptions();
 		
-		if(isset($initialize['structure'])){
-			$this->structure = $initialize['structure'];
-			unset($initialize['structure']);
-			
+		if(isset($this->options['structure'])){
+			$this->structure = $this->options['structure'];
 			$this->clear();
 			if($this->new)
 				foreach($this->structure as $key => $value){
@@ -33,10 +31,6 @@ abstract class ObjectPrototype implements Iterator, ArrayAccess, Countable {
 					if(!empty($value[':default'])) $this->Data[$key] = $value[':default'];
 				}
 		}
-		
-		if(is_array($initialize)) Hash::extend($this->options, $initialize);
-		
-		$this->options['identifier'] = Core::getIdentifier($this->options['identifier']);
 		
 		if(is_object($data)) $data = $data->toArray();
 		if(is_array($data)){
@@ -55,7 +49,10 @@ abstract class ObjectPrototype implements Iterator, ArrayAccess, Countable {
 		}
 	}
 	
-	protected function initialize(){}
+	protected function getModuleName(){
+		return $this->name;
+	}
+	
 	protected function onSave($data){ return $data; }
 	protected function onInsert($data){ return $data; }
 	protected function onDelete(){}

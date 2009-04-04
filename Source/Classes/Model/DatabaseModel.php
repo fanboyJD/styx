@@ -8,7 +8,6 @@ abstract class DatabaseModel extends Model {
 		parent::__construct();
 		
 		$this->table = !empty($this->options['table']) ? $this->options['table'] : strtolower($this->name);
-		unset($this->options['table']);
 	}
 	
 	public function setCache($cache){

@@ -26,6 +26,11 @@ abstract class LayerPrototype extends Runner {
 		$Model,
 		
 		/**
+		 * @var Module
+		 */
+		$Module,
+		
+		/**
 		 * @var Paginate
 		 */
 		$Paginate = null,
@@ -41,13 +46,7 @@ abstract class LayerPrototype extends Runner {
 		$methods = array(),
 		$event = null,
 		
-		$options = array(
-			/*'model' => null,*/
-			'rebound' => true,
-			'defaultEvent' => 'view',
-			'defaultEditEvent' => 'edit',
-			'preventPass' => array('post'), // Prevents passing post/get variable if the layer is not the Mainlayer
-		);
+		$options = array();
 	
 	public $get = array(),
 		$post = array();
@@ -74,12 +73,13 @@ abstract class LayerPrototype extends Runner {
 		$this->layername = strtolower($this->name);
 		$this->methods = Core::getMethods($this->layername.'layer');
 		
-		$initialize = $this->initialize();
-		if(is_array($initialize)) Hash::extend($this->options, $initialize);
-		
-		$model = isset($this->options['model']) ? $this->options['model'] : strtolower($this->name);
-		if($model) $this->Model = Model::create($model);
-		unset($this->options['model']);
+		$this->Module = Module::retrieve($this->getModuleName());
+		$this->Model = Model::create($this->Module->getName('model'));
+		$this->options = $this->Module->getOptions();
+	}
+	
+	protected function getModuleName(){
+		return $this->name;
 	}
 	
 	protected function initialize(){}

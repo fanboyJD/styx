@@ -1,6 +1,6 @@
 <?php
 
-class Module {
+class ModulePrototype {
 	
 	protected $Model;
 	
@@ -30,7 +30,7 @@ class Module {
 	/**
 	 * @return Module
 	 */
-	public static function retrieve($layer){
+	public static function retrieve($module){
 		static $Instances;
 		
 		return empty($Instances[$module = strtolower($module)]) ? $Instances[$module] = Module::create($module) : $Instances[$module];
@@ -44,9 +44,9 @@ class Module {
 		
 		$this->options['identifier'] = Core::getIdentifier($this->options['identifier']);
 		
-		$this->objectname = !empty($this->options['objectname']) ? $this->options['objectname'] : strtolower($this->name).'object';
-		$this->modelname = isset($this->options['modelname']) ? $this->options['modelname'] : strtolower($this->name);
-		unset($this->options['modelname'], $this->options['objectname']);
+		$this->objectname = !empty($this->options['object']) ? $this->options['object'] : strtolower($this->name);
+		$this->modelname = isset($this->options['model']) ? $this->options['model'] : strtolower($this->name);
+		unset($this->options['model'], $this->options['object']);
 	}
 	
 	public function getOptions(){
@@ -57,7 +57,7 @@ class Module {
 		switch(strtolower($class)){
 			case 'object': return $this->objectname;
 			case 'model': return $this->modelname;
-			default: $this->name;
+			default: return $this->name;
 		};
 	}
 	
@@ -65,10 +65,6 @@ class Module {
 		if(!$this->modelname) return null;
 		
 		return $this->Model ? $this->Model : $this->Model = Model::create($this->modelname);
-	}
-	
-	public function getObjectName(){
-		return substr($this->objectname, 0, -6);
 	}
 	
 }

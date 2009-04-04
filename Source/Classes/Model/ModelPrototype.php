@@ -3,34 +3,29 @@
 abstract class ModelPrototype implements Iterator, Countable {
 	
 	protected $Collection = array();
+	protected $Module;
 	protected $name;
+	protected $options = array();
 	protected $objectname;
-	protected $options = array(
-		'identifier' => null,
-		'objectname' => null,
-		'cache' => true,
-	);
 	
 	/**
 	 * @return Model
 	 */
 	public static function create($model){
-		return Core::classExists($model .= 'model') ? new $model : false;
+		return Core::classExists($model .= 'model') ? new $model() : false;
 	}
 	
 	public function __construct(){
 		$this->name = ucfirst(substr(get_class($this), 0, -5));
 		
-		$initialize = $this->initialize();
-		if(is_array($initialize)) Hash::extend($this->options, $initialize);
-		
-		$this->options['identifier'] = Core::getIdentifier($this->options['identifier']);
-		
-		$this->objectname = !empty($this->options['objectname']) ? $this->options['objectname'] : strtolower($this->name).'object';
-		unset($this->options['objectname']);
+		$this->Module = Module::retrieve($this->getModuleName());
+		$this->options = $this->Module->getOptions();
+		$this->objectname = $this->Module->getName('object').'object';
 	}
-
-	protected function initialize(){}
+	
+	protected function getModuleName(){
+		return $this->name;
+	}
 	
 	public function createObject($data = null, $new = true){
 		return new $this->objectname($data, $new);

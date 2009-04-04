@@ -8,7 +8,6 @@ abstract class DatabaseObject extends Object {
 		parent::__construct($data, $new);
 		
 		$this->table = !empty($this->options['table']) ? $this->options['table'] : strtolower($this->name);
-		unset($this->options['table']);
 	}
 	
 	public function setTable($table){
