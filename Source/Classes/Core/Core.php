@@ -118,17 +118,15 @@ class Core {
 	}
 	
 	/**
-	 * Returns the filename of a class if it exists anywhere in the Framework
+	 * Returns true if a class exists anywhere in the Framework
 	 * or in the Application. The class might not be loaded at that point as
 	 * it only checks if the given class-file exists
 	 *
 	 * @param string $class
-	 * @return mixed 
+	 * @return bool 
 	 */
 	public static function classExists($class){
-		$class = strtolower($class);
-		
-		return !empty(self::$Storage['Classes'][$class]) || class_exists($class, false) ? self::$Storage['Classes'][$class] : false;	
+		return !empty(self::$Storage['Classes'][$class = strtolower($class)]) || class_exists($class, false);	
 	}
 	
 	/**

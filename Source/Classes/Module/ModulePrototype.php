@@ -52,11 +52,11 @@ class ModulePrototype {
 	protected function onInitialize(){}
 	protected function onStructureCreate(){}
 	
-	public function getName($class){
+	public function getName($class = null){
 		switch(strtolower($class)){
 			case 'object': return $this->options['object'];
 			case 'model': return $this->options['model'];
-			default: return $this->name;
+			default: return strtolower($this->name);
 		};
 	}
 	
