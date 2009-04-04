@@ -11,7 +11,7 @@ define('ONE_WEEK', 604800);
 Core::store(array(
 	'styx.name' => 'Styx PHP Framework',
 	'styx.link' => 'http://styx.og5.net',
-	'styx.version' => '0.2beta',
+	'styx.version' => '0.3beta',
 	
 	'path.separator' => ':',
 	
