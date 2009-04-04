@@ -55,8 +55,7 @@ abstract class LayerPrototype extends Runner {
 	 * @return Layer
 	 */
 	public static function create($name){
-		$layer = $name;
-		return Core::classExists($layer .= 'layer') ? new $layer($name) : false;
+		return Core::classExists($layer = $name.'layer') ? new $layer($name) : false;
 	}
 	
 	/**
@@ -74,7 +73,7 @@ abstract class LayerPrototype extends Runner {
 		$this->methods = Core::getMethods($this->layername.'layer');
 		
 		$this->Module = Module::retrieve($this->getModuleName());
-		$this->Model = Model::create($this->Module->getName('model'));
+		$this->Model = $this->Module->getModel();
 		$this->options = $this->Module->getOptions();
 	}
 	

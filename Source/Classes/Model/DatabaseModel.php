@@ -2,28 +2,26 @@
 
 abstract class DatabaseModel extends Model {
 	
-	protected $table;
-	
 	public function __construct(){
 		parent::__construct();
 		
-		$this->table = !empty($this->options['table']) ? $this->options['table'] : strtolower($this->name);
+		if(empty($this->options['table'])) $this->options['table'] = strtolower($this->name);
 	}
 	
 	public function setCache($cache){
-		$this->cache = !!$cache;
+		$this->options['cache'] = !!$cache;
 		
 		return $this;
 	}
 	
 	public function setTable($table){
-		$this->table = $table;
+		$this->options['table'] = $table;
 		
 		return $this;
 	}
 	
 	public function getTable(){
-		return $this->table;
+		return $this->options['table'];
 	}
 	
 	public function find($criteria){
@@ -35,13 +33,13 @@ abstract class DatabaseModel extends Model {
 	}
 	
 	public function select(){
-		return Database::select($this->table, $this->options['cache']);
+		return Database::select($this->options['table'], $this->options['cache']);
 	}
 	
 	public function destroy($criteria){
 		$this->Collection = array();
 		
-		Database::delete($this->table)->setCriteria($criteria)->query();
+		Database::delete($this->options['table'])->setCriteria($criteria)->query();
 	}
 	
 }

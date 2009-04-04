@@ -4,37 +4,35 @@ require_once('./Initialize.php');
 
 class TestuserObject extends Object {
 	
-	protected function initialize(){
+	protected function onStructureCreate(){
 		return array(
-			'structure' => array(
-				'id' => array(
-					':caption' => 'Id',
-					':public' => true,
-					':validate' => array(
-						'id' => true,
-					),
+			'id' => array(
+				':caption' => 'Id',
+				':public' => true,
+				':validate' => array(
+					'id' => true,
 				),
-				'name' => array(
-					':caption' => 'Username',
-					':public' => true,
-					':validate' => array(
-						'pagetitle' => true,
-						'notempty' => true,
-					),
+			),
+			'name' => array(
+				':caption' => 'Username',
+				':public' => true,
+				':validate' => array(
+					'pagetitle' => true,
+					'notempty' => true,
 				),
-				'job' => array(
-					':caption' => 'Job description',
-					':public' => true,
-					':validate' => array(
-						'sanitize' => true,
-					),
+			),
+			'job' => array(
+				':caption' => 'Job description',
+				':public' => true,
+				':validate' => array(
+					'sanitize' => true,
 				),
-				'time' => array(
-					':public' => true,
-					':default' => time(),
-					':validate' => array(
-						'id' => true,
-					),
+			),
+			'time' => array(
+				':public' => true,
+				':default' => time(),
+				':validate' => array(
+					'id' => true,
 				),
 			),
 		);

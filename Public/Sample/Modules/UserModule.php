@@ -2,7 +2,7 @@
 
 class UserModule extends Module {
 	
-	protected function initialize(){
+	protected function onInitialize(){
 		return array(
 			'defaultEvent' => 'login',
 			
@@ -10,13 +10,16 @@ class UserModule extends Module {
 			'identifier' => array(
 				'external' => 'name',
 			),
-			'structure' => array(
-				'id' => array(),
-				'name' => array(),
-				'pwd' => array(),
-				'session' => array(),
-				'rights' => array(),
-			),
+		);
+	}
+	
+	protected function onStructureCreate(){
+		return array(
+			'id' => array(),
+			'name' => array(),
+			'pwd' => array(),
+			'session' => array(),
+			'rights' => array(),
 		);
 	}
 	

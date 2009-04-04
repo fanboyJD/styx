@@ -2,29 +2,32 @@
 
 class UsermanagementModule extends Module {
 	
-	protected function initialize(){
+	protected function onInitialize(){
 		return array(
 			'table' => 'users',
 			'identifier' => array(
 				'external' => 'name',
 			),
-			'structure' => array(
-				'name' => array(
-					':caption' => Lang::retrieve('user.name'),
-					':public' => true,
-					':validate' => array(
-						'pagetitle' => true,
-						'notempty' => true,
-					),
+		);
+	}
+	
+	protected function onStructureCreate(){
+		return array(
+			'name' => array(
+				':caption' => Lang::retrieve('user.name'),
+				':public' => true,
+				':validate' => array(
+					'pagetitle' => true,
+					'notempty' => true,
 				),
-				'id' => array(),
-				'pwd' => array(
-					':caption' => Lang::retrieve('user.pwd'),
-				),
-				'session' => array(),
-				'rights' => array(
-					':default' => '[]',
-				),
+			),
+			'id' => array(),
+			'pwd' => array(
+				':caption' => Lang::retrieve('user.pwd'),
+			),
+			'session' => array(),
+			'rights' => array(
+				':default' => '[]',
 			),
 		);
 	}

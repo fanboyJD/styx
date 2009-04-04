@@ -2,22 +2,20 @@
 
 abstract class DatabaseObject extends Object {
 	
-	protected $table;
-	
 	public function __construct($data = null, $new = true){
 		parent::__construct($data, $new);
 		
-		$this->table = !empty($this->options['table']) ? $this->options['table'] : strtolower($this->name);
+		if(empty($this->options['table'])) $this->options['table'] = strtolower($this->name);
 	}
 	
 	public function setTable($table){
-		$this->table = $table;
+		$this->options['table'] = $table;
 		
 		return $this;
 	}
 	
 	public function getTable(){
-		return $this->table;
+		return $this->options['table'];
 	}
 	
 	public function save(){
@@ -26,9 +24,9 @@ abstract class DatabaseObject extends Object {
 		$identifier = $this->options['identifier']['internal'];
 		
 		if($this->new || empty($this->Data[$identifier])){
-			$query = Database::insert($this->table);
+			$query = Database::insert($this->options['table']);
 		}else{
-			$query = Database::update($this->table)->where(array($identifier => $this->Data[$identifier]));
+			$query = Database::update($this->options['table'])->where(array($identifier => $this->Data[$identifier]));
 			unset($this->Changed[$identifier]);
 		}
 		
@@ -49,7 +47,7 @@ abstract class DatabaseObject extends Object {
 	public function delete(){
 		if($this->new) return parent::delete();
 		
-		$query = Database::delete($this->table);
+		$query = Database::delete($this->options['table']);
 		$identifier = $this->options['identifier']['internal'];
 		
 		if(count($this->criteria))
@@ -65,7 +63,7 @@ abstract class DatabaseObject extends Object {
 	}
 	
 	public function getPagetitle($title, $options = array()){
-		$contents = Database::select($this->table)
+		$contents = Database::select($this->options['table'])
 			->where($this->options['identifier']['external']." LIKE '".Data::pagetitle($title)."%'")
 			->fields(array_unique(array_values($this->options['identifier'])))
 			->retrieve();

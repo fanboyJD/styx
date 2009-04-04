@@ -235,8 +235,9 @@ class Core {
 	protected static function getClassList($folder, $path = 'app.path'){
 		$files = array();
 		
-		foreach(new ExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator(self::$Storage[$path].'/'.$folder))) as $file)
-			$files[strtolower(basename($file->getFileName(), '.php'))] = $file->getRealPath();
+		if(is_dir($folder = self::$Storage[$path].'/'.$folder))
+			foreach(new ExtensionFilter(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($folder))) as $file)
+				$files[strtolower(basename($file->getFileName(), '.php'))] = $file->getRealPath();
 		
 		return $files;
 	}

@@ -4,16 +4,19 @@ class ModulePrototype {
 	
 	protected $Model;
 	
+	protected $structure;
+	
 	protected $options = array(
+		/* Names */
+		/*'model' => null,
+		'object' => null,*/
+		
 		/* Model / Object Options */
 		/*'table' => null,*/
 		'identifier' => null,
-		'structure' => null,
-		'objectname' => null,
 		'cache' => true,
 		
 		/* Layer Options */
-		/*'modelname' => null,*/
 		'rebound' => true,
 		'defaultEvent' => 'view',
 		'defaultEditEvent' => 'edit',
@@ -23,8 +26,8 @@ class ModulePrototype {
 	/**
 	 * @return Module
 	 */
-	public static function create($module){
-		return Core::classExists($module .= 'module') ? new $module : false;
+	public static function create($name){
+		return Core::classExists($module = $name.'module') ? new $module($name) : false;
 	}
 	
 	/**
@@ -36,35 +39,39 @@ class ModulePrototype {
 		return empty($Instances[$module = strtolower($module)]) ? $Instances[$module] = Module::create($module) : $Instances[$module];
 	}
 	
-	protected function __construct(){
-		$this->name = ucfirst(substr(get_class($this), 0, -6));
+	protected function __construct($name){
+		$this->name = ucfirst($name);
 		
-		$initialize = $this->initialize();
-		if(is_array($initialize)) Hash::extend($this->options, $initialize);
+		Hash::extend($this->options, pick($this->onInitialize(), array()));
 		
 		$this->options['identifier'] = Core::getIdentifier($this->options['identifier']);
-		
-		$this->objectname = !empty($this->options['object']) ? $this->options['object'] : strtolower($this->name);
-		$this->modelname = isset($this->options['model']) ? $this->options['model'] : strtolower($this->name);
-		unset($this->options['model'], $this->options['object']);
+		if(empty($this->options['object'])) $this->options['object'] = strtolower($this->name);
+		if(!isset($this->options['model'])) $this->options['model'] = strtolower($this->name);
+	}
+	
+	protected function onInitialize(){}
+	protected function onStructureCreate(){}
+	
+	public function getName($class){
+		switch(strtolower($class)){
+			case 'object': return $this->options['object'];
+			case 'model': return $this->options['model'];
+			default: return $this->name;
+		};
 	}
 	
 	public function getOptions(){
 		return $this->options;
 	}
 	
-	public function getName($class){
-		switch(strtolower($class)){
-			case 'object': return $this->objectname;
-			case 'model': return $this->modelname;
-			default: return $this->name;
-		};
+	public function getStructure(){
+		return $this->structure ? $this->structure : $this->structure = pick($this->onStructureCreate(), array());
 	}
 	
 	public function getModel(){
-		if(!$this->modelname) return null;
+		if(empty($this->options['model'])) return null;
 		
-		return $this->Model ? $this->Model : $this->Model = Model::create($this->modelname);
+		return $this->Model ? $this->Model : $this->Model = Model::create($this->options['model']);
 	}
 	
 }

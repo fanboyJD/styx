@@ -7,6 +7,7 @@ abstract class ObjectPrototype implements Iterator, ArrayAccess, Countable {
 	protected $Garbage = array();
 	protected $Form;
 	protected $Module;
+	
 	protected $name;
 	protected $structure;
 	protected $criteria = array();
@@ -20,10 +21,11 @@ abstract class ObjectPrototype implements Iterator, ArrayAccess, Countable {
 		$this->new = !!$new;
 		
 		$this->Module = Module::retrieve($this->getModuleName());
-		$this->options = $this->Module->getOptions();
+		if($this->Module) $this->options = $this->Module->getOptions();
+		Hash::extend($this->options, pick($this->onInitialize(), array()));
 		
-		if(isset($this->options['structure'])){
-			$this->structure = $this->options['structure'];
+		$this->structure = $this->Module ? $this->Module->getStructure() : pick($this->onStructureCreate(), array());
+		if(count($this->structure)){
 			$this->clear();
 			if($this->new)
 				foreach($this->structure as $key => $value){
@@ -52,7 +54,9 @@ abstract class ObjectPrototype implements Iterator, ArrayAccess, Countable {
 	protected function getModuleName(){
 		return $this->name;
 	}
-	
+
+	protected function onInitialize(){}
+	protected function onStructureCreate(){}
 	protected function onSave($data){ return $data; }
 	protected function onInsert($data){ return $data; }
 	protected function onDelete(){}
