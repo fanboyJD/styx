@@ -1,7 +1,19 @@
 <?php
+class PasswordModule extends Module {
+	
+	protected function onInitialize(){
+		return array(
+			'model' => null,
+			'defaultEvent' => 'edit',
+		);
+	}
+	
+}
+
 class PasswordLayer extends Layer {
 	
 	protected $Form;
+	
 	protected function initialize(){
 		$this->Form = new FormElement(array(
 			':elements' => array(
@@ -20,10 +32,6 @@ class PasswordLayer extends Layer {
 				)),
 			)
 		));
-		
-		return array(
-			'defaultEvent' => 'edit',
-		);
 	}
 	
 	public function onSave(){

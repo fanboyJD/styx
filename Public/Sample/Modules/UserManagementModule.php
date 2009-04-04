@@ -1,6 +1,6 @@
 <?php
 
-class UsermanagementModule extends Module {
+class UserManagementModule extends Module {
 	
 	protected function onInitialize(){
 		return array(

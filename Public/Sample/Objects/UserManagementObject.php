@@ -1,6 +1,6 @@
 <?php
 
-class UsermanagementObject extends DatabaseObject {
+class UserManagementObject extends DatabaseObject {
 	
 	protected function onFormCreate(){
 		$this->Form->addElements(

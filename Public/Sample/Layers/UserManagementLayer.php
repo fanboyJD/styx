@@ -1,5 +1,5 @@
 <?php
-class UsermanagementLayer extends Layer {
+class UserManagementLayer extends Layer {
 	
 	protected function initialize(){
 		$this->base = 'admin/user';

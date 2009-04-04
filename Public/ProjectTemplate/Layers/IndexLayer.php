@@ -1,10 +1,8 @@
 <?php
 class IndexLayer extends Layer {
 	
-	protected function initialize(){
-		return array(
-			'model' => 'news',
-		);
+	protected function getModuleName(){
+		return 'news';
 	}
 	
 	public function onSave($title){

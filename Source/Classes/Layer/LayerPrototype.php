@@ -75,6 +75,8 @@ abstract class LayerPrototype extends Runner {
 		$this->Module = Module::retrieve($this->getModuleName());
 		$this->Model = $this->Module->getModel();
 		$this->options = $this->Module->getOptions();
+		
+		$this->initialize();
 	}
 	
 	protected function getModuleName(){
