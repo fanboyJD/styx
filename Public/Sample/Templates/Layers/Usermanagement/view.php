@@ -5,7 +5,7 @@ echo '<a class="go icon" href="'.$this->link(null, 'edit').'">'.Lang::retrieve('
 $edit = Lang::retrieve('edit');
 $delete = Lang::retrieve('delete');
 $confirmdelete = Lang::retrieve('user.confirmdelete');
-$session = Core::generateSessionName($this->Model->getObjectname());
+$session = Core::generateSessionName($this->Module->getName('object'));
 
 foreach($this->Model as $user)
 	echo '<div class="anchor">

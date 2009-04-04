@@ -1,6 +1,6 @@
 <?php
 
-class NewsModule extends Module {
+class PageModule extends Module {
 	
 	protected function initialize(){
 		return array(
@@ -25,10 +25,7 @@ class NewsModule extends Module {
 					),
 				),
 				'id' => array(),
-				'uid' => array(),
 				'pagetitle' => array(),
-				'time' => array(),
-				'picture' => array(),
 			),
 		);
 	}

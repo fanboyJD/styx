@@ -5,11 +5,10 @@ class LoginLayer extends Layer {
 	
 	protected function initialize(){
 		$this->setReboundEvent('handle', 'login');
-		
-		return array(
-			'model' => 'user',
-			'defaultEvent' => 'login',
-		);
+	}
+	
+	protected function getModuleName(){
+		return 'user';
 	}
 	
 	protected function access(){

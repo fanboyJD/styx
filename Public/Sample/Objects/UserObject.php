@@ -2,22 +2,6 @@
 
 class UserObject extends DatabaseObject {
 	
-	protected function initialize(){
-		return array(
-			'table' => 'users',
-			'identifier' => array(
-				'external' => 'name',
-			),
-			'structure' => array(
-				'id' => array(),
-				'name' => array(),
-				'pwd' => array(),
-				'session' => array(),
-				'rights' => array(),
-			),
-		);
-	}
-	
 	protected function onInsert($data){
 		throw new ValidatorException('data');
 	}

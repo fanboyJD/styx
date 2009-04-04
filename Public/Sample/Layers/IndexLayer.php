@@ -3,10 +3,8 @@ class IndexLayer extends Layer {
 	
 	public $isIndex = false;
 	
-	protected function initialize(){
-		return array(
-			'model' => 'news',
-		);
+	protected function getModuleName(){
+		return 'news';
 	}
 	
 	public function onSave($title){

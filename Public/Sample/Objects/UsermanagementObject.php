@@ -2,33 +2,6 @@
 
 class UsermanagementObject extends DatabaseObject {
 	
-	protected function initialize(){
-		return array(
-			'table' => 'users',
-			'identifier' => array(
-				'external' => 'name',
-			),
-			'structure' => array(
-				'name' => array(
-					':caption' => Lang::retrieve('user.name'),
-					':public' => true,
-					':validate' => array(
-						'pagetitle' => true,
-						'notempty' => true,
-					),
-				),
-				'id' => array(),
-				'pwd' => array(
-					':caption' => Lang::retrieve('user.pwd'),
-				),
-				'session' => array(),
-				'rights' => array(
-					':default' => '[]',
-				),
-			),
-		);
-	}
-	
 	protected function onFormCreate(){
 		$this->Form->addElements(
 			new InputElement(array(

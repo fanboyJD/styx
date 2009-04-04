@@ -5,7 +5,7 @@
 	
 	$edit = User::hasRight('layer.index.edit.modify');
 	$delete = User::hasRight('layer.index.delete');
-	if($delete) $session = Core::generateSessionName($this->Model->getObjectname());
+	if($delete) $session = Core::generateSessionName($this->Module->getName('object'));
 	foreach($this->Model as $k => $n){
 		echo '<div'.($k ? ' style="margin-top: 20px;"' : '').'>';
 		
@@ -15,7 +15,7 @@
 		echo '<h1>'.$n['title'].'</h1>
 				<div>'.($n['picture'] ? '<img src="'.$n['picture'].'" class="articleimg" alt="" />' : '').$n['content'].'</div>
 				<div style="float: right; padding-top: 5px;">
-					<small><i>'.Lang::get('news.posted', $n['name'], date('d.m.Y - H:i', $n['time'])).'</i></small>
+					<small><i>'.Lang::get('news.posted', $n->getUsername(), date('d.m.Y - H:i', $n['time'])).'</i></small>
 				</div>
 				<div class="clear"></div>
 			</div>';
