@@ -28,12 +28,20 @@ namespace page {
 
 # The namespace for the framework :)
 namespace framework {
-	description = '<span class="blue">Styx</span> is a PHP-Framework currently in development.
+	description = '
+		The <span class="blue">Styx PHP Framework</span> is a highly modular, fast and flexible PHP Framework with a coherent API.
 		<br/><br/>
-		You can view the source by cloning the git-repository<br/>
-			<span class="blue icon">git clone git://og5.net/styx.git</span>
+		<span class="blue">GitHub:</span> <a href="http://github.com/zilenCe/styx/tree">http://github.com/zilenCe/styx/tree</a><br/>
+		<span class="blue">Ohloh:</span> <a href="https://www.ohloh.net/p/Styx">https://www.ohloh.net/p/Styx</a>
 		<br/><br/>
-		If you want to help or work on it please contact me: <a href="http://og5.net/christoph/page/About">Contact-Info</a>
+		If you want to help and work on Styx feel free to fork the project on GitHub.
+		<br/><br/>
+		Styx is designed for the intermediate to advanced Web Developer with experience in PHP and other web technologies. Note: the current
+		version <span class="blue">({version})</span> is in beta and, as such, you may encounter bugs and incompatibilities.
+		Report your findings: <a href="http://og5.net/christoph/page/About">Contact-Info</a>
+		<br/><br/>
+		There are documentation and guides to get started:
+		<a href="/docs">Documentation &amp; Guides</a>
 	';
 }
 

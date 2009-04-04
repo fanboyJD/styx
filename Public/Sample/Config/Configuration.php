@@ -5,7 +5,7 @@ $CONFIGURATION['debug'] = array(
 	'app.name' => 'Styx PHP Framework',
 	'app.link' => 'http://localhost/Styx/Public/Sample/Public',
 	'app.mail' => 'christoph.pojer@gmail.com',
-	'app.version' => '0.3beta',
+	'app.version' => '0.3.1beta',
 	
 	'debug' => true, // When debug is set to true no cache is used etc.
 	'database.cache' => false,	

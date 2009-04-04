@@ -38,7 +38,7 @@
 				
 				'scripts' => Script::get(),
 				
-				'framework.description' => Layer::retrieve('index')->isIndex ? '<div id="content">'.Lang::retrieve('framework.description').'</div>' : '',
+				'framework.description' => Layer::retrieve('index')->isIndex ? '<div id="content">'.str_replace('{version}', Core::retrieve('styx.version'), Lang::retrieve('framework.description')).'</div>' : '',
 				
 				'languages' => implode($languages),
 				
