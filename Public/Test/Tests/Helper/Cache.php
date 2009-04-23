@@ -1,5 +1,4 @@
 <?php
-
 chdir('..');
 
 $Helper = true;

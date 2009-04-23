@@ -8,7 +8,7 @@ class Suite extends TestSuite {
 		$this->TestSuite('Suite');
 		
 		foreach(glob('./*.php') as $file)
-			if(!in_array(basename($file), array('Initialize.php', 'Suite.php', 'StyxReporter.php', 'StyxUnitTest.php')))
+			if(!in_array(basename($file), array('Initialize.php', 'Suite.php', 'StyxReporter.php', 'StyxUnitTest.php', 'StyxBrowser.php')))
 				$this->addFile($file);
 	}
 	

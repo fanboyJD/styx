@@ -76,25 +76,18 @@ class CacheTest extends StyxUnitTest {
 	}
 	
 	public function testTime(){
-		$link = rtrim(Request::getUrl(), '/').'/';
 		// This sets the cache for 1 second
-		$b = new SimpleBrowser();
-		$b->get($link.'Helper/Cache.php');
-		
+		$b = new StyxBrowser();
+		$b->get($this->getTestURL().'Helper/Cache.php');
 		sleep(1);
 		
 		// If the cache is not empty it should output "1"
-		$b = new SimpleBrowser();
-		$b->get($link.'Helper/Cache.php?check=true');
-		
+		$b->get($this->getTestURL().'Helper/Cache.php?check=true');
 		$this->assertEqual($b->getContent(), 1);
-		
 		sleep(2);
 		
 		// If the cache is empty it should output "0"
-		$b = new SimpleBrowser();
-		$b->get($link.'Helper/Cache.php?check=true');
-		
+		$b->get($this->getTestURL().'Helper/Cache.php?check=true');
 		$this->assertEqual($b->getContent(), 0);
 	}
 	

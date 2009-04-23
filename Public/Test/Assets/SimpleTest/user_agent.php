@@ -212,7 +212,7 @@ class SimpleUserAgent {
      *    @access public
      */
     function fetchResponse($url, $encoding) {
-        if ($encoding->getMethod() != 'POST') {
+        if (!in_array($encoding->getMethod(), array('POST', 'PUT'))) {
             $url->addRequestParameters($encoding);
             $encoding->clear();
         }
