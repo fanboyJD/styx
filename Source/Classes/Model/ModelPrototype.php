@@ -77,21 +77,20 @@ abstract class ModelPrototype implements Iterator, Countable {
 	}
 	
 	public function make($array){
-		if(!$array) return false;
+		$objects = $this->makeMany(array($array));
 		
-		$this->Collection = array(new $this->objectname($array, false));
-		return reset($this->Collection);
+		return count($objects) ? $objects[0] : null;
 	}
 	
 	public function makeMany($list){
 		$this->Collection = array();
-		if(!count($list)) return false;
+		if(!count($list)) return;
 		
 		foreach($list as $obj)
-			if(is_array($obj) || is_object($obj))
-				$this->Collection[] = new $this->objectname($obj, false);
+			if(is_array($obj)) $this->Collection[] = new $this->objectname($obj, false);
+			elseif(is_object($obj)) $this->Collection[] = $obj instanceof $this->objectname ? $obj : new $this->objectname($obj, false);
 		
-		return count($this->Collection) ? $this->Collection : false;
+		return count($this->Collection) ? $this->Collection : null;
 	}
 	
 	public function rewind(){
