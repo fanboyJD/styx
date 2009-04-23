@@ -48,7 +48,7 @@ class Application {
 		));
 		
 		Route::connect('admin/user/event', array(
-			'layer' => 'Usermanagement',
+			'layer' => 'UserManagement',
 			'match' => array(
 				'event' => array(
 					'omit' => true,

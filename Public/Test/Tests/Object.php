@@ -119,7 +119,7 @@ class ObjectTest extends StyxUnitTest {
 	}
 	
 	public function testUserObject(){
-		$user = new UsermanagementObject();
+		$user = new UserManagementObject();
 		
 		$this->assertEqual($user['rights'], '[]');
 		$user->clear();

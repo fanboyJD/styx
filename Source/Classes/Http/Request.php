@@ -133,6 +133,7 @@ final class Request {
 			}else{
 				$client = array(
 					'browser' => 'compatible',
+					'version' => null,
 				);
 			}
 		}

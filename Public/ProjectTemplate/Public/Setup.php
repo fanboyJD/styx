@@ -51,7 +51,7 @@ class Setup {
 		'password' => 'After changing the "secure"-String in your Configuration you have to reset your password. Note that you should
 			not change the "secure"-String at any time as it would invalidate all passwords. Please never expose this string and keep it private.
 			After a successful change of the password please try to login with the used password and the username "admin". You can change the username
-			at any time right in the database. For a little UsermanagementLayer see the Sample Application.
+			at any time right in the database. For a little UserManagementLayer see the Sample Application.
 		',
 		
 		'mbstring' => 'Notice: The mbstring PHP-Extension was not found or was manually disabled. It is recommended to enable it if you are creating
