@@ -21,11 +21,18 @@ final class Request {
 	}
 	
 	public static function parse(){
-		foreach(array('post', 'cookie') as $v)
-			self::store($v, self::sanitize($GLOBALS['_'.String::toUpper($v)]));
+		$collection = array('cookie' => $_COOKIE, 'put' => null);
+		$method = self::retrieve('method');
+		if($method=='post') $collection['post'] = $_POST;
+		elseif($method=='put') parse_str(file_get_contents('php://input'), $collection['put']);
+		
+		foreach($collection as $k => $v)
+			if(count($v)) $collection[$k] = self::sanitize($v);
+			else unset($collection[$k]);
+		
+		self::store($collection);
 		
 		$request = self::processRequest();
-		
 		if(!empty($request['language']) && Core::retrieve('languages.cookie'))
 			Response::setCookie(Core::retrieve('languages.cookie'), $request['language']);
 		
