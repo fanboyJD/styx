@@ -3,7 +3,7 @@
  *  base include file for SimpleTest
  *  @package    SimpleTest
  *  @subpackage WebTester
- *  @version    $Id: encoding.php 1784 2008-04-26 13:07:14Z pp11 $
+ *  @version    $Id$
  */
     
 /**#@+
@@ -521,7 +521,7 @@ class SimpleMultipartEncoding extends SimplePostEncoding {
      */
     function writeHeadersTo(&$socket) {
         $socket->write("Content-Length: " . (integer)strlen($this->encode()) . "\r\n");
-        $socket->write("Content-Type: multipart/form-data, boundary=" . $this->boundary . "\r\n");
+        $socket->write("Content-Type: multipart/form-data; boundary=" . $this->boundary . "\r\n");
     }
     
     /**

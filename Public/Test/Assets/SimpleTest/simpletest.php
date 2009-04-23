@@ -3,7 +3,7 @@
  *  Global state for SimpleTest and kicker script in future versions.
  *  @package    SimpleTest
  *  @subpackage UnitTester
- *  @version    $Id: simpletest.php 1786 2008-04-26 17:32:20Z pp11 $
+ *  @version    $Id$
  */
 
 /**#@+

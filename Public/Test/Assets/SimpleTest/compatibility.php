@@ -2,7 +2,7 @@
 /**
  *  base include file for SimpleTest
  *  @package    SimpleTest
- *  @version    $Id: compatibility.php 1747 2008-04-13 18:26:47Z pp11 $
+ *  @version    $Id$
  */
 
 /**
