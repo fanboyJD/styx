@@ -1,7 +1,6 @@
 <?php
 	$use = 'debug';
 	if($use=='production'){
-		// Don't forget to adjust the Database-Settings :)
 		$Paths = array(
 			'app.path' => '/var/wusch/Sample/',
 			'app.public' => realpath('./'),

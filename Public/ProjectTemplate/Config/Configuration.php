@@ -16,7 +16,7 @@ $CONFIGURATION['debug'] = array(
 		'host' => 'localhost',
 		'user' => 'root',
 		'password' => '',
-		'db' => 'application'
+		'db' => 'application',
 	),
 	
 	'secure' => '-insecure-', // This should be a safe, unique key for your application that shouldn't be exposed as it is used for additional security
@@ -36,7 +36,7 @@ $CONFIGURATION['production'] = array_merge($CONFIGURATION['debug'], array(
 		'host' => 'localhost',
 		'user' => 'myusername',
 		'password' => 'mypassword',
-		'db' => 'application'
+		'db' => 'application',
 	),
 	
 ));

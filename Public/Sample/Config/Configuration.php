@@ -20,7 +20,7 @@ $CONFIGURATION['debug'] = array(
 		'host' => 'localhost',
 		'user' => 'root',
 		'password' => '',
-		'db' => 'framework'
+		'db' => 'framework',
 	),
 	
 	'secure' => '32lms/(d902_3-k2"§$jsd', // This should be a safe, unique key for your application that shouldn't be exposed as it is used for additional security
@@ -41,7 +41,7 @@ $CONFIGURATION['production'] = array_merge($CONFIGURATION['debug'], array(
 		'host' => 'localhost',
 		'user' => 'wusch',
 		'password' => 'DBPASS',
-		'db' => 'wusch_framework'
+		'db' => 'wusch_framework',
 	),
 	
 ));
