@@ -6,8 +6,6 @@ class Application {
 		User::handle(); // Automatically sign-on the user if login data is provided
 		
 		Script::set('
-			if(!window.console) window.console = console = {log: $empty};
-			
 			var Config = '.json_encode(array(
 				'link' => Core::retrieve('app.link'),
 				'separator' => Core::retrieve('path.separator'),
@@ -31,7 +29,7 @@ class Application {
 		*/
 		PackageManager::add('ie.js', array(
 			'type' => 'js',
-			'files' => 'belatedPNG',
+			'files' => array('belatedPNG'),
 			'require' => array(
 				'browser' => 'ie',
 				'version' => 6

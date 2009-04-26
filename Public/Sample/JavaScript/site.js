@@ -1,3 +1,5 @@
+if(!window.console) window.console = console = {log: $empty};
+
 if(Browser.Engine.trident4)
 	DD_belatedPNG.fix('div#content, a#logo, div#menuleft, div#footer, .go, .hicon img');
 

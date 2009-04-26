@@ -252,7 +252,7 @@ class PackageManager {
 			if(!empty($require['login']) && !User::retrieve())
 				return false;
 			
-			if(!empty($require['browser']) && ($require['browser']!=$client['browser'] || (!$require['version'] || !in_array($client['version'], Hash::splat($require['version'])))))
+			if(!empty($require['browser']) && ($require['browser']!=$client['browser'] || (!empty($require['version']) && !in_array($client['version'], Hash::splat($require['version'])))))
 				return false;
 		}
 		
