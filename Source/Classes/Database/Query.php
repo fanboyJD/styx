@@ -43,6 +43,7 @@ class Query {
 		if(is_scalar($data))
 			return $data;
 		
+		$out = array();
 		foreach($data as $k => $v)
 			$out[] = $k.'='.($v!==null ? "'".addslashes(is_scalar($v) ? $v : (count($v[1]) ? Data::call($v[0], $v[1]) : $v[0]))."'" : 'NULL');
 		
@@ -64,6 +65,7 @@ class Query {
 		elseif(!$deep && !$data)
 			return '';
 		
+		$out = array();
 		foreach($data as $k => $v){
 			if(!ctype_digit((string)$k))
 				$out[] = $k.'='.($v!==null ? "'".addslashes(is_scalar($v) ? $v : (count($v[1]) ? Data::call($v[0], $v[1]) : $v[0]))."'" : 'NULL');

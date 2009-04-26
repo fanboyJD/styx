@@ -18,7 +18,7 @@ class PageLayer extends Layer {
 		
 		if(!$object) throw new ValidatorException('onlyedit');
 		
-		if(!User::hasRight('layer.index.edit')) throw new ValidatorException('rights');
+		if(!User::hasRight('layer.page.edit')) throw new ValidatorException('rights');
 		
 		$form = $object->requireSession()->getForm()->set('action', $this->link($object->getIdentifier(), 'save'));
 		if($this->isRebound()) $form->setRaw($this->post);
