@@ -466,7 +466,7 @@ class CheckboxElement extends Element {
 	
 }
 
-class TextareaElement extends Element {
+class TextAreaElement extends Element {
 	
 	public function __construct($options){
 		foreach(array('cols', 'rows') as $v)
@@ -488,6 +488,7 @@ class RichTextElement extends TextareaElement {
 	public function __construct($options){
 		parent::__construct($options);
 		
+		$this->type = 'textarea';
 		$this->addClass('richtext');
 	}
 	
