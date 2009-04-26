@@ -73,8 +73,10 @@ abstract class LayerPrototype extends Runner {
 		$this->methods = Core::getMethods($this->layername.'layer');
 		
 		$this->Module = Module::retrieve($this->getModuleName());
-		$this->Model = $this->Module->getModel();
-		$this->options = $this->Module->getOptions();
+		if($this->Module){
+			$this->Model = $this->Module->getModel();
+			$this->options = $this->Module->getOptions();
+		}
 		
 		$this->initialize();
 	}

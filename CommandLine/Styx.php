@@ -163,7 +163,7 @@ class StyxCommandLine {
 			$code .= $indent."\t'".$key."' => ".$codeValue.",";
 		}
 		
-		return $code.$indent.")".$options['end'];
+		return $code.$indent.')'.$options['end'];
 	}
 	
 	protected function unlink($file){
