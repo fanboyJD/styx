@@ -5,6 +5,7 @@ abstract class ObjectPrototype implements Iterator, ArrayAccess, Countable {
 	protected $Data = array();
 	protected $Changed = array();
 	protected $Garbage = array();
+	protected $Raw = array();
 	protected $Form;
 	protected $Module;
 	
@@ -39,8 +40,8 @@ abstract class ObjectPrototype implements Iterator, ArrayAccess, Countable {
 			// If it is loaded from a datasource it should not care about the :public modifier
 			if($this->structure && !$this->new){
 				foreach($this->structure as $key => $value)
-					if(!empty($data[$key])){
-						$this->Data[$key] = $data[$key];
+					if(isset($data[$key])){
+						$this->Data[$key] = $this->Raw[$key] = $data[$key];
 						unset($data[$key]);
 					}
 				
@@ -60,6 +61,7 @@ abstract class ObjectPrototype implements Iterator, ArrayAccess, Countable {
 	protected function onSave($data){ return $data; }
 	protected function onInsert($data){ return $data; }
 	protected function onDelete(){}
+	protected function onSaveComplete(){}
 	protected function onFormCreate(){}
 	
 	public function setCriteria($criteria){
@@ -100,6 +102,7 @@ abstract class ObjectPrototype implements Iterator, ArrayAccess, Countable {
 		
 		$this->Changed = Hash::remove($this->onSave($this->new ? $this->onInsert($this->Changed) : $this->Changed), null);
 		Hash::extend($this->Data, $this->Changed);
+		$this->onSaveComplete();
 		$this->cleanup();
 		
 		return true;

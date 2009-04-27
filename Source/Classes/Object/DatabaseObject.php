@@ -39,6 +39,7 @@ abstract class DatabaseObject extends Object {
 		if($this->new && empty($this->Data[$identifier]))
 			$this->Data[$identifier] = Database::getInsertId();
 		
+		$this->onSaveComplete();
 		$this->cleanup();
 		
 		return true;
