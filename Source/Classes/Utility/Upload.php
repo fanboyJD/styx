@@ -43,7 +43,10 @@ class Upload {
 			throw new UploadException('extension');
 		
 		if(Hash::length($default['mimes'])){
-			$mime = self::mime($file['tmp_name'], $file['type']);
+			$mime = self::mime($file['tmp_name'], array(
+				'default' => $file['type'],
+				'extension' => $pathinfo['extension'],
+			));
 			
 			if(!$mime || !in_array($mime, $default['mimes']))
 				throw new UploadException('extension');
@@ -55,8 +58,7 @@ class Upload {
 		$real = realpath($to);
 		if(!$real) throw new UploadException('path');
 		
-		if(is_dir($real))
-			$to = $real.'/'.pick($default['name'], $file['base']).'.'.$file['ext'];
+		if(is_dir($real)) $to = $real.'/'.pick($default['name'], $file['base']).'.'.$file['ext'];
 		
 		if(!$default['overwrite'] && file_exists($to))
 			throw new UploadException('exists');
@@ -83,11 +85,14 @@ class Upload {
 	 * Returns (if possible) the mimetype of the given file
 	 *
 	 * @param string $file
-	 * @param sring $default The default mimetype to return if none is found. If application/octet-stream is passed it tries to guess the mimetype (Flash-Upload maybe?)
+	 * @param array $options
 	 */
-	public function mime($file, $default = null){
+	public function mime($file, $options = array()){
 		$file = realpath($file);
-		$ext = String::toLower(pathinfo($file, PATHINFO_EXTENSION));
+		$options = array_merge(array(
+			'default' => null,
+			'extension' => strtolower(pathinfo($file, PATHINFO_EXTENSION)),
+		), $options);
 		
 		$mime = null;
 		if(function_exists('finfo_open') && $f = finfo_open(FILEINFO_MIME, getenv('MAGIC'))){
@@ -95,19 +100,19 @@ class Upload {
 			finfo_close($f);
 		}
 		
-		if(!$mime && in_array($ext, array('gif', 'jpg', 'jpeg', 'png'))){
+		if(!$mime && in_array($options['extension'], array('gif', 'jpg', 'jpeg', 'png'))){
 			$image = getimagesize($file);
 			if(!empty($image['mime']))
 				$mime = $image['mime'];
 		}
 		
-		if(!$mime && $default) $mime = $default;
+		if(!$mime && $options['default']) $mime = $options['default'];
 		
-		if((!$mime || $mime=='application/octet-stream') && $ext){
+		if((!$mime || $mime=='application/octet-stream') && $options['extension']){
 			static $mimes;
 			if(!$mimes) $mimes = parse_ini_file(Core::retrieve('path').'Config/MimeTypes.ini');
 			
-			if(!empty($mimes[$ext])) return $mimes[$ext];
+			if(!empty($mimes[$options['extension']])) return $mimes[$options['extension']];
 		}
 		
 		return $mime;
