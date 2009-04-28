@@ -25,6 +25,7 @@ class Upload {
 		
 		$default = array(
 			'name' => null,
+			'extension' => null,
 			'size' => null,
 			'chmod' => 0777,
 			'overwrite' => false,
@@ -39,6 +40,7 @@ class Upload {
 			throw new UploadException('size');
 		
 		$pathinfo = pathinfo($file['name']);
+		if($options['extension']) $pathinfo['extension'] = $options['extension'];
 		if(!$pathinfo['extension'])
 			throw new UploadException('extension');
 		
