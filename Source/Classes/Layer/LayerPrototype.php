@@ -54,8 +54,8 @@ abstract class LayerPrototype extends Runner {
 	/**
 	 * @return Layer
 	 */
-	public static function create($name){
-		return Core::classExists($layer = $name.'layer') ? new $layer($name) : false;
+	public static function create($name, $single = false){
+		return Core::classExists($layer = $name.'layer') ? new $layer($name, $single) : false;
 	}
 	
 	/**
@@ -64,15 +64,15 @@ abstract class LayerPrototype extends Runner {
 	public static function retrieve($layer){
 		static $Instances;
 		
-		return empty($Instances[$layer = strtolower($layer)]) ? $Instances[$layer] = Layer::create($layer) : $Instances[$layer];
+		return empty($Instances[$layer = strtolower($layer)]) ? $Instances[$layer] = Layer::create($layer, true) : $Instances[$layer];
 	}
 	
-	protected function __construct($name){
+	protected function __construct($name, $single = false){
 		$this->base = $this->name = ucfirst($name);
 		$this->layername = strtolower($this->name);
 		$this->methods = Core::getMethods($this->layername.'layer');
 		
-		$this->Module = Module::retrieve($this->getModuleName());
+		$this->Module = $single ? Module::create($this->getModuleName()) : Module::retrieve($this->getModuleName());
 		if($this->Module){
 			$this->Model = $this->Module->getModel();
 			$this->options = $this->Module->getOptions();

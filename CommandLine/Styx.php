@@ -15,6 +15,7 @@ class StyxCommandLine {
 		'identifier.internal' => null,
 		'identifier.external' => null,
 		'identifier' => null,
+		'base' => 'Database',
 	);
 	protected $commands = array();
 	protected $mainCommand = null;
@@ -66,9 +67,9 @@ class StyxCommandLine {
 		
 		foreach(array(
 			$this->ProjectPath.'/Layers/'.$module.'Layer.php' => $this->createFileCode($module.'Layer', array('extends' => 'Layer')),
-			$this->ProjectPath.'/Models/'.$module.'Model.php' => $this->createFileCode($module.'Model', array('extends' => 'Model')),
+			$this->ProjectPath.'/Models/'.$module.'Model.php' => $this->createFileCode($module.'Model', array('extends' => ucfirst($this->options['base']).'Model')),
 			$this->ProjectPath.'/Modules/'.$module.'Module.php' => $this->createFileCode($module.'Module', array('extends' => 'Module', 'body' => $moduleBody)),
-			$this->ProjectPath.'/Objects/'.$module.'Object.php' => $this->createFileCode($module.'Object', array('extends' => 'Object')),
+			$this->ProjectPath.'/Objects/'.$module.'Object.php' => $this->createFileCode($module.'Object', array('extends' => ucfirst($this->options['base']).'Object')),
 		) as $file => $content){
 			touch($file);
 			file_put_contents($file, $content);
